@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_runner/src/services/tart/tart_service.dart';
+import 'package:runner/src/services/tart/tart_service.dart';
 
 class VMController {
   VMController(this.workingVMName, this._tartService);

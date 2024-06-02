@@ -2,25 +2,25 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:cli_completion/cli_completion.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_runner/src/commands/commands.dart';
-import 'package:openci_runner/src/features/runner/runner_command.dart';
-import 'package:openci_runner/src/version.dart';
+import 'package:runner/src/commands/commands.dart';
+import 'package:runner/src/features/runner/runner_command.dart';
+import 'package:runner/src/version.dart';
 import 'package:pub_updater/pub_updater.dart';
 
-const executableName = 'openci_runner';
-const packageName = 'openci_runner';
+const executableName = 'runner';
+const packageName = 'runner';
 const description = 'Open CI VM runner';
 
-/// {@template openci_runner_command_runner}
+/// {@template runner_command_runner}
 /// A [CommandRunner] for the CLI.
 ///
 /// ```
-/// $ openci_runner --version
+/// $ runner --version
 /// ```
 /// {@endtemplate}
-class OpenciRunnerCommandRunner extends CompletionCommandRunner<int> {
-  /// {@macro openci_runner_command_runner}
-  OpenciRunnerCommandRunner({
+class RunnerCommandRunner extends CompletionCommandRunner<int> {
+  /// {@macro runner_command_runner}
+  RunnerCommandRunner({
     Logger? logger,
     PubUpdater? pubUpdater,
   })  : _logger = logger ?? Logger(),

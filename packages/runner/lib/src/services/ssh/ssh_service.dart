@@ -4,10 +4,10 @@ import 'dart:typed_data';
 
 import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_runner/src/services/build_job/build_utility_service.dart';
-import 'package:openci_runner/src/services/log/log_service.dart';
-import 'package:openci_runner/src/services/shell/shell_result.dart';
-import 'package:openci_runner/src/services/ssh/domain/session_result.dart';
+import 'package:runner/src/services/build_job/build_utility_service.dart';
+import 'package:runner/src/services/log/log_service.dart';
+import 'package:runner/src/services/shell/shell_result.dart';
+import 'package:runner/src/services/ssh/domain/session_result.dart';
 
 class SSHService {
   SSHService(this.logService, this._buildUtilityService);

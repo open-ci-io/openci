@@ -1,7 +1,7 @@
 import 'package:dart_firebase_admin/firestore.dart';
-import 'package:openci_runner/src/services/firebase/firestore/firestore_path.dart';
-import 'package:openci_runner/src/services/ssh/domain/session_result.dart';
-import 'package:openci_runner/src/services/uuid/uuid_service.dart';
+import 'package:runner/src/services/firebase/firestore/firestore_path.dart';
+import 'package:runner/src/services/ssh/domain/session_result.dart';
+import 'package:runner/src/services/uuid/uuid_service.dart';
 
 class LogService {
   LogService(this.firestore);

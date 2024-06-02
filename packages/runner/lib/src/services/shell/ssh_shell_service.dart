@@ -1,7 +1,7 @@
 import 'package:dartssh2/dartssh2.dart';
-import 'package:openci_runner/src/services/shell/shell_result.dart';
+import 'package:runner/src/services/shell/shell_result.dart';
 
-import 'package:openci_runner/src/services/ssh/ssh_service.dart';
+import 'package:runner/src/services/ssh/ssh_service.dart';
 
 class SSHShellService {
   SSHShellService(this._sshService);

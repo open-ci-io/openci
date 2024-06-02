@@ -1,4 +1,4 @@
-import 'package:openci_runner/src/features/runner/ios/domain/ios_runner.dart';
+import 'package:runner/src/features/runner/ios/domain/ios_runner.dart';
 
 class IosArguments {
   static IosRunner get supabaseUrl {

@@ -1,6 +1,6 @@
 import 'package:dartssh2/dartssh2.dart';
-import 'package:openci_runner/src/services/build_job/build_common_commands.dart';
-import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
+import 'package:runner/src/services/build_job/build_common_commands.dart';
+import 'package:runner/src/services/shell/ssh_shell_service.dart';
 
 class AabBuildService {
   AabBuildService(

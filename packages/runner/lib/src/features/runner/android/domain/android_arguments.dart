@@ -1,4 +1,4 @@
-import 'package:openci_runner/src/features/runner/android/domain/android_runner.dart';
+import 'package:runner/src/features/runner/android/domain/android_runner.dart';
 
 class AndroidArguments {
   static AndroidRunner get firebaseProjectName {

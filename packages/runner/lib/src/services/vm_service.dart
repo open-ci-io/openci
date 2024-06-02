@@ -1,4 +1,4 @@
-import 'package:openci_runner/src/services/tart/tart_service.dart';
+import 'package:runner/src/services/tart/tart_service.dart';
 
 class VMService {
   VMService(this._tartService);

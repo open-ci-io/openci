@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:openci_runner/src/features/job/domain/job_data.dart';
+import 'package:runner/src/features/job/domain/job_data.dart';
 
 part 'workflow_model.freezed.dart';
 part 'workflow_model.g.dart';

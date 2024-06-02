@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:openci_runner/src/command_runner.dart';
+import 'package:runner/src/command_runner.dart';
 
 Future<void> main(List<String> args) async {
-  await _flushThenExit(await OpenciRunnerCommandRunner().run(args));
+  await _flushThenExit(await RunnerCommandRunner().run(args));
 }
 
 /// Flushes the stdout and stderr streams, then exits the program with the given

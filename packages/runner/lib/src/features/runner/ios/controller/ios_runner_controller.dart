@@ -1,6 +1,6 @@
 import 'package:args/args.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_runner/src/features/runner/ios/domain/ios_runner.dart';
+import 'package:runner/src/features/runner/ios/domain/ios_runner.dart';
 
 class IosRunnerController {
   IosRunnerController(this._logger, this.argResults);

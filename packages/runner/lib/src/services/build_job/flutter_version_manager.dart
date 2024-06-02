@@ -1,5 +1,5 @@
 import 'package:dartssh2/dartssh2.dart';
-import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
+import 'package:runner/src/services/shell/ssh_shell_service.dart';
 
 class FlutterVersionManager {
   FlutterVersionManager(
