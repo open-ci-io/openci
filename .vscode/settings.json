@@ -1,3 +1,10 @@
 {
-  "cSpell.words": ["openci"]
+  "cSpell.words": [
+    "dartssh",
+    "dotenv",
+    "googleapis",
+    "jsonwebtoken",
+    "mocktail",
+    "openci"
+  ]
 }
