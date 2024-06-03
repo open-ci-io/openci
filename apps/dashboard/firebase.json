@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"macos":{"default":{"projectId":"open-ci-release","appId":"1:226435817638:ios:f3ae0aae078d6fcdc1d467","uploadDebugSymbols":false,"fileOutput":"macos/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"open-ci-release","configurations":{"macos":"1:226435817638:ios:f3ae0aae078d6fcdc1d467"}}}}}}
