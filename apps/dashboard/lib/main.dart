@@ -1,5 +1,4 @@
 import 'package:dashboard/src/features/auth_gate/presentation/auth_gate.dart';
-import 'package:dashboard/src/features/top/presentation/top_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

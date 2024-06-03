@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:uuid/uuid.dart';
 
 class EditWorkflowPage extends HookConsumerWidget {
   const EditWorkflowPage({super.key});
@@ -47,7 +46,6 @@ class EditWorkflowPage extends HookConsumerWidget {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    final id = const Uuid().v4();
                     // await FirebaseFirestore.instance
                     //     .collection('organizations')
                     //     .doc(id)
