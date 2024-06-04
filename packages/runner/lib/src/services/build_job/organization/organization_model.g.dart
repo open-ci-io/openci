@@ -23,8 +23,8 @@ Map<String, dynamic> _$$OrganizationModelImplToJson(
 
 _$BuildNumberImpl _$$BuildNumberImplFromJson(Map<String, dynamic> json) =>
     _$BuildNumberImpl(
-      android: json['android'] as int,
-      ios: json['ios'] as int,
+      android: (json['android'] as num).toInt(),
+      ios: (json['ios'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$BuildNumberImplToJson(_$BuildNumberImpl instance) =>

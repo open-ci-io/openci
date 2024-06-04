@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:dartssh2/dartssh2.dart';
 import 'package:runner/src/services/build_job/build_common_commands.dart';
+import 'package:runner/src/services/build_job/flavor_service.dart';
+import 'package:runner/src/services/build_job/workflow/workflow_model.dart';
 import 'package:runner/src/services/macos/directory_paths.dart';
 import 'package:runner/src/services/shell/shell_result.dart';
 import 'package:runner/src/services/shell/ssh_shell_service.dart';
@@ -119,11 +121,10 @@ pod install;
 
   Future<void> buildIpa(
     int iosBuildNumber,
-    String flavor,
-    List<String>? dartDefines,
+    WorkflowFlutterConfig flutterConfig,
   ) async {
     final command =
-        '${BuildCommonCommands.loadZshrc} && ${BuildCommonCommands.navigateToAppDirectory(_appName)} && flutter build ipa ${_flavorArgument(flavor)} ${BuildCommonCommands.generateDartDefines(dartDefines)} --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist;';
+        '${BuildCommonCommands.loadZshrc} && ${BuildCommonCommands.navigateToAppDirectory(_appName)} && flutter build ipa ${FlavorService.flavorArgument(flutterConfig)} ${BuildCommonCommands.generateDartDefines(flutterConfig.dartDefine)} --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist;';
     await _sshShellService.executeCommand(
       command,
       _sshClient,
@@ -132,19 +133,10 @@ pod install;
     );
   }
 
-  String _flavorArgument(String flavor) {
-    var flavorArgument = '';
-    if (flavor != 'none') {
-      flavorArgument = '--flavor $flavor';
-    }
-    return flavorArgument;
-  }
-
   Future<ShellResult> patchShorebirdIpa(
     int iosBuildNumber,
-    String flavor,
     String? shorebirdToken,
-    List<String>? dartDefines,
+    WorkflowFlutterConfig flutterConfig,
   ) async {
     if (shorebirdToken == null) {
       throw Exception('Shorebird token is required');
@@ -154,7 +146,7 @@ ${BuildCommonCommands.loadZshrc};
 ${BuildCommonCommands.navigateToAppDirectory(_appName)};
 export SHOREBIRD_TOKEN=$shorebirdToken;
 export CI=true;
-shorebird patch ios ${_flavorArgument(flavor)} --allow-asset-diffs --allow-native-diffs -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${BuildCommonCommands.generateDartDefines(dartDefines)}; 
+shorebird patch ios ${FlavorService.flavorArgument(flutterConfig)} --allow-asset-diffs --allow-native-diffs -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${BuildCommonCommands.generateDartDefines(flutterConfig.dartDefine)}; 
 ''';
     return _sshShellService.executeCommand(
       command,
@@ -166,23 +158,21 @@ shorebird patch ios ${_flavorArgument(flavor)} --allow-asset-diffs --allow-nativ
 
   Future<ShellResult> buildShorebirdIpa(
     int iosBuildNumber,
-    String flavor,
     String? shorebirdToken,
-    String flutterVersion,
-    List<String>? dartDefines,
+    WorkflowFlutterConfig flutterConfig,
   ) async {
     if (shorebirdToken == null) {
       throw Exception('Shorebird token is required');
     }
-    var flutterVersionArgument = '--flutter-version=$flutterVersion';
-    if (int.parse(flutterVersion.replaceAll('.', '')) < 3195) {
+    var flutterVersionArgument = '--flutter-version=${flutterConfig.version}';
+    if (int.parse(flutterConfig.version.replaceAll('.', '')) < 3195) {
       flutterVersionArgument = '';
     }
     final command = '''
 ${BuildCommonCommands.loadZshrc};
 ${BuildCommonCommands.navigateToAppDirectory(_appName)};
 export SHOREBIRD_TOKEN=$shorebirdToken;
-shorebird release ios ${_flavorArgument(flavor)} $flutterVersionArgument -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${BuildCommonCommands.generateDartDefines(dartDefines)}; 
+shorebird release ios ${FlavorService.flavorArgument(flutterConfig)} $flutterVersionArgument -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${BuildCommonCommands.generateDartDefines(flutterConfig.dartDefine)}; 
 ''';
     return _sshShellService.executeCommand(
       command,

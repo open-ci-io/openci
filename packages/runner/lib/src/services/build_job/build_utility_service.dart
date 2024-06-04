@@ -85,7 +85,7 @@ class BuildUtilityService {
     String installationToken,
   ) async {
     await sshShellService.executeCommand(
-      'cd ~/Downloads && git clone -b ${buildModel.branch.buildBranch} https://x-access-token:$installationToken@github.com/${buildModel.github.owner}/${buildModel.github.repositoryName}.git',
+      'cd ~/Downloads && git clone -b ${buildModel.branch.baseBranch} https://x-access-token:$installationToken@github.com/${buildModel.github.owner}/${buildModel.github.repositoryName}.git',
       sshClient,
       jobId,
       workingVMName,

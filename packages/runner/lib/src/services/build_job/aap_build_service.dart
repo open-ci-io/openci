@@ -1,5 +1,7 @@
 import 'package:dartssh2/dartssh2.dart';
 import 'package:runner/src/services/build_job/build_common_commands.dart';
+import 'package:runner/src/services/build_job/flavor_service.dart';
+import 'package:runner/src/services/build_job/workflow/workflow_model.dart';
 import 'package:runner/src/services/shell/ssh_shell_service.dart';
 
 class AabBuildService {
@@ -17,15 +19,25 @@ class AabBuildService {
   final String _appName;
 
   Future<void> downloadKeyJks(
-    String? downloadUrl,
+    WorkflowAndroidConfig androidConfig,
   ) async {
+    final downloadUrl = androidConfig.jks;
     if (downloadUrl == null) {
       throw Exception('Download URL is required');
     }
-    const fileName = 'key.jks';
+    final keyJksName = androidConfig.jksName;
+    if (keyJksName == null) {
+      throw Exception('Key JKS name is required');
+    }
+    final jksDirectory = androidConfig.jksDirectory;
+
+    if (jksDirectory == null) {
+      throw Exception('Key JKS directory is required');
+    }
+    final fileName = '$keyJksName.jks';
 
     await _sshShellService.executeCommand(
-      '${BuildCommonCommands.navigateToAppDirectory(_appName)}/android/app && curl -L -o $fileName "$downloadUrl"',
+      '${BuildCommonCommands.navigateToAppDirectory(_appName)}/$jksDirectory && curl -L -o $fileName "$downloadUrl"',
       _sshClient,
       _jobId,
       _workingVMName,
@@ -48,35 +60,28 @@ class AabBuildService {
     );
   }
 
-  Future<void> buildApk(int buildNumber, String flavor) async {
+  Future<void> buildApk(
+    int buildNumber,
+    WorkflowFlutterConfig flutterConfig,
+  ) async {
     await _sshShellService.executeCommand(
-      '${BuildCommonCommands.loadZshrc} && ${BuildCommonCommands.navigateToAppDirectory(_appName)} && $pathAndroidSDK && flutter clean && flutter pub get && flutter build apk ${_flavorArgument(flavor)} --build-number=$buildNumber;',
+      '${BuildCommonCommands.loadZshrc} && ${BuildCommonCommands.navigateToAppDirectory(_appName)} && $pathAndroidSDK && flutter clean && flutter pub get && flutter build apk ${FlavorService.flavorArgument(flutterConfig)} --build-number=$buildNumber;',
       _sshClient,
       _jobId,
       _workingVMName,
     );
   }
 
-  String _flavorArgument(String flavor) {
-    var flavorArgument = '';
-    if (flavor != 'none') {
-      flavorArgument = '--flavor $flavor';
-    }
-    return flavorArgument;
-  }
-
   Future<void> buildShorebirdAppBundle(
     int buildNumber,
     String? shorebirdToken,
-    String flutterVersion,
-    List<String>? dartDefines,
-    String flavor,
+    WorkflowFlutterConfig flutterConfig,
   ) async {
     if (shorebirdToken == null) {
       throw Exception('Shorebird token is required');
     }
-    var flutterVersionArgument = '--flutter-version=$flutterVersion';
-    if (int.parse(flutterVersion.replaceAll('.', '')) < 3195) {
+    var flutterVersionArgument = '--flutter-version=${flutterConfig.version}';
+    if (int.parse(flutterConfig.version.replaceAll('.', '')) < 3195) {
       flutterVersionArgument = '';
     }
     await _sshShellService.executeCommand(
@@ -86,7 +91,7 @@ ${BuildCommonCommands.navigateToAppDirectory(_appName)};
 $pathAndroidSDK;
 export SHOREBIRD_TOKEN=$shorebirdToken;
 export CI=true;
-shorebird release android ${_flavorArgument(flavor)} $flutterVersionArgument -- --build-number=$buildNumber ${BuildCommonCommands.generateDartDefines(dartDefines)}; 
+shorebird release android ${FlavorService.flavorArgument(flutterConfig)} $flutterVersionArgument -- --build-number=$buildNumber ${BuildCommonCommands.generateDartDefines(flutterConfig.dartDefine)}; 
 
 ''',
       _sshClient,

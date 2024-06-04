@@ -291,24 +291,25 @@ class RunnerCommand extends Command<int> {
             vm.workingVMName,
             appName,
           );
+          final android = workflow.android;
+          if (android == null) {
+            throw Exception('Android is null');
+          }
 
-          await aabBuildService.downloadKeyJks(workflow.android.jks);
-          await aabBuildService
-              .downloadKeyProperties(workflow.android.keyProperties);
+          await aabBuildService.downloadKeyJks(android);
+          await aabBuildService.downloadKeyProperties(android.keyProperties);
           final useShorebird = workflow.shorebird.useShorebird;
 
           if (useShorebird != null && useShorebird == true) {
             await aabBuildService.buildShorebirdAppBundle(
               organization.buildNumber.android,
               workflow.shorebird.token,
-              workflow.flutter.version,
-              workflow.flutter.dartDefine,
-              workflow.flutter.flavor,
+              workflow.flutter,
             );
           } else {
             await aabBuildService.buildApk(
               organization.buildNumber.android,
-              workflow.flutter.flavor,
+              workflow.flutter,
             );
           }
 
@@ -350,16 +351,20 @@ class RunnerCommand extends Command<int> {
             vm.workingVMName,
             appName,
           );
+          final workflowForIos = workflow.ios;
+          if (workflowForIos == null) {
+            throw Exception('workflowForIos is null');
+          }
 
           await ipaBuildService.downloadExportOptionsPlist(
-            workflow.ios.exportOptions,
+            workflowForIos.exportOptions,
           );
           await ipaBuildService.createCertificateDirectory();
           await ipaBuildService.downloadP12Certificate(
-            workflow.ios.p12,
+            workflowForIos.p12,
           );
           await ipaBuildService.downloadMobileProvisioningProfile(
-            workflow.ios.provisioningProfile?.url,
+            workflowForIos.provisioningProfile?.url,
           );
           await ipaBuildService.importCertificates();
 
@@ -385,35 +390,31 @@ class RunnerCommand extends Command<int> {
           final patch = workflow.shorebird.patch;
           if (patch != null && patch) {
             final privateKey = await ipaBuildService
-                .fetchPrivateKey(workflow.ios.appStoreConnectAPI?.p8);
+                .fetchPrivateKey(workflowForIos.appStoreConnectAPI?.p8);
             final data =
                 await ipaBuildService.getLatestAppVersionAndBuildNumber(
-              workflow.ios.appStoreConnectAPI?.appId,
-              workflow.ios.appStoreConnectAPI?.keyId,
-              workflow.ios.appStoreConnectAPI?.issuerId,
+              workflowForIos.appStoreConnectAPI?.appId,
+              workflowForIos.appStoreConnectAPI?.keyId,
+              workflowForIos.appStoreConnectAPI?.issuerId,
               privateKey,
             );
 
             await ipaBuildService.patchShorebirdIpa(
               int.parse(data['buildNumber'].toString()),
-              workflow.flutter.flavor,
               workflow.shorebird.token,
-              workflow.flutter.dartDefine,
+              workflow.flutter,
             );
           } else {
             if (useShorebird != null && useShorebird == true) {
               await ipaBuildService.buildShorebirdIpa(
                 organization.buildNumber.ios,
-                workflow.flutter.flavor,
                 workflow.shorebird.token,
-                workflow.flutter.version,
-                workflow.flutter.dartDefine,
+                workflow.flutter,
               );
             } else {
               await ipaBuildService.buildIpa(
                 organization.buildNumber.ios,
-                workflow.flutter.flavor,
-                workflow.flutter.dartDefine,
+                workflow.flutter,
               );
             }
 
@@ -446,12 +447,12 @@ class RunnerCommand extends Command<int> {
                 _logger.success('upload build success');
               case BuildDistributionChannel.testFlight:
                 await ipaBuildService.downloadP8(
-                  workflow.ios.appStoreConnectAPI?.p8,
-                  workflow.ios.appStoreConnectAPI?.keyId,
+                  workflowForIos.appStoreConnectAPI?.p8,
+                  workflowForIos.appStoreConnectAPI?.keyId,
                 );
                 await ipaBuildService.uploadIpaToTestFlight(
-                  workflow.ios.appStoreConnectAPI?.keyId,
-                  workflow.ios.appStoreConnectAPI?.issuerId,
+                  workflowForIos.appStoreConnectAPI?.keyId,
+                  workflowForIos.appStoreConnectAPI?.issuerId,
                   await buildDistributionService.ipaPath(),
                 );
               case BuildDistributionChannel.playStoreInternal:

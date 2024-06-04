@@ -8,11 +8,15 @@ part of 'workflow_model.dart';
 
 _$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
     _$WorkflowModelImpl(
-      android: WorkflowAndroidConfig.fromJson(
-          json['android'] as Map<String, dynamic>),
+      android: json['android'] == null
+          ? null
+          : WorkflowAndroidConfig.fromJson(
+              json['android'] as Map<String, dynamic>),
       firebase: WorkflowFirebaseConfig.fromJson(
           json['firebase'] as Map<String, dynamic>),
-      ios: WorkflowIosConfig.fromJson(json['ios'] as Map<String, dynamic>),
+      ios: json['ios'] == null
+          ? null
+          : WorkflowIosConfig.fromJson(json['ios'] as Map<String, dynamic>),
       organizationId: json['organizationId'] as String,
       flutter: WorkflowFlutterConfig.fromJson(
           json['flutter'] as Map<String, dynamic>),
@@ -56,6 +60,7 @@ _$WorkflowAndroidConfigImpl _$$WorkflowAndroidConfigImplFromJson(
       jks: json['jks'] as String? ?? null,
       jksName: json['jksName'] as String? ?? null,
       keyProperties: json['keyProperties'] as String? ?? null,
+      jksDirectory: json['jksDirectory'] as String?,
     );
 
 Map<String, dynamic> _$$WorkflowAndroidConfigImplToJson(
@@ -64,6 +69,7 @@ Map<String, dynamic> _$$WorkflowAndroidConfigImplToJson(
       'jks': instance.jks,
       'jksName': instance.jksName,
       'keyProperties': instance.keyProperties,
+      'jksDirectory': instance.jksDirectory,
     };
 
 _$WorkflowShorebirdConfigImpl _$$WorkflowShorebirdConfigImplFromJson(
@@ -167,6 +173,7 @@ _$WorkflowFlutterConfigImpl _$$WorkflowFlutterConfigImplFromJson(
     _$WorkflowFlutterConfigImpl(
       flavor: json['flavor'] as String,
       version: json['version'] as String,
+      entryPoint: json['entryPoint'] as String?,
       dartDefine: (json['dartDefine'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -178,6 +185,7 @@ Map<String, dynamic> _$$WorkflowFlutterConfigImplToJson(
     <String, dynamic>{
       'flavor': instance.flavor,
       'version': instance.version,
+      'entryPoint': instance.entryPoint,
       'dartDefine': instance.dartDefine,
     };
 

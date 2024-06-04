@@ -29,6 +29,9 @@ dependencies:
   github: ^9.24.0
 
 dev_dependencies:
+  build_runner: ^2.4.4
+  freezed: ^2.4.3
+  json_serializable: ^6.7.1
   lints: ^3.0.0
   test: ^1.24.0
 

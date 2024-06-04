@@ -33,8 +33,8 @@ Map<String, dynamic> _$$BranchImplToJson(_$BranchImpl instance) =>
 
 _$GithubChecksImpl _$$GithubChecksImplFromJson(Map<String, dynamic> json) =>
     _$GithubChecksImpl(
-      checkRunId: json['checkRunId'] as int,
-      issueNumber: json['issueNumber'] as int? ?? null,
+      checkRunId: (json['checkRunId'] as num).toInt(),
+      issueNumber: (json['issueNumber'] as num?)?.toInt() ?? null,
     );
 
 Map<String, dynamic> _$$GithubChecksImplToJson(_$GithubChecksImpl instance) =>
@@ -47,8 +47,8 @@ _$GithubImpl _$$GithubImplFromJson(Map<String, dynamic> json) => _$GithubImpl(
       repositoryUrl: json['repositoryUrl'] as String,
       owner: json['owner'] as String,
       repositoryName: json['repositoryName'] as String,
-      installationId: json['installationId'] as int,
-      appId: json['appId'] as int,
+      installationId: (json['installationId'] as num).toInt(),
+      appId: (json['appId'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$GithubImplToJson(_$GithubImpl instance) =>

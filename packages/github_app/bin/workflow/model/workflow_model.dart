@@ -11,9 +11,9 @@ enum TargetPlatform {
 @freezed
 class WorkflowModel with _$WorkflowModel {
   const factory WorkflowModel({
-    required WorkflowAndroidConfig android,
+    WorkflowAndroidConfig? android,
     required WorkflowFirebaseConfig firebase,
-    required WorkflowIosConfig ios,
+    WorkflowIosConfig? ios,
     required String organizationId,
     required WorkflowFlutterConfig flutter,
     required WorkflowShorebirdConfig shorebird,

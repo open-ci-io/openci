@@ -10,7 +10,7 @@ _$SessionResultImpl _$$SessionResultImplFromJson(Map<String, dynamic> json) =>
     _$SessionResultImpl(
       sessionStdout: json['sessionStdout'] as String? ?? '',
       sessionStderr: json['sessionStderr'] as String? ?? '',
-      sessionExitCode: json['sessionExitCode'] as int?,
+      sessionExitCode: (json['sessionExitCode'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$SessionResultImplToJson(_$SessionResultImpl instance) =>

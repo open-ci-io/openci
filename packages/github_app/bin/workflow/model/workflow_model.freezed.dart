@@ -12,7 +12,7 @@ part of 'workflow_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 WorkflowModel _$WorkflowModelFromJson(Map<String, dynamic> json) {
   return _WorkflowModel.fromJson(json);
@@ -20,9 +20,9 @@ WorkflowModel _$WorkflowModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$WorkflowModel {
-  WorkflowAndroidConfig get android => throw _privateConstructorUsedError;
+  WorkflowAndroidConfig? get android => throw _privateConstructorUsedError;
   WorkflowFirebaseConfig get firebase => throw _privateConstructorUsedError;
-  WorkflowIosConfig get ios => throw _privateConstructorUsedError;
+  WorkflowIosConfig? get ios => throw _privateConstructorUsedError;
   String get organizationId => throw _privateConstructorUsedError;
   WorkflowFlutterConfig get flutter => throw _privateConstructorUsedError;
   WorkflowShorebirdConfig get shorebird => throw _privateConstructorUsedError;
@@ -44,9 +44,9 @@ abstract class $WorkflowModelCopyWith<$Res> {
       _$WorkflowModelCopyWithImpl<$Res, WorkflowModel>;
   @useResult
   $Res call(
-      {WorkflowAndroidConfig android,
+      {WorkflowAndroidConfig? android,
       WorkflowFirebaseConfig firebase,
-      WorkflowIosConfig ios,
+      WorkflowIosConfig? ios,
       String organizationId,
       WorkflowFlutterConfig flutter,
       WorkflowShorebirdConfig shorebird,
@@ -54,9 +54,9 @@ abstract class $WorkflowModelCopyWith<$Res> {
       TargetPlatform platform,
       BuildDistributionChannel? distribution});
 
-  $WorkflowAndroidConfigCopyWith<$Res> get android;
+  $WorkflowAndroidConfigCopyWith<$Res>? get android;
   $WorkflowFirebaseConfigCopyWith<$Res> get firebase;
-  $WorkflowIosConfigCopyWith<$Res> get ios;
+  $WorkflowIosConfigCopyWith<$Res>? get ios;
   $WorkflowFlutterConfigCopyWith<$Res> get flutter;
   $WorkflowShorebirdConfigCopyWith<$Res> get shorebird;
 }
@@ -74,9 +74,9 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? android = null,
+    Object? android = freezed,
     Object? firebase = null,
-    Object? ios = null,
+    Object? ios = freezed,
     Object? organizationId = null,
     Object? flutter = null,
     Object? shorebird = null,
@@ -85,18 +85,18 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
     Object? distribution = freezed,
   }) {
     return _then(_value.copyWith(
-      android: null == android
+      android: freezed == android
           ? _value.android
           : android // ignore: cast_nullable_to_non_nullable
-              as WorkflowAndroidConfig,
+              as WorkflowAndroidConfig?,
       firebase: null == firebase
           ? _value.firebase
           : firebase // ignore: cast_nullable_to_non_nullable
               as WorkflowFirebaseConfig,
-      ios: null == ios
+      ios: freezed == ios
           ? _value.ios
           : ios // ignore: cast_nullable_to_non_nullable
-              as WorkflowIosConfig,
+              as WorkflowIosConfig?,
       organizationId: null == organizationId
           ? _value.organizationId
           : organizationId // ignore: cast_nullable_to_non_nullable
@@ -126,8 +126,12 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
 
   @override
   @pragma('vm:prefer-inline')
-  $WorkflowAndroidConfigCopyWith<$Res> get android {
-    return $WorkflowAndroidConfigCopyWith<$Res>(_value.android, (value) {
+  $WorkflowAndroidConfigCopyWith<$Res>? get android {
+    if (_value.android == null) {
+      return null;
+    }
+
+    return $WorkflowAndroidConfigCopyWith<$Res>(_value.android!, (value) {
       return _then(_value.copyWith(android: value) as $Val);
     });
   }
@@ -142,8 +146,12 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
 
   @override
   @pragma('vm:prefer-inline')
-  $WorkflowIosConfigCopyWith<$Res> get ios {
-    return $WorkflowIosConfigCopyWith<$Res>(_value.ios, (value) {
+  $WorkflowIosConfigCopyWith<$Res>? get ios {
+    if (_value.ios == null) {
+      return null;
+    }
+
+    return $WorkflowIosConfigCopyWith<$Res>(_value.ios!, (value) {
       return _then(_value.copyWith(ios: value) as $Val);
     });
   }
@@ -174,9 +182,9 @@ abstract class _$$WorkflowModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {WorkflowAndroidConfig android,
+      {WorkflowAndroidConfig? android,
       WorkflowFirebaseConfig firebase,
-      WorkflowIosConfig ios,
+      WorkflowIosConfig? ios,
       String organizationId,
       WorkflowFlutterConfig flutter,
       WorkflowShorebirdConfig shorebird,
@@ -185,11 +193,11 @@ abstract class _$$WorkflowModelImplCopyWith<$Res>
       BuildDistributionChannel? distribution});
 
   @override
-  $WorkflowAndroidConfigCopyWith<$Res> get android;
+  $WorkflowAndroidConfigCopyWith<$Res>? get android;
   @override
   $WorkflowFirebaseConfigCopyWith<$Res> get firebase;
   @override
-  $WorkflowIosConfigCopyWith<$Res> get ios;
+  $WorkflowIosConfigCopyWith<$Res>? get ios;
   @override
   $WorkflowFlutterConfigCopyWith<$Res> get flutter;
   @override
@@ -207,9 +215,9 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? android = null,
+    Object? android = freezed,
     Object? firebase = null,
-    Object? ios = null,
+    Object? ios = freezed,
     Object? organizationId = null,
     Object? flutter = null,
     Object? shorebird = null,
@@ -218,18 +226,18 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
     Object? distribution = freezed,
   }) {
     return _then(_$WorkflowModelImpl(
-      android: null == android
+      android: freezed == android
           ? _value.android
           : android // ignore: cast_nullable_to_non_nullable
-              as WorkflowAndroidConfig,
+              as WorkflowAndroidConfig?,
       firebase: null == firebase
           ? _value.firebase
           : firebase // ignore: cast_nullable_to_non_nullable
               as WorkflowFirebaseConfig,
-      ios: null == ios
+      ios: freezed == ios
           ? _value.ios
           : ios // ignore: cast_nullable_to_non_nullable
-              as WorkflowIosConfig,
+              as WorkflowIosConfig?,
       organizationId: null == organizationId
           ? _value.organizationId
           : organizationId // ignore: cast_nullable_to_non_nullable
@@ -262,9 +270,9 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$WorkflowModelImpl implements _WorkflowModel {
   const _$WorkflowModelImpl(
-      {required this.android,
+      {this.android,
       required this.firebase,
-      required this.ios,
+      this.ios,
       required this.organizationId,
       required this.flutter,
       required this.shorebird,
@@ -276,11 +284,11 @@ class _$WorkflowModelImpl implements _WorkflowModel {
       _$$WorkflowModelImplFromJson(json);
 
   @override
-  final WorkflowAndroidConfig android;
+  final WorkflowAndroidConfig? android;
   @override
   final WorkflowFirebaseConfig firebase;
   @override
-  final WorkflowIosConfig ios;
+  final WorkflowIosConfig? ios;
   @override
   final String organizationId;
   @override
@@ -301,7 +309,7 @@ class _$WorkflowModelImpl implements _WorkflowModel {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$WorkflowModelImpl &&
@@ -343,9 +351,9 @@ class _$WorkflowModelImpl implements _WorkflowModel {
 
 abstract class _WorkflowModel implements WorkflowModel {
   const factory _WorkflowModel(
-      {required final WorkflowAndroidConfig android,
+      {final WorkflowAndroidConfig? android,
       required final WorkflowFirebaseConfig firebase,
-      required final WorkflowIosConfig ios,
+      final WorkflowIosConfig? ios,
       required final String organizationId,
       required final WorkflowFlutterConfig flutter,
       required final WorkflowShorebirdConfig shorebird,
@@ -357,11 +365,11 @@ abstract class _WorkflowModel implements WorkflowModel {
       _$WorkflowModelImpl.fromJson;
 
   @override
-  WorkflowAndroidConfig get android;
+  WorkflowAndroidConfig? get android;
   @override
   WorkflowFirebaseConfig get firebase;
   @override
-  WorkflowIosConfig get ios;
+  WorkflowIosConfig? get ios;
   @override
   String get organizationId;
   @override
@@ -511,7 +519,7 @@ class _$WorkflowAndroidConfigImpl implements _WorkflowAndroidConfig {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$WorkflowAndroidConfigImpl &&
@@ -718,7 +726,7 @@ class _$WorkflowShorebirdConfigImpl implements _WorkflowShorebirdConfig {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$WorkflowShorebirdConfigImpl &&
@@ -945,7 +953,7 @@ class _$WorkflowFirebaseConfigImpl implements _WorkflowFirebaseConfig {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$WorkflowFirebaseConfigImpl &&
@@ -1208,7 +1216,7 @@ class _$WorkflowIosConfigImpl implements _WorkflowIosConfig {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$WorkflowIosConfigImpl &&
@@ -1420,7 +1428,7 @@ class _$WorkflowAppStoreConnectAPIImpl implements _WorkflowAppStoreConnectAPI {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$WorkflowAppStoreConnectAPIImpl &&
@@ -1597,7 +1605,7 @@ class _$WorkflowProvisioningProfileConfigImpl
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$WorkflowProvisioningProfileConfigImpl &&
@@ -1785,7 +1793,7 @@ class _$WorkflowFlutterConfigImpl implements _WorkflowFlutterConfig {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$WorkflowFlutterConfigImpl &&
@@ -1946,7 +1954,7 @@ class _$AppDistributionConfigImpl implements _AppDistributionConfig {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AppDistributionConfigImpl &&

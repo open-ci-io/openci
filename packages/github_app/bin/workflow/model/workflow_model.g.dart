@@ -8,11 +8,15 @@ part of 'workflow_model.dart';
 
 _$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
     _$WorkflowModelImpl(
-      android: WorkflowAndroidConfig.fromJson(
-          json['android'] as Map<String, dynamic>),
+      android: json['android'] == null
+          ? null
+          : WorkflowAndroidConfig.fromJson(
+              json['android'] as Map<String, dynamic>),
       firebase: WorkflowFirebaseConfig.fromJson(
           json['firebase'] as Map<String, dynamic>),
-      ios: WorkflowIosConfig.fromJson(json['ios'] as Map<String, dynamic>),
+      ios: json['ios'] == null
+          ? null
+          : WorkflowIosConfig.fromJson(json['ios'] as Map<String, dynamic>),
       organizationId: json['organizationId'] as String,
       flutter: WorkflowFlutterConfig.fromJson(
           json['flutter'] as Map<String, dynamic>),

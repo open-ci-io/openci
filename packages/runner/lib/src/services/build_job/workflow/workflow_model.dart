@@ -7,9 +7,9 @@ part 'workflow_model.g.dart';
 @freezed
 class WorkflowModel with _$WorkflowModel {
   const factory WorkflowModel({
-    required WorkflowAndroidConfig android,
+    WorkflowAndroidConfig? android,
     required WorkflowFirebaseConfig firebase,
-    required WorkflowIosConfig ios,
+    WorkflowIosConfig? ios,
     required String organizationId,
     required WorkflowFlutterConfig flutter,
     required WorkflowShorebirdConfig shorebird,
@@ -27,6 +27,7 @@ class WorkflowAndroidConfig with _$WorkflowAndroidConfig {
     @Default(null) String? jks,
     @Default(null) String? jksName,
     @Default(null) String? keyProperties,
+    String? jksDirectory,
   }) = _WorkflowAndroidConfig;
   factory WorkflowAndroidConfig.fromJson(Map<String, Object?> json) =>
       _$WorkflowAndroidConfigFromJson(json);
@@ -99,6 +100,7 @@ class WorkflowFlutterConfig with _$WorkflowFlutterConfig {
   const factory WorkflowFlutterConfig({
     required String flavor,
     required String version,
+    String? entryPoint,
     @Default(null) List<String>? dartDefine,
   }) = _WorkflowFlutterConfig;
   factory WorkflowFlutterConfig.fromJson(Map<String, Object?> json) =>

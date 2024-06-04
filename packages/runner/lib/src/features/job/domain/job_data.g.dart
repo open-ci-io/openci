@@ -45,7 +45,7 @@ _$BuildModelImpl _$$BuildModelImplFromJson(Map<String, dynamic> json) =>
       buildStatus: json['buildStatus'] == null
           ? const BuildStatus(processing: false, failure: false, success: false)
           : BuildStatus.fromJson(json['buildStatus'] as Map<String, dynamic>),
-      issueNumber: json['issueNumber'] as int?,
+      issueNumber: (json['issueNumber'] as num?)?.toInt(),
       createdAt: _$JsonConverterFromJson<Object, Timestamp>(
               json['createdAt'], const TimestampConverter().fromJson) ??
           null,
@@ -95,10 +95,10 @@ Map<String, dynamic> _$$BuildStatusImplToJson(_$BuildStatusImpl instance) =>
     };
 
 _$ChecksImpl _$$ChecksImplFromJson(Map<String, dynamic> json) => _$ChecksImpl(
-      checkRunId: json['checkRunId'] as int,
+      checkRunId: (json['checkRunId'] as num).toInt(),
       owner: json['owner'] as String,
       repositoryName: json['repositoryName'] as String,
-      installationId: json['installationId'] as int,
+      installationId: (json['installationId'] as num).toInt(),
       jobId: json['jobId'] as String,
     );
 
