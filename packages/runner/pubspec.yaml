@@ -1,5 +1,5 @@
 name: runner
-description: A sample command-line application.
+description: OpenCI's CLI
 version: 1.0.0
 # repository: https://github.com/my_org/my_repo
 
