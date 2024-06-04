@@ -1,0 +1,18 @@
+name: model
+description: A sample command-line application.
+version: 1.0.0
+# repository: https://github.com/my_org/my_repo
+
+environment:
+  sdk: ^3.5.0-214.0.dev
+
+dependencies:
+  freezed_annotation: ^2.4.1
+  dart_firebase_admin: ^0.3.0
+
+dev_dependencies:
+  lints: ^4.0.0
+  test: ^1.24.0
+  build_runner: ^2.4.4
+  freezed: ^2.4.3
+  json_serializable: ^6.7.1
