@@ -1,6 +1,6 @@
 name: runner
 description: OpenCI's CLI
-version: 1.0.0
+version: 1.0.2
 # repository: https://github.com/my_org/my_repo
 
 environment:
@@ -27,6 +27,7 @@ dependencies:
   dotenv: ^4.2.0
   dart_jsonwebtoken: ^2.14.0
   github: ^9.24.0
+  openci_models: ^1.0.3
 
 dev_dependencies:
   build_runner: ^2.4.4

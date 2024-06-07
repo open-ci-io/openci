@@ -1,5 +1,5 @@
 import 'package:dartssh2/dartssh2.dart';
-import 'package:runner/src/features/job/domain/job_data.dart';
+import 'package:openci_models/openci_models.dart';
 import 'package:runner/src/services/build_job/build_common_commands.dart';
 import 'package:runner/src/services/shell/ssh_shell_service.dart';
 

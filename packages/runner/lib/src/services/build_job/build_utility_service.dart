@@ -2,8 +2,7 @@
 
 import 'package:dart_firebase_admin/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
-import 'package:runner/src/features/job/domain/job_data.dart';
-import 'package:runner/src/features/job/domain/job_data_v2.dart';
+import 'package:openci_models/openci_models.dart';
 import 'package:runner/src/services/build_job/build_common_commands.dart';
 import 'package:runner/src/services/build_job/organization/organization_model.dart';
 import 'package:runner/src/services/firebase/firestore/firestore_path.dart';

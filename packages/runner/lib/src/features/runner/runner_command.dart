@@ -6,8 +6,7 @@ import 'package:args/command_runner.dart';
 import 'package:dart_firebase_admin/dart_firebase_admin.dart';
 import 'package:dart_firebase_admin/firestore.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:runner/src/features/job/domain/job_data.dart';
-import 'package:runner/src/features/job/domain/job_data_v2.dart';
+import 'package:openci_models/openci_models.dart';
 import 'package:runner/src/features/vm/controller/vm_controller.dart';
 import 'package:runner/src/services/build_job/aap_build_service.dart';
 import 'package:runner/src/services/build_job/build_distribution_service.dart';
@@ -15,7 +14,6 @@ import 'package:runner/src/services/build_job/build_utility_service.dart';
 import 'package:runner/src/services/build_job/flutter_version_manager.dart';
 import 'package:runner/src/services/build_job/ipa_build_service.dart';
 import 'package:runner/src/services/build_job/organization/organization_model.dart';
-import 'package:runner/src/services/build_job/workflow/workflow_model.dart';
 import 'package:runner/src/services/build_job/workflow/workflow_service.dart';
 import 'package:runner/src/services/firebase/firestore/firestore_path.dart';
 import 'package:runner/src/services/github_service.dart';
@@ -307,6 +305,7 @@ class RunnerCommand extends Command<int> {
               workflow.flutter,
             );
           } else {
+            await aabBuildService.runCustomScripts();
             await aabBuildService.buildApk(
               organization.buildNumber.android,
               workflow.flutter,

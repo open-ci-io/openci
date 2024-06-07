@@ -2,12 +2,11 @@ import 'package:dart_firebase_admin/firestore.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
 import 'package:github/github.dart';
+import 'package:openci_models/openci_models.dart';
 
 import '../bin/env/model/env_model.dart';
 import '../bin/firebase/firebase_service.dart';
-import '../bin/job/model/job_v2_model.dart';
 import '../bin/jwt_service.dart';
-import '../bin/workflow/model/workflow_model.dart';
 
 enum ChecksStatus {
   inProgress,
@@ -66,7 +65,7 @@ Future<Response> onRequest(RequestContext context) async {
     }
     print('Job data retrieved');
 
-    final jobData = JobV2Model.fromJson(data);
+    final jobData = BuildModel.fromJson(data);
 
     final token = await accessToken(
       jobData.github.installationId,

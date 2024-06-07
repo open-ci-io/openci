@@ -1,5 +1,5 @@
 import 'package:dart_firebase_admin/firestore.dart';
-import 'package:runner/src/services/build_job/workflow/workflow_model.dart';
+import 'package:openci_models/openci_models.dart';
 import 'package:runner/src/services/firebase/firestore/firestore_path.dart';
 
 class WorkflowService {

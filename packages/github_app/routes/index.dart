@@ -4,16 +4,14 @@ import 'package:dart_firebase_admin/firestore.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
 import 'package:github/github.dart';
+import 'package:openci_models/openci_models.dart' as model;
+import 'package:openci_models/openci_models.dart';
 import 'package:uuid/uuid.dart';
 
 import '../bin/env/model/env_model.dart';
 import '../bin/firebase/firebase_service.dart';
 import '../bin/github/model/action_type.dart';
-import '../bin/job/model/job_v2_model.dart';
 import '../bin/jwt_service.dart';
-import '../bin/workflow/model/workflow_model.dart';
-
-import '../bin/job/model/job_v2_model.dart' as job;
 
 Future<Response> onRequest(RequestContext context) async {
   final env = EnvModel.fromEnvironment(
@@ -100,21 +98,21 @@ Future<void> handlePullRequestAction(
   );
 
   for (final docs in qs.docs) {
-    final workflow = WorkflowModel.fromJson(docs.data());
+    final workflow = model.WorkflowModel.fromJson(docs.data());
     final result = await github.checks.checkRuns.createCheckRun(
       slug,
       name: workflow.workflowName,
       headSha: headSha,
       startedAt: DateTime.now(),
     );
-    final branch = job.Branch(baseBranch: headRef, buildBranch: baseRef);
+    final branch = model.Branch(baseBranch: headRef, buildBranch: baseRef);
 
     final checkRunId = result.id;
     if (checkRunId == null) {
       throw Exception('checkRunId is null');
     }
 
-    final githubChecks = job.GithubChecks(
+    final githubChecks = model.GithubChecks(
       checkRunId: checkRunId,
       issueNumber: pullRequest.number,
     );
@@ -125,7 +123,7 @@ Future<void> handlePullRequestAction(
       throw Exception('owner is null');
     }
 
-    final jobGitHub = job.Github(
+    final jobGitHub = model.Github(
       appId: int.parse(env.githubAppId),
       repositoryUrl: repositoryUrl,
       owner: owner,
@@ -133,7 +131,7 @@ Future<void> handlePullRequestAction(
       installationId: installationId,
     );
 
-    final jobData = job.JobV2Model(
+    final jobData = BuildModel(
       buildStatus: const BuildStatus(),
       branch: branch,
       githubChecks: githubChecks,

@@ -1,6 +1,5 @@
 import 'package:dart_firebase_admin/firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:model/job/job_data.dart';
 
 part 'job_data_v2.freezed.dart';
 part 'job_data_v2.g.dart';
@@ -84,4 +83,9 @@ class TimestampConverter implements JsonConverter<Timestamp, Object> {
 
   @override
   Object toJson(Timestamp timestamp) => timestamp;
+}
+
+enum TargetPlatform {
+  android,
+  ios,
 }

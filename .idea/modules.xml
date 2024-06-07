@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/apps/dashboard/melos_dashboard.iml" filepath="$PROJECT_DIR$/apps/dashboard/melos_dashboard.iml" />
       <module fileurl="file://$PROJECT_DIR$/packages/github_app/melos_github_app.iml" filepath="$PROJECT_DIR$/packages/github_app/melos_github_app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/packages/model/melos_model.iml" filepath="$PROJECT_DIR$/packages/model/melos_model.iml" />
+      <module fileurl="file://$PROJECT_DIR$/packages/openci_models/melos_openci_models.iml" filepath="$PROJECT_DIR$/packages/openci_models/melos_openci_models.iml" />
       <module fileurl="file://$PROJECT_DIR$/packages/runner/melos_runner.iml" filepath="$PROJECT_DIR$/packages/runner/melos_runner.iml" />
       <module fileurl="file://$PROJECT_DIR$/melos_openci.iml" filepath="$PROJECT_DIR$/melos_openci.iml" />
     </modules>

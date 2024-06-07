@@ -3,10 +3,11 @@ import 'dart:convert';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:runner/src/services/build_job/build_common_commands.dart';
 import 'package:runner/src/services/build_job/flavor_service.dart';
-import 'package:runner/src/services/build_job/workflow/workflow_model.dart';
 import 'package:runner/src/services/macos/directory_paths.dart';
 import 'package:runner/src/services/shell/shell_result.dart';
 import 'package:runner/src/services/shell/ssh_shell_service.dart';
+
+import 'package:openci_models/src/workflow/model/workflow_model.dart';
 
 import 'package:http/http.dart' as http;
 

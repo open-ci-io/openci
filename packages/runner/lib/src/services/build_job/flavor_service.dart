@@ -1,4 +1,4 @@
-import 'package:runner/src/services/build_job/workflow/workflow_model.dart';
+import 'package:openci_models/openci_models.dart';
 
 class FlavorService {
   static String flavorArgument(

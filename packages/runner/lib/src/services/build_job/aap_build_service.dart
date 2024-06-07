@@ -1,7 +1,7 @@
 import 'package:dartssh2/dartssh2.dart';
+import 'package:openci_models/openci_models.dart';
 import 'package:runner/src/services/build_job/build_common_commands.dart';
 import 'package:runner/src/services/build_job/flavor_service.dart';
-import 'package:runner/src/services/build_job/workflow/workflow_model.dart';
 import 'package:runner/src/services/shell/ssh_shell_service.dart';
 
 class AabBuildService {
@@ -54,6 +54,21 @@ class AabBuildService {
 
     await _sshShellService.executeCommand(
       '${BuildCommonCommands.navigateToAppDirectory(_appName)}/android/ && curl -L -o $fileName "$downloadUrl"',
+      _sshClient,
+      _jobId,
+      _workingVMName,
+    );
+  }
+
+  Future<void> runCustomScripts() async {
+    await _sshShellService.executeCommand(
+      '''
+${BuildCommonCommands.loadZshrc};
+cd Downloads/$_appName;
+flutter pub cache repair;
+flutter clean;
+flutter pub get;
+''',
       _sshClient,
       _jobId,
       _workingVMName,
