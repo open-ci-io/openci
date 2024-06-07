@@ -7,7 +7,6 @@ import 'package:dart_firebase_admin/dart_firebase_admin.dart';
 import 'package:dart_firebase_admin/firestore.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_models/openci_models.dart';
-import 'package:runner/src/features/vm/controller/vm_controller.dart';
 import 'package:runner/src/services/build_job/aap_build_service.dart';
 import 'package:runner/src/services/build_job/build_distribution_service.dart';
 import 'package:runner/src/services/build_job/build_utility_service.dart';
@@ -222,16 +221,15 @@ class RunnerCommand extends Command<int> {
         }
         final organization = OrganizationModel.fromJson(organizationData);
 
-        final vmId = UuidService.generateV4();
-        final vm = VMController(vmId, tartService);
-        await vm.cleanupVMs;
-        await vm.cloneVM;
-        unawaited(vm.launchVM);
+        final workingVMName = UuidService.generateV4();
+        await vmService.cleanupVMs();
+        await vmService.cloneVM(workingVMName);
+        unawaited(vmService.launchVM(workingVMName));
         while (true) {
           final shell = Shell();
           List<ProcessResult>? result;
           try {
-            result = await shell.run('tart ip $vmId');
+            result = await shell.run('tart ip $workingVMName');
           } catch (e) {
             result = null;
           }
@@ -241,7 +239,7 @@ class RunnerCommand extends Command<int> {
           await Future<void>.delayed(const Duration(seconds: 1));
         }
         _logger.success('VM is ready');
-        final vmIP = await vm.fetchIpAddress;
+        final vmIP = await vmService.fetchIpAddress(workingVMName);
         final logService = LogService(firestore);
 
         final sshService = SSHService(logService, buildUtilityService);
@@ -258,7 +256,7 @@ class RunnerCommand extends Command<int> {
           sshClient,
           buildJob,
           jobId,
-          vm.workingVMName,
+          workingVMName,
           tokenId,
         );
 
@@ -266,7 +264,7 @@ class RunnerCommand extends Command<int> {
           sshShellService,
           sshClient,
           jobId,
-          vm.workingVMName,
+          workingVMName,
           appName,
         );
 
@@ -277,7 +275,7 @@ class RunnerCommand extends Command<int> {
           sshShellService,
           sshClient,
           jobId,
-          vm.workingVMName,
+          workingVMName,
           appName,
         );
 
@@ -286,7 +284,7 @@ class RunnerCommand extends Command<int> {
             sshShellService,
             sshClient,
             jobId,
-            vm.workingVMName,
+            workingVMName,
             appName,
           );
           final android = workflow.android;
@@ -326,7 +324,7 @@ class RunnerCommand extends Command<int> {
                 sshShellService,
                 sshClient,
                 jobId,
-                vm.workingVMName,
+                workingVMName,
                 appName,
                 serviceAccountJsonDownloadUrl,
               );
@@ -347,7 +345,7 @@ class RunnerCommand extends Command<int> {
             sshShellService,
             sshClient,
             jobId,
-            vm.workingVMName,
+            workingVMName,
             appName,
           );
           final workflowForIos = workflow.ios;
@@ -433,7 +431,7 @@ class RunnerCommand extends Command<int> {
                   sshShellService,
                   sshClient,
                   jobId,
-                  vm.workingVMName,
+                  workingVMName,
                   appName,
                   serviceAccountJsonDownloadUrl,
                 );
@@ -472,7 +470,7 @@ class RunnerCommand extends Command<int> {
         _logger.success('${workflow.platform} buildNumber update success');
         _logger.success('whole build process completed');
 
-        await vm.stopVM;
+        await vmService.stopVM(workingVMName);
       } catch (e, s) {
         _logger
           ..err('CLI crashed: $e')
