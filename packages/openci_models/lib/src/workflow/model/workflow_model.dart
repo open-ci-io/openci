@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:openci_models/openci_models.dart';
+
+import '../../target_platform.dart';
 
 part 'workflow_model.freezed.dart';
 part 'workflow_model.g.dart';
@@ -12,6 +13,7 @@ class WorkflowModel with _$WorkflowModel {
     WorkflowIosConfig? ios,
     required String organizationId,
     required WorkflowFlutterConfig flutter,
+    WorkflowGitHubConfig? github,
     required WorkflowShorebirdConfig shorebird,
     required String workflowName,
     required TargetPlatform platform,
@@ -19,6 +21,17 @@ class WorkflowModel with _$WorkflowModel {
   }) = _WorkflowModel;
   factory WorkflowModel.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelFromJson(json);
+}
+
+@freezed
+class WorkflowGitHubConfig with _$WorkflowGitHubConfig {
+  const factory WorkflowGitHubConfig({
+    @Default(null) String? baseBranch,
+    @Default(null) String? repositoryUrl,
+    @Default(null) String? triggerType,
+  }) = _WorkflowGitHubConfig;
+  factory WorkflowGitHubConfig.fromJson(Map<String, Object?> json) =>
+      _$WorkflowGitHubConfigFromJson(json);
 }
 
 @freezed

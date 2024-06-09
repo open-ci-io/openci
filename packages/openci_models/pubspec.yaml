@@ -1,7 +1,7 @@
 name: openci_models
 description: OpenCI Models
-version: 1.0.3
-repository: https://github.com/my_org/my_repo
+version: 1.0.8
+repository: https://github.com/open-ci-io/openci/tree/develop/packages/openci_models
 
 environment:
   sdk: ^3.3.4

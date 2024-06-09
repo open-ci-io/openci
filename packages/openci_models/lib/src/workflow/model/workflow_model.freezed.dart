@@ -25,6 +25,7 @@ mixin _$WorkflowModel {
   WorkflowIosConfig? get ios => throw _privateConstructorUsedError;
   String get organizationId => throw _privateConstructorUsedError;
   WorkflowFlutterConfig get flutter => throw _privateConstructorUsedError;
+  WorkflowGitHubConfig? get github => throw _privateConstructorUsedError;
   WorkflowShorebirdConfig get shorebird => throw _privateConstructorUsedError;
   String get workflowName => throw _privateConstructorUsedError;
   TargetPlatform get platform => throw _privateConstructorUsedError;
@@ -49,6 +50,7 @@ abstract class $WorkflowModelCopyWith<$Res> {
       WorkflowIosConfig? ios,
       String organizationId,
       WorkflowFlutterConfig flutter,
+      WorkflowGitHubConfig? github,
       WorkflowShorebirdConfig shorebird,
       String workflowName,
       TargetPlatform platform,
@@ -58,6 +60,7 @@ abstract class $WorkflowModelCopyWith<$Res> {
   $WorkflowFirebaseConfigCopyWith<$Res> get firebase;
   $WorkflowIosConfigCopyWith<$Res>? get ios;
   $WorkflowFlutterConfigCopyWith<$Res> get flutter;
+  $WorkflowGitHubConfigCopyWith<$Res>? get github;
   $WorkflowShorebirdConfigCopyWith<$Res> get shorebird;
 }
 
@@ -79,6 +82,7 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
     Object? ios = freezed,
     Object? organizationId = null,
     Object? flutter = null,
+    Object? github = freezed,
     Object? shorebird = null,
     Object? workflowName = null,
     Object? platform = null,
@@ -105,6 +109,10 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
           ? _value.flutter
           : flutter // ignore: cast_nullable_to_non_nullable
               as WorkflowFlutterConfig,
+      github: freezed == github
+          ? _value.github
+          : github // ignore: cast_nullable_to_non_nullable
+              as WorkflowGitHubConfig?,
       shorebird: null == shorebird
           ? _value.shorebird
           : shorebird // ignore: cast_nullable_to_non_nullable
@@ -166,6 +174,18 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
 
   @override
   @pragma('vm:prefer-inline')
+  $WorkflowGitHubConfigCopyWith<$Res>? get github {
+    if (_value.github == null) {
+      return null;
+    }
+
+    return $WorkflowGitHubConfigCopyWith<$Res>(_value.github!, (value) {
+      return _then(_value.copyWith(github: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
   $WorkflowShorebirdConfigCopyWith<$Res> get shorebird {
     return $WorkflowShorebirdConfigCopyWith<$Res>(_value.shorebird, (value) {
       return _then(_value.copyWith(shorebird: value) as $Val);
@@ -187,6 +207,7 @@ abstract class _$$WorkflowModelImplCopyWith<$Res>
       WorkflowIosConfig? ios,
       String organizationId,
       WorkflowFlutterConfig flutter,
+      WorkflowGitHubConfig? github,
       WorkflowShorebirdConfig shorebird,
       String workflowName,
       TargetPlatform platform,
@@ -200,6 +221,8 @@ abstract class _$$WorkflowModelImplCopyWith<$Res>
   $WorkflowIosConfigCopyWith<$Res>? get ios;
   @override
   $WorkflowFlutterConfigCopyWith<$Res> get flutter;
+  @override
+  $WorkflowGitHubConfigCopyWith<$Res>? get github;
   @override
   $WorkflowShorebirdConfigCopyWith<$Res> get shorebird;
 }
@@ -220,6 +243,7 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
     Object? ios = freezed,
     Object? organizationId = null,
     Object? flutter = null,
+    Object? github = freezed,
     Object? shorebird = null,
     Object? workflowName = null,
     Object? platform = null,
@@ -246,6 +270,10 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
           ? _value.flutter
           : flutter // ignore: cast_nullable_to_non_nullable
               as WorkflowFlutterConfig,
+      github: freezed == github
+          ? _value.github
+          : github // ignore: cast_nullable_to_non_nullable
+              as WorkflowGitHubConfig?,
       shorebird: null == shorebird
           ? _value.shorebird
           : shorebird // ignore: cast_nullable_to_non_nullable
@@ -275,6 +303,7 @@ class _$WorkflowModelImpl implements _WorkflowModel {
       this.ios,
       required this.organizationId,
       required this.flutter,
+      this.github,
       required this.shorebird,
       required this.workflowName,
       required this.platform,
@@ -294,6 +323,8 @@ class _$WorkflowModelImpl implements _WorkflowModel {
   @override
   final WorkflowFlutterConfig flutter;
   @override
+  final WorkflowGitHubConfig? github;
+  @override
   final WorkflowShorebirdConfig shorebird;
   @override
   final String workflowName;
@@ -305,7 +336,7 @@ class _$WorkflowModelImpl implements _WorkflowModel {
 
   @override
   String toString() {
-    return 'WorkflowModel(android: $android, firebase: $firebase, ios: $ios, organizationId: $organizationId, flutter: $flutter, shorebird: $shorebird, workflowName: $workflowName, platform: $platform, distribution: $distribution)';
+    return 'WorkflowModel(android: $android, firebase: $firebase, ios: $ios, organizationId: $organizationId, flutter: $flutter, github: $github, shorebird: $shorebird, workflowName: $workflowName, platform: $platform, distribution: $distribution)';
   }
 
   @override
@@ -320,6 +351,7 @@ class _$WorkflowModelImpl implements _WorkflowModel {
             (identical(other.organizationId, organizationId) ||
                 other.organizationId == organizationId) &&
             (identical(other.flutter, flutter) || other.flutter == flutter) &&
+            (identical(other.github, github) || other.github == github) &&
             (identical(other.shorebird, shorebird) ||
                 other.shorebird == shorebird) &&
             (identical(other.workflowName, workflowName) ||
@@ -332,8 +364,18 @@ class _$WorkflowModelImpl implements _WorkflowModel {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, android, firebase, ios,
-      organizationId, flutter, shorebird, workflowName, platform, distribution);
+  int get hashCode => Object.hash(
+      runtimeType,
+      android,
+      firebase,
+      ios,
+      organizationId,
+      flutter,
+      github,
+      shorebird,
+      workflowName,
+      platform,
+      distribution);
 
   @JsonKey(ignore: true)
   @override
@@ -356,6 +398,7 @@ abstract class _WorkflowModel implements WorkflowModel {
       final WorkflowIosConfig? ios,
       required final String organizationId,
       required final WorkflowFlutterConfig flutter,
+      final WorkflowGitHubConfig? github,
       required final WorkflowShorebirdConfig shorebird,
       required final String workflowName,
       required final TargetPlatform platform,
@@ -375,6 +418,8 @@ abstract class _WorkflowModel implements WorkflowModel {
   @override
   WorkflowFlutterConfig get flutter;
   @override
+  WorkflowGitHubConfig? get github;
+  @override
   WorkflowShorebirdConfig get shorebird;
   @override
   String get workflowName;
@@ -386,6 +431,217 @@ abstract class _WorkflowModel implements WorkflowModel {
   @JsonKey(ignore: true)
   _$$WorkflowModelImplCopyWith<_$WorkflowModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+WorkflowGitHubConfig _$WorkflowGitHubConfigFromJson(Map<String, dynamic> json) {
+  return _WorkflowGitHubConfig.fromJson(json);
+}
+
+/// @nodoc
+mixin _$WorkflowGitHubConfig {
+  String? get baseBranch => throw _privateConstructorUsedError;
+  String? get repositoryUrl => throw _privateConstructorUsedError;
+  String? get triggerType => throw _privateConstructorUsedError;
+  String? get jksDirectory => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $WorkflowGitHubConfigCopyWith<WorkflowGitHubConfig> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $WorkflowGitHubConfigCopyWith<$Res> {
+  factory $WorkflowGitHubConfigCopyWith(WorkflowGitHubConfig value,
+          $Res Function(WorkflowGitHubConfig) then) =
+      _$WorkflowGitHubConfigCopyWithImpl<$Res, WorkflowGitHubConfig>;
+  @useResult
+  $Res call(
+      {String? baseBranch,
+      String? repositoryUrl,
+      String? triggerType,
+      String? jksDirectory});
+}
+
+/// @nodoc
+class _$WorkflowGitHubConfigCopyWithImpl<$Res,
+        $Val extends WorkflowGitHubConfig>
+    implements $WorkflowGitHubConfigCopyWith<$Res> {
+  _$WorkflowGitHubConfigCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? baseBranch = freezed,
+    Object? repositoryUrl = freezed,
+    Object? triggerType = freezed,
+    Object? jksDirectory = freezed,
+  }) {
+    return _then(_value.copyWith(
+      baseBranch: freezed == baseBranch
+          ? _value.baseBranch
+          : baseBranch // ignore: cast_nullable_to_non_nullable
+              as String?,
+      repositoryUrl: freezed == repositoryUrl
+          ? _value.repositoryUrl
+          : repositoryUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      triggerType: freezed == triggerType
+          ? _value.triggerType
+          : triggerType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      jksDirectory: freezed == jksDirectory
+          ? _value.jksDirectory
+          : jksDirectory // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$WorkflowGitHubConfigImplCopyWith<$Res>
+    implements $WorkflowGitHubConfigCopyWith<$Res> {
+  factory _$$WorkflowGitHubConfigImplCopyWith(_$WorkflowGitHubConfigImpl value,
+          $Res Function(_$WorkflowGitHubConfigImpl) then) =
+      __$$WorkflowGitHubConfigImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String? baseBranch,
+      String? repositoryUrl,
+      String? triggerType,
+      String? jksDirectory});
+}
+
+/// @nodoc
+class __$$WorkflowGitHubConfigImplCopyWithImpl<$Res>
+    extends _$WorkflowGitHubConfigCopyWithImpl<$Res, _$WorkflowGitHubConfigImpl>
+    implements _$$WorkflowGitHubConfigImplCopyWith<$Res> {
+  __$$WorkflowGitHubConfigImplCopyWithImpl(_$WorkflowGitHubConfigImpl _value,
+      $Res Function(_$WorkflowGitHubConfigImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? baseBranch = freezed,
+    Object? repositoryUrl = freezed,
+    Object? triggerType = freezed,
+    Object? jksDirectory = freezed,
+  }) {
+    return _then(_$WorkflowGitHubConfigImpl(
+      baseBranch: freezed == baseBranch
+          ? _value.baseBranch
+          : baseBranch // ignore: cast_nullable_to_non_nullable
+              as String?,
+      repositoryUrl: freezed == repositoryUrl
+          ? _value.repositoryUrl
+          : repositoryUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      triggerType: freezed == triggerType
+          ? _value.triggerType
+          : triggerType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      jksDirectory: freezed == jksDirectory
+          ? _value.jksDirectory
+          : jksDirectory // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$WorkflowGitHubConfigImpl implements _WorkflowGitHubConfig {
+  const _$WorkflowGitHubConfigImpl(
+      {this.baseBranch = null,
+      this.repositoryUrl = null,
+      this.triggerType = null,
+      this.jksDirectory});
+
+  factory _$WorkflowGitHubConfigImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WorkflowGitHubConfigImplFromJson(json);
+
+  @override
+  @JsonKey()
+  final String? baseBranch;
+  @override
+  @JsonKey()
+  final String? repositoryUrl;
+  @override
+  @JsonKey()
+  final String? triggerType;
+  @override
+  final String? jksDirectory;
+
+  @override
+  String toString() {
+    return 'WorkflowGitHubConfig(baseBranch: $baseBranch, repositoryUrl: $repositoryUrl, triggerType: $triggerType, jksDirectory: $jksDirectory)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$WorkflowGitHubConfigImpl &&
+            (identical(other.baseBranch, baseBranch) ||
+                other.baseBranch == baseBranch) &&
+            (identical(other.repositoryUrl, repositoryUrl) ||
+                other.repositoryUrl == repositoryUrl) &&
+            (identical(other.triggerType, triggerType) ||
+                other.triggerType == triggerType) &&
+            (identical(other.jksDirectory, jksDirectory) ||
+                other.jksDirectory == jksDirectory));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, baseBranch, repositoryUrl, triggerType, jksDirectory);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$WorkflowGitHubConfigImplCopyWith<_$WorkflowGitHubConfigImpl>
+      get copyWith =>
+          __$$WorkflowGitHubConfigImplCopyWithImpl<_$WorkflowGitHubConfigImpl>(
+              this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$WorkflowGitHubConfigImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _WorkflowGitHubConfig implements WorkflowGitHubConfig {
+  const factory _WorkflowGitHubConfig(
+      {final String? baseBranch,
+      final String? repositoryUrl,
+      final String? triggerType,
+      final String? jksDirectory}) = _$WorkflowGitHubConfigImpl;
+
+  factory _WorkflowGitHubConfig.fromJson(Map<String, dynamic> json) =
+      _$WorkflowGitHubConfigImpl.fromJson;
+
+  @override
+  String? get baseBranch;
+  @override
+  String? get repositoryUrl;
+  @override
+  String? get triggerType;
+  @override
+  String? get jksDirectory;
+  @override
+  @JsonKey(ignore: true)
+  _$$WorkflowGitHubConfigImplCopyWith<_$WorkflowGitHubConfigImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 WorkflowAndroidConfig _$WorkflowAndroidConfigFromJson(

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -13,8 +14,11 @@ class EditOrgPage extends HookConsumerWidget {
 
     return Scaffold(
       body: StreamBuilder(
-        stream:
-            FirebaseFirestore.instance.collection('organizations').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('organizations')
+            .where('editors',
+                arrayContains: FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(

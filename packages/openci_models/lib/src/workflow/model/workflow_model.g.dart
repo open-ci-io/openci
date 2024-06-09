@@ -20,6 +20,10 @@ _$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
       organizationId: json['organizationId'] as String,
       flutter: WorkflowFlutterConfig.fromJson(
           json['flutter'] as Map<String, dynamic>),
+      github: json['github'] == null
+          ? null
+          : WorkflowGitHubConfig.fromJson(
+              json['github'] as Map<String, dynamic>),
       shorebird: WorkflowShorebirdConfig.fromJson(
           json['shorebird'] as Map<String, dynamic>),
       workflowName: json['workflowName'] as String,
@@ -31,12 +35,13 @@ _$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$WorkflowModelImplToJson(_$WorkflowModelImpl instance) =>
     <String, dynamic>{
-      'android': instance.android,
-      'firebase': instance.firebase,
-      'ios': instance.ios,
+      'android': instance.android?.toJson(),
+      'firebase': instance.firebase.toJson(),
+      'ios': instance.ios?.toJson(),
       'organizationId': instance.organizationId,
-      'flutter': instance.flutter,
-      'shorebird': instance.shorebird,
+      'flutter': instance.flutter.toJson(),
+      'github': instance.github?.toJson(),
+      'shorebird': instance.shorebird.toJson(),
       'workflowName': instance.workflowName,
       'platform': _$TargetPlatformEnumMap[instance.platform]!,
       'distribution': _$BuildDistributionChannelEnumMap[instance.distribution],
@@ -53,6 +58,24 @@ const _$BuildDistributionChannelEnumMap = {
   BuildDistributionChannel.playStoreInternal: 'playStoreInternal',
   BuildDistributionChannel.playStoreBeta: 'playStoreBeta',
 };
+
+_$WorkflowGitHubConfigImpl _$$WorkflowGitHubConfigImplFromJson(
+        Map<String, dynamic> json) =>
+    _$WorkflowGitHubConfigImpl(
+      baseBranch: json['baseBranch'] as String? ?? null,
+      repositoryUrl: json['repositoryUrl'] as String? ?? null,
+      triggerType: json['triggerType'] as String? ?? null,
+      jksDirectory: json['jksDirectory'] as String?,
+    );
+
+Map<String, dynamic> _$$WorkflowGitHubConfigImplToJson(
+        _$WorkflowGitHubConfigImpl instance) =>
+    <String, dynamic>{
+      'baseBranch': instance.baseBranch,
+      'repositoryUrl': instance.repositoryUrl,
+      'triggerType': instance.triggerType,
+      'jksDirectory': instance.jksDirectory,
+    };
 
 _$WorkflowAndroidConfigImpl _$$WorkflowAndroidConfigImplFromJson(
         Map<String, dynamic> json) =>
@@ -103,7 +126,7 @@ _$WorkflowFirebaseConfigImpl _$$WorkflowFirebaseConfigImplFromJson(
 Map<String, dynamic> _$$WorkflowFirebaseConfigImplToJson(
         _$WorkflowFirebaseConfigImpl instance) =>
     <String, dynamic>{
-      'appDistribution': instance.appDistribution,
+      'appDistribution': instance.appDistribution.toJson(),
       'appIdIos': instance.appIdIos,
       'appIdAndroid': instance.appIdAndroid,
       'serviceAccountJson': instance.serviceAccountJson,
@@ -130,8 +153,8 @@ Map<String, dynamic> _$$WorkflowIosConfigImplToJson(
     <String, dynamic>{
       'exportOptions': instance.exportOptions,
       'p12': instance.p12,
-      'provisioningProfile': instance.provisioningProfile,
-      'appStoreConnectAPI': instance.appStoreConnectAPI,
+      'provisioningProfile': instance.provisioningProfile?.toJson(),
+      'appStoreConnectAPI': instance.appStoreConnectAPI?.toJson(),
       'teamId': instance.teamId,
     };
 

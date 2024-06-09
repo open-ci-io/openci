@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -29,10 +26,7 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
@@ -53,6 +47,25 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyDTeGz1_vuYepo69Zg_gthdr3BCb4LNJSo',
+    appId: '1:226435817638:ios:f3ae0aae078d6fcdc1d467',
+    messagingSenderId: '226435817638',
+    projectId: 'open-ci-release',
+    storageBucket: 'open-ci-release.appspot.com',
+    iosBundleId: 'com.example.dashboard',
+  );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCHa8osNS0tQ1q06DI1RcVcJY-nhRPkV7U',
+    appId: '1:226435817638:web:df2ad13626294fb4c1d467',
+    messagingSenderId: '226435817638',
+    projectId: 'open-ci-release',
+    authDomain: 'open-ci-release.firebaseapp.com',
+    storageBucket: 'open-ci-release.appspot.com',
+    measurementId: 'G-GHPQH8QE3X',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDTeGz1_vuYepo69Zg_gthdr3BCb4LNJSo',
     appId: '1:226435817638:ios:f3ae0aae078d6fcdc1d467',
     messagingSenderId: '226435817638',

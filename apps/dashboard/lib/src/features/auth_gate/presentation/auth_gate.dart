@@ -1,5 +1,5 @@
-import 'package:dashboard/src/features/login/presentation/login_page.dart';
 import 'package:dashboard/src/features/menu/presentation/menu_page.dart';
+import 'package:dashboard/src/features/top/presentation/top_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -26,6 +26,6 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    return _user == null ? const LoginPage() : const MenuPage();
+    return _user == null ? const TopPage() : const MenuPage();
   }
 }

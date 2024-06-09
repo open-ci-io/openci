@@ -78,10 +78,10 @@ _$BuildModelImpl _$$BuildModelImplFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$BuildModelImplToJson(_$BuildModelImpl instance) =>
     <String, dynamic>{
-      'buildStatus': instance.buildStatus,
-      'branch': instance.branch,
-      'githubChecks': instance.githubChecks,
-      'github': instance.github,
+      'buildStatus': instance.buildStatus.toJson(),
+      'branch': instance.branch.toJson(),
+      'githubChecks': instance.githubChecks.toJson(),
+      'github': instance.github.toJson(),
       'documentId': instance.documentId,
       'platform': _$TargetPlatformEnumMap[instance.platform]!,
       'workflowId': instance.workflowId,

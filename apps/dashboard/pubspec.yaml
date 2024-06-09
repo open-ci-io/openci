@@ -10,15 +10,19 @@ dependencies:
   awesome_extensions: ^2.0.16
   cloud_firestore: ^4.17.5
   cupertino_icons: ^1.0.6
+  file_picker: ^8.0.3
   firebase_auth: ^4.20.0
   firebase_core: ^2.32.0
+  firebase_storage: ^11.7.7
   flutter:
     sdk: flutter
   flutter_hooks: ^0.20.5
   freezed: ^2.4.8
   google_fonts: ^6.2.1
   hooks_riverpod: ^2.5.1
+  openci_models: ^1.0.8
   riverpod_annotation: ^2.3.5
+  url_launcher: ^6.3.0
   uuid: ^4.4.0
 
 dev_dependencies:
