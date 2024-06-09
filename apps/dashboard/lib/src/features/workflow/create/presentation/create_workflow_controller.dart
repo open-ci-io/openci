@@ -61,16 +61,21 @@ class CreateWorkflowController extends _$CreateWorkflowController {
   }
 
   Future<void> save(WorkflowModel data) async {
-    final res = await FirebaseFirestore.instance
-        .collection('workflows_v1')
-        .add(data.toJson());
-    await FirebaseFirestore.instance
-        .collection('workflows_v1')
-        .doc(res.id)
-        .update({
-      'documentId': res.id,
-      'createdAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    try {
+      final res = await FirebaseFirestore.instance
+          .collection('workflows_v1')
+          .add(data.toJson());
+      await FirebaseFirestore.instance
+          .collection('workflows_v1')
+          .doc(res.id)
+          .update({
+        'documentId': res.id,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } on FirebaseException catch (e, s) {
+      print(e);
+      print(s);
+    }
   }
 }
