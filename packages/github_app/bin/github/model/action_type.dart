@@ -4,5 +4,6 @@ enum ActionType {
   edited,
   created,
   completed,
+  synchronize,
   ;
 }

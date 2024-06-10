@@ -36,7 +36,9 @@ Future<Response> onRequest(RequestContext context) async {
   final github = GitHub(auth: Authentication.withToken(token));
   final slug = RepositorySlug.full(fullName);
 
-  if ((action == ActionType.opened || action == ActionType.reopened) &&
+  if ((action == ActionType.opened ||
+          action == ActionType.reopened ||
+          action == ActionType.synchronize) &&
       data['pull_request'] != null) {
     await handlePullRequestAction(
       data,
@@ -132,7 +134,11 @@ Future<void> handlePullRequestAction(
     );
 
     final jobData = BuildModel(
-      buildStatus: const BuildStatus(),
+      buildStatus: const BuildStatus(
+        processing: false,
+        failure: false,
+        success: false,
+      ),
       branch: branch,
       githubChecks: githubChecks,
       github: jobGitHub,
