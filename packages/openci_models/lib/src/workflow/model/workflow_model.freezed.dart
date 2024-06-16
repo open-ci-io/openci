@@ -442,7 +442,6 @@ mixin _$WorkflowGitHubConfig {
   String? get baseBranch => throw _privateConstructorUsedError;
   String? get repositoryUrl => throw _privateConstructorUsedError;
   String? get triggerType => throw _privateConstructorUsedError;
-  String? get jksDirectory => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -456,11 +455,7 @@ abstract class $WorkflowGitHubConfigCopyWith<$Res> {
           $Res Function(WorkflowGitHubConfig) then) =
       _$WorkflowGitHubConfigCopyWithImpl<$Res, WorkflowGitHubConfig>;
   @useResult
-  $Res call(
-      {String? baseBranch,
-      String? repositoryUrl,
-      String? triggerType,
-      String? jksDirectory});
+  $Res call({String? baseBranch, String? repositoryUrl, String? triggerType});
 }
 
 /// @nodoc
@@ -480,7 +475,6 @@ class _$WorkflowGitHubConfigCopyWithImpl<$Res,
     Object? baseBranch = freezed,
     Object? repositoryUrl = freezed,
     Object? triggerType = freezed,
-    Object? jksDirectory = freezed,
   }) {
     return _then(_value.copyWith(
       baseBranch: freezed == baseBranch
@@ -495,10 +489,6 @@ class _$WorkflowGitHubConfigCopyWithImpl<$Res,
           ? _value.triggerType
           : triggerType // ignore: cast_nullable_to_non_nullable
               as String?,
-      jksDirectory: freezed == jksDirectory
-          ? _value.jksDirectory
-          : jksDirectory // ignore: cast_nullable_to_non_nullable
-              as String?,
     ) as $Val);
   }
 }
@@ -511,11 +501,7 @@ abstract class _$$WorkflowGitHubConfigImplCopyWith<$Res>
       __$$WorkflowGitHubConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String? baseBranch,
-      String? repositoryUrl,
-      String? triggerType,
-      String? jksDirectory});
+  $Res call({String? baseBranch, String? repositoryUrl, String? triggerType});
 }
 
 /// @nodoc
@@ -532,7 +518,6 @@ class __$$WorkflowGitHubConfigImplCopyWithImpl<$Res>
     Object? baseBranch = freezed,
     Object? repositoryUrl = freezed,
     Object? triggerType = freezed,
-    Object? jksDirectory = freezed,
   }) {
     return _then(_$WorkflowGitHubConfigImpl(
       baseBranch: freezed == baseBranch
@@ -547,10 +532,6 @@ class __$$WorkflowGitHubConfigImplCopyWithImpl<$Res>
           ? _value.triggerType
           : triggerType // ignore: cast_nullable_to_non_nullable
               as String?,
-      jksDirectory: freezed == jksDirectory
-          ? _value.jksDirectory
-          : jksDirectory // ignore: cast_nullable_to_non_nullable
-              as String?,
     ));
   }
 }
@@ -561,8 +542,7 @@ class _$WorkflowGitHubConfigImpl implements _WorkflowGitHubConfig {
   const _$WorkflowGitHubConfigImpl(
       {this.baseBranch = null,
       this.repositoryUrl = null,
-      this.triggerType = null,
-      this.jksDirectory});
+      this.triggerType = null});
 
   factory _$WorkflowGitHubConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowGitHubConfigImplFromJson(json);
@@ -576,12 +556,10 @@ class _$WorkflowGitHubConfigImpl implements _WorkflowGitHubConfig {
   @override
   @JsonKey()
   final String? triggerType;
-  @override
-  final String? jksDirectory;
 
   @override
   String toString() {
-    return 'WorkflowGitHubConfig(baseBranch: $baseBranch, repositoryUrl: $repositoryUrl, triggerType: $triggerType, jksDirectory: $jksDirectory)';
+    return 'WorkflowGitHubConfig(baseBranch: $baseBranch, repositoryUrl: $repositoryUrl, triggerType: $triggerType)';
   }
 
   @override
@@ -594,15 +572,13 @@ class _$WorkflowGitHubConfigImpl implements _WorkflowGitHubConfig {
             (identical(other.repositoryUrl, repositoryUrl) ||
                 other.repositoryUrl == repositoryUrl) &&
             (identical(other.triggerType, triggerType) ||
-                other.triggerType == triggerType) &&
-            (identical(other.jksDirectory, jksDirectory) ||
-                other.jksDirectory == jksDirectory));
+                other.triggerType == triggerType));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, baseBranch, repositoryUrl, triggerType, jksDirectory);
+  int get hashCode =>
+      Object.hash(runtimeType, baseBranch, repositoryUrl, triggerType);
 
   @JsonKey(ignore: true)
   @override
@@ -624,8 +600,7 @@ abstract class _WorkflowGitHubConfig implements WorkflowGitHubConfig {
   const factory _WorkflowGitHubConfig(
       {final String? baseBranch,
       final String? repositoryUrl,
-      final String? triggerType,
-      final String? jksDirectory}) = _$WorkflowGitHubConfigImpl;
+      final String? triggerType}) = _$WorkflowGitHubConfigImpl;
 
   factory _WorkflowGitHubConfig.fromJson(Map<String, dynamic> json) =
       _$WorkflowGitHubConfigImpl.fromJson;
@@ -636,8 +611,6 @@ abstract class _WorkflowGitHubConfig implements WorkflowGitHubConfig {
   String? get repositoryUrl;
   @override
   String? get triggerType;
-  @override
-  String? get jksDirectory;
   @override
   @JsonKey(ignore: true)
   _$$WorkflowGitHubConfigImplCopyWith<_$WorkflowGitHubConfigImpl>

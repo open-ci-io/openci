@@ -4,7 +4,6 @@ import 'package:dotenv/dotenv.dart';
 import 'package:github/github.dart';
 import 'package:openci_models/openci_models.dart';
 
-import '../bin/env/model/env_model.dart';
 import '../bin/firebase/firebase_service.dart';
 import '../bin/jwt_service.dart';
 

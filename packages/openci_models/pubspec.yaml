@@ -1,6 +1,6 @@
 name: openci_models
 description: OpenCI Models
-version: 1.0.8
+version: 1.0.10
 repository: https://github.com/open-ci-io/openci/tree/develop/packages/openci_models
 
 environment:
@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   dart_firebase_admin: ^0.3.1
+  dotenv: ^4.2.0
   freezed: ^2.4.8
   freezed_annotation: ^2.4.1
   json_annotation: ^4.9.0

@@ -8,9 +8,7 @@ import 'package:openci_models/openci_models.dart' as model;
 import 'package:openci_models/openci_models.dart';
 import 'package:uuid/uuid.dart';
 
-import '../bin/env/model/env_model.dart';
 import '../bin/firebase/firebase_service.dart';
-import '../bin/github/model/action_type.dart';
 import '../bin/jwt_service.dart';
 
 Future<Response> onRequest(RequestContext context) async {

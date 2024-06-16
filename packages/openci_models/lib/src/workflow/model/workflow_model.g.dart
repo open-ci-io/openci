@@ -65,7 +65,6 @@ _$WorkflowGitHubConfigImpl _$$WorkflowGitHubConfigImplFromJson(
       baseBranch: json['baseBranch'] as String? ?? null,
       repositoryUrl: json['repositoryUrl'] as String? ?? null,
       triggerType: json['triggerType'] as String? ?? null,
-      jksDirectory: json['jksDirectory'] as String?,
     );
 
 Map<String, dynamic> _$$WorkflowGitHubConfigImplToJson(
@@ -74,7 +73,6 @@ Map<String, dynamic> _$$WorkflowGitHubConfigImplToJson(
       'baseBranch': instance.baseBranch,
       'repositoryUrl': instance.repositoryUrl,
       'triggerType': instance.triggerType,
-      'jksDirectory': instance.jksDirectory,
     };
 
 _$WorkflowAndroidConfigImpl _$$WorkflowAndroidConfigImplFromJson(

@@ -22,7 +22,7 @@ dependencies:
   http: ^1.2.1
   json_annotation: ^4.8.1
   mason_logger: ^0.2.5
-  openci_models: ^1.0.8
+  openci_models: ^1.0.10
   process_run: ^0.13.3
   pub_updater: ^0.3.0
   sentry: ^7.18.0

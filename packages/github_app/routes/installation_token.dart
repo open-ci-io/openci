@@ -1,7 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
+import 'package:openci_models/openci_models.dart';
 
-import '../bin/env/model/env_model.dart';
 import '../bin/jwt_service.dart';
 
 Future<Response> onRequest(RequestContext context) async {

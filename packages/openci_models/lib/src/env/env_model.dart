@@ -19,23 +19,23 @@ class EnvModel with _$EnvModel {
     final base64SA = env['FIREBASE_SERVICE_ACCOUNT_BASE64'];
 
     if (base64SA == null) {
-      throw Exception("base64SA is null");
+      throw Exception('base64SA is null');
     }
 
     final firebaseProjectName = env['FIREBASE_PROJECT_NAME'];
     if (firebaseProjectName == null) {
-      throw Exception("firebaseProjectName is null");
+      throw Exception('firebaseProjectName is null');
     }
 
     final base64Pem = env['PEM_BASE64'];
 
     if (base64Pem == null) {
-      throw Exception("base64Pem is null");
+      throw Exception('base64Pem is null');
     }
 
     final githubAppId = env['GITHUB_APP_ID'];
     if (githubAppId == null) {
-      throw Exception("githubAppId is null");
+      throw Exception('githubAppId is null');
     }
     return EnvModel(
       firebaseServiceAccountBase64: base64SA,
