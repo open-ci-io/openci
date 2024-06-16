@@ -6,3 +6,5 @@ packages:
 scripts:
   analyze:
     exec: dart analyze .
+  deploy: melos publish --no-dry-run
+  commit: git add . && git commit -m "update packages"
