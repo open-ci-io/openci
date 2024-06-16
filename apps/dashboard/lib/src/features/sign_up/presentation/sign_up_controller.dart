@@ -9,7 +9,11 @@ class SignUpController extends _$SignUpController {
     return;
   }
 
-  Future<void> signInAnonymously() async {
-    await FirebaseAuth.instance.signInAnonymously();
+  Future<void> createUserWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
   }
 }

@@ -8,3 +8,4 @@ scripts:
     exec: dart analyze .
   deploy: melos publish --no-dry-run
   commit: git add . && git commit -m "update packages" && git push origin develop;
+  deploy-dashboard: cd apps/dashboard && firebase deploy --only hosting:openci-dashboard
