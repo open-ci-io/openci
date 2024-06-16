@@ -1,0 +1,119 @@
+export const metadata = {
+  // title: 'Quickstart',
+  // description:
+    // 'This guide will get you all set up and ready to use the Protocol API. We’ll cover how to get started an API client and how to make your first API request.',
+}
+
+# Quickstart
+
+This guide will get you all set up and ready to use OpenCI. {{ className: 'lead' }}
+
+{/* <Note>
+  Before you can make requests to the Protocol API, you will need to grab your
+  API key from your dashboard. You find it under [Settings &raquo; API](#).
+</Note> */}
+## Create a OpenCI project
+
+At the OpenCI dashboard, create a new project.
+
+[OpenCI Dashboard](https://openci-dashboard.web.app/)
+
+## Create an Android Workflow
+There are number of files that you need to input to OpenCI. 
+
+<Properties>
+  <Property name="jks" type=".jks">
+    JKS file for signing the app. If you have not created a JKS file, please create one.
+  </Property>
+  [Build and release an Android app](https://docs.flutter.dev/deployment/android)
+  <Property name="jksDiredctory" type="string">
+    Please provide the directory of the JKS file. typically, is is located in the ```android/app``` directory.
+  </Property>
+  <Property name="jksName" type="string">
+    Please provide the name of the JKS file.
+  </Property>
+  <Property name="keyPropreties" type="key.properties">
+    Upload the key.properties file. This file contains the key information for signing the app.
+  </Property>
+</Properties>
+
+### Create a Firebase Project
+
+OpenCI uses Firebase App Distribution for distributing your app to testers. To get started, create a new Firebase project and add your app to it.
+If you have not created the project, please follow the steps below:
+
+[Firebase Dashboard](https://console.firebase.google.com/u/0)
+
+### Step 1: Create a Firebase project
+Head over to the [Firebase Console](https://console.firebase.google.com/u/0) and create a new project. (It's free).
+
+### Step 2: Install Firebase CLI
+To add your app to Firebase project, you need to use flutterfire CLI. To use the CLI, you first need to install firebase CLI.
+
+<CodeGroup>
+```bash {{ title: 'Android' }}
+npm install -g firebase-tools
+```
+</CodeGroup>
+
+### Step 3: Install FlutterFire CLI
+
+<CodeGroup>
+```bash {{ title: 'Android' }}
+dart pub global activate flutterfire_cli
+```
+</CodeGroup>
+
+### Step 4: Add your app to Firebase project
+<CodeGroup>
+```bash {{ title: 'Android' }}
+flutterfire configure
+```
+</CodeGroup>
+
+### Step 5: Enable Firebase App Distribution
+Go to the App Distribution tab and click on the Get Started button.
+
+### Step 6: Download google-services.json
+This file is needed for uploading your build (apk) to Firebase App Distribution.
+
+After setting up Firebase, you need to add the following files to OpenCI:
+<Properties>
+  <Property name="testerGroups" type="string">
+    Please provide the tester group name of Firebase App Distribution. If you haven't created a tester group, it's okay to leave it blank.
+  </Property>
+  <Property name="testers" type="string">
+    Please provide the email addresses of the testers. It's okay to leave it blank.
+  </Property>
+  <Property name="appIdAndroid" type="string">
+    After adding your app to Firebase project, you will get an Android App ID. Please provide the id here.
+  </Property>
+  <Property name="service-account.json" type=".json">
+    Upload the service-account.json file. This file is needed for uploading the build to Firebase App Distribution.
+  </Property>
+  <Property name="appName" type="string">
+    Please provide the name of the app.
+  </Property>
+  <Property name="dartDefine" type="string">
+    If you use dart define, please provide the commands.
+  </Property>
+  <Property name="entryPoint" type="string">
+    If you don't use flavor, it's ```lib/main.dart```. If you use flavor, please provide the entry point. ```lib/main_dev.dart```.
+  </Property>
+  <Property name="entryPoint" type="string">
+    If you use flavor, please provide the flavor name that you want to use.
+  </Property>
+  <Property name="version" type="string">
+    Flutter version that you use for the project. ```3.22.0```.
+  </Property>
+  <Property name="baseBranch" type="string">
+    Please provide the base branch name. ```develop```. In this case, if you create a PR toward the develop branch, the workflow will be triggered.
+  </Property>
+  <Property name="repositoryUrl" type="string">
+    Please provide the repository URL.
+  </Property>
+  <Property name="workflowName" type="string">
+    Please provide the workflow name. ```Android CI```.
+  </Property>
+</Properties>
+

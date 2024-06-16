@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "open-ci-release"
+  },
+  "targets": {
+    "open-ci-release": {
+      "hosting": {
+        "openci-docs": [
+          "openci-docs"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
