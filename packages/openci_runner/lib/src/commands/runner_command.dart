@@ -132,11 +132,14 @@ class RunnerCommand extends Command<int> {
       progressSignal.value = _logger.progress('Searching for new job');
       isSearchingSignal.value = true;
     }
+
     final data = await supabaseClient
         .from('jobs')
-        .select('*')
+        .update({'status': 'processing'})
+        .eq('status', 'queued')
+        .order('created_at')
         .limit(1)
-        .order('created_at');
+        .select();
 
     if (data.isEmpty && progressSignal.value != null) {
       progressSignal.value
