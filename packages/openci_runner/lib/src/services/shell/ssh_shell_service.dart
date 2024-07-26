@@ -1,4 +1,5 @@
 import 'package:dartssh2/dartssh2.dart';
+import 'package:runner/src/commands/runner_command.dart';
 import 'package:runner/src/services/shell/shell_result.dart';
 
 import 'package:runner/src/services/ssh/ssh_service.dart';
@@ -24,7 +25,6 @@ class SSHShellService {
   Future<ShellResult> executeCommandV2(
     String command,
     SSHClient sshClient,
-    String workingVMName,
   ) async =>
-      _sshService.shellV2(command, sshClient, workingVMName);
+      _sshService.shellV2(command, sshClient, workingVMNameSignal.value);
 }

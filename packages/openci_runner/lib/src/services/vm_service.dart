@@ -1,14 +1,52 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:mason_logger/mason_logger.dart';
+import 'package:process_run/process_run.dart';
+import 'package:runner/src/commands/runner_command.dart';
+import 'package:runner/src/services/logger/logger_service.dart';
 import 'package:runner/src/services/tart/tart_service.dart';
+import 'package:runner/src/services/uuid/uuid_service.dart';
 
 class VMService {
   VMService(this._tartService);
 
   final TartService _tartService;
 
-  Logger logger = Logger();
+  Logger get _logger => loggerSignal.value;
+
+  Future<void> waitForTartIP(String workingVMName) async {
+    while (true) {
+      final shell = Shell();
+      List<ProcessResult>? result;
+      try {
+        result = await shell.run('tart ip $workingVMName');
+      } catch (e) {
+        result = null;
+      }
+      if (result != null) {
+        break;
+      }
+      await Future<void>.delayed(const Duration(seconds: 1));
+    }
+  }
+
+  void _createNewVMName() =>
+      workingVMNameSignal.value = UuidService.generateV4();
+
+  Future<String> startVM() async {
+    _createNewVMName();
+    final workingVMName = workingVMNameSignal.value;
+
+    await cleanupVMs();
+    await cloneVM(workingVMName);
+    unawaited(launchVM(workingVMName));
+    await waitForTartIP(workingVMName);
+
+    _logger.success('VM is ready');
+    return await fetchIpAddress(workingVMName);
+  }
 
   Future<void> cloneVM(String workingVMName) async {
     const baseVMName = 'sonoma';
@@ -18,7 +56,8 @@ class VMService {
   Future<void> launchVM(String workingVMName) =>
       _tartService.run(workingVMName);
 
-  Future<void> stopVM(String workingVMName) async {
+  Future<void> stopVM() async {
+    final workingVMName = workingVMNameSignal.value;
     await _tartService.stop(workingVMName);
     await _tartService.delete(workingVMName);
   }
@@ -43,7 +82,7 @@ class VMService {
         }
       }
     }
-    logger.success('tart VMs cleanup completed');
+    _logger.success('tart VMs cleanup completed');
     return true;
   }
 
@@ -56,15 +95,15 @@ class VMService {
       final Iterable<Match> matches = ipRegex.allMatches(ip);
 
       if (matches.length == 1) {
-        logger.info('Found IP Address: ${matches.first.group(0)}');
+        _logger.info('Found IP Address: ${matches.first.group(0)}');
       } else if (matches.length > 1) {
-        logger.warn('More than one IP addresses found.');
+        _logger.warn('More than one IP addresses found.');
       } else {
-        logger.alert('No IP addresses found.');
+        _logger.alert('No IP addresses found.');
       }
       return matches.first.group(0)!;
     } catch (e) {
-      logger.err(e.toString());
+      _logger.err(e.toString());
       rethrow;
     }
   }

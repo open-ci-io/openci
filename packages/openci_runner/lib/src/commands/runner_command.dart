@@ -5,6 +5,7 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:runner/src/models/job/job_model.dart';
+import 'package:runner/src/services/process/process_service.dart';
 import 'package:runner/src/services/shell/local_shell_service.dart';
 import 'package:runner/src/services/shell/ssh_shell_service.dart';
 import 'package:runner/src/services/ssh/ssh_service.dart';
@@ -12,8 +13,8 @@ import 'package:runner/src/services/supabase/supabase_service.dart';
 import 'package:runner/src/services/tart/tart_service.dart';
 import 'package:runner/src/services/uuid/uuid_service.dart';
 import 'package:runner/src/services/vm_service.dart';
-import 'package:process_run/shell.dart';
-import 'package:sentry/sentry.dart';
+import 'package:signals_core/signals_core.dart';
+import 'package:supabase/supabase.dart';
 
 class AppArgs {
   AppArgs({
@@ -24,7 +25,23 @@ class AppArgs {
   final String supabaseAPIKey;
 }
 
-bool shouldExit = false;
+Future<AppArgs> initializeApp(ArgResults? argResults) async {
+  if (argResults == null) {
+    throw Exception('ArgResults is null');
+  }
+  final supabaseUrl = argResults['supabaseUrl'] as String;
+  final supabaseAPIKey = argResults['supabaseAPIKey'] as String;
+
+  return AppArgs(
+    supabaseUrl: supabaseUrl,
+    supabaseAPIKey: supabaseAPIKey,
+  );
+}
+
+final shouldExitSignal = signal(false);
+final isSearchingSignal = signal(false);
+final progressSignal = signal<Progress?>(null);
+final workingVMNameSignal = signal(UuidService.generateV4());
 
 class RunnerCommand extends Command<int> {
   RunnerCommand({
@@ -48,29 +65,6 @@ class RunnerCommand extends Command<int> {
       );
   }
 
-  Future<AppArgs> initializeApp(ArgResults? argResults) async {
-    if (argResults == null) {
-      throw Exception('ArgResults is null');
-    }
-    final supabaseUrl = argResults['supabaseUrl'] as String;
-    final supabaseAPIKey = argResults['supabaseAPIKey'] as String;
-
-    return AppArgs(
-      supabaseUrl: supabaseUrl,
-      supabaseAPIKey: supabaseAPIKey,
-    );
-  }
-
-  Future<void> initializeSentry(String? sentryDSN) async {
-    if (sentryDSN != null) {
-      await Sentry.init((options) {
-        options
-          ..dsn = sentryDSN
-          ..tracesSampleRate = 1.0;
-      });
-    }
-  }
-
   @override
   String get description => 'Open CI core command';
 
@@ -89,104 +83,71 @@ class RunnerCommand extends Command<int> {
     );
     _logger.success('Argument check passed.');
 
-    var isSearching = false;
+    processServiceSignal.value.watchKeyboardSignals();
+    final vmService = _vmService;
+    final sshShellService = sshShellServiceSignal.value;
 
-    Progress? progress;
-
-    ProcessSignal.sigterm.watch().listen((signal) {
-      _logger.warn('Received SIGTERM. Terminating the CLI...');
-    });
-
-    ProcessSignal.sigint.watch().listen((signal) {
-      _logger.warn('Received SIGINT. Terminating the CLI...');
-      shouldExit = true;
-      exit(0);
-    });
-
-    while (!shouldExit) {
+    while (!shouldExitSignal.value) {
       try {
-        if (isSearching == false) {
-          _logger.info('Searching new job');
-          progress = _logger.progress('Searching new job');
-
-          isSearching = true;
-        }
-
-        final data = await supabaseClient
-            .from('jobs')
-            .select('*')
-            .limit(1)
-            .order('created_at');
-
-        if (data.isEmpty && progress != null) {
-          progress.update('No jobs were found, retrying in 10 seconds');
-
-          await Future<void>.delayed(const Duration(seconds: 10));
+        final isJobAvailable = await startJobSearch(supabaseClient);
+        if (isJobAvailable == false) {
           continue;
         }
 
-        final job = JobModel.fromJson(data.first);
+        final vmIP = await vmService.startVM();
+        final sshClient = await sshServiceSignal.value.sshToServer(vmIP);
 
-        progress!.complete('New job found: $job');
-
-        isSearching = false;
-
-        // prepare service classes
-        final localShellService = LocalShellService();
-        final tartService = TartService(localShellService);
-        final vmService = VMService(tartService);
-
-        final workingVMName = UuidService.generateV4();
-        await vmService.cleanupVMs();
-        await vmService.cloneVM(workingVMName);
-        unawaited(vmService.launchVM(workingVMName));
-        while (true) {
-          final shell = Shell();
-          List<ProcessResult>? result;
-          try {
-            result = await shell.run('tart ip $workingVMName');
-          } catch (e) {
-            result = null;
-          }
-          if (result != null) {
-            break;
-          }
-          await Future<void>.delayed(const Duration(seconds: 1));
-        }
-        _logger.success('VM is ready');
-        final vmIP = await vmService.fetchIpAddress(workingVMName);
-        await Future<void>.delayed(const Duration(seconds: 10));
-        print('vmIP: $vmIP');
-
-        final sshService = sshServiceSignal.value;
-
-        final sshClient = await sshService.sshToServer(vmIP);
-        if (sshClient == null) {
-          throw Exception('ssh client is null');
-        }
-        final sshShellService = sshShellServiceSignal.value;
         await sshShellService.executeCommandV2(
-            'cd ~/Desktop && touch test.ts', sshClient, workingVMName);
+            'cd ~/Desktop && touch test.ts', sshClient);
+        await Future<void>.delayed(const Duration(seconds: 10));
 
-        _logger.success('whole build process completed');
-
-        await vmService.stopVM(workingVMName);
+        await vmService.stopVM();
       } catch (e, s) {
-        _logger
-          ..err('CLI crashed: $e')
-          ..err('StackTrace: $s');
-
-        await Sentry.captureException(
-          e,
-          stackTrace: s,
-        );
-
-        await Future<void>.delayed(const Duration(seconds: 2));
-
-        _logger.warn('Restarting the CLI...');
+        handleException(e, s, _logger);
         continue;
       }
     }
     exit(0);
+  }
+
+  void handleException(dynamic e, StackTrace s, Logger logger) async {
+    logger
+      ..err('CLI crashed: $e')
+      ..err('StackTrace: $s');
+
+    await Future<void>.delayed(const Duration(seconds: 2));
+
+    logger.warn('Restarting the CLI...');
+  }
+
+  VMService get _vmService {
+    final localShellService = LocalShellService();
+    final tartService = TartService(localShellService);
+    return VMService(tartService);
+  }
+
+  Future<bool> startJobSearch(SupabaseClient supabaseClient) async {
+    if (!isSearchingSignal.value) {
+      _logger.info('Starting job search');
+      progressSignal.value = _logger.progress('Searching for new job');
+      isSearchingSignal.value = true;
+    }
+    final data = await supabaseClient
+        .from('jobs')
+        .select('*')
+        .limit(1)
+        .order('created_at');
+
+    if (data.isEmpty && progressSignal.value != null) {
+      progressSignal.value
+          ?.update('No jobs were found, retrying in 10 seconds');
+
+      await Future<void>.delayed(const Duration(seconds: 10));
+      return false;
+    }
+    final job = JobModel.fromJson(data.first);
+    progressSignal.value?.complete('New job found: $job');
+    isSearchingSignal.value = false;
+    return true;
   }
 }

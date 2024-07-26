@@ -15,7 +15,7 @@ class SSHService {
 
   // final LogService logService;
   Logger logger = Logger();
-  Future<SSHClient?> sshToServer(
+  Future<SSHClient> sshToServer(
     String vmIp, {
     String username = 'admin',
     String password = 'admin',
