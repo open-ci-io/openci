@@ -42,6 +42,7 @@ final shouldExitSignal = signal(false);
 final isSearchingSignal = signal(false);
 final progressSignal = signal<Progress?>(null);
 final workingVMNameSignal = signal(UuidService.generateV4());
+final supabaseRowIdSignal = signal<int?>(null);
 
 class RunnerCommand extends Command<int> {
   RunnerCommand({
@@ -99,12 +100,15 @@ class RunnerCommand extends Command<int> {
 
         await sshShellService.executeCommandV2(
             'cd ~/Desktop && touch test.ts', sshClient);
-        await Future<void>.delayed(const Duration(seconds: 10));
+        // await Future<void>.delayed(const Duration(seconds: 10));
 
         await vmService.stopVM();
       } catch (e, s) {
         handleException(e, s, _logger);
         continue;
+      } finally {
+        await supabaseClient.from('jobs').update({'status': 'completed'}).eq(
+            'id', supabaseRowIdSignal.value!);
       }
     }
     exit(0);
@@ -137,7 +141,7 @@ class RunnerCommand extends Command<int> {
         .from('jobs')
         .update({'status': 'processing'})
         .eq('status', 'queued')
-        .order('created_at')
+        .order('created_at', ascending: true)
         .limit(1)
         .select();
 
@@ -148,6 +152,7 @@ class RunnerCommand extends Command<int> {
       await Future<void>.delayed(const Duration(seconds: 10));
       return false;
     }
+    supabaseRowIdSignal.value = data.first['id'] as int;
     final job = JobModel.fromJson(data.first);
     progressSignal.value?.complete('New job found: $job');
     isSearchingSignal.value = false;
