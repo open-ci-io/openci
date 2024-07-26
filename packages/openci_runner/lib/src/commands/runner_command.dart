@@ -132,6 +132,7 @@ class RunnerCommand extends Command<int> {
   }
 
   Future<bool> startJobSearch(SupabaseClient supabaseClient) async {
+    final retrySecond = 1;
     if (!isSearchingSignal.value) {
       _logger.info('Starting job search');
       progressSignal.value = _logger.progress('Searching for new job');
@@ -148,9 +149,9 @@ class RunnerCommand extends Command<int> {
 
     if (data.isEmpty && progressSignal.value != null) {
       progressSignal.value
-          ?.update('No jobs were found, retrying in 10 seconds');
+          ?.update('No jobs were found, retrying in $retrySecond seconds');
 
-      await Future<void>.delayed(const Duration(seconds: 10));
+      await Future<void>.delayed(Duration(seconds: retrySecond));
       return false;
     }
     supabaseRowIdSignal.value = data.first['id'] as int;
