@@ -14,6 +14,14 @@ class SSHShellService {
   SSHShellService(this._sshService);
   final SSHService _sshService;
 
+  SSHClient get _sshClient {
+    final sshClient = sshClientSignal.value;
+    if (sshClient == null) {
+      throw Exception('SSHClient is null');
+    }
+    return sshClient;
+  }
+
   Future<ShellResult> executeCommand(
     String command,
     SSHClient sshClient,
@@ -24,7 +32,6 @@ class SSHShellService {
 
   Future<ShellResult> executeCommandV2(
     String command,
-    SSHClient sshClient,
   ) async =>
-      _sshService.shellV2(command, sshClient, workingVMNameSignal.value);
+      _sshService.shellV2(command, _sshClient, workingVMNameSignal.value);
 }

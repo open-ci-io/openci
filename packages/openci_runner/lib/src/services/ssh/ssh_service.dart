@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
+import 'package:runner/src/commands/runner_command.dart';
 import 'package:runner/src/services/shell/shell_result.dart';
 import 'package:runner/src/services/ssh/domain/session_result.dart';
 import 'package:signals_core/signals_core.dart';
@@ -15,16 +16,17 @@ class SSHService {
 
   // final LogService logService;
   Logger logger = Logger();
-  Future<SSHClient> sshToServer(
+  Future<void> sshToServer(
     String vmIp, {
     String username = 'admin',
     String password = 'admin',
   }) async {
-    return SSHClient(
+    final client = SSHClient(
       await SSHSocket.connect(vmIp, 22),
       username: username,
       onPasswordRequest: () => password,
     );
+    sshClientSignal.value = client;
   }
 
   @Deprecated('use run()')

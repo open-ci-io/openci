@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
+import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:runner/src/models/job/job_model.dart';
 import 'package:runner/src/services/process/process_service.dart';
@@ -43,6 +44,7 @@ final isSearchingSignal = signal(false);
 final progressSignal = signal<Progress?>(null);
 final workingVMNameSignal = signal(UuidService.generateV4());
 final supabaseRowIdSignal = signal<int?>(null);
+final sshClientSignal = signal<SSHClient?>(null);
 
 class RunnerCommand extends Command<int> {
   RunnerCommand({
@@ -58,11 +60,6 @@ class RunnerCommand extends Command<int> {
         'supabaseAPIKey',
         help: 'Supabase API Key',
         abbr: 'k',
-      )
-      ..addOption(
-        'sentryDSN',
-        help: "Sentry's DSN",
-        abbr: 'd',
       );
   }
 
@@ -96,22 +93,26 @@ class RunnerCommand extends Command<int> {
         }
 
         final vmIP = await vmService.startVM();
-        final sshClient = await sshServiceSignal.value.sshToServer(vmIP);
+        await sshServiceSignal.value.sshToServer(vmIP);
 
-        await sshShellService.executeCommandV2(
-            'cd ~/Desktop && touch test.ts', sshClient);
+        await sshShellService.executeCommandV2('cd ~/Desktop && touch test.ts');
         // await Future<void>.delayed(const Duration(seconds: 10));
 
         await vmService.stopVM();
+        await setCompleted(supabaseClient);
       } catch (e, s) {
         handleException(e, s, _logger);
+        await setCompleted(supabaseClient);
         continue;
-      } finally {
-        await supabaseClient.from('jobs').update({'status': 'completed'}).eq(
-            'id', supabaseRowIdSignal.value!);
       }
     }
     exit(0);
+  }
+
+  Future<void> setCompleted(SupabaseClient supabase) async {
+    await supabase
+        .from('jobs')
+        .update({'status': 'completed'}).eq('id', supabaseRowIdSignal.value!);
   }
 
   void handleException(dynamic e, StackTrace s, Logger logger) async {
