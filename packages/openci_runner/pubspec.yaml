@@ -7,7 +7,6 @@ environment:
 dependencies:
   args: ^2.4.1
   cli_completion: ^0.3.0
-  dart_firebase_admin: ^0.3.0
   dart_frog: ^1.1.0
   dart_jsonwebtoken: ^2.14.0
   dartssh2: ^2.8.2
