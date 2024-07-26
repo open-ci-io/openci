@@ -3,7 +3,7 @@ import 'package:args/command_runner.dart';
 import 'package:cli_completion/cli_completion.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:runner/src/commands/commands.dart';
-import 'package:runner/src/features/runner/runner_command.dart';
+import 'package:runner/src/commands/runner_command.dart';
 import 'package:runner/src/version.dart';
 import 'package:pub_updater/pub_updater.dart';
 

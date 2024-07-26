@@ -28,7 +28,7 @@
     }
   },
   "hosting": {
-    "target": "openci-dashboard",
+    "target": "openci-dashboard", 
     "source": ".",
     "ignore": [
       "firebase.json",

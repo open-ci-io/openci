@@ -24,6 +24,8 @@ dependencies:
   process_run: ^0.13.3
   pub_updater: ^0.3.0
   sentry: ^7.18.0
+  signals_core: ^5.2.2
+  supabase: ^2.2.5
   uuid: ^4.2.1
 
 dev_dependencies:
