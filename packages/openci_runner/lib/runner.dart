@@ -8,3 +8,8 @@
 /// runner --help
 /// ```
 library runner;
+// - lib/
+//   - main.dart
+// - bin/
+//   - app.dart
+// - pubspec.yaml

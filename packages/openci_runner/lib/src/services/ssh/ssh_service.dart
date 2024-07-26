@@ -4,32 +4,27 @@ import 'dart:typed_data';
 
 import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:runner/src/services/build_job/build_utility_service.dart';
-import 'package:runner/src/services/log/log_service.dart';
 import 'package:runner/src/services/shell/shell_result.dart';
 import 'package:runner/src/services/ssh/domain/session_result.dart';
+import 'package:signals_core/signals_core.dart';
+
+final sshServiceSignal = signal(SSHService());
 
 class SSHService {
-  SSHService(this.logService, this._buildUtilityService);
+  SSHService();
 
-  final LogService logService;
-  final BuildUtilityService _buildUtilityService;
+  // final LogService logService;
   Logger logger = Logger();
-  Future<SSHClient?> sshToServer(
+  Future<SSHClient> sshToServer(
     String vmIp, {
     String username = 'admin',
     String password = 'admin',
   }) async {
-    try {
-      return SSHClient(
-        await SSHSocket.connect(vmIp, 22),
-        username: username,
-        onPasswordRequest: () => password,
-      );
-    } catch (e) {
-      logger.err(e.toString());
-      return null;
-    }
+    return SSHClient(
+      await SSHSocket.connect(vmIp, 22),
+      username: username,
+      onPasswordRequest: () => password,
+    );
   }
 
   @Deprecated('use run()')
@@ -119,7 +114,6 @@ class SSHService {
   Future<ShellResult> shellV2(
     String command,
     SSHClient sshClient,
-    String jobId,
     String workingVMName,
   ) async {
     final sessionResult = await runV2(
@@ -127,17 +121,17 @@ class SSHService {
       command,
     );
 
-    await logService.saveCommandLog(
-      jobDocumentId: jobId,
-      command: command,
-      sessionResult: sessionResult,
-    );
+    // await logService.saveCommandLog(
+    //   jobDocumentId: jobId,
+    //   command: command,
+    //   sessionResult: sessionResult,
+    // );
 
     final exitCode = sessionResult.sessionExitCode;
     if (exitCode == 0) {
       return ShellResult(result: true, sessionResult: sessionResult);
     } else {
-      await _buildUtilityService.handleJobFailure(jobId, workingVMName);
+      // await _buildUtilityService.handleJobFailure(jobId, workingVMName);
       throw Exception('$command failed with exit code $exitCode');
     }
   }
