@@ -10,7 +10,6 @@ dependencies:
   dart_frog: ^1.1.0
   dart_jsonwebtoken: ^2.14.0
   dartssh2: ^2.8.2
-  dotenv: ^4.2.0
   freezed_annotation: ^2.4.1
   github: ^9.24.0
   google_play_api_kit: ^0.2.6
@@ -20,6 +19,7 @@ dependencies:
   json_annotation: ^4.8.1
   mason_logger: ^0.2.5
   openci_models: ^1.0.3
+  path: ^1.9.0
   process_run: ^0.13.3
   pub_updater: ^0.3.0
   sentry: ^7.18.0

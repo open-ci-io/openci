@@ -14,9 +14,4 @@ coverage/
 # Android studio and IntelliJ
 .idea
 
-service_account.json
-
-/scripts
-.env
-/build
 run.sh

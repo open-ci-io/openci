@@ -28,10 +28,16 @@ class SSHShellService {
     String jobId,
     String workingVMName,
   ) async =>
-      _sshService.shellV2(command, sshClient, workingVMName);
+      _sshService.shellV2(
+        sshClient,
+        command,
+      );
 
   Future<ShellResult> executeCommandV2(
     String command,
   ) async =>
-      _sshService.shellV2(command, _sshClient, workingVMNameSignal.value);
+      _sshService.shellV2(
+        _sshClient,
+        command,
+      );
 }

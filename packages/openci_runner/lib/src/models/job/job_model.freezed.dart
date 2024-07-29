@@ -24,6 +24,10 @@ mixin _$JobModel {
   DateTime get created_at => throw _privateConstructorUsedError;
   DateTime get updated_at => throw _privateConstructorUsedError;
   JobStatus get status => throw _privateConstructorUsedError;
+  String get github_org_name => throw _privateConstructorUsedError;
+  String get github_repo_name => throw _privateConstructorUsedError;
+  int get workflow_run_id => throw _privateConstructorUsedError;
+  int get github_installation_id => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -37,7 +41,14 @@ abstract class $JobModelCopyWith<$Res> {
       _$JobModelCopyWithImpl<$Res, JobModel>;
   @useResult
   $Res call(
-      {int id, DateTime created_at, DateTime updated_at, JobStatus status});
+      {int id,
+      DateTime created_at,
+      DateTime updated_at,
+      JobStatus status,
+      String github_org_name,
+      String github_repo_name,
+      int workflow_run_id,
+      int github_installation_id});
 }
 
 /// @nodoc
@@ -57,6 +68,10 @@ class _$JobModelCopyWithImpl<$Res, $Val extends JobModel>
     Object? created_at = null,
     Object? updated_at = null,
     Object? status = null,
+    Object? github_org_name = null,
+    Object? github_repo_name = null,
+    Object? workflow_run_id = null,
+    Object? github_installation_id = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -75,6 +90,22 @@ class _$JobModelCopyWithImpl<$Res, $Val extends JobModel>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as JobStatus,
+      github_org_name: null == github_org_name
+          ? _value.github_org_name
+          : github_org_name // ignore: cast_nullable_to_non_nullable
+              as String,
+      github_repo_name: null == github_repo_name
+          ? _value.github_repo_name
+          : github_repo_name // ignore: cast_nullable_to_non_nullable
+              as String,
+      workflow_run_id: null == workflow_run_id
+          ? _value.workflow_run_id
+          : workflow_run_id // ignore: cast_nullable_to_non_nullable
+              as int,
+      github_installation_id: null == github_installation_id
+          ? _value.github_installation_id
+          : github_installation_id // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -88,7 +119,14 @@ abstract class _$$JobModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id, DateTime created_at, DateTime updated_at, JobStatus status});
+      {int id,
+      DateTime created_at,
+      DateTime updated_at,
+      JobStatus status,
+      String github_org_name,
+      String github_repo_name,
+      int workflow_run_id,
+      int github_installation_id});
 }
 
 /// @nodoc
@@ -106,6 +144,10 @@ class __$$JobModelImplCopyWithImpl<$Res>
     Object? created_at = null,
     Object? updated_at = null,
     Object? status = null,
+    Object? github_org_name = null,
+    Object? github_repo_name = null,
+    Object? workflow_run_id = null,
+    Object? github_installation_id = null,
   }) {
     return _then(_$JobModelImpl(
       id: null == id
@@ -124,6 +166,22 @@ class __$$JobModelImplCopyWithImpl<$Res>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as JobStatus,
+      github_org_name: null == github_org_name
+          ? _value.github_org_name
+          : github_org_name // ignore: cast_nullable_to_non_nullable
+              as String,
+      github_repo_name: null == github_repo_name
+          ? _value.github_repo_name
+          : github_repo_name // ignore: cast_nullable_to_non_nullable
+              as String,
+      workflow_run_id: null == workflow_run_id
+          ? _value.workflow_run_id
+          : workflow_run_id // ignore: cast_nullable_to_non_nullable
+              as int,
+      github_installation_id: null == github_installation_id
+          ? _value.github_installation_id
+          : github_installation_id // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -135,7 +193,11 @@ class _$JobModelImpl implements _JobModel {
       {required this.id,
       required this.created_at,
       required this.updated_at,
-      required this.status});
+      required this.status,
+      required this.github_org_name,
+      required this.github_repo_name,
+      required this.workflow_run_id,
+      required this.github_installation_id});
 
   factory _$JobModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$JobModelImplFromJson(json);
@@ -148,10 +210,18 @@ class _$JobModelImpl implements _JobModel {
   final DateTime updated_at;
   @override
   final JobStatus status;
+  @override
+  final String github_org_name;
+  @override
+  final String github_repo_name;
+  @override
+  final int workflow_run_id;
+  @override
+  final int github_installation_id;
 
   @override
   String toString() {
-    return 'JobModel(id: $id, created_at: $created_at, updated_at: $updated_at, status: $status)';
+    return 'JobModel(id: $id, created_at: $created_at, updated_at: $updated_at, status: $status, github_org_name: $github_org_name, github_repo_name: $github_repo_name, workflow_run_id: $workflow_run_id, github_installation_id: $github_installation_id)';
   }
 
   @override
@@ -164,13 +234,29 @@ class _$JobModelImpl implements _JobModel {
                 other.created_at == created_at) &&
             (identical(other.updated_at, updated_at) ||
                 other.updated_at == updated_at) &&
-            (identical(other.status, status) || other.status == status));
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.github_org_name, github_org_name) ||
+                other.github_org_name == github_org_name) &&
+            (identical(other.github_repo_name, github_repo_name) ||
+                other.github_repo_name == github_repo_name) &&
+            (identical(other.workflow_run_id, workflow_run_id) ||
+                other.workflow_run_id == workflow_run_id) &&
+            (identical(other.github_installation_id, github_installation_id) ||
+                other.github_installation_id == github_installation_id));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, created_at, updated_at, status);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      created_at,
+      updated_at,
+      status,
+      github_org_name,
+      github_repo_name,
+      workflow_run_id,
+      github_installation_id);
 
   @JsonKey(ignore: true)
   @override
@@ -191,7 +277,11 @@ abstract class _JobModel implements JobModel {
       {required final int id,
       required final DateTime created_at,
       required final DateTime updated_at,
-      required final JobStatus status}) = _$JobModelImpl;
+      required final JobStatus status,
+      required final String github_org_name,
+      required final String github_repo_name,
+      required final int workflow_run_id,
+      required final int github_installation_id}) = _$JobModelImpl;
 
   factory _JobModel.fromJson(Map<String, dynamic> json) =
       _$JobModelImpl.fromJson;
@@ -204,6 +294,14 @@ abstract class _JobModel implements JobModel {
   DateTime get updated_at;
   @override
   JobStatus get status;
+  @override
+  String get github_org_name;
+  @override
+  String get github_repo_name;
+  @override
+  int get workflow_run_id;
+  @override
+  int get github_installation_id;
   @override
   @JsonKey(ignore: true)
   _$$JobModelImplCopyWith<_$JobModelImpl> get copyWith =>

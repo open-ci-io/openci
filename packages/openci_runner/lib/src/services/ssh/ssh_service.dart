@@ -114,26 +114,18 @@ class SSHService {
   }
 
   Future<ShellResult> shellV2(
-    String command,
     SSHClient sshClient,
-    String workingVMName,
+    String command,
   ) async {
     final sessionResult = await runV2(
       sshClient,
       command,
     );
 
-    // await logService.saveCommandLog(
-    //   jobDocumentId: jobId,
-    //   command: command,
-    //   sessionResult: sessionResult,
-    // );
-
     final exitCode = sessionResult.sessionExitCode;
     if (exitCode == 0) {
       return ShellResult(result: true, sessionResult: sessionResult);
     } else {
-      // await _buildUtilityService.handleJobFailure(jobId, workingVMName);
       throw Exception('$command failed with exit code $exitCode');
     }
   }
