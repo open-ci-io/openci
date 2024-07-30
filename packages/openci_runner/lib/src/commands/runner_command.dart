@@ -82,10 +82,14 @@ Future<void> setupJITRunner(String orgName) async {
   print('Runner Name: $runnerName');
 
   try {
+    print(
+        'owner: ${jobSignal.value!.github_org_name}, repo: ${jobSignal.value!.github_repo_name}');
     final response = await github.request(
       'POST',
-      '/orgs/{org}/actions/runners/generate-jitconfig',
+      '/repos/${jobSignal.value!.github_org_name}/${jobSignal.value!.github_repo_name}/actions/runners/generate-jitconfig',
       body: jsonEncode({
+        'owner': jobSignal.value!.github_org_name,
+        'repo': jobSignal.value!.github_repo_name,
         'name': runnerName,
         'runner_group_id': 1,
         'labels': [
