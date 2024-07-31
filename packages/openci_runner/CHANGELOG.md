@@ -1,3 +1,6 @@
+## 2.0.2
+- fix: [#15](https://github.com/open-ci-io/openci/issues/15)
+
 ## 2.0.1
 - fix: [#13](https://github.com/open-ci-io/openci/issues/13)
 

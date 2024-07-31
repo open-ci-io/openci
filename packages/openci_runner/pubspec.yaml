@@ -1,6 +1,6 @@
 name: runner
 description: OpenCI's CLI
-version: 2.0.1
+version: 2.0.2
 environment:
   sdk: ^3.3.4
 
