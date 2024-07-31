@@ -119,6 +119,7 @@ Future<void> setupRunner(
   try {
     print('Creating runner directory...');
     final sshService = sshServiceSignal.value;
+
     await execCommand(client, 'mkdir -p $runnerDir');
 
     print('Downloading runner package...');
@@ -132,6 +133,9 @@ Future<void> setupRunner(
       client,
       'cd $runnerDir && tar xzf ./actions-runner-osx-x64-2.317.0.tar.gz',
     );
+
+    await sshService.shellV2(client,
+        'cd $runnerDir && touch .env && echo "ACTIONS_RUNNER_HOOK_JOB_STARTED=/opt/runner/cleanup_script.sh" >> .env');
     print('Starting runner...');
     final configCommand =
         'cd $runnerDir && ./run.sh --jitconfig ${encodedJitConfigSignal.value}';
