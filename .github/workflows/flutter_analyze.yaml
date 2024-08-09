@@ -2,10 +2,12 @@ name: Ruby Install Workflow
 
 on:
   push:
-    branches: [develop]
+    paths:
+      - "apps/cicd_sandbox_app/**"
+      - ".github/workflows/flutter_analyze.yaml"
   pull_request:
-    branches: [develop]
-    types: [opened, synchronize, reopened]
+    paths:
+      - "apps/cicd_sandbox_app/**"
 
 jobs:
   test:
@@ -14,6 +16,9 @@ jobs:
         os: [ubuntu-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: apps/cicd_sandbox_app
 
     steps:
       - uses: actions/checkout@v4
@@ -21,9 +26,3 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
-
-      - name: Install dependencies
-        run: bundle install
-
-      - name: Run tests
-        run: bundle exec rake
