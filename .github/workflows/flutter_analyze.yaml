@@ -2,12 +2,15 @@ name: Ruby Install Workflow
 
 on:
   push:
+    branches: [develop]
     paths:
       - "apps/cicd_sandbox_app/**"
       - ".github/workflows/flutter_analyze.yaml"
   pull_request:
+    branches: [develop]
     paths:
       - "apps/cicd_sandbox_app/**"
+      - ".github/workflows/flutter_analyze.yaml"
 
 jobs:
   test:
