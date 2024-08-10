@@ -11,6 +11,7 @@ on:
     paths:
       - "apps/cicd_sandbox_app/**"
       - ".github/workflows/flutter_analyze.yaml"
+    types: [opened, synchronize, reopened]
 
 jobs:
   test:
