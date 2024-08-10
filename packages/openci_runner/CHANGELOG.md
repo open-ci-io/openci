@@ -1,3 +1,6 @@
+## 2.0.3
+- remove pre-run script
+
 ## 2.0.2
 - fix: [#15](https://github.com/open-ci-io/openci/issues/15)
 
