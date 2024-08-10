@@ -15,7 +15,7 @@ on:
 
 jobs:
   ruby_install:
-  runs-on: openci-macos-m1-mini
+    runs-on: openci-macos-m1-mini
     defaults:
       run:
         working-directory: apps/cicd_sandbox_app
