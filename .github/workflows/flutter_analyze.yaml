@@ -14,7 +14,7 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  test:
+  ruby_install:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
