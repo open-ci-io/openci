@@ -11,15 +11,11 @@ on:
     paths:
       - "apps/cicd_sandbox_app/**"
       - ".github/workflows/flutter_analyze.yaml"
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, edited]
 
 jobs:
   ruby_install:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-
-    runs-on: ${{ matrix.os }}
+    runs-on: openci-macos-m1-mini
     defaults:
       run:
         working-directory: apps/cicd_sandbox_app
