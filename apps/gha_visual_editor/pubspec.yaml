@@ -11,6 +11,8 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.6
   signals: ^5.3.0
+  font_awesome_flutter: ^10.7.0
+  dotted_border: ^2.1.0
 
 dev_dependencies:
   flutter_test:

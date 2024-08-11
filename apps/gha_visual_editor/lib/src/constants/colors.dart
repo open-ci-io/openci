@@ -7,4 +7,5 @@ class AppColors {
   static const bluePoint = Color(0xFF0075F5);
   static const focusedBorderBlue = Color(0xFF0056C3);
   static const focusedBorderPaddingBlue = Color(0xFF9CBEE3);
+  static const dotGray = Color(0xFF89929A);
 }

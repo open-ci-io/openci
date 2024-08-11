@@ -1,6 +1,9 @@
 import 'dart:math';
+import 'dart:ui';
 
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -18,7 +21,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -43,17 +45,53 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: AppColors.grayBackground,
       body: Center(
-        child: GestureDetector(
-          onTap: () {
-            isFocused.value = !isFocused.value;
-            borderColor.value = isFocused.value
-                ? AppColors.focusedBorderBlue
-                : AppColors.borderBlack;
-            secondBorderColor.value = isFocused.value
-                ? AppColors.focusedBorderPaddingBlue
-                : Colors.transparent;
-          },
-          child: const _Card(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () {
+                isFocused.value = !isFocused.value;
+                borderColor.value = isFocused.value
+                    ? AppColors.focusedBorderBlue
+                    : AppColors.borderBlack;
+                secondBorderColor.value = isFocused.value
+                    ? AppColors.focusedBorderPaddingBlue
+                    : Colors.transparent;
+              },
+              child: const _Card(),
+            ),
+            const SizedBox(height: 16),
+            Icon(
+              key: UniqueKey(),
+              FontAwesomeIcons.arrowDown,
+              color: AppColors.bluePoint,
+              size: 18,
+            ),
+            const SizedBox(height: 80),
+            SizedBox(
+              height: 300,
+              width: 340,
+              child: DottedBorder(
+                dashPattern: const [
+                  6,
+                  3,
+                ],
+                borderType: BorderType.RRect,
+                radius: const Radius.circular(8),
+                color: AppColors.dotGray,
+                strokeWidth: 1.5,
+                child: const Center(
+                  child: Text(
+                    'Drag the blue connector here to \ncreate your first action.',
+                    style: TextStyle(
+                        color: AppColors.dotGray,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
