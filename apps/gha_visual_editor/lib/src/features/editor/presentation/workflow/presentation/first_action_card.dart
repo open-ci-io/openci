@@ -4,8 +4,8 @@ import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.d
 import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/connector_dot.dart';
 import 'package:signals/signals_flutter.dart';
 
-class FirstAction extends StatelessWidget {
-  const FirstAction({
+class FirstActionCard extends StatelessWidget {
+  const FirstActionCard({
     super.key,
   });
 

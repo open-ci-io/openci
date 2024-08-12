@@ -4,7 +4,7 @@ import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/arrow_painter.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/dotted_empty_box.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/first_action.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/first_action_card.dart';
 import 'package:signals/signals_flutter.dart';
 
 final startCircleKeySignal = signal(GlobalKey());
@@ -149,7 +149,7 @@ class _WorkflowState extends State<Workflow> {
                         showChooseActionSheet.value = true;
                       }
                     },
-                    child: const FirstAction(),
+                    child: const FirstActionCard(),
                   ),
                   const SizedBox(height: 16),
                   Visibility(
@@ -168,7 +168,7 @@ class _WorkflowState extends State<Workflow> {
                   Watch(
                     (context) => Visibility(
                       visible: showNextStepSignal.value,
-                      child: const FirstAction(),
+                      child: const FirstActionCard(),
                     ),
                   ),
                   GestureDetector(
