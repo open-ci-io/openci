@@ -32,7 +32,7 @@ class EditorPage extends StatelessWidget {
                       ? AppColors.focusedBorderPaddingBlue
                       : Colors.transparent;
                 },
-                child: const _Card(),
+                child: const StepCard(),
               ),
               const SizedBox(height: 16),
               Icon(
@@ -73,8 +73,8 @@ class EditorPage extends StatelessWidget {
   }
 }
 
-class _Card extends StatelessWidget {
-  const _Card({
+class StepCard extends StatelessWidget {
+  const StepCard({
     super.key,
   });
 
@@ -95,7 +95,7 @@ class _Card extends StatelessWidget {
                   border: Border.all(
                     color: secondBorderColor.value,
                     width: 4,
-                  ), // 外側のボーダー
+                  ),
                 ),
                 child: Container(
                   width: 340,

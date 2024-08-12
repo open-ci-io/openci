@@ -8,4 +8,5 @@ class AppColors {
   static const focusedBorderBlue = Color(0xFF0056C3);
   static const focusedBorderPaddingBlue = Color(0xFF9CBEE3);
   static const dotGray = Color(0xFF89929A);
+  static const successButton = Color(0xFF227136);
 }
