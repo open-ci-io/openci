@@ -47,7 +47,7 @@ class ActionCard extends StatelessWidget {
                         child: Padding(
                           padding: EdgeInsets.only(left: 24.0),
                           child: Text(
-                            'Filter for Tag Events',
+                            'Install Flutter',
                             style: TextStyle(
                               color: Colors.black87,
                               fontSize: 18,
@@ -88,7 +88,7 @@ class ActionCard extends StatelessWidget {
                                 ),
                                 SizedBox(width: 24),
                                 Text(
-                                  'actions/npm@master',
+                                  'subosito/flutter-action',
                                   style: TextStyle(
                                     color: Colors.black87,
                                     fontSize: 16,
@@ -105,7 +105,7 @@ class ActionCard extends StatelessWidget {
                                 SizedBox(
                                   width: 64,
                                   child: Text(
-                                    'args',
+                                    'channel',
                                     style: TextStyle(
                                       color: Colors.black54,
                                       fontSize: 16,
@@ -115,7 +115,7 @@ class ActionCard extends StatelessWidget {
                                 ),
                                 SizedBox(width: 24),
                                 Text(
-                                  'test',
+                                  'stable',
                                   style: TextStyle(
                                     color: Colors.black87,
                                     fontSize: 16,
@@ -144,7 +144,7 @@ class ActionCard extends StatelessWidget {
                                 Icon(Icons.lock_outline,
                                     color: Colors.green, size: 20),
                                 Text(
-                                  'NPM_AUTH_TOKEN',
+                                  'ANY_TOKENS',
                                   style: TextStyle(
                                     color: Colors.green,
                                     fontSize: 16,

@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(),
       home: const Scaffold(
         backgroundColor: AppColors.grayBackground,
-        body: ActionCard(),
+        body: Center(child: ActionCard()),
       ),
     );
   }
