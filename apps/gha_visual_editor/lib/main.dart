@@ -1,9 +1,8 @@
-import 'dart:math';
-
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/arrow_painter.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -18,48 +17,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(),
-      // home: const EditorPage(),
       home: const Scaffold(
         backgroundColor: AppColors.grayBackground,
         body: CircleToArrowWidget(),
       ),
     );
   }
-}
-
-class ArrowPainter extends CustomPainter {
-  final Offset start;
-  final Offset end;
-
-  ArrowPainter({required this.start, required this.end});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.bluePoint
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke;
-
-    canvas.drawLine(start, end, paint);
-
-    const arrowSize = 15.0;
-    final angle = atan2(end.dy - start.dy, end.dx - start.dx);
-    final path = Path();
-    path.moveTo(end.dx, end.dy);
-    path.lineTo(
-      end.dx - arrowSize * cos(angle - pi / 6),
-      end.dy - arrowSize * sin(angle - pi / 6),
-    );
-    path.moveTo(end.dx, end.dy);
-    path.lineTo(
-      end.dx - arrowSize * cos(angle + pi / 6),
-      end.dy - arrowSize * sin(angle + pi / 6),
-    );
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
 
 class CircleToArrowWidget extends StatefulWidget {
