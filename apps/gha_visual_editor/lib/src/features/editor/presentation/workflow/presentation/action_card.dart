@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/connector_dot.dart';
 import 'package:signals/signals_flutter.dart';
+
+final _borderColor = Colors.grey[300]!;
 
 class ActionCard extends StatelessWidget {
   const ActionCard({
@@ -11,25 +13,19 @@ class ActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Watch(
-      (context) => Stack(
-        children: [
-          Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: secondBorderColor.value,
-                  width: 4,
-                ),
-              ),
+      (context) => SizedBox(
+        width: 340,
+        height: 300,
+        child: Stack(
+          children: [
+            Center(
               child: Container(
                 width: 340,
                 height: 280,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: Colors.grey[300]!,
+                    color: _borderColor,
                     width: 1,
                   ),
                 ),
@@ -193,8 +189,23 @@ class ActionCard extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-        ],
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConnectorDot(
+                borderColor: _borderColor,
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: ConnectorDot(
+                borderColor: _borderColor,
+                dotPaddingColor: Colors.white,
+                dotColor: AppColors.bluePoint,
+                drawTop: false,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
