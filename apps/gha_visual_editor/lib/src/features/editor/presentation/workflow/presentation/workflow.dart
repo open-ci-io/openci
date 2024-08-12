@@ -221,9 +221,11 @@ class _WorkflowState extends State<Workflow> {
           Watch(
             (context) => Visibility(
               visible: showConfigureActionSheet.value,
-              child: const Align(
+              child: Align(
                 alignment: Alignment.centerRight,
-                child: ConfigureActions(),
+                child: ConfigureActions(
+                  clearArrow: () => _clearArrow(),
+                ),
               ),
             ),
           )
@@ -348,7 +350,12 @@ class ChooseAction extends StatelessWidget {
 }
 
 class ConfigureActions extends StatelessWidget {
-  const ConfigureActions({super.key});
+  const ConfigureActions({
+    super.key,
+    required this.clearArrow,
+  });
+
+  final VoidCallback clearArrow;
 
   @override
   Widget build(BuildContext context) {
@@ -443,6 +450,7 @@ class ConfigureActions extends StatelessWidget {
                   ),
                   child: ElevatedButton(
                     onPressed: () {
+                      clearArrow();
                       showConfigureActionSheet.value = false;
                       showNextStepSignal.value = true;
                     },
