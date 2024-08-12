@@ -105,7 +105,12 @@ class FirstAction extends StatelessWidget {
             ),
             const Align(
               alignment: Alignment.bottomCenter,
-              child: ConnectorDot(),
+              child: ConnectorDot(
+                dotColor: AppColors.bluePoint,
+                borderColor: AppColors.borderBlack,
+                dotPaddingColor: AppColors.firstStepDarkGray,
+                drawTop: false,
+              ),
             ),
           ],
         ),

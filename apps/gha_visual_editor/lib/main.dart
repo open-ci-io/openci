@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/action_card.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/workflow.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(),
       home: const Scaffold(
         backgroundColor: AppColors.grayBackground,
-        body: Center(child: ActionCard()),
+        body: Workflow(),
       ),
     );
   }
