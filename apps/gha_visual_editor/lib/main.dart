@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/workflow.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
 
 void main() {
   runApp(const MyApp());
