@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gha_visual_editor/main.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/arrow_painter.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/action_card.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/action_list.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/dotted_empty_box.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/first_action_card.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/components/arrow_painter.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/components/action_card.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/components/action_connector_painter.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/components/action_list.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/components/dotted_empty_box.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/components/first_action_card.dart';
 import 'package:signals/signals_flutter.dart';
 
 final startCircleKeySignal = signal(GlobalKey());
@@ -23,14 +23,14 @@ final selectedAction = signal<Map<String, String>>({});
 final showConfigureActionSheet = signal(false);
 final showFirstArrowSignal = signal(false);
 
-class Workflow extends StatefulWidget {
-  const Workflow({super.key});
+class EditorPage extends StatefulWidget {
+  const EditorPage({super.key});
 
   @override
-  _WorkflowState createState() => _WorkflowState();
+  _EditorPageState createState() => _EditorPageState();
 }
 
-class _WorkflowState extends State<Workflow> {
+class _EditorPageState extends State<EditorPage> {
   Offset? _arrowStart;
   Offset? _arrowEnd;
   bool _isDragging = false;
@@ -113,7 +113,7 @@ class _WorkflowState extends State<Workflow> {
       child: Stack(
         children: [
           CustomPaint(
-            painter: LinePainter(
+            painter: ActionConnectorPainter(
               startKey: keyA,
               endKey: keyB,
             ),

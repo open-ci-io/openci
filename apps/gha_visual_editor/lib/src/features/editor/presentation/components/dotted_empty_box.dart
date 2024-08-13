@@ -1,7 +1,7 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/workflow.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/workflow.dart';
 
 class DottedEmptyBox extends StatelessWidget {
   const DottedEmptyBox({

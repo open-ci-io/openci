@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/connector_dot.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/workflow.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/components/connector_dot.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/workflow.dart';
 import 'package:signals/signals_flutter.dart';
 
 class FirstActionCard extends StatelessWidget {
