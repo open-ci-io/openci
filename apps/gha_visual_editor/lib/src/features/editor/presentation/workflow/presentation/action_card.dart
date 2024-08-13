@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
+import 'package:gha_visual_editor/src/constants/margins.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/connector_dot.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -100,7 +101,7 @@ class ActionCard extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 10),
+                            verticalMargin10,
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -116,7 +117,7 @@ class ActionCard extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 24),
+                                horizontalMargin24,
                                 Text(
                                   'stable',
                                   style: TextStyle(
@@ -127,11 +128,11 @@ class ActionCard extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 10),
+                            verticalMargin10,
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                SizedBox(width: 24),
+                                horizontalMargin24,
                                 SizedBox(
                                   width: 62,
                                   child: Text(
@@ -143,7 +144,7 @@ class ActionCard extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 24),
+                                horizontalMargin24,
                                 Icon(Icons.lock_outline,
                                     color: Colors.green, size: 20),
                                 Text(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
+import 'package:gha_visual_editor/src/constants/margins.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/connector_dot.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/workflow.dart';
 import 'package:signals/signals_flutter.dart';
@@ -59,7 +60,7 @@ class FirstActionCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      verticalMargin4,
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0),
                         child: RichText(
@@ -83,7 +84,7 @@ class FirstActionCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      verticalMargin20,
                       const Divider(
                         color: AppColors.borderBlack,
                         thickness: 1.5,

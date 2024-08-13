@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gha_visual_editor/main.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
+import 'package:gha_visual_editor/src/constants/margins.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/arrow_painter.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/action_card.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/action_list.dart';
@@ -188,7 +189,7 @@ class _WorkflowState extends State<Workflow> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  verticalMargin40,
                   Watch(
                     (context) => Visibility(
                       visible: showNextStepSignal.value,
@@ -197,7 +198,7 @@ class _WorkflowState extends State<Workflow> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  verticalMargin40,
                   GestureDetector(
                     onPanStart: (details) {
                       final RenderBox renderBox =
