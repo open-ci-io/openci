@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gha_visual_editor/main.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/arrow_painter.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/action_card.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/action_list.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/dotted_empty_box.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/first_action_card.dart';
@@ -15,6 +17,10 @@ final showNextStepSignal = signal(false);
 final isFocused = signal(false);
 final borderColor = signal(AppColors.borderBlack);
 final secondBorderColor = signal(Colors.transparent);
+
+final selectedAction = signal<Map<String, String>>({});
+final showConfigureActionSheet = signal(false);
+final showFirstArrowSignal = signal(false);
 
 class Workflow extends StatefulWidget {
   const Workflow({super.key});
@@ -32,6 +38,9 @@ class _WorkflowState extends State<Workflow> {
 
   Rect? _startCircleRect;
   Rect? _targetRect;
+
+  final GlobalKey keyA = GlobalKey();
+  final GlobalKey keyB = GlobalKey();
 
   @override
   void initState() {
@@ -103,6 +112,12 @@ class _WorkflowState extends State<Workflow> {
       child: Stack(
         children: [
           CustomPaint(
+            painter: LinePainter(
+              startKey: keyA,
+              endKey: keyB,
+            ),
+          ),
+          CustomPaint(
             painter: _arrowStart != null && _arrowEnd != null
                 ? ArrowPainter(start: _arrowStart!, end: _arrowEnd!)
                 : null,
@@ -153,28 +168,36 @@ class _WorkflowState extends State<Workflow> {
                         showChooseActionSheet.value = true;
                       }
                     },
-                    child: const FirstActionCard(),
+                    child: FirstActionCard(
+                      dotKey: keyA,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Visibility(
-                    maintainSize: true,
-                    maintainAnimation: true,
-                    maintainState: true,
-                    visible: _arrowStart == null,
-                    child: Icon(
-                      key: UniqueKey(),
-                      FontAwesomeIcons.arrowDown,
-                      color: AppColors.bluePoint,
-                      size: 18,
+                    visible: showFirstArrowSignal.value,
+                    child: Visibility(
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      visible: _arrowStart == null,
+                      child: Icon(
+                        key: UniqueKey(),
+                        FontAwesomeIcons.arrowDown,
+                        color: AppColors.bluePoint,
+                        size: 18,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 40),
                   Watch(
                     (context) => Visibility(
                       visible: showNextStepSignal.value,
-                      child: const FirstActionCard(),
+                      child: ActionCard(
+                        dotKey: keyB,
+                      ),
                     ),
                   ),
+                  const SizedBox(height: 40),
                   GestureDetector(
                     onPanStart: (details) {
                       final RenderBox renderBox =
@@ -190,7 +213,7 @@ class _WorkflowState extends State<Workflow> {
                     },
                     onPanUpdate: (details) {
                       if (_isDragging) {
-                        final RenderBox renderBox =
+                        final renderBox =
                             context.findRenderObject() as RenderBox;
                         final localPosition =
                             renderBox.globalToLocal(details.globalPosition);
@@ -232,15 +255,12 @@ class _WorkflowState extends State<Workflow> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 }
-
-final selectedAction = signal<Map<String, String>>({});
-final showConfigureActionSheet = signal(false);
 
 class ChooseAction extends StatelessWidget {
   const ChooseAction({super.key});
@@ -446,6 +466,7 @@ class ConfigureActions extends StatelessWidget {
                       clearArrow();
                       showConfigureActionSheet.value = false;
                       showNextStepSignal.value = true;
+                      showFirstArrowSignal.value = false;
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,

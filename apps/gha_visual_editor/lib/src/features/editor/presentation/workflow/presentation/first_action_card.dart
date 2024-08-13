@@ -7,7 +7,10 @@ import 'package:signals/signals_flutter.dart';
 class FirstActionCard extends StatelessWidget {
   const FirstActionCard({
     super.key,
+    required this.dotKey,
   });
+
+  final GlobalKey dotKey;
 
   @override
   Widget build(BuildContext context) {
@@ -103,9 +106,10 @@ class FirstActionCard extends StatelessWidget {
                 ),
               ),
             ),
-            const Align(
+            Align(
               alignment: Alignment.bottomCenter,
               child: ConnectorDot(
+                key: dotKey,
                 dotColor: AppColors.bluePoint,
                 borderColor: AppColors.borderBlack,
                 dotPaddingColor: AppColors.firstStepDarkGray,

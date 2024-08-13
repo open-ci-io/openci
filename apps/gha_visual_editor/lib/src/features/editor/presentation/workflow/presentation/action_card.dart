@@ -8,7 +8,10 @@ final _borderColor = Colors.grey[300]!;
 class ActionCard extends StatelessWidget {
   const ActionCard({
     super.key,
+    required this.dotKey,
   });
+
+  final GlobalKey dotKey;
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +79,7 @@ class ActionCard extends StatelessWidget {
                               children: [
                                 SizedBox(width: 24),
                                 SizedBox(
-                                  width: 64,
+                                  width: 66,
                                   child: Text(
                                     'uses',
                                     style: TextStyle(
@@ -103,7 +106,7 @@ class ActionCard extends StatelessWidget {
                               children: [
                                 SizedBox(width: 24),
                                 SizedBox(
-                                  width: 64,
+                                  width: 66,
                                   child: Text(
                                     'channel',
                                     style: TextStyle(
@@ -130,7 +133,7 @@ class ActionCard extends StatelessWidget {
                               children: [
                                 SizedBox(width: 24),
                                 SizedBox(
-                                  width: 60,
+                                  width: 62,
                                   child: Text(
                                     'secrets',
                                     style: TextStyle(
@@ -192,6 +195,7 @@ class ActionCard extends StatelessWidget {
             Align(
               alignment: Alignment.topCenter,
               child: ConnectorDot(
+                key: dotKey,
                 borderColor: _borderColor,
               ),
             ),
