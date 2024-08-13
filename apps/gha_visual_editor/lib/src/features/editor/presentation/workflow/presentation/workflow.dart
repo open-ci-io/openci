@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/arrow_painter.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/action_list.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/dotted_empty_box.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/workflow/presentation/first_action_card.dart';
 import 'package:signals/signals_flutter.dart';
@@ -11,6 +11,10 @@ final startCircleKeySignal = signal(GlobalKey());
 final targetRectKeySignal = signal(GlobalKey());
 final showChooseActionSheet = signal(false);
 final showNextStepSignal = signal(false);
+
+final isFocused = signal(false);
+final borderColor = signal(AppColors.borderBlack);
+final secondBorderColor = signal(Colors.transparent);
 
 class Workflow extends StatefulWidget {
   const Workflow({super.key});
@@ -234,17 +238,6 @@ class _WorkflowState extends State<Workflow> {
     );
   }
 }
-
-final actionList = [
-  {'title': 'Install Flutter', 'actionName': 'subosito/flutter-action@v2'},
-  {'title': 'Get dependencies', 'actionName': 'flutter pub get'},
-  {'title': 'Flutter Analyze', 'actionName': 'flutter analyze'},
-  {'title': 'Flutter Build APK', 'actionName': 'flutter build apk'},
-  {
-    'title': 'Upload APK to Firebase App Distribution',
-    'actionName': 'wzieba/Firebase-Distribution-Github-Action@v1'
-  }
-];
 
 final selectedAction = signal<Map<String, String>>({});
 final showConfigureActionSheet = signal(false);
