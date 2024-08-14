@@ -55,8 +55,7 @@ class _EditorPageState extends State<EditorPage> {
   }
 
   Rect? _getRectFromKey(GlobalKey key) {
-    final RenderBox? renderBox =
-        key.currentContext?.findRenderObject() as RenderBox?;
+    final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       final position = renderBox.localToGlobal(Offset.zero);
       return Rect.fromLTWH(
@@ -133,8 +132,7 @@ class _EditorPageState extends State<EditorPage> {
                 children: [
                   GestureDetector(
                     onPanStart: (details) {
-                      final RenderBox renderBox =
-                          context.findRenderObject() as RenderBox;
+                      final renderBox = context.findRenderObject() as RenderBox;
                       final localPosition =
                           renderBox.globalToLocal(details.globalPosition);
                       setState(() {
@@ -146,7 +144,7 @@ class _EditorPageState extends State<EditorPage> {
                     },
                     onPanUpdate: (details) {
                       if (_isDragging) {
-                        final RenderBox renderBox =
+                        final renderBox =
                             context.findRenderObject() as RenderBox;
                         final localPosition =
                             renderBox.globalToLocal(details.globalPosition);
@@ -193,8 +191,7 @@ class _EditorPageState extends State<EditorPage> {
                   verticalMargin40,
                   GestureDetector(
                     onPanStart: (details) {
-                      final RenderBox renderBox =
-                          context.findRenderObject() as RenderBox;
+                      final renderBox = context.findRenderObject() as RenderBox;
                       final localPosition =
                           renderBox.globalToLocal(details.globalPosition);
                       setState(() {
