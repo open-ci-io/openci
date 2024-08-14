@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/components/connector_dot.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
 import 'package:signals/signals_flutter.dart';
 
 class FirstActionCard extends StatelessWidget {
@@ -28,7 +27,7 @@ class FirstActionCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: secondBorderColor.value,
+                    color: Colors.transparent,
                     width: 4,
                   ),
                 ),
@@ -39,7 +38,7 @@ class FirstActionCard extends StatelessWidget {
                     color: AppColors.firstStepDarkGray,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: borderColor.value,
+                      color: AppColors.borderBlack,
                       width: 1.5, // Set border width to 1 pixel
                     ),
                   ),

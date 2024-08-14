@@ -16,13 +16,10 @@ final targetRectKeySignal = signal(GlobalKey());
 final showChooseActionSheet = signal(false);
 final showNextStepSignal = signal(false);
 
-final isFocused = signal(false);
-final borderColor = signal(AppColors.borderBlack);
-final secondBorderColor = signal(Colors.transparent);
-
 final selectedAction = signal<Map<String, String>>({});
 final showConfigureActionSheet = signal(false);
 final showFirstArrowSignal = signal(false);
+final showFirstFlexibleArrowSignal = signal(true);
 
 class EditorPage extends StatefulWidget {
   const EditorPage({super.key});
@@ -119,11 +116,14 @@ class _EditorPageState extends State<EditorPage> {
               endKey: keyB,
             ),
           ),
-          CustomPaint(
-            painter: _arrowStart != null && _arrowEnd != null
-                ? ArrowPainter(start: _arrowStart!, end: _arrowEnd!)
-                : null,
-            child: Container(),
+          Visibility(
+            visible: showFirstFlexibleArrowSignal.value,
+            child: CustomPaint(
+              painter: _arrowStart != null && _arrowEnd != null
+                  ? ArrowPainter(start: _arrowStart!, end: _arrowEnd!)
+                  : null,
+              child: Container(),
+            ),
           ),
           Align(
             alignment: Alignment.center,
@@ -132,15 +132,6 @@ class _EditorPageState extends State<EditorPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      isFocused.value = !isFocused.value;
-                      borderColor.value = isFocused.value
-                          ? AppColors.focusedBorderBlue
-                          : AppColors.borderBlack;
-                      secondBorderColor.value = isFocused.value
-                          ? AppColors.focusedBorderPaddingBlue
-                          : Colors.transparent;
-                    },
                     onPanStart: (details) {
                       final RenderBox renderBox =
                           context.findRenderObject() as RenderBox;
@@ -174,7 +165,7 @@ class _EditorPageState extends State<EditorPage> {
                       dotKey: keyA,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  verticalMargin16,
                   Visibility(
                     visible: showFirstArrowSignal.value,
                     child: Visibility(
@@ -253,7 +244,10 @@ class _EditorPageState extends State<EditorPage> {
               child: Align(
                 alignment: Alignment.centerRight,
                 child: ConfigureActions(
-                  clearArrow: () => _clearArrow(),
+                  clearArrow: () {
+                    _clearArrow();
+                    showFirstFlexibleArrowSignal.value = false;
+                  },
                 ),
               ),
             ),
