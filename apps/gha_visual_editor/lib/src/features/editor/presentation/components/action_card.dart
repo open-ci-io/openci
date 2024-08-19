@@ -16,6 +16,7 @@ class ActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('ActionCard: $dotKey');
     return Watch(
       (context) => SizedBox(
         width: 340,
