@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
 
 void main() {
@@ -13,10 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(),
-      home: const Scaffold(
-        backgroundColor: AppColors.grayBackground,
-        body: EditorPage(),
-      ),
+      home: const EditorPage(),
     );
   }
 }

@@ -7,58 +7,29 @@ class ChooseAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 32.0),
-      child: Container(
-        height: 600,
-        width: 400,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey[300]!),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Choose action',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    showChooseActionSheet.value = false;
-                  },
-                ),
-              ],
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: actionList.length,
-                itemBuilder: (context, index) {
-                  final title = actionList[index]['title'] as String;
-                  final actionName = actionList[index]['actionName'] as String;
-                  return ListTile(
-                    title: Text(title),
-                    subtitle: Text(actionName),
-                    onTap: () {
-                      showChooseActionSheet.value = false;
-                      selectedAction.value = {
-                        'title': title,
-                        'actionName': actionName
-                      };
-                      showConfigureActionSheet.value = true;
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
+    return Scaffold(
+      body: SizedBox(
+        width: 300,
+        height: 500,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: actionList.length,
+          itemBuilder: (context, index) {
+            final title = actionList[index]['title'] as String;
+            final actionName = actionList[index]['actionName'] as String;
+            return ListTile(
+              title: Text(title),
+              subtitle: Text(actionName),
+              onTap: () {
+                showChooseActionSheet.value = false;
+                selectedAction.value = {
+                  'title': title,
+                  'actionName': actionName
+                };
+                showConfigureActionSheet.value = true;
+              },
+            );
+          },
         ),
       ),
     );
