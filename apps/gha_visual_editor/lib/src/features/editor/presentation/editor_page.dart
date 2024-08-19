@@ -8,13 +8,9 @@ import 'package:gha_visual_editor/src/features/editor/presentation/components/co
 import 'package:gha_visual_editor/src/features/editor/presentation/components/first_action_card.dart';
 import 'package:signals/signals_flutter.dart';
 
-final showChooseActionSheet = signal(false);
 final showNextStepSignal = signal(false);
 
 final selectedAction = signal<Map<String, String>>({});
-final showConfigureActionSheet = signal(false);
-final showFirstArrowSignal = signal(false);
-final showFirstFlexibleArrowSignal = signal(true);
 
 class EditorPage extends StatefulWidget {
   const EditorPage({super.key});
@@ -47,12 +43,10 @@ class _EditorPageState extends State<EditorPage> {
                         title: Text(title),
                         subtitle: Text(actionName),
                         onTap: () {
-                          showChooseActionSheet.value = false;
                           selectedAction.value = {
                             'title': title,
                             'actionName': actionName
                           };
-                          showConfigureActionSheet.value = true;
                           Navigator.pop(context);
                           showAdaptiveDialog(
                             context: context,

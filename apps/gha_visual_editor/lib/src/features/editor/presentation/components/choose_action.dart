@@ -21,12 +21,10 @@ class ChooseAction extends StatelessWidget {
               title: Text(title),
               subtitle: Text(actionName),
               onTap: () {
-                showChooseActionSheet.value = false;
                 selectedAction.value = {
                   'title': title,
                   'actionName': actionName
                 };
-                showConfigureActionSheet.value = true;
               },
             );
           },
