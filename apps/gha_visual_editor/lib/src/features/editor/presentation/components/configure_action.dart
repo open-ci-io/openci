@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
-import 'package:signals/signals_flutter.dart';
 
 class ConfigureActions extends StatelessWidget {
   const ConfigureActions({
@@ -12,92 +11,90 @@ class ConfigureActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Watch(
-      (context) => Container(
-        width: 500,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: const BoxDecoration(
-                    color: Colors.redAccent,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.inventory_2, color: Colors.white),
-                ),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      selectedAction.value['title']!,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const Text(
-                      'View source',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildConfigItem('uses', selectedAction.value['title']!),
-            _buildConfigItem('label', 'Run NPM Test'),
-            // _buildConfigItem('runs', 'Overrides ENTRYPOINT'),
-            // _buildConfigItem('args', 'test'),
-            // const SizedBox(height: 16),
-            // const Text(
-            //   'secrets',
-            //   style: TextStyle(fontWeight: FontWeight.bold),
-            // ),
-            // const Text(
-            //   'Secrets are environment variables that are encrypted and available only when this action executes.',
-            //   style: TextStyle(fontSize: 12, color: Colors.grey),
-            // ),
-            // const SizedBox(height: 8),
-            // _buildSecretItem('GITHUB_TOKEN'),
-            // _buildSecretItem('NPM_AUTH_TOKEN', showDelete: true),
-            // const SizedBox(height: 8),
-            // const Text(
-            //   'Create a new secret',
-            //   style: TextStyle(color: Colors.blue),
-            // ),
-            Align(
-              alignment: Alignment.center,
-              child: Container(
-                width: 200,
+    return Container(
+      width: 500,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
                 height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(8),
+                decoration: const BoxDecoration(
+                  color: Colors.redAccent,
+                  shape: BoxShape.circle,
                 ),
-                child: ElevatedButton(
-                  onPressed: onTap,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                child: const Icon(Icons.inventory_2, color: Colors.white),
+              ),
+              const SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    selectedAction.value['title'] ?? '',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  child: const Text(
-                    'Done',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
+                  const Text(
+                    'View source',
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildConfigItem('uses', '${selectedAction.value['title']}'),
+          _buildConfigItem('label', 'Run NPM Test'),
+          // _buildConfigItem('runs', 'Overrides ENTRYPOINT'),
+          // _buildConfigItem('args', 'test'),
+          // const SizedBox(height: 16),
+          // const Text(
+          //   'secrets',
+          //   style: TextStyle(fontWeight: FontWeight.bold),
+          // ),
+          // const Text(
+          //   'Secrets are environment variables that are encrypted and available only when this action executes.',
+          //   style: TextStyle(fontSize: 12, color: Colors.grey),
+          // ),
+          // const SizedBox(height: 8),
+          // _buildSecretItem('GITHUB_TOKEN'),
+          // _buildSecretItem('NPM_AUTH_TOKEN', showDelete: true),
+          // const SizedBox(height: 8),
+          // const Text(
+          //   'Create a new secret',
+          //   style: TextStyle(color: Colors.blue),
+          // ),
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              width: 200,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: ElevatedButton(
+                onPressed: onTap,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Done',
+                  style: TextStyle(
+                    color: Colors.white,
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

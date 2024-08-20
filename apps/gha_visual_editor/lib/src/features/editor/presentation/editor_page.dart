@@ -5,12 +5,15 @@ import 'package:gha_visual_editor/src/features/editor/presentation/components/ac
 import 'package:gha_visual_editor/src/features/editor/presentation/components/action_connector_painter.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/components/action_list.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/components/configure_action.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/components/first_action_card.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/configure_workflow.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/first_action_card.dart';
 import 'package:signals/signals_flutter.dart';
 
 final showNextStepSignal = signal(false);
-
 final selectedAction = signal<Map<String, String>>({});
+final workflowNameSignal = signal('Default Workflow');
+final branchSignal = signal('develop');
+final onSignal = signal(OnPush.push);
 
 class EditorPage extends StatefulWidget {
   const EditorPage({super.key});
@@ -83,9 +86,6 @@ class _EditorPageState extends State<EditorPage> {
               );
             },
           );
-          // setState(() {
-          //   keyList.add(GlobalKey());
-          // });
         },
         child: const Icon(Icons.add),
       ),
