@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
-
-enum OnPush { push, pull_request }
+import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/domain/workflow_domain.dart';
 
 class ConfigureWorkflow extends StatelessWidget {
   const ConfigureWorkflow({
@@ -22,9 +20,11 @@ class ConfigureWorkflow extends StatelessWidget {
         children: [
           CustomTextField(
             label: 'Workflow Name',
-            value: workflowNameSignal.value,
+            value: workflowDomainSignal.value.workflowName,
             onChanged: (value) {
-              workflowNameSignal.value = value;
+              workflowDomainSignal.value = workflowDomainSignal.value.copyWith(
+                workflowName: value,
+              );
             },
           ),
           const SizedBox(height: 16),
@@ -34,7 +34,9 @@ class ConfigureWorkflow extends StatelessWidget {
             label: const Text('Run'),
             onSelected: (value) {
               if (value == null) return;
-              onSignal.value = value;
+              workflowDomainSignal.value = workflowDomainSignal.value.copyWith(
+                on: value,
+              );
             },
             dropdownMenuEntries:
                 OnPush.values.map<DropdownMenuEntry<OnPush>>((value) {
@@ -47,9 +49,11 @@ class ConfigureWorkflow extends StatelessWidget {
           ),
           CustomTextField(
             label: 'branch',
-            value: branchSignal.value,
+            value: workflowDomainSignal.value.branch,
             onChanged: (value) {
-              branchSignal.value = value;
+              workflowDomainSignal.value = workflowDomainSignal.value.copyWith(
+                branch: value,
+              );
             },
           ),
           // _buildConfigItem('Run', 'on: push'),

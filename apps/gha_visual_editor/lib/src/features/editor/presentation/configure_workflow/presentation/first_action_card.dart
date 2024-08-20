@@ -3,7 +3,7 @@ import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/configure_workflow.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/components/connector_dot.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/domain/workflow_domain.dart';
 import 'package:signals/signals_flutter.dart';
 
 class FirstActionCard extends StatelessWidget {
@@ -52,7 +52,7 @@ class FirstActionCard extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(left: 16.0),
                       child: Watch((context) => Text(
-                            workflowNameSignal.value,
+                            workflowDomainSignal.value.workflowName,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -75,14 +75,14 @@ class FirstActionCard extends StatelessWidget {
                                 ),
                               ),
                               TextSpan(
-                                text: '${onSignal.value.name} ',
+                                text: '${workflowDomainSignal.value.on.name} ',
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.9),
                                   fontSize: 14,
                                 ),
                               ),
                               TextSpan(
-                                text: '-> ${branchSignal.value}',
+                                text: '-> ${workflowDomainSignal.value.branch}',
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.9),
                                   fontSize: 14,
