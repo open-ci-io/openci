@@ -29,11 +29,13 @@ class _EditorPageState extends State<EditorPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showAdaptiveDialog(
+            barrierDismissible: true,
             context: context,
             builder: (context) {
               return AlertDialog(
                 title: const Text('Choose action'),
                 content: SizedBox(
+                  width: 400,
                   height: 350,
                   child: Column(
                     children: List.generate(actionList.length, (index) {
@@ -47,6 +49,7 @@ class _EditorPageState extends State<EditorPage> {
                           selectedActionSignal.value = actionSignal;
                           Navigator.pop(context);
                           showAdaptiveDialog(
+                            barrierDismissible: true,
                             context: context,
                             builder: (context) {
                               return AlertDialog(
