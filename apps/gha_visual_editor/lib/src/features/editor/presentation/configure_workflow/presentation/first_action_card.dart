@@ -3,7 +3,7 @@ import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/configure_workflow.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/components/connector_dot.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/domain/workflow_domain.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/domain/workflow_domain.dart';
 import 'package:signals/signals_flutter.dart';
 
 class FirstActionCard extends StatelessWidget {

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/components/action_card.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/action/presentation/action_card.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/components/action_connector_painter.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/components/action_list.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/components/configure_action.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/configure_action/domain/flutter_action_model.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/configure_action/presentation/configure_action.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/first_action_card.dart';
 import 'package:signals/signals_flutter.dart';
 
 final showNextStepSignal = signal(false);
-final selectedAction = signal<Map<String, String>>({});
+final selectedActionSignal = signal<Signal<FlutterActionModel>?>(null);
+final installFlutterSignal = signal(const FlutterActionModel());
+final actionList = listSignal([installFlutterSignal]);
 
 class EditorPage extends StatefulWidget {
   const EditorPage({super.key});
@@ -35,17 +37,14 @@ class _EditorPageState extends State<EditorPage> {
                   height: 350,
                   child: Column(
                     children: List.generate(actionList.length, (index) {
-                      final title = actionList[index]['title'] as String;
-                      final actionName =
-                          actionList[index]['actionName'] as String;
+                      final actionSignal = actionList[index];
+                      final action = actionSignal.value;
+
                       return ListTile(
-                        title: Text(title),
-                        subtitle: Text(actionName),
+                        title: Text(action.title),
+                        subtitle: Text(action.name),
                         onTap: () {
-                          selectedAction.value = {
-                            'title': title,
-                            'actionName': actionName
-                          };
+                          selectedActionSignal.value = actionSignal;
                           Navigator.pop(context);
                           showAdaptiveDialog(
                             context: context,
@@ -53,7 +52,7 @@ class _EditorPageState extends State<EditorPage> {
                               return AlertDialog(
                                 title: const Text('Configure action'),
                                 content: SizedBox(
-                                  height: 350,
+                                  height: 600,
                                   child: ConfigureActions(
                                     onTap: () {
                                       setState(() {
@@ -76,7 +75,7 @@ class _EditorPageState extends State<EditorPage> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: const Text('Next'),
+                    child: const Text('Close'),
                   ),
                 ],
               );

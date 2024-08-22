@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/domain/workflow_domain.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/domain/workflow_domain.dart';
 
 class ConfigureWorkflow extends StatelessWidget {
   const ConfigureWorkflow({
@@ -144,6 +144,34 @@ class ConfigureWorkflow extends StatelessWidget {
           const Icon(Icons.delete, size: 16, color: Colors.grey),
         ],
       ],
+    );
+  }
+}
+
+class UsesField extends StatelessWidget {
+  final String label;
+  final String value;
+  final ValueChanged<String>? onChanged;
+
+  const UsesField({
+    super.key,
+    required this.label,
+    required this.value,
+    this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.grey)),
+          const SizedBox(height: 4),
+          Text(value),
+        ],
+      ),
     );
   }
 }
