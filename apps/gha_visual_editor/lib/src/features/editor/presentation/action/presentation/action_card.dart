@@ -3,6 +3,7 @@ import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/components/connector_dot.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/configure_action/domain/flutter_action_model.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/configure_action/presentation/configure_action.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -51,25 +52,45 @@ class ActionCard extends StatelessWidget {
                       color: Colors.grey[300]!,
                       height: 1.5,
                     ),
-                    Container(
-                      padding: const EdgeInsets.only(right: 24.0),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(10),
-                          bottomRight: Radius.circular(10),
+                    GestureDetector(
+                      onTap: () {
+                        showAdaptiveDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Configure action'),
+                              content: SizedBox(
+                                height: 600,
+                                child: ConfigureActions(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.only(right: 24.0),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(10),
+                            bottomRight: Radius.circular(10),
+                          ),
                         ),
-                      ),
-                      width: double.infinity,
-                      height: 45.0,
-                      child: const Center(
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            'Edit',
-                            style: TextStyle(
-                              color: AppColors.bluePoint,
-                              fontSize: 16,
+                        width: double.infinity,
+                        height: 45.0,
+                        child: const Center(
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              'Edit',
+                              style: TextStyle(
+                                color: AppColors.bluePoint,
+                                fontSize: 16,
+                              ),
                             ),
                           ),
                         ),
