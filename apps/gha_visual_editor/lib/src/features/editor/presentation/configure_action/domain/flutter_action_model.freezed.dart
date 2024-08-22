@@ -192,7 +192,7 @@ class __$$FlutterActionModelImplCopyWithImpl<$Res>
 class _$FlutterActionModelImpl implements _FlutterActionModel {
   const _$FlutterActionModelImpl(
       {this.title = 'Install Flutter',
-      this.source = 'url',
+      this.source = 'https://github.com/subosito/flutter-action',
       this.uses = 'subosito/flutter-action@v2',
       this.name = 'Setup Flutter SDK',
       this.channel = FlutterChannel.stable,

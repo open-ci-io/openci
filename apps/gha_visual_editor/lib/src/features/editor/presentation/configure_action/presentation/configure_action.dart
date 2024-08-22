@@ -121,7 +121,7 @@ class ConfigureActions extends StatelessWidget {
                 width: 40,
                 child: Switch(
                   // This bool value toggles the switch.
-                  value: true,
+                  value: selectedActionSignal.value!.value.cache,
                   onChanged: (bool value) {
                     selectedActionSignal.value!.value =
                         selectedActionSignal.value!.value.copyWith(

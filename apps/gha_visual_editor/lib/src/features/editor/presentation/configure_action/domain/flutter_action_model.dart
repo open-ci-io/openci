@@ -8,7 +8,7 @@ part 'flutter_action_model.g.dart';
 class FlutterActionModel with _$FlutterActionModel {
   const factory FlutterActionModel({
     @Default('Install Flutter') String title,
-    @Default('url') String source,
+    @Default('https://github.com/subosito/flutter-action') String source,
     @Default('subosito/flutter-action@v2') String uses,
     @Default('Setup Flutter SDK') String name,
     @Default(FlutterChannel.stable) FlutterChannel channel,

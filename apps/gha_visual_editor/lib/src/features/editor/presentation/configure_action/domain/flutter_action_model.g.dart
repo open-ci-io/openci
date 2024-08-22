@@ -10,7 +10,8 @@ _$FlutterActionModelImpl _$$FlutterActionModelImplFromJson(
         Map<String, dynamic> json) =>
     _$FlutterActionModelImpl(
       title: json['title'] as String? ?? 'Install Flutter',
-      source: json['source'] as String? ?? 'url',
+      source: json['source'] as String? ??
+          'https://github.com/subosito/flutter-action',
       uses: json['uses'] as String? ?? 'subosito/flutter-action@v2',
       name: json['name'] as String? ?? 'Setup Flutter SDK',
       channel: $enumDecodeNullable(_$FlutterChannelEnumMap, json['channel']) ??
