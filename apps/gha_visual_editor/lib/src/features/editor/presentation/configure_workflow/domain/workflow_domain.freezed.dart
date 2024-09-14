@@ -24,8 +24,12 @@ mixin _$WorkflowDomain {
   String get branch => throw _privateConstructorUsedError;
   OnPush get on => throw _privateConstructorUsedError;
 
+  /// Serializes this WorkflowDomain to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of WorkflowDomain
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $WorkflowDomainCopyWith<WorkflowDomain> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -49,6 +53,8 @@ class _$WorkflowDomainCopyWithImpl<$Res, $Val extends WorkflowDomain>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of WorkflowDomain
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -92,6 +98,8 @@ class __$$WorkflowDomainImplCopyWithImpl<$Res>
       _$WorkflowDomainImpl _value, $Res Function(_$WorkflowDomainImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of WorkflowDomain
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -148,11 +156,13 @@ class _$WorkflowDomainImpl implements _WorkflowDomain {
             (identical(other.on, on) || other.on == on));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, workflowName, branch, on);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of WorkflowDomain
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$WorkflowDomainImplCopyWith<_$WorkflowDomainImpl> get copyWith =>
@@ -182,8 +192,11 @@ abstract class _WorkflowDomain implements WorkflowDomain {
   String get branch;
   @override
   OnPush get on;
+
+  /// Create a copy of WorkflowDomain
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$WorkflowDomainImplCopyWith<_$WorkflowDomainImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

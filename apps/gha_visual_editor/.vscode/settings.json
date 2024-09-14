@@ -3,5 +3,9 @@
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
   },
-  "cSpell.words": ["LTWH", "Rects", "subosito", "wzieba"]
+  "cSpell.words": ["LTWH", "Rects", "subosito", "wzieba"],
+  "files.exclude": {
+    "**/*.freezed.dart": true,
+    "**/*.g.dart": true
+  }
 }

@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/components/connector_dot.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/configure_action/domain/flutter_action_model.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/configure_action/presentation/configure_action.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
-import 'package:signals/signals_flutter.dart';
 
 final _borderColor = Colors.grey[300]!;
 
@@ -15,111 +11,112 @@ class ActionCard extends StatelessWidget {
   const ActionCard({
     super.key,
     required this.dotKey,
+    required this.action,
+    required this.index,
   });
 
   final GlobalKey dotKey;
+  final Map<String, dynamic> action;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
-      final action = selectedActionSignal.value!.value;
-      return SizedBox(
-        width: 340,
-        height: _height,
-        child: Stack(
-          children: [
-            Center(
-              child: Container(
-                width: 340,
-                height: _height - 20,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: _borderColor,
-                    width: 1,
-                  ),
+    return SizedBox(
+      width: 340,
+      height: _height,
+      child: Stack(
+        children: [
+          Center(
+            child: Container(
+              width: 340,
+              height: _height - 20,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: _borderColor,
+                  width: 1,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _Title(action: action),
-                    Divider(
-                      color: Colors.grey[300]!,
-                      height: 1.5,
-                    ),
-                    _Body(action: action),
-                    Divider(
-                      color: Colors.grey[300]!,
-                      height: 1.5,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        showAdaptiveDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Configure action'),
-                              content: SizedBox(
-                                height: 600,
-                                child: ConfigureActions(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.only(right: 24.0),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(10),
-                            bottomRight: Radius.circular(10),
-                          ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _Title(title: action['title']),
+                  Divider(
+                    color: Colors.grey[300]!,
+                    height: 1.5,
+                  ),
+                  _Body(action: action),
+                  Divider(
+                    color: Colors.grey[300]!,
+                    height: 1.5,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      // showAdaptiveDialog(
+                      //   context: context,
+                      //   builder: (context) {
+                      //     return AlertDialog(
+                      //       title: const Text('Configure action'),
+                      //       content: SizedBox(
+                      //         height: 600,
+                      //         child: ConfigureActions(
+                      //           onTap: () {
+                      //             Navigator.pop(context);
+                      //           },
+                      //         ),
+                      //       ),
+                      //     );
+                      //   },
+                      // );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.only(right: 24.0),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
                         ),
-                        width: double.infinity,
-                        height: 45.0,
-                        child: const Center(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              'Edit',
-                              style: TextStyle(
-                                color: AppColors.bluePoint,
-                                fontSize: 16,
-                              ),
+                      ),
+                      width: double.infinity,
+                      height: 45.0,
+                      child: const Center(
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            'Edit',
+                            style: TextStyle(
+                              color: AppColors.bluePoint,
+                              fontSize: 16,
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            Align(
-              alignment: Alignment.topCenter,
-              child: ConnectorDot(
-                key: dotKey,
-                borderColor: _borderColor,
-              ),
+          ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConnectorDot(
+              key: dotKey,
+              borderColor: _borderColor,
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: ConnectorDot(
-                borderColor: _borderColor,
-                dotPaddingColor: Colors.white,
-                dotColor: AppColors.bluePoint,
-                drawTop: false,
-              ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: ConnectorDot(
+              borderColor: _borderColor,
+              dotPaddingColor: Colors.white,
+              dotColor: AppColors.bluePoint,
+              drawTop: false,
             ),
-          ],
-        ),
-      );
-    });
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -129,7 +126,7 @@ class _Body extends StatelessWidget {
     required this.action,
   });
 
-  final FlutterActionModel action;
+  final Map<String, dynamic> action;
 
   @override
   Widget build(BuildContext context) {
@@ -145,27 +142,17 @@ class _Body extends StatelessWidget {
           children: [
             _Row(
               title: 'uses',
-              value: action.uses,
+              value: action['uses'],
             ),
             verticalMargin10,
-            _Row(
-              title: 'channel',
-              value: action.channel.name,
-            ),
-            verticalMargin10,
-            _Row(
-              title: 'flutter version',
-              value: action.flutterVersion,
-            ),
-            verticalMargin10,
-            _Row(
-              title: 'cache',
-              value: action.cache.toString(),
-            ),
-            verticalMargin10,
-            _Row(
-              title: 'cache key',
-              value: action.cacheKey,
+            Expanded(
+              child: ListView.builder(
+                itemCount: action['properties'].length,
+                itemBuilder: (context, index) {
+                  final data = action['properties'][index];
+                  return _Row(title: data['label'], value: data['value']);
+                },
+              ),
             ),
             const Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,10 +192,10 @@ class _Body extends StatelessWidget {
 class _Title extends StatelessWidget {
   const _Title({
     super.key,
-    required this.action,
+    required this.title,
   });
 
-  final FlutterActionModel action;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -227,7 +214,7 @@ class _Title extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(left: 24.0),
           child: Text(
-            action.title,
+            title,
             style: const TextStyle(
               color: Colors.black87,
               fontSize: 18,

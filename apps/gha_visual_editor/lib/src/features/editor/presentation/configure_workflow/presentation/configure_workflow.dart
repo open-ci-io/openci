@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/domain/workflow_domain.dart';
 
 class ConfigureWorkflow extends StatelessWidget {
@@ -176,7 +177,7 @@ class UsesField extends StatelessWidget {
   }
 }
 
-class CustomTextField extends StatelessWidget {
+class CustomTextField extends HookWidget {
   final String label;
   final String value;
   final ValueChanged<String>? onChanged;
@@ -190,6 +191,7 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = useTextEditingController(text: value);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -198,7 +200,7 @@ class CustomTextField extends StatelessWidget {
           Text(label, style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: 4),
           TextField(
-            controller: TextEditingController(text: value),
+            controller: controller,
             onChanged: onChanged,
             decoration: InputDecoration(
               contentPadding:

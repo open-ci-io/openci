@@ -20,6 +20,7 @@ ActionModel _$ActionModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ActionModel {
+  /// Serializes this ActionModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 }
 
@@ -39,6 +40,9 @@ class _$ActionModelCopyWithImpl<$Res, $Val extends ActionModel>
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
+
+  /// Create a copy of ActionModel
+  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
@@ -55,6 +59,9 @@ class __$$ActionModelImplCopyWithImpl<$Res>
   __$$ActionModelImplCopyWithImpl(
       _$ActionModelImpl _value, $Res Function(_$ActionModelImpl) _then)
       : super(_value, _then);
+
+  /// Create a copy of ActionModel
+  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
@@ -76,7 +83,7 @@ class _$ActionModelImpl implements _ActionModel {
         (other.runtimeType == runtimeType && other is _$ActionModelImpl);
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => runtimeType.hashCode;
 
