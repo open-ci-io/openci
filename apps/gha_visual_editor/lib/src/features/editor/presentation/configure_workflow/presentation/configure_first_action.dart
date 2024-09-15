@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gha_visual_editor/src/constants/margins.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/domain/workflow_domain.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/first_action_card_controller.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ConfigureWorkflow extends StatelessWidget {
-  const ConfigureWorkflow({
+class ConfigureFirstAction extends ConsumerWidget {
+  const ConfigureFirstAction({
     super.key,
     required this.onTap,
   });
@@ -11,7 +14,13 @@ class ConfigureWorkflow extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(firstActionCardControllerProvider);
+    final controller = ref.watch(firstActionCardControllerProvider.notifier);
+    final workflow = state.workflow;
+    final run = state.run;
+    final branch = state.branch;
+    final buildMachine = state.buildMachine;
     return Container(
       width: 500,
       padding: const EdgeInsets.all(16),
@@ -20,24 +29,20 @@ class ConfigureWorkflow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CustomTextField(
-            label: 'Workflow Name',
-            value: workflowDomainSignal.value.workflowName,
+            label: workflow.label,
+            value: workflow.value,
             onChanged: (value) {
-              workflowDomainSignal.value = workflowDomainSignal.value.copyWith(
-                workflowName: value,
-              );
+              controller.updateWorkflow(value);
             },
           ),
-          const SizedBox(height: 16),
+          verticalMargin16,
           DropdownMenu<OnPush>(
             initialSelection: OnPush.push,
             requestFocusOnTap: true,
             label: const Text('Run'),
             onSelected: (value) {
               if (value == null) return;
-              workflowDomainSignal.value = workflowDomainSignal.value.copyWith(
-                on: value,
-              );
+              controller.updateRun(value.name);
             },
             dropdownMenuEntries:
                 OnPush.values.map<DropdownMenuEntry<OnPush>>((value) {
@@ -49,36 +54,20 @@ class ConfigureWorkflow extends StatelessWidget {
             }).toList(),
           ),
           CustomTextField(
-            label: 'branch',
-            value: workflowDomainSignal.value.branch,
+            label: branch.label,
+            value: branch.value,
             onChanged: (value) {
-              workflowDomainSignal.value = workflowDomainSignal.value.copyWith(
-                branch: value,
-              );
+              controller.updateBranch(value);
             },
           ),
-          // _buildConfigItem('Run', 'on: push'),
-          // _buildConfigItem('Target Branch', 'develop'),
-          // _buildConfigItem('runs', 'Overrides ENTRYPOINT'),
-          // _buildConfigItem('args', 'test'),
-          // const SizedBox(height: 16),
-          // const Text(
-          //   'secrets',
-          //   style: TextStyle(fontWeight: FontWeight.bold),
-          // ),
-          // const Text(
-          //   'Secrets are environment variables that are encrypted and available only when this action executes.',
-          //   style: TextStyle(fontSize: 12, color: Colors.grey),
-          // ),
-          // const SizedBox(height: 8),
-          // _buildSecretItem('GITHUB_TOKEN'),
-          // _buildSecretItem('NPM_AUTH_TOKEN', showDelete: true),
-          // const SizedBox(height: 8),
-          // const Text(
-          //   'Create a new secret',
-          //   style: TextStyle(color: Colors.blue),
-          // ),
-          const SizedBox(height: 16),
+          CustomTextField(
+            label: buildMachine.label,
+            value: buildMachine.value,
+            onChanged: (value) {
+              controller.updateBuildMachine(value);
+            },
+          ),
+          verticalMargin16,
           Align(
             alignment: Alignment.center,
             child: Container(
@@ -110,28 +99,6 @@ class ConfigureWorkflow extends StatelessWidget {
       ),
     );
   }
-
-  // Widget _buildConfigItem(String label, String value) {
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(vertical: 8),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Text(label, style: const TextStyle(color: Colors.grey)),
-  //         const SizedBox(height: 4),
-  //         Container(
-  //           width: double.infinity,
-  //           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-  //           decoration: BoxDecoration(
-  //             border: Border.all(color: Colors.grey[300]!),
-  //             borderRadius: BorderRadius.circular(4),
-  //           ),
-  //           child: Text(value),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _buildSecretItem(String label, {bool showDelete = false}) {
     return Row(

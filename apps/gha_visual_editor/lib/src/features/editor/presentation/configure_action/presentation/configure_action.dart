@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/configure_action/presentation/configure_action_controller.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/configure_workflow.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/configure_first_action.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';

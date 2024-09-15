@@ -9,6 +9,25 @@ import 'package:signals/signals_flutter.dart';
 
 final showNextStepSignal = signal(false);
 
+String convertToYaml(Map<String, dynamic> map) {
+  final StringBuffer yaml = StringBuffer();
+
+  yaml.writeln('name: ${map['name']}');
+  yaml.writeln('uses: ${map['uses']}');
+
+  final properties = map['properties'];
+  if (properties != null && properties.isNotEmpty) {
+    yaml.writeln('with:');
+    for (final property in properties) {
+      final label =
+          property['label'].toString().toLowerCase().replaceAll(' ', '-');
+      yaml.writeln('  $label: ${property['value']}');
+    }
+  }
+
+  return yaml.toString();
+}
+
 enum FormStyle {
   dropDown,
   textField,
@@ -53,7 +72,15 @@ final flutterPubGetMap = {
   'properties': []
 };
 
-final actionsList = [installFlutterMap, flutterPubGetMap];
+final checkoutCode = {
+  'title': 'checkout',
+  'source': 'https://github.com/actions/checkout',
+  'name': 'Checkout the source code',
+  'uses': 'actions/checkout@v4',
+  'properties': []
+};
+
+final actionsList = [installFlutterMap, flutterPubGetMap, checkoutCode];
 
 final savedActionList = listSignal([]);
 final keyListSignal = listSignal([GlobalKey()]);
@@ -70,62 +97,76 @@ class _EditorPageState extends State<EditorPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: AppColors.grayBackground,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showAdaptiveDialog(
-              barrierDismissible: true,
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: const Text('Choose action'),
-                  content: SizedBox(
-                    width: 400,
-                    height: 350,
-                    child: Column(
-                      children: List.generate(
-                        actionsList.length,
-                        (index) {
-                          final action = actionsList[index];
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              onPressed: () {
+                final action = savedActionList.value.first;
+                print('$action');
+                print('convertToYaml: ${convertToYaml(action)}');
+              },
+              child: const Icon(Icons.download),
+            ),
+            verticalMargin10,
+            FloatingActionButton(
+              onPressed: () {
+                showAdaptiveDialog(
+                  barrierDismissible: true,
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Choose action'),
+                      content: SizedBox(
+                        width: 400,
+                        height: 350,
+                        child: Column(
+                          children: List.generate(
+                            actionsList.length,
+                            (index) {
+                              final action = actionsList[index];
 
-                          return ListTile(
-                            title: Text('${action['title']}'),
-                            subtitle: Text('${action['name']}'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              showAdaptiveDialog(
-                                barrierDismissible: true,
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: const Text('Configure action'),
-                                    content: SizedBox(
-                                      height: 600,
-                                      child: ConfigureActions(
-                                        action: action,
-                                      ),
-                                    ),
+                              return ListTile(
+                                title: Text('${action['title']}'),
+                                subtitle: Text('${action['name']}'),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  showAdaptiveDialog(
+                                    barrierDismissible: true,
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text('Configure action'),
+                                        content: SizedBox(
+                                          height: 600,
+                                          child: ConfigureActions(
+                                            action: action,
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   );
                                 },
                               );
                             },
-                          );
-                        },
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Close'),
-                    ),
-                  ],
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
-            );
-          },
-          child: const Icon(Icons.add),
+              child: const Icon(Icons.add),
+            ),
+          ],
         ),
         body: Watch((context) {
           final keyList = keyListSignal.value;
