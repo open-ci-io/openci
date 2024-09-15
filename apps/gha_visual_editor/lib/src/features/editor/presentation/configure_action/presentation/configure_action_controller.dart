@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/action/domain/action_model.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'configure_action_controller.g.dart';
@@ -6,43 +7,24 @@ part 'configure_action_controller.g.dart';
 @riverpod
 class ConfigureActionController extends _$ConfigureActionController {
   @override
-  Map<String, dynamic> build(Map<String, dynamic> value) {
-    return value;
+  ActionModel build(ActionModel action) {
+    return action;
   }
 
-  void updateValue(Map<String, dynamic> value) {
+  void updateValue(ActionModel value) {
     state = value;
   }
 
-  void updateState({
-    required FormStyle formStyle,
-    required int index,
-    required String label,
-    required String newValue,
-    List<String>? options,
-  }) {
-    final newProperties = state['properties'];
-    if (options == null) {
-      newProperties[index] = {
-        'formStyle': formStyle.name,
-        'label': label,
-        'value': newValue,
-      };
-    } else {
-      newProperties[index] = {
-        'formStyle': formStyle.name,
-        'label': label,
-        'value': newValue,
-        'options': options,
-      };
-    }
+  void updateName(String value) {
+    state = state.copyWith(name: value);
+  }
 
-    state = {
-      ...state,
-      'properties': [
-        ...state['properties'],
-      ],
-    };
+  void updateProperties(ActionModelProperties value, int index) {
+    state = state.copyWith(properties: [
+      ...state.properties.sublist(0, index),
+      value,
+      ...state.properties.sublist(index + 1),
+    ]);
   }
 
   void addNewSavedAction() {

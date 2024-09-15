@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/action/domain/action_model.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/components/connector_dot.dart';
 
 final _borderColor = Colors.grey[300]!;
@@ -16,7 +17,7 @@ class ActionCard extends StatelessWidget {
   });
 
   final GlobalKey dotKey;
-  final Map<String, dynamic> action;
+  final ActionModel action;
   final int index;
 
   @override
@@ -40,7 +41,7 @@ class ActionCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _Title(title: action['title']),
+                  _Title(title: action.title),
                   Divider(
                     color: Colors.grey[300]!,
                     height: 1.5,
@@ -125,7 +126,7 @@ class _Body extends StatelessWidget {
     required this.action,
   });
 
-  final Map<String, dynamic> action;
+  final ActionModel action;
 
   @override
   Widget build(BuildContext context) {
@@ -141,15 +142,15 @@ class _Body extends StatelessWidget {
           children: [
             _Row(
               title: 'uses',
-              value: action['uses'],
+              value: action.uses,
             ),
             verticalMargin10,
             Expanded(
               child: ListView.builder(
-                itemCount: action['properties'].length,
+                itemCount: action.properties.length,
                 itemBuilder: (context, index) {
-                  final data = action['properties'][index];
-                  return _Row(title: data['label'], value: data['value']);
+                  final data = action.properties[index];
+                  return _Row(title: data.label, value: data.value);
                 },
               ),
             ),

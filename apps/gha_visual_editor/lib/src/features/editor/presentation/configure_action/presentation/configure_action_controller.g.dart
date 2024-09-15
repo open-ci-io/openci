@@ -7,7 +7,7 @@ part of 'configure_action_controller.dart';
 // **************************************************************************
 
 String _$configureActionControllerHash() =>
-    r'cc3bbddf3f0adf5077db3451310b0aa16116ee04';
+    r'b43fd2aa7fe8a8ae21fb119e9f0713b4a1d36b04';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -31,11 +31,11 @@ class _SystemHash {
 }
 
 abstract class _$ConfigureActionController
-    extends BuildlessAutoDisposeNotifier<Map<String, dynamic>> {
-  late final Map<String, dynamic> value;
+    extends BuildlessAutoDisposeNotifier<ActionModel> {
+  late final ActionModel action;
 
-  Map<String, dynamic> build(
-    Map<String, dynamic> value,
+  ActionModel build(
+    ActionModel action,
   );
 }
 
@@ -44,16 +44,16 @@ abstract class _$ConfigureActionController
 const configureActionControllerProvider = ConfigureActionControllerFamily();
 
 /// See also [ConfigureActionController].
-class ConfigureActionControllerFamily extends Family<Map<String, dynamic>> {
+class ConfigureActionControllerFamily extends Family<ActionModel> {
   /// See also [ConfigureActionController].
   const ConfigureActionControllerFamily();
 
   /// See also [ConfigureActionController].
   ConfigureActionControllerProvider call(
-    Map<String, dynamic> value,
+    ActionModel action,
   ) {
     return ConfigureActionControllerProvider(
-      value,
+      action,
     );
   }
 
@@ -62,7 +62,7 @@ class ConfigureActionControllerFamily extends Family<Map<String, dynamic>> {
     covariant ConfigureActionControllerProvider provider,
   ) {
     return call(
-      provider.value,
+      provider.action,
     );
   }
 
@@ -83,12 +83,12 @@ class ConfigureActionControllerFamily extends Family<Map<String, dynamic>> {
 
 /// See also [ConfigureActionController].
 class ConfigureActionControllerProvider extends AutoDisposeNotifierProviderImpl<
-    ConfigureActionController, Map<String, dynamic>> {
+    ConfigureActionController, ActionModel> {
   /// See also [ConfigureActionController].
   ConfigureActionControllerProvider(
-    Map<String, dynamic> value,
+    ActionModel action,
   ) : this._internal(
-          () => ConfigureActionController()..value = value,
+          () => ConfigureActionController()..action = action,
           from: configureActionControllerProvider,
           name: r'configureActionControllerProvider',
           debugGetCreateSourceHash:
@@ -98,7 +98,7 @@ class ConfigureActionControllerProvider extends AutoDisposeNotifierProviderImpl<
           dependencies: ConfigureActionControllerFamily._dependencies,
           allTransitiveDependencies:
               ConfigureActionControllerFamily._allTransitiveDependencies,
-          value: value,
+          action: action,
         );
 
   ConfigureActionControllerProvider._internal(
@@ -108,17 +108,17 @@ class ConfigureActionControllerProvider extends AutoDisposeNotifierProviderImpl<
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.value,
+    required this.action,
   }) : super.internal();
 
-  final Map<String, dynamic> value;
+  final ActionModel action;
 
   @override
-  Map<String, dynamic> runNotifierBuild(
+  ActionModel runNotifierBuild(
     covariant ConfigureActionController notifier,
   ) {
     return notifier.build(
-      value,
+      action,
     );
   }
 
@@ -127,51 +127,51 @@ class ConfigureActionControllerProvider extends AutoDisposeNotifierProviderImpl<
     return ProviderOverride(
       origin: this,
       override: ConfigureActionControllerProvider._internal(
-        () => create()..value = value,
+        () => create()..action = action,
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        value: value,
+        action: action,
       ),
     );
   }
 
   @override
-  AutoDisposeNotifierProviderElement<ConfigureActionController,
-      Map<String, dynamic>> createElement() {
+  AutoDisposeNotifierProviderElement<ConfigureActionController, ActionModel>
+      createElement() {
     return _ConfigureActionControllerProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is ConfigureActionControllerProvider && other.value == value;
+    return other is ConfigureActionControllerProvider && other.action == action;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, value.hashCode);
+    hash = _SystemHash.combine(hash, action.hashCode);
 
     return _SystemHash.finish(hash);
   }
 }
 
 mixin ConfigureActionControllerRef
-    on AutoDisposeNotifierProviderRef<Map<String, dynamic>> {
-  /// The parameter `value` of this provider.
-  Map<String, dynamic> get value;
+    on AutoDisposeNotifierProviderRef<ActionModel> {
+  /// The parameter `action` of this provider.
+  ActionModel get action;
 }
 
 class _ConfigureActionControllerProviderElement
     extends AutoDisposeNotifierProviderElement<ConfigureActionController,
-        Map<String, dynamic>> with ConfigureActionControllerRef {
+        ActionModel> with ConfigureActionControllerRef {
   _ConfigureActionControllerProviderElement(super.provider);
 
   @override
-  Map<String, dynamic> get value =>
-      (origin as ConfigureActionControllerProvider).value;
+  ActionModel get action =>
+      (origin as ConfigureActionControllerProvider).action;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

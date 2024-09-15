@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:gha_visual_editor/src/constants/action_list.dart';
 import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/action/domain/action_model.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/action/presentation/action_card.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/components/action_connector_painter.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/configure_action/presentation/configure_action.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/first_action_card.dart';
 import 'package:signals/signals_flutter.dart';
-
-final showNextStepSignal = signal(false);
 
 String convertToYaml(Map<String, dynamic> map) {
   final StringBuffer yaml = StringBuffer();
@@ -28,71 +28,18 @@ String convertToYaml(Map<String, dynamic> map) {
   return yaml.toString();
 }
 
-enum FormStyle {
-  dropDown,
-  textField,
-  checkBox,
-}
+final actionsList = [
+  ActionList.installFlutter,
+  ActionList.checkoutCode,
+  ActionList.flutterPubGet,
+];
 
-final installFlutterMap = {
-  'title': 'Install Flutter',
-  'source': 'https://github.com/subosito/flutter-action',
-  'name': 'Setup Flutter SDK',
-  'uses': 'subosito/flutter-action@v2',
-  'properties': [
-    {
-      'formStyle': 'dropDown',
-      'label': 'channel',
-      'options': ['stable', 'beta', 'dev', 'master'],
-      'value': 'stable',
-    },
-    {
-      'formStyle': 'textField',
-      'label': 'Flutter Version',
-      'value': '3.22.2',
-    },
-    {
-      'formStyle': 'checkBox',
-      'label': 'Cache',
-      'value': 'false',
-    },
-    {
-      'formStyle': 'textField',
-      'label': 'Cache Key',
-      'value': 'default',
-    }
-  ]
-};
-
-final flutterPubGetMap = {
-  'title': 'Flutter Pub Get',
-  'source': 'none',
-  'name': 'Install dependencies',
-  'uses': 'custom',
-  'properties': []
-};
-
-final checkoutCode = {
-  'title': 'checkout',
-  'source': 'https://github.com/actions/checkout',
-  'name': 'Checkout the source code',
-  'uses': 'actions/checkout@v4',
-  'properties': []
-};
-
-final actionsList = [installFlutterMap, flutterPubGetMap, checkoutCode];
-
-final savedActionList = listSignal([]);
+final savedActionList = listSignal(<ActionModel>[]);
 final keyListSignal = listSignal([GlobalKey()]);
 
-class EditorPage extends StatefulWidget {
+class EditorPage extends StatelessWidget {
   const EditorPage({super.key});
 
-  @override
-  State<EditorPage> createState() => _EditorPageState();
-}
-
-class _EditorPageState extends State<EditorPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,8 +70,8 @@ class _EditorPageState extends State<EditorPage> {
                               final action = actionsList[index];
 
                               return ListTile(
-                                title: Text('${action['title']}'),
-                                subtitle: Text('${action['name']}'),
+                                title: Text(action.title),
+                                subtitle: Text(action.name),
                                 onTap: () {
                                   Navigator.pop(context);
                                   showAdaptiveDialog(

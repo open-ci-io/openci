@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/action/domain/action_model.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/configure_action/presentation/configure_action_controller.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/configure_first_action.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/editor_page.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -12,14 +12,14 @@ class ConfigureActions extends ConsumerWidget {
     required this.action,
   });
 
-  final Map<String, dynamic> action;
+  final ActionModel action;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(configureActionControllerProvider(action));
     final controller =
         ref.watch(configureActionControllerProvider(action).notifier);
-    final properties = state['properties'] as List;
+    final properties = state.properties;
     return Container(
       width: 500,
       padding: const EdgeInsets.all(16),
@@ -43,12 +43,12 @@ class ConfigureActions extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    state['title'],
+                    state.title,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   GestureDetector(
                     onTap: () async {
-                      final url = Uri.parse(state['source']);
+                      final url = Uri.parse(state.source);
                       if (!await launchUrl(url)) {
                         throw Exception('Could not launch $url');
                       }
@@ -63,31 +63,24 @@ class ConfigureActions extends ConsumerWidget {
             ],
           ),
           verticalMargin16,
-          UsesField(label: 'uses', value: state['uses']),
+          UsesField(label: 'uses', value: state.uses),
           CustomTextField(
             label: 'name',
-            value: state['name'],
-            onChanged: (value) {
-              controller.updateValue(
-                {
-                  ...state,
-                  'name': value,
-                },
-              );
-            },
+            value: state.name,
+            onChanged: (value) => controller.updateName(value),
           ),
           verticalMargin16,
           if (properties.isNotEmpty)
             ...properties.asMap().entries.map((e) {
               final index = e.key;
               final value = e.value;
-              final formStyle = FormStyle.values.byName(value['formStyle']);
-              final label = value['label'];
-              final data = value['value'];
+              final formStyle = value.formStyle;
+              final label = value.label;
+              final data = value.value;
 
               switch (formStyle) {
                 case FormStyle.dropDown:
-                  final options = value['options'] as List<String>;
+                  final options = value.options;
                   return DropdownMenu<String>(
                     inputDecorationTheme: InputDecorationTheme(
                       enabledBorder: OutlineInputBorder(
@@ -103,12 +96,14 @@ class ConfigureActions extends ConsumerWidget {
                       if (newValue == null) {
                         return;
                       }
-                      controller.updateState(
-                        formStyle: FormStyle.dropDown,
-                        index: index,
-                        label: label,
-                        newValue: newValue,
-                        options: options,
+                      controller.updateProperties(
+                        ActionModelProperties(
+                          formStyle: FormStyle.dropDown,
+                          label: label,
+                          value: newValue,
+                          options: options,
+                        ),
+                        index,
                       );
                     },
                     dropdownMenuEntries:
@@ -117,21 +112,23 @@ class ConfigureActions extends ConsumerWidget {
                     }).toList(),
                   );
                 case FormStyle.textField:
-                  final data = value['value'];
+                  final data = value.value;
                   return CustomTextField(
                     label: label,
                     value: data,
                     onChanged: (value) {
-                      controller.updateState(
-                        formStyle: FormStyle.textField,
-                        index: index,
-                        label: label,
-                        newValue: value,
+                      controller.updateProperties(
+                        ActionModelProperties(
+                          formStyle: FormStyle.textField,
+                          label: label,
+                          value: value,
+                        ),
+                        index,
                       );
                     },
                   );
                 case FormStyle.checkBox:
-                  final data = bool.parse(value['value']);
+                  final data = bool.parse(value.value);
 
                   return Column(
                     children: [
@@ -143,11 +140,13 @@ class ConfigureActions extends ConsumerWidget {
                           child: Switch(
                             value: data,
                             onChanged: (bool value) {
-                              controller.updateState(
-                                formStyle: FormStyle.checkBox,
-                                index: index,
-                                label: label,
-                                newValue: value.toString(),
+                              controller.updateProperties(
+                                ActionModelProperties(
+                                  formStyle: FormStyle.checkBox,
+                                  label: label,
+                                  value: value.toString(),
+                                ),
+                                index,
                               );
                             },
                           ),
