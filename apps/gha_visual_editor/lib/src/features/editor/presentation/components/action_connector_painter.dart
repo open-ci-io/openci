@@ -4,14 +4,10 @@ class ActionConnectorPainter extends CustomPainter {
   final GlobalKey startKey;
   final GlobalKey endKey;
 
-  ActionConnectorPainter({required this.startKey, required this.endKey}) {
-    print('ActionConnectorPainter が初期化されました'); // コンストラクタに追加
-  }
+  ActionConnectorPainter({required this.startKey, required this.endKey});
 
   @override
   void paint(Canvas canvas, Size size) {
-    print('ActionConnectorPainter の paint メソッドが呼び出されました'); // paint メソッドの先頭に追加
-
     final paint = Paint()
       ..color = Colors.grey
       ..strokeWidth = 5;
@@ -25,12 +21,9 @@ class ActionConnectorPainter extends CustomPainter {
       final endCenter =
           endBox.localToGlobal(endBox.size.topCenter(Offset.zero));
 
-      print('Start center: $startCenter'); // ここに print 文を追加
-      print('End center: $endCenter'); // ここに print 文を追加
-
       canvas.drawLine(startCenter, endCenter, paint);
     } else {
-      print('startBox or endBox is null'); // エラーチェックのための print 文
+      throw Exception('startBox or endBox is null');
     }
   }
 

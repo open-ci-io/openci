@@ -122,7 +122,6 @@ class ActionCard extends StatelessWidget {
 
 class _Body extends StatelessWidget {
   const _Body({
-    super.key,
     required this.action,
   });
 
@@ -191,7 +190,6 @@ class _Body extends StatelessWidget {
 
 class _Title extends StatelessWidget {
   const _Title({
-    super.key,
     required this.title,
   });
 
@@ -229,7 +227,6 @@ class _Title extends StatelessWidget {
 
 class _Row extends StatelessWidget {
   const _Row({
-    super.key,
     required this.title,
     required this.value,
   });

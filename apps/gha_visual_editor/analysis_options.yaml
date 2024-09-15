@@ -4,3 +4,10 @@ linter:
   rules:
     - omit_local_variable_types: true
     - require_trailing_commas: true
+
+analyzer:
+  exclude:
+    - lib/generated/**
+    - test/generated/**
+    - '**/*.g.dart'
+    - '**/*.freezed.dart'

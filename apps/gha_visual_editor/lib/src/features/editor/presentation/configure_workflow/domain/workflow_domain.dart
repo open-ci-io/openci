@@ -21,4 +21,5 @@ class WorkflowDomain with _$WorkflowDomain {
       _$WorkflowDomainFromJson(json);
 }
 
+// ignore: constant_identifier_names
 enum OnPush { push, pull_request }

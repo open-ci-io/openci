@@ -194,8 +194,22 @@ class ConfigureActions extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildConfigItem(String label, String value) {
+class UsesField extends StatelessWidget {
+  final String label;
+  final String value;
+  final ValueChanged<String>? onChanged;
+
+  const UsesField({
+    super.key,
+    required this.label,
+    required this.value,
+    this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -203,32 +217,9 @@ class ConfigureActions extends ConsumerWidget {
         children: [
           Text(label, style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: 4),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(value),
-          ),
+          Text(value),
         ],
       ),
-    );
-  }
-
-  Widget _buildSecretItem(String label, {bool showDelete = false}) {
-    return Row(
-      children: [
-        Checkbox(value: false, onChanged: (value) {}),
-        const Icon(Icons.lock, size: 16, color: Colors.grey),
-        const SizedBox(width: 8),
-        Text(label),
-        if (showDelete) ...[
-          const Spacer(),
-          const Icon(Icons.delete, size: 16, color: Colors.grey),
-        ],
-      ],
     );
   }
 }

@@ -100,34 +100,6 @@ class ConfigureFirstAction extends ConsumerWidget {
   }
 }
 
-class UsesField extends StatelessWidget {
-  final String label;
-  final String value;
-  final ValueChanged<String>? onChanged;
-
-  const UsesField({
-    super.key,
-    required this.label,
-    required this.value,
-    this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.grey)),
-          const SizedBox(height: 4),
-          Text(value),
-        ],
-      ),
-    );
-  }
-}
-
 class CustomTextField extends HookWidget {
   final String label;
   final String value;

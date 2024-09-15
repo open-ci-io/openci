@@ -101,11 +101,7 @@ class _EditorPageState extends State<EditorPage> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FloatingActionButton(
-              onPressed: () {
-                final action = savedActionList.value.first;
-                print('$action');
-                print('convertToYaml: ${convertToYaml(action)}');
-              },
+              onPressed: () {},
               child: const Icon(Icons.download),
             ),
             verticalMargin10,
