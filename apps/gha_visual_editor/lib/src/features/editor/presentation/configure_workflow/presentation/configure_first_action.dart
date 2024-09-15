@@ -18,7 +18,6 @@ class ConfigureFirstAction extends ConsumerWidget {
     final state = ref.watch(firstActionCardControllerProvider);
     final controller = ref.watch(firstActionCardControllerProvider.notifier);
     final workflow = state.workflow;
-    final run = state.run;
     final branch = state.branch;
     final buildMachine = state.buildMachine;
     return Container(
