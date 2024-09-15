@@ -98,21 +98,6 @@ class ConfigureFirstAction extends ConsumerWidget {
       ),
     );
   }
-
-  Widget _buildSecretItem(String label, {bool showDelete = false}) {
-    return Row(
-      children: [
-        Checkbox(value: false, onChanged: (value) {}),
-        const Icon(Icons.lock, size: 16, color: Colors.grey),
-        const SizedBox(width: 8),
-        Text(label),
-        if (showDelete) ...[
-          const Spacer(),
-          const Icon(Icons.delete, size: 16, color: Colors.grey),
-        ],
-      ],
-    );
-  }
 }
 
 class UsesField extends StatelessWidget {
