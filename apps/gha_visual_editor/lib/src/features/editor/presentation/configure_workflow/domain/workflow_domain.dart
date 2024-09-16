@@ -4,11 +4,13 @@ import 'package:signals/signals_flutter.dart';
 part 'workflow_domain.freezed.dart';
 part 'workflow_domain.g.dart';
 
-final workflowDomainSignal = signal<WorkflowDomain>(const WorkflowDomain(
-  workflowName: 'Default Workflow',
-  branch: 'develop',
-  on: OnPush.push,
-));
+final workflowDomainSignal = signal<WorkflowDomain>(
+  const WorkflowDomain(
+    workflowName: 'Default Workflow',
+    branch: 'develop',
+    on: OnPush.push,
+  ),
+);
 
 @freezed
 class WorkflowDomain with _$WorkflowDomain {

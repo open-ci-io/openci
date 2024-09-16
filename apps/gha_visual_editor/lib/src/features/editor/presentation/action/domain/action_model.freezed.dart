@@ -267,6 +267,7 @@ mixin _$ActionModelProperties {
   FormStyle get formStyle => throw _privateConstructorUsedError;
   String get label => throw _privateConstructorUsedError;
   String get value => throw _privateConstructorUsedError;
+  String get key => throw _privateConstructorUsedError;
   List<String> get options => throw _privateConstructorUsedError;
 
   /// Serializes this ActionModelProperties to a JSON map.
@@ -286,7 +287,11 @@ abstract class $ActionModelPropertiesCopyWith<$Res> {
       _$ActionModelPropertiesCopyWithImpl<$Res, ActionModelProperties>;
   @useResult
   $Res call(
-      {FormStyle formStyle, String label, String value, List<String> options});
+      {FormStyle formStyle,
+      String label,
+      String value,
+      String key,
+      List<String> options});
 }
 
 /// @nodoc
@@ -308,6 +313,7 @@ class _$ActionModelPropertiesCopyWithImpl<$Res,
     Object? formStyle = null,
     Object? label = null,
     Object? value = null,
+    Object? key = null,
     Object? options = null,
   }) {
     return _then(_value.copyWith(
@@ -322,6 +328,10 @@ class _$ActionModelPropertiesCopyWithImpl<$Res,
       value: null == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
+              as String,
+      key: null == key
+          ? _value.key
+          : key // ignore: cast_nullable_to_non_nullable
               as String,
       options: null == options
           ? _value.options
@@ -341,7 +351,11 @@ abstract class _$$ActionModelPropertiesImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {FormStyle formStyle, String label, String value, List<String> options});
+      {FormStyle formStyle,
+      String label,
+      String value,
+      String key,
+      List<String> options});
 }
 
 /// @nodoc
@@ -361,6 +375,7 @@ class __$$ActionModelPropertiesImplCopyWithImpl<$Res>
     Object? formStyle = null,
     Object? label = null,
     Object? value = null,
+    Object? key = null,
     Object? options = null,
   }) {
     return _then(_$ActionModelPropertiesImpl(
@@ -375,6 +390,10 @@ class __$$ActionModelPropertiesImplCopyWithImpl<$Res>
       value: null == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
+              as String,
+      key: null == key
+          ? _value.key
+          : key // ignore: cast_nullable_to_non_nullable
               as String,
       options: null == options
           ? _value._options
@@ -391,6 +410,7 @@ class _$ActionModelPropertiesImpl implements _ActionModelProperties {
       {required this.formStyle,
       required this.label,
       required this.value,
+      required this.key,
       final List<String> options = const []})
       : _options = options;
 
@@ -403,6 +423,8 @@ class _$ActionModelPropertiesImpl implements _ActionModelProperties {
   final String label;
   @override
   final String value;
+  @override
+  final String key;
   final List<String> _options;
   @override
   @JsonKey()
@@ -414,7 +436,7 @@ class _$ActionModelPropertiesImpl implements _ActionModelProperties {
 
   @override
   String toString() {
-    return 'ActionModelProperties(formStyle: $formStyle, label: $label, value: $value, options: $options)';
+    return 'ActionModelProperties(formStyle: $formStyle, label: $label, value: $value, key: $key, options: $options)';
   }
 
   @override
@@ -426,12 +448,13 @@ class _$ActionModelPropertiesImpl implements _ActionModelProperties {
                 other.formStyle == formStyle) &&
             (identical(other.label, label) || other.label == label) &&
             (identical(other.value, value) || other.value == value) &&
+            (identical(other.key, key) || other.key == key) &&
             const DeepCollectionEquality().equals(other._options, _options));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, formStyle, label, value,
+  int get hashCode => Object.hash(runtimeType, formStyle, label, value, key,
       const DeepCollectionEquality().hash(_options));
 
   /// Create a copy of ActionModelProperties
@@ -456,6 +479,7 @@ abstract class _ActionModelProperties implements ActionModelProperties {
       {required final FormStyle formStyle,
       required final String label,
       required final String value,
+      required final String key,
       final List<String> options}) = _$ActionModelPropertiesImpl;
 
   factory _ActionModelProperties.fromJson(Map<String, dynamic> json) =
@@ -467,6 +491,8 @@ abstract class _ActionModelProperties implements ActionModelProperties {
   String get label;
   @override
   String get value;
+  @override
+  String get key;
   @override
   List<String> get options;
 

@@ -7,7 +7,7 @@ part of 'configure_action_controller.dart';
 // **************************************************************************
 
 String _$configureActionControllerHash() =>
-    r'b43fd2aa7fe8a8ae21fb119e9f0713b4a1d36b04';
+    r'78b7c338b22b2504fa246d855d4bbc1d1828c03d';
 
 /// Copied from Dart SDK
 class _SystemHash {

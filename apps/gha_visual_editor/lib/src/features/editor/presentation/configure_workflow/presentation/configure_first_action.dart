@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/domain/workflow_domain.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/first_action_card_controller.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/editor_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ConfigureFirstAction extends ConsumerWidget {
@@ -15,11 +15,12 @@ class ConfigureFirstAction extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(firstActionCardControllerProvider);
-    final controller = ref.watch(firstActionCardControllerProvider.notifier);
-    final workflow = state.workflow;
-    final branch = state.branch;
-    final buildMachine = state.buildMachine;
+    final state = ref.watch(editorControllerProvider);
+    final controller = ref.watch(editorControllerProvider.notifier);
+    final firstAction = state.firstAction;
+    final workflow = firstAction.workflow;
+    final branch = firstAction.branch;
+    final buildMachine = firstAction.buildMachine;
     return Container(
       width: 500,
       padding: const EdgeInsets.all(16),
@@ -31,7 +32,7 @@ class ConfigureFirstAction extends ConsumerWidget {
             label: workflow.label,
             value: workflow.value,
             onChanged: (value) {
-              controller.updateWorkflow(value);
+              controller.updateWorkflowOfFirstAction(value);
             },
           ),
           verticalMargin16,
@@ -41,7 +42,7 @@ class ConfigureFirstAction extends ConsumerWidget {
             label: const Text('Run'),
             onSelected: (value) {
               if (value == null) return;
-              controller.updateRun(value.name);
+              controller.updateRunOfFirstAction(value.name);
             },
             dropdownMenuEntries:
                 OnPush.values.map<DropdownMenuEntry<OnPush>>((value) {
@@ -56,14 +57,14 @@ class ConfigureFirstAction extends ConsumerWidget {
             label: branch.label,
             value: branch.value,
             onChanged: (value) {
-              controller.updateBranch(value);
+              controller.updateBranchOfFirstAction(value);
             },
           ),
           CustomTextField(
             label: buildMachine.label,
             value: buildMachine.value,
             onChanged: (value) {
-              controller.updateBuildMachine(value);
+              controller.updateBuildMachineOfFirstAction(value);
             },
           ),
           verticalMargin16,

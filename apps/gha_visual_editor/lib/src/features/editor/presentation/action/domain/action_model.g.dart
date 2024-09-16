@@ -34,6 +34,7 @@ _$ActionModelPropertiesImpl _$$ActionModelPropertiesImplFromJson(
       formStyle: $enumDecode(_$FormStyleEnumMap, json['formStyle']),
       label: json['label'] as String,
       value: json['value'] as String,
+      key: json['key'] as String,
       options: (json['options'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -46,6 +47,7 @@ Map<String, dynamic> _$$ActionModelPropertiesImplToJson(
       'formStyle': _$FormStyleEnumMap[instance.formStyle]!,
       'label': instance.label,
       'value': instance.value,
+      'key': instance.key,
       'options': instance.options,
     };
 

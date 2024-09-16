@@ -5,12 +5,13 @@ import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ConnectorDot extends StatelessWidget {
-  const ConnectorDot(
-      {super.key,
-      this.dotColor = Colors.grey,
-      this.borderColor = Colors.grey,
-      this.dotPaddingColor = AppColors.lightGray,
-      this.drawTop = true});
+  const ConnectorDot({
+    super.key,
+    this.dotColor = Colors.grey,
+    this.borderColor = Colors.grey,
+    this.dotPaddingColor = AppColors.lightGray,
+    this.drawTop = true,
+  });
 
   final Color dotColor;
   final Color borderColor;
@@ -56,15 +57,18 @@ class _BorderPainter extends CustomPainter {
   final bool drawTop;
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
+    final paint = Paint()
       ..color = dotPaddingColor
       ..style = PaintingStyle.fill;
 
     // 円全体を描画
     canvas.drawCircle(
-        Offset(size.width / 2, size.height / 2), size.width / 2, paint);
+      Offset(size.width / 2, size.height / 2),
+      size.width / 2,
+      paint,
+    );
 
-    final Paint borderPaint = Paint()
+    final borderPaint = Paint()
       ..color = borderColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;

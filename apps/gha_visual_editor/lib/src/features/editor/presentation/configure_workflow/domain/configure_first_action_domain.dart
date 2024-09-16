@@ -26,7 +26,8 @@ class ConfigureFirstActionDomainWorkflow
     @Default('Workflow Name') String label,
   }) = _ConfigureFirstActionDomainWorkflow;
   factory ConfigureFirstActionDomainWorkflow.fromJson(
-          Map<String, Object?> json) =>
+    Map<String, Object?> json,
+  ) =>
       _$ConfigureFirstActionDomainWorkflowFromJson(json);
 }
 
@@ -48,7 +49,8 @@ class ConfigureFirstActionDomainBranch with _$ConfigureFirstActionDomainBranch {
     @Default('Branch') String label,
   }) = _ConfigureFirstActionDomainBranch;
   factory ConfigureFirstActionDomainBranch.fromJson(
-          Map<String, Object?> json) =>
+    Map<String, Object?> json,
+  ) =>
       _$ConfigureFirstActionDomainBranchFromJson(json);
 }
 
@@ -60,6 +62,7 @@ class ConfigureFirstActionDomainBuildMachine
     @Default('Build Machine') String label,
   }) = _ConfigureFirstActionDomainBuildMachine;
   factory ConfigureFirstActionDomainBuildMachine.fromJson(
-          Map<String, Object?> json) =>
+    Map<String, Object?> json,
+  ) =>
       _$ConfigureFirstActionDomainBuildMachineFromJson(json);
 }

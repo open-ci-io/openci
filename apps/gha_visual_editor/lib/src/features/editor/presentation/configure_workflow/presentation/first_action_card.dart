@@ -3,7 +3,7 @@ import 'package:gha_visual_editor/src/constants/colors.dart';
 import 'package:gha_visual_editor/src/constants/margins.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/configure_first_action.dart';
 import 'package:gha_visual_editor/src/features/editor/presentation/components/connector_dot.dart';
-import 'package:gha_visual_editor/src/features/editor/presentation/configure_workflow/presentation/first_action_card_controller.dart';
+import 'package:gha_visual_editor/src/features/editor/presentation/editor_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class FirstActionCard extends ConsumerWidget {
@@ -16,12 +16,13 @@ class FirstActionCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(firstActionCardControllerProvider);
+    final state = ref.watch(editorControllerProvider);
+    final firstAction = state.firstAction;
 
-    final workflow = state.workflow;
-    final run = state.run;
-    final branch = state.branch;
-    final buildMachine = state.buildMachine;
+    final workflow = firstAction.workflow;
+    final run = firstAction.run;
+    final branch = firstAction.branch;
+    final buildMachine = firstAction.buildMachine;
 
     return Container(
       width: 340,

@@ -22,6 +22,7 @@ class ActionModelProperties with _$ActionModelProperties {
     required FormStyle formStyle,
     required String label,
     required String value,
+    required String key,
     @Default([]) List<String> options,
   }) = _ActionModelProperties;
   factory ActionModelProperties.fromJson(Map<String, Object?> json) =>
@@ -61,7 +62,7 @@ final installFlutterMap = {
       'label': 'Cache Key',
       'value': 'default',
     }
-  ]
+  ],
 };
 
 final flutterPubGetMap = {
@@ -69,7 +70,7 @@ final flutterPubGetMap = {
   'source': 'none',
   'name': 'Install dependencies',
   'uses': 'custom',
-  'properties': []
+  'properties': [],
 };
 
 final checkoutCode = {
@@ -77,5 +78,5 @@ final checkoutCode = {
   'source': 'https://github.com/actions/checkout',
   'name': 'Checkout the source code',
   'uses': 'actions/checkout@v4',
-  'properties': []
+  'properties': [],
 };

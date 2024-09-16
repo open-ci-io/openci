@@ -102,6 +102,7 @@ class ConfigureActions extends ConsumerWidget {
                           label: label,
                           value: newValue,
                           options: options,
+                          key: label,
                         ),
                         index,
                       );
@@ -122,6 +123,7 @@ class ConfigureActions extends ConsumerWidget {
                           formStyle: FormStyle.textField,
                           label: label,
                           value: value,
+                          key: value.toString(),
                         ),
                         index,
                       );
@@ -145,6 +147,7 @@ class ConfigureActions extends ConsumerWidget {
                                   formStyle: FormStyle.checkBox,
                                   label: label,
                                   value: value.toString(),
+                                  key: value.toString(),
                                 ),
                                 index,
                               );
