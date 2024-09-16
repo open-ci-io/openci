@@ -12,25 +12,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 
-String convertToYaml(Map<String, dynamic> map) {
-  final yaml = StringBuffer();
-
-  yaml.writeln('name: ${map['name']}');
-  yaml.writeln('uses: ${map['uses']}');
-
-  final properties = map['properties'];
-  if (properties != null && properties.isNotEmpty) {
-    yaml.writeln('with:');
-    for (final property in properties) {
-      final label =
-          property['label'].toString().toLowerCase().replaceAll(' ', '-');
-      yaml.writeln('  $label: ${property['value']}');
-    }
-  }
-
-  return yaml.toString();
-}
-
 final actionsList = [
   ActionList.installFlutter,
   ActionList.checkoutCode,
@@ -54,12 +35,13 @@ class EditorPage extends ConsumerWidget {
           FloatingActionButton(
             onPressed: () async {
               await Highlighter.initialize(['yaml']);
-              var theme = await HighlighterTheme.loadDarkTheme();
-              var highlighter = Highlighter(
+              final theme = await HighlighterTheme.loadDarkTheme();
+              final highlighter = Highlighter(
                 language: 'yaml',
                 theme: theme,
               );
-              var highlightedCode = highlighter.highlight(controller.toYaml());
+              final highlightedCode =
+                  highlighter.highlight(controller.toYaml());
 
               showAdaptiveDialog(
                 barrierDismissible: true,
