@@ -19,7 +19,9 @@ mixin _$ShellResult {
   bool get result => throw _privateConstructorUsedError;
   SessionResult get sessionResult => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ShellResult
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ShellResultCopyWith<ShellResult> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -45,6 +47,8 @@ class _$ShellResultCopyWithImpl<$Res, $Val extends ShellResult>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ShellResult
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -63,6 +67,8 @@ class _$ShellResultCopyWithImpl<$Res, $Val extends ShellResult>
     ) as $Val);
   }
 
+  /// Create a copy of ShellResult
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $SessionResultCopyWith<$Res> get sessionResult {
@@ -94,6 +100,8 @@ class __$$ShellResultImplCopyWithImpl<$Res>
       _$ShellResultImpl _value, $Res Function(_$ShellResultImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ShellResult
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -141,7 +149,9 @@ class _$ShellResultImpl implements _ShellResult {
   @override
   int get hashCode => Object.hash(runtimeType, result, sessionResult);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ShellResult
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ShellResultImplCopyWith<_$ShellResultImpl> get copyWith =>
@@ -157,8 +167,11 @@ abstract class _ShellResult implements ShellResult {
   bool get result;
   @override
   SessionResult get sessionResult;
+
+  /// Create a copy of ShellResult
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ShellResultImplCopyWith<_$ShellResultImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

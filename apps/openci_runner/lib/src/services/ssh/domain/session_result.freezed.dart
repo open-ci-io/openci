@@ -24,8 +24,12 @@ mixin _$SessionResult {
   String get sessionStderr => throw _privateConstructorUsedError;
   int? get sessionExitCode => throw _privateConstructorUsedError;
 
+  /// Serializes this SessionResult to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of SessionResult
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $SessionResultCopyWith<SessionResult> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -49,6 +53,8 @@ class _$SessionResultCopyWithImpl<$Res, $Val extends SessionResult>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of SessionResult
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -92,6 +98,8 @@ class __$$SessionResultImplCopyWithImpl<$Res>
       _$SessionResultImpl _value, $Res Function(_$SessionResultImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of SessionResult
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -152,12 +160,14 @@ class _$SessionResultImpl implements _SessionResult {
                 other.sessionExitCode == sessionExitCode));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, sessionStdout, sessionStderr, sessionExitCode);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of SessionResult
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$SessionResultImplCopyWith<_$SessionResultImpl> get copyWith =>
@@ -186,8 +196,11 @@ abstract class _SessionResult implements SessionResult {
   String get sessionStderr;
   @override
   int? get sessionExitCode;
+
+  /// Create a copy of SessionResult
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$SessionResultImplCopyWith<_$SessionResultImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

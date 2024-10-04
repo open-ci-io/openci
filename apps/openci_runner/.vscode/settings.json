@@ -6,5 +6,9 @@
     "openci",
     "sonoma",
     "unawaited"
-  ]
+  ],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
 }

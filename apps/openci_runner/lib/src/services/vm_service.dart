@@ -45,7 +45,7 @@ class VMService {
     await waitForTartIP(workingVMName);
 
     _logger.success('VM is ready');
-    return await fetchIpAddress(workingVMName);
+    return fetchIpAddress(workingVMName);
   }
 
   Future<void> cloneVM(String workingVMName) async {
@@ -73,7 +73,8 @@ class VMService {
           final uuid = parts[1];
           // UUID v4パターンに一致するか確認
           if (RegExp(
-            r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+            r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-'
+            r'[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
           ).hasMatch(uuid)) {
             // 一致する場合、'tart delete'コマンドを実行
             Logger().info('Deleting: $uuid');

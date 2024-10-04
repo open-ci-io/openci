@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:mason_logger/mason_logger.dart';
+import 'package:process_run/shell.dart' as process_run;
 import 'package:runner/src/services/shell/local_shell_service.dart';
 import 'package:runner/src/services/shell/shell_result.dart';
 import 'package:runner/src/services/tart/tart_command.dart';
-import 'package:process_run/shell.dart' as process_run;
 
 class TartService {
   TartService(this._shellService);

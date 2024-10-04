@@ -1,7 +1,6 @@
-import 'package:runner/src/services/shell/shell_result.dart';
-
-import 'package:runner/src/services/ssh/domain/session_result.dart';
 import 'package:process_run/shell.dart';
+import 'package:runner/src/services/shell/shell_result.dart';
+import 'package:runner/src/services/ssh/domain/session_result.dart';
 
 class LocalShellService {
   Future<ShellResult> executeCommand(String command) async {

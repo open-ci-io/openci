@@ -2,19 +2,19 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:cli_completion/cli_completion.dart';
 import 'package:mason_logger/mason_logger.dart';
+import 'package:pub_updater/pub_updater.dart';
 import 'package:runner/src/commands/commands.dart';
 import 'package:runner/src/commands/runner_command.dart';
 import 'package:runner/src/version.dart';
-import 'package:pub_updater/pub_updater.dart';
 
 const executableName = 'runner';
 const packageName = 'runner';
-const description = 'Open CI VM runner';
+const description = 'Open CI runner';
 
 /// {@template runner_command_runner}
 /// A [CommandRunner] for the CLI.
 ///
-/// ```
+/// ```sh
 /// $ runner --version
 /// ```
 /// {@endtemplate}
