@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:runner/src/commands/runner_command.dart';
+import 'package:runner/src/features/build_job/models/job_status.dart';
 
 part 'build_job.freezed.dart';
 part 'build_job.g.dart';

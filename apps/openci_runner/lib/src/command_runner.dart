@@ -40,7 +40,7 @@ class RunnerCommandRunner extends CompletionCommandRunner<int> {
       );
 
     // Add sub commands
-    addCommand(RunnerCommand(logger: _logger));
+    addCommand(RunnerCommand());
     addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
   }
 

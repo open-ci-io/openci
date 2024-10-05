@@ -38,8 +38,6 @@ class VMService {
   Future<String> startVM() async {
     _createNewVMName();
     final workingVMName = workingVMNameSignal.value;
-
-    await cleanupVMs();
     await cloneVM(workingVMName);
     unawaited(launchVM(workingVMName));
     await waitForTartIP(workingVMName);

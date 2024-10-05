@@ -14,7 +14,6 @@ final sshServiceSignal = signal(SSHService());
 class SSHService {
   SSHService();
 
-  // final LogService logService;
   Logger logger = Logger();
   Future<void> sshToServer(
     String vmIp, {
