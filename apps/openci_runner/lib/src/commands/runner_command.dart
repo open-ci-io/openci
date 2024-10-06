@@ -92,7 +92,6 @@ class RunnerCommand extends Command<int> {
           loggerSignal.value.info('No job found');
           continue;
         }
-        print('job: $job');
         final vmIp = await vmServiceSignal.value.startVM();
         await sshServiceSignal.value.sshToServer(vmIp);
         await sshSignal.executeCommandV2(
