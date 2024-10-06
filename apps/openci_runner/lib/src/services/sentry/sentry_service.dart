@@ -7,7 +7,8 @@ final sentryServiceSignal = signal(SentryService());
 class SentryService {
   Future<void> initializeSentry(String? sentryDSN) async {
     if (sentryDSN == null) {
-      loggerSignal.value.warn('Sentry DSN not set, skipping initialization');
+      loggerSignal.value
+          .warn('Sentry DSN not set, skipping Sentry initialization');
       return;
     }
     await Sentry.init((options) {

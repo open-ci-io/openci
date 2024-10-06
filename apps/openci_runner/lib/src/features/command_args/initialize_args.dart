@@ -8,10 +8,12 @@ Future<AppArgs> initializeApp(ArgResults? argResults) async {
   }
   final supabaseUrl = argResults['supabaseUrl'] as String;
   final supabaseAPIKey = argResults['supabaseAPIKey'] as String;
+  final sentryDSN = argResults['sentryDSN'] as String?;
   loggerSignal.value.success('Argument check passed.');
 
   return AppArgs(
     supabaseUrl: supabaseUrl,
     supabaseAPIKey: supabaseAPIKey,
+    sentryDSN: sentryDSN,
   );
 }

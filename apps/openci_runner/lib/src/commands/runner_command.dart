@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
+import 'package:runner/src/commands/handle_exception.dart';
 import 'package:runner/src/features/build_job/find_job.dart';
 import 'package:runner/src/features/command_args/initialize_args.dart';
 import 'package:runner/src/services/logger/logger_service.dart';
 import 'package:runner/src/services/process/process_service.dart';
+import 'package:runner/src/services/sentry/sentry_service.dart';
 import 'package:runner/src/services/shell/local_shell_service.dart';
 import 'package:runner/src/services/shell/ssh_shell_service.dart';
 import 'package:runner/src/services/ssh/ssh_service.dart';
@@ -42,6 +44,11 @@ class RunnerCommand extends Command<int> {
         'supabaseAPIKey',
         help: 'Supabase API Key',
         abbr: 'k',
+      )
+      ..addOption(
+        'sentryDSN',
+        help: 'Sentry DSN',
+        abbr: 's',
       );
   }
 
@@ -59,24 +66,31 @@ class RunnerCommand extends Command<int> {
       url: appArgs.supabaseUrl,
       key: appArgs.supabaseAPIKey,
     );
+    await sentryServiceSignal.value.initializeSentry(appArgs.sentryDSN);
 
     processServiceSignal.value.watchKeyboardSignals();
 
     while (!shouldExitSignal.value) {
-      await Future<void>.delayed(const Duration(seconds: 1));
-      final job = await findJob(supabaseClient);
-      if (job == null) {
-        loggerSignal.value.info('No job found');
-        continue;
-      }
-      final vmIp = await vmServiceSignal.value.startVM();
-      await sshServiceSignal.value.sshToServer(vmIp);
-      await sshSignal.executeCommandV2(
-        'ls',
-      );
       await Future<void>.delayed(const Duration(seconds: 10));
 
-      await vmServiceSignal.value.cleanupVMs();
+      try {
+        await Future<void>.delayed(const Duration(seconds: 1));
+        final job = await findJob(supabaseClient);
+        if (job == null) {
+          loggerSignal.value.info('No job found');
+          continue;
+        }
+        final vmIp = await vmServiceSignal.value.startVM();
+        await sshServiceSignal.value.sshToServer(vmIp);
+        await sshSignal.executeCommandV2(
+          'ls',
+        );
+
+        await vmServiceSignal.value.cleanupVMs();
+      } catch (error, stackTrace) {
+        await handleException(error, stackTrace);
+        continue;
+      }
     }
 
     exit(0);
