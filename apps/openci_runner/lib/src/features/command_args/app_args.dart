@@ -1,10 +1,10 @@
 class AppArgs {
   AppArgs({
-    required this.supabaseUrl,
-    required this.supabaseAPIKey,
+    required this.firebaseProjectName,
     this.sentryDSN,
+    required this.firebaseServiceAccountFileRelativePath,
   });
-  final String supabaseUrl;
-  final String supabaseAPIKey;
+  final String firebaseProjectName;
   final String? sentryDSN;
+  final String firebaseServiceAccountFileRelativePath;
 }

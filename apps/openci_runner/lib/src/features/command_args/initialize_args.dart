@@ -6,14 +6,16 @@ Future<AppArgs> initializeApp(ArgResults? argResults) async {
   if (argResults == null) {
     throw Exception('ArgResults is null');
   }
-  final supabaseUrl = argResults['supabaseUrl'] as String;
-  final supabaseAPIKey = argResults['supabaseAPIKey'] as String;
+  final firebaseProjectName = argResults['firebaseProjectName'] as String;
   final sentryDSN = argResults['sentryDSN'] as String?;
+  final firebaseServiceAccountFileRelativePath =
+      argResults['firebaseServiceAccountFileRelativePath'] as String;
   loggerSignal.value.success('Argument check passed.');
 
   return AppArgs(
-    supabaseUrl: supabaseUrl,
-    supabaseAPIKey: supabaseAPIKey,
+    firebaseProjectName: firebaseProjectName,
     sentryDSN: sentryDSN,
+    firebaseServiceAccountFileRelativePath:
+        firebaseServiceAccountFileRelativePath,
   );
 }

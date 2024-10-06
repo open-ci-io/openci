@@ -7,27 +7,18 @@ part of 'build_job.dart';
 // **************************************************************************
 
 _$BuildJobImpl _$$BuildJobImplFromJson(Map<String, dynamic> json) =>
-    $checkedCreate(
-      r'_$BuildJobImpl',
-      json,
-      ($checkedConvert) {
-        final val = _$BuildJobImpl(
-          id: $checkedConvert('id', (v) => (v as num).toInt()),
-          createdAt:
-              $checkedConvert('created_at', (v) => DateTime.parse(v as String)),
-          statusV2: $checkedConvert(
-              'status_v2', (v) => $enumDecode(_$JobStatusEnumMap, v)),
-        );
-        return val;
-      },
-      fieldKeyMap: const {'createdAt': 'created_at', 'statusV2': 'status_v2'},
+    _$BuildJobImpl(
+      id: json['id'] as String,
+      createdAt:
+          const TimestampConverter().fromJson(json['createdAt'] as Timestamp),
+      status: $enumDecode(_$JobStatusEnumMap, json['status']),
     );
 
 Map<String, dynamic> _$$BuildJobImplToJson(_$BuildJobImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'created_at': instance.createdAt.toIso8601String(),
-      'status_v2': _$JobStatusEnumMap[instance.statusV2]!,
+      'createdAt': const TimestampConverter().toJson(instance.createdAt),
+      'status': _$JobStatusEnumMap[instance.status]!,
     };
 
 const _$JobStatusEnumMap = {
