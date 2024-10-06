@@ -26,7 +26,6 @@ Future<Response> onRequest(RequestContext context) async {
   final body = await context.request.body();
   final data = jsonDecode(body) as Map<String, dynamic>;
   final action = ActionType.values.byName(data['action'].toString());
-  print('action: $action');
   final fullName = data['repository']['full_name'].toString();
   final installationId = data['installation']['id'] as int;
   final token =
