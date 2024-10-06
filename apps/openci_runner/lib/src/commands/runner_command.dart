@@ -72,7 +72,7 @@ class RunnerCommand extends Command<int> {
       final vmIp = await vmServiceSignal.value.startVM();
       await sshServiceSignal.value.sshToServer(vmIp);
       await sshSignal.executeCommandV2(
-        'echo "Hello, World!"',
+        'ls',
       );
       await Future<void>.delayed(const Duration(seconds: 10));
 

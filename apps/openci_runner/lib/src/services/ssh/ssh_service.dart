@@ -72,28 +72,31 @@ class SSHService {
     return true;
   }
 
+  String? customInfoStyle(String? m) {
+    return lightBlue.wrap(styleBold.wrap(lightBlue.wrap(m)));
+  }
+
   Future<SessionResult> runV2(SSHClient client, String command) async {
     var sessionStdout = '';
     var sessionStderr = '';
     int? exitCode;
 
-    logger.info('command: $command');
+    logger.info('command: $command', style: customInfoStyle);
     final session = await client.execute(command);
     await session.stdin.close();
     await session.done;
     exitCode = session.exitCode;
     sessionStdout = await streamToString(session.stdout);
     sessionStderr = await streamToString(session.stderr);
+
     if (exitCode == 0) {
       logger
-        ..success('session.stdout: $sessionStdout')
-        ..success('session.stderr: $sessionStderr')
-        ..success('exitCode: ${session.exitCode}');
+        ..success('stdout: $sessionStdout')
+        ..success('stderr: $sessionStderr');
     } else {
       logger
-        ..success('session.stdout: $sessionStdout')
-        ..err('session.stderr: $sessionStderr')
-        ..info(session.exitCode.toString());
+        ..err('exitCode: $exitCode, stdout: $sessionStdout')
+        ..err('exitCode: $exitCode, stderr: $sessionStderr');
     }
 
     return SessionResult(
