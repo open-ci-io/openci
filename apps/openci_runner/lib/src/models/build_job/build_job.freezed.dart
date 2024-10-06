@@ -20,9 +20,10 @@ BuildJob _$BuildJobFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$BuildJob {
-  int get id => throw _privateConstructorUsedError;
+  String get id => throw _privateConstructorUsedError;
+  @TimestampConverter()
   DateTime get createdAt => throw _privateConstructorUsedError;
-  JobStatus get statusV2 => throw _privateConstructorUsedError;
+  JobStatus get status => throw _privateConstructorUsedError;
 
   /// Serializes this BuildJob to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -39,7 +40,8 @@ abstract class $BuildJobCopyWith<$Res> {
   factory $BuildJobCopyWith(BuildJob value, $Res Function(BuildJob) then) =
       _$BuildJobCopyWithImpl<$Res, BuildJob>;
   @useResult
-  $Res call({int id, DateTime createdAt, JobStatus statusV2});
+  $Res call(
+      {String id, @TimestampConverter() DateTime createdAt, JobStatus status});
 }
 
 /// @nodoc
@@ -59,20 +61,20 @@ class _$BuildJobCopyWithImpl<$Res, $Val extends BuildJob>
   $Res call({
     Object? id = null,
     Object? createdAt = null,
-    Object? statusV2 = null,
+    Object? status = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      statusV2: null == statusV2
-          ? _value.statusV2
-          : statusV2 // ignore: cast_nullable_to_non_nullable
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
               as JobStatus,
     ) as $Val);
   }
@@ -86,7 +88,8 @@ abstract class _$$BuildJobImplCopyWith<$Res>
       __$$BuildJobImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int id, DateTime createdAt, JobStatus statusV2});
+  $Res call(
+      {String id, @TimestampConverter() DateTime createdAt, JobStatus status});
 }
 
 /// @nodoc
@@ -104,20 +107,20 @@ class __$$BuildJobImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? createdAt = null,
-    Object? statusV2 = null,
+    Object? status = null,
   }) {
     return _then(_$BuildJobImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      statusV2: null == statusV2
-          ? _value.statusV2
-          : statusV2 // ignore: cast_nullable_to_non_nullable
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
               as JobStatus,
     ));
   }
@@ -127,21 +130,24 @@ class __$$BuildJobImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$BuildJobImpl implements _BuildJob {
   const _$BuildJobImpl(
-      {required this.id, required this.createdAt, required this.statusV2});
+      {required this.id,
+      @TimestampConverter() required this.createdAt,
+      required this.status});
 
   factory _$BuildJobImpl.fromJson(Map<String, dynamic> json) =>
       _$$BuildJobImplFromJson(json);
 
   @override
-  final int id;
+  final String id;
   @override
+  @TimestampConverter()
   final DateTime createdAt;
   @override
-  final JobStatus statusV2;
+  final JobStatus status;
 
   @override
   String toString() {
-    return 'BuildJob(id: $id, createdAt: $createdAt, statusV2: $statusV2)';
+    return 'BuildJob(id: $id, createdAt: $createdAt, status: $status)';
   }
 
   @override
@@ -152,13 +158,12 @@ class _$BuildJobImpl implements _BuildJob {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
-            (identical(other.statusV2, statusV2) ||
-                other.statusV2 == statusV2));
+            (identical(other.status, status) || other.status == status));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, createdAt, statusV2);
+  int get hashCode => Object.hash(runtimeType, id, createdAt, status);
 
   /// Create a copy of BuildJob
   /// with the given fields replaced by the non-null parameter values.
@@ -178,19 +183,20 @@ class _$BuildJobImpl implements _BuildJob {
 
 abstract class _BuildJob implements BuildJob {
   const factory _BuildJob(
-      {required final int id,
-      required final DateTime createdAt,
-      required final JobStatus statusV2}) = _$BuildJobImpl;
+      {required final String id,
+      @TimestampConverter() required final DateTime createdAt,
+      required final JobStatus status}) = _$BuildJobImpl;
 
   factory _BuildJob.fromJson(Map<String, dynamic> json) =
       _$BuildJobImpl.fromJson;
 
   @override
-  int get id;
+  String get id;
   @override
+  @TimestampConverter()
   DateTime get createdAt;
   @override
-  JobStatus get statusV2;
+  JobStatus get status;
 
   /// Create a copy of BuildJob
   /// with the given fields replaced by the non-null parameter values.

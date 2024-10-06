@@ -1,19 +1,19 @@
+import 'package:dart_firebase_admin/firestore.dart';
+import 'package:runner/src/commands/runner_command.dart';
 import 'package:runner/src/features/build_job/models/job_status.dart';
 import 'package:runner/src/models/build_job/build_job.dart';
-import 'package:supabase/supabase.dart';
 
-Future<BuildJob?> findJob(
-  SupabaseClient supabaseClient,
-) async {
-  final data = await supabaseClient
-      .from('build_jobs')
-      .select()
-      .eq('status_v2', JobStatus.waiting.name)
-      .limit(1);
+Future<BuildJob?> findJob() async {
+  final firestore = nonNullFirestoreClientSignal.value;
+  final qs = await firestore
+      .collection('build_jobs')
+      .where('status', WhereFilter.equal, JobStatus.waiting.name)
+      .limit(1)
+      .get();
 
-  if (data.isEmpty) {
+  if (qs.docs.isEmpty) {
     return null;
   }
 
-  return BuildJob.fromJson(data.first);
+  return BuildJob.fromJson(qs.docs.first.data());
 }
