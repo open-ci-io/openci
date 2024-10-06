@@ -7,6 +7,7 @@ import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:runner/src/commands/handle_exception.dart';
 import 'package:runner/src/features/build_job/find_job.dart';
+import 'package:runner/src/features/build_job/initialize_firestore.dart';
 import 'package:runner/src/features/command_args/initialize_args.dart';
 import 'package:runner/src/services/logger/logger_service.dart';
 import 'package:runner/src/services/process/process_service.dart';
@@ -71,14 +72,7 @@ class RunnerCommand extends Command<int> {
   @override
   Future<int> run() async {
     final appArgs = await initializeApp(argResults);
-
-    final admin = FirebaseAdminApp.initializeApp(
-      appArgs.firebaseProjectName,
-      Credential.fromServiceAccount(
-        File(appArgs.firebaseServiceAccountFileRelativePath),
-      ),
-    );
-    firestoreClientSignal.value = Firestore(admin);
+    initializeFirestore(appArgs);
 
     await sentryServiceSignal.value.initializeSentry(appArgs.sentryDSN);
 
