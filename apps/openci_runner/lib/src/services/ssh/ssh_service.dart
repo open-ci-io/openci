@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:runner/src/commands/runner_command.dart';
+import 'package:runner/src/commands/signals.dart';
 import 'package:runner/src/services/shell/shell_result.dart';
 import 'package:runner/src/services/ssh/domain/session_result.dart';
 import 'package:signals_core/signals_core.dart';

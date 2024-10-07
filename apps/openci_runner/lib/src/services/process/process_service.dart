@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:mason_logger/mason_logger.dart';
-import 'package:runner/src/commands/runner_command.dart';
+import 'package:runner/src/commands/signals.dart';
 import 'package:runner/src/services/logger/logger_service.dart';
 import 'package:signals_core/signals_core.dart';
 

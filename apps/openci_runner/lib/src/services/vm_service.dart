@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:mason_logger/mason_logger.dart';
 import 'package:process_run/process_run.dart';
-import 'package:runner/src/commands/runner_command.dart';
+import 'package:runner/src/commands/signals.dart';
 import 'package:runner/src/services/logger/logger_service.dart';
 import 'package:runner/src/services/tart/tart_service.dart';
 import 'package:runner/src/services/uuid/uuid_service.dart';

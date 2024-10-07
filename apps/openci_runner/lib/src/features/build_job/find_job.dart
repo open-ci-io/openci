@@ -1,6 +1,6 @@
 import 'package:dart_firebase_admin/firestore.dart';
 import 'package:openci_models/openci_models.dart';
-import 'package:runner/src/commands/runner_command.dart';
+import 'package:runner/src/commands/signals.dart';
 
 Future<BuildJob?> findJob() async {
   final firestore = nonNullFirestoreClientSignal.value;

@@ -1,5 +1,5 @@
 import 'package:openci_models/openci_models.dart';
-import 'package:runner/src/commands/runner_command.dart';
+import 'package:runner/src/commands/signals.dart';
 
 Future<void> setJobStatus(
   BuildJob job,
