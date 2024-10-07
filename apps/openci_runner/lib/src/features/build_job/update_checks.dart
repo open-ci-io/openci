@@ -27,3 +27,24 @@ Future<Response> updateChecks({
 
   return response;
 }
+
+Future<void> setFailure(String jobId) async {
+  await updateChecks(
+    jobId: jobId,
+    status: OpenCIGitHubChecksStatus.failure,
+  );
+}
+
+Future<void> setSuccess(String jobId) async {
+  await updateChecks(
+    jobId: jobId,
+    status: OpenCIGitHubChecksStatus.success,
+  );
+}
+
+Future<void> setInProgress(String jobId) async {
+  await updateChecks(
+    jobId: jobId,
+    status: OpenCIGitHubChecksStatus.inProgress,
+  );
+}

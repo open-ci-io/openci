@@ -19,7 +19,6 @@ final tartServiceSignal = signal(TartService(localShellServiceSignal.value));
 final vmServiceSignal = signal(VMService(tartServiceSignal.value));
 final sshSignal = sshShellServiceSignal.value;
 final isDebugMode = signal(true);
-
 final isDebugSignal = signal(false);
 final firestoreClientSignal = signal<Firestore?>(null);
 

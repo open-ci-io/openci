@@ -1,8 +1,11 @@
 import 'package:args/args.dart';
+import 'package:runner/src/features/build_job/initialize_firestore.dart';
 import 'package:runner/src/features/command_args/app_args.dart';
 import 'package:runner/src/services/logger/logger_service.dart';
+import 'package:runner/src/services/process/process_service.dart';
+import 'package:runner/src/services/sentry/sentry_service.dart';
 
-Future<AppArgs> initializeApp(ArgResults? argResults) async {
+Future<void> initializeApp(ArgResults? argResults) async {
   if (argResults == null) {
     throw Exception('ArgResults is null');
   }
@@ -12,10 +15,14 @@ Future<AppArgs> initializeApp(ArgResults? argResults) async {
       argResults['firebaseServiceAccountFileRelativePath'] as String;
   loggerSignal.value.success('Argument check passed.');
 
-  return AppArgs(
+  final appArgs = AppArgs(
     firebaseProjectName: firebaseProjectName,
     sentryDSN: sentryDSN,
     firebaseServiceAccountFileRelativePath:
         firebaseServiceAccountFileRelativePath,
   );
+
+  initializeFirestore(appArgs);
+  await sentryServiceSignal.value.initializeSentry(appArgs.sentryDSN);
+  processServiceSignal.value.watchKeyboardSignals();
 }

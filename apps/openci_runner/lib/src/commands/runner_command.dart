@@ -42,13 +42,7 @@ class RunnerCommand extends Command<int> {
 
   @override
   Future<int> run() async {
-    final appArgs = await initializeApp(argResults);
-    initializeFirestore(appArgs);
-
-    await sentryServiceSignal.value.initializeSentry(appArgs.sentryDSN);
-
-    processServiceSignal.value.watchKeyboardSignals();
-
+    await initializeApp(argResults);
     while (!shouldExitSignal.value) {
       await Future<void>.delayed(const Duration(seconds: 1));
       final job = await findJob();
@@ -57,31 +51,22 @@ class RunnerCommand extends Command<int> {
         continue;
       }
       final workflow = await fetchWorkflow(job.workflowId);
-      final steps = workflow.steps;
       try {
-        await updateChecks(
-          jobId: job.id,
-          status: OpenCIGitHubChecksStatus.inProgress,
-        );
-        final vmIp = await vmServiceSignal.value.startVM();
-        await sshServiceSignal.value.sshToServer(vmIp);
+        await setInProgress(job.id);
+        await vmServiceSignal.value.startVM();
 
-        for (final step in steps) {
+        for (final step in workflow.steps) {
           for (final command in step.commands) {
             await sshSignal.executeCommandV2(command);
           }
         }
 
         await vmServiceSignal.value.stopVM();
-        await updateChecks(
-          jobId: job.id,
-          status: OpenCIGitHubChecksStatus.success,
-        );
+        await setSuccess(job.id);
       } catch (error, stackTrace) {
         await handleException(error, stackTrace);
-        await updateChecks(
-          jobId: job.id,
-          status: OpenCIGitHubChecksStatus.failure,
+        await setFailure(
+          job.id,
         );
         continue;
       } finally {

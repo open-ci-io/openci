@@ -6,6 +6,7 @@ import 'package:mason_logger/mason_logger.dart';
 import 'package:process_run/process_run.dart';
 import 'package:runner/src/commands/signals.dart';
 import 'package:runner/src/services/logger/logger_service.dart';
+import 'package:runner/src/services/ssh/ssh_service.dart';
 import 'package:runner/src/services/tart/tart_service.dart';
 import 'package:runner/src/services/uuid/uuid_service.dart';
 
@@ -35,7 +36,7 @@ class VMService {
   void _createNewVMName() =>
       workingVMNameSignal.value = UuidService.generateV4();
 
-  Future<String> startVM() async {
+  Future<void> startVM() async {
     _createNewVMName();
     final workingVMName = workingVMNameSignal.value;
     await cloneVM(workingVMName);
@@ -43,7 +44,8 @@ class VMService {
     await waitForTartIP(workingVMName);
 
     _logger.success('VM is ready');
-    return fetchIpAddress(workingVMName);
+    final vmIp = await fetchIpAddress(workingVMName);
+    await sshServiceSignal.value.sshToServer(vmIp);
   }
 
   Future<void> cloneVM(String workingVMName) async {
