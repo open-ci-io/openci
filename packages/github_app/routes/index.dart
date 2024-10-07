@@ -4,7 +4,6 @@ import 'package:dart_firebase_admin/firestore.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
 import 'package:github/github.dart';
-import 'package:openci_models/openci_models.dart' as model;
 import 'package:openci_models/openci_models.dart';
 import 'package:uuid/uuid.dart';
 
@@ -25,17 +24,21 @@ Future<Response> onRequest(RequestContext context) async {
 
   final body = await context.request.body();
   final data = jsonDecode(body) as Map<String, dynamic>;
-  final action = ActionType.values.byName(data['action'].toString());
+  final action =
+      OpenCIGitHubActionType.values.byName(data['action'].toString());
   final fullName = data['repository']['full_name'].toString();
   final installationId = data['installation']['id'] as int;
   final token =
       await accessToken(installationId, env.pemBase64, env.githubAppId);
+  print('token: $token');
   final github = GitHub(auth: Authentication.withToken(token));
   final slug = RepositorySlug.full(fullName);
 
-  if ((action == ActionType.opened ||
-          action == ActionType.reopened ||
-          action == ActionType.synchronize) &&
+  print('action: $action');
+  if ((action == OpenCIGitHubActionType.opened ||
+          action == OpenCIGitHubActionType.reopened ||
+          action == OpenCIGitHubActionType.synchronize ||
+          action == OpenCIGitHubActionType.edited) &&
       data['pull_request'] != null) {
     await handlePullRequestAction(
       data,
@@ -46,13 +49,6 @@ Future<Response> onRequest(RequestContext context) async {
       installationId,
     );
   }
-  // else if (action == ActionType.created && data['comment'] != null) {
-  //   final commentBody = data['comment']['body'] ?? '';
-  //   if (commentBody.contains('/rebuild')) {
-  //     // await handleRebuildComment(
-  //     //     data, firestore, github, slug, env, installationId);
-  //   }
-  // }
 
   return Response(body: 'Success');
 }
@@ -97,24 +93,18 @@ Future<void> handlePullRequestAction(
   );
 
   for (final docs in qs.docs) {
-    final workflow = model.WorkflowModel.fromJson(docs.data());
+    final workflow = WorkflowModelV2.fromJson(docs.data());
     final result = await github.checks.checkRuns.createCheckRun(
       slug,
-      name: workflow.workflowName,
+      name: workflow.name,
       headSha: headSha,
       startedAt: DateTime.now(),
     );
-    final branch = model.Branch(baseBranch: headRef, buildBranch: baseRef);
 
     final checkRunId = result.id;
     if (checkRunId == null) {
       throw Exception('checkRunId is null');
     }
-
-    final githubChecks = model.GithubChecks(
-      checkRunId: checkRunId,
-      issueNumber: pullRequest.number,
-    );
 
     final owner = head?.repo?.owner?.login;
 
@@ -122,43 +112,36 @@ Future<void> handlePullRequestAction(
       throw Exception('owner is null');
     }
 
-    final jobGitHub = model.Github(
+    final jobGitHub = OpenCIGithub(
       appId: int.parse(env.githubAppId),
       repositoryUrl: repositoryUrl,
       owner: owner,
       repositoryName: repositoryName,
       installationId: installationId,
+      issueNumber: pullRequest.number,
+      checkRunId: checkRunId,
+      baseBranch: baseRef,
+      buildBranch: headRef,
     );
 
-    final jobData = BuildModel(
-      buildStatus: const BuildStatus(
-        processing: false,
-        failure: false,
-        success: false,
-      ),
-      branch: branch,
-      githubChecks: githubChecks,
+    final docId = const Uuid().v4();
+
+    final jobData = BuildJob(
+      buildStatus: OpenCIGitHubChecksStatus.queued,
       github: jobGitHub,
-      documentId: const Uuid().v4(),
-      platform: workflow.platform,
+      id: docId,
       workflowId: docs.id,
       createdAt: Timestamp.now(),
     );
 
     final jobDataJson = {
-      'buildStatus': jobData.buildStatus.toJson(),
-      'branch': jobData.branch.toJson(),
-      'githubChecks': jobData.githubChecks.toJson(),
+      'buildStatus': jobData.buildStatus.name,
       'github': jobData.github.toJson(),
-      'documentId': jobData.documentId,
-      'platform': jobData.platform.name,
+      'id': jobData.id,
       'workflowId': jobData.workflowId,
       'createdAt': jobData.createdAt,
     };
 
-    await firestore
-        .collection('jobs_v3')
-        .doc(jobData.documentId)
-        .set(jobDataJson);
+    await firestore.collection('build_jobs').doc(docId).set(jobDataJson);
   }
 }

@@ -260,10 +260,10 @@
       "languageVersion": "3.0"
     }
   ],
-  "generated": "2024-06-24T17:32:28.451343Z",
+  "generated": "2024-10-07T08:37:07.312671Z",
   "generator": "pub",
-  "generatorVersion": "3.4.3",
+  "generatorVersion": "3.5.3",
   "flutterRoot": "file:///Users/masahiroaoki/Developer/flutter",
-  "flutterVersion": "3.22.2",
+  "flutterVersion": "3.24.3",
   "pubCache": "file:///Users/masahiroaoki/.pub-cache"
 }

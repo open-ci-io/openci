@@ -28,7 +28,7 @@ mixin _$WorkflowModel {
   WorkflowGitHubConfig? get github => throw _privateConstructorUsedError;
   WorkflowShorebirdConfig get shorebird => throw _privateConstructorUsedError;
   String get workflowName => throw _privateConstructorUsedError;
-  TargetPlatform get platform => throw _privateConstructorUsedError;
+  OpenCITargetPlatform get platform => throw _privateConstructorUsedError;
   BuildDistributionChannel? get distribution =>
       throw _privateConstructorUsedError;
 
@@ -53,7 +53,7 @@ abstract class $WorkflowModelCopyWith<$Res> {
       WorkflowGitHubConfig? github,
       WorkflowShorebirdConfig shorebird,
       String workflowName,
-      TargetPlatform platform,
+      OpenCITargetPlatform platform,
       BuildDistributionChannel? distribution});
 
   $WorkflowAndroidConfigCopyWith<$Res>? get android;
@@ -124,7 +124,7 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
       platform: null == platform
           ? _value.platform
           : platform // ignore: cast_nullable_to_non_nullable
-              as TargetPlatform,
+              as OpenCITargetPlatform,
       distribution: freezed == distribution
           ? _value.distribution
           : distribution // ignore: cast_nullable_to_non_nullable
@@ -210,7 +210,7 @@ abstract class _$$WorkflowModelImplCopyWith<$Res>
       WorkflowGitHubConfig? github,
       WorkflowShorebirdConfig shorebird,
       String workflowName,
-      TargetPlatform platform,
+      OpenCITargetPlatform platform,
       BuildDistributionChannel? distribution});
 
   @override
@@ -285,7 +285,7 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
       platform: null == platform
           ? _value.platform
           : platform // ignore: cast_nullable_to_non_nullable
-              as TargetPlatform,
+              as OpenCITargetPlatform,
       distribution: freezed == distribution
           ? _value.distribution
           : distribution // ignore: cast_nullable_to_non_nullable
@@ -329,7 +329,7 @@ class _$WorkflowModelImpl implements _WorkflowModel {
   @override
   final String workflowName;
   @override
-  final TargetPlatform platform;
+  final OpenCITargetPlatform platform;
   @override
   @JsonKey()
   final BuildDistributionChannel? distribution;
@@ -401,7 +401,7 @@ abstract class _WorkflowModel implements WorkflowModel {
       final WorkflowGitHubConfig? github,
       required final WorkflowShorebirdConfig shorebird,
       required final String workflowName,
-      required final TargetPlatform platform,
+      required final OpenCITargetPlatform platform,
       final BuildDistributionChannel? distribution}) = _$WorkflowModelImpl;
 
   factory _WorkflowModel.fromJson(Map<String, dynamic> json) =
@@ -424,7 +424,7 @@ abstract class _WorkflowModel implements WorkflowModel {
   @override
   String get workflowName;
   @override
-  TargetPlatform get platform;
+  OpenCITargetPlatform get platform;
   @override
   BuildDistributionChannel? get distribution;
   @override

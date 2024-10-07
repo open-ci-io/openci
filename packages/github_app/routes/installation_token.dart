@@ -16,6 +16,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     final token =
         await accessToken(installationId, env.pemBase64, env.githubAppId);
+    print('Installation token: $token');
     return Response(body: '{"installation_token":"$token"}');
   } catch (e) {
     return Response(body: 'Error: $e', statusCode: 500);

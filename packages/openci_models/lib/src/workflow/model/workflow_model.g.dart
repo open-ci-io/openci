@@ -27,7 +27,7 @@ _$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
       shorebird: WorkflowShorebirdConfig.fromJson(
           json['shorebird'] as Map<String, dynamic>),
       workflowName: json['workflowName'] as String,
-      platform: $enumDecode(_$TargetPlatformEnumMap, json['platform']),
+      platform: $enumDecode(_$OpenCITargetPlatformEnumMap, json['platform']),
       distribution: $enumDecodeNullable(
               _$BuildDistributionChannelEnumMap, json['distribution']) ??
           null,
@@ -43,13 +43,13 @@ Map<String, dynamic> _$$WorkflowModelImplToJson(_$WorkflowModelImpl instance) =>
       'github': instance.github?.toJson(),
       'shorebird': instance.shorebird.toJson(),
       'workflowName': instance.workflowName,
-      'platform': _$TargetPlatformEnumMap[instance.platform]!,
+      'platform': _$OpenCITargetPlatformEnumMap[instance.platform]!,
       'distribution': _$BuildDistributionChannelEnumMap[instance.distribution],
     };
 
-const _$TargetPlatformEnumMap = {
-  TargetPlatform.android: 'android',
-  TargetPlatform.ios: 'ios',
+const _$OpenCITargetPlatformEnumMap = {
+  OpenCITargetPlatform.android: 'android',
+  OpenCITargetPlatform.ios: 'ios',
 };
 
 const _$BuildDistributionChannelEnumMap = {

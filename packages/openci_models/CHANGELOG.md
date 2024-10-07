@@ -1,3 +1,19 @@
+## 1.1.3
+
+- update: OpenCIGitHubChecksStatus enum
+
+## 1.1.2
+
+- update: OpenCIGitHubChecksStatus enum
+
+## 1.1.1
+
+- update models
+
+## 1.1.0
+
+- update models
+
 ## 1.0.10
 
 - update models
