@@ -1,18 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:args/command_runner.dart';
-import 'package:openci_models/openci_models.dart';
 import 'package:runner/src/commands/handle_exception.dart';
 import 'package:runner/src/commands/signals.dart';
 import 'package:runner/src/features/build_job/fetch_workflow.dart';
 import 'package:runner/src/features/build_job/find_job.dart';
-import 'package:runner/src/features/build_job/initialize_firestore.dart';
 import 'package:runner/src/features/build_job/update_checks.dart';
 import 'package:runner/src/features/command_args/initialize_args.dart';
 import 'package:runner/src/services/logger/logger_service.dart';
-import 'package:runner/src/services/process/process_service.dart';
-import 'package:runner/src/services/sentry/sentry_service.dart';
-import 'package:runner/src/services/ssh/ssh_service.dart';
 
 class RunnerCommand extends Command<int> {
   RunnerCommand() {
