@@ -11,6 +11,9 @@ _$WorkflowModelV2Impl _$$WorkflowModelV2ImplFromJson(
     _$WorkflowModelV2Impl(
       id: json['id'] as String,
       name: json['name'] as String,
+      steps: (json['steps'] as List<dynamic>)
+          .map((e) => OpenCIStep.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$$WorkflowModelV2ImplToJson(
@@ -18,4 +21,5 @@ Map<String, dynamic> _$$WorkflowModelV2ImplToJson(
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
+      'steps': instance.steps.map((e) => e.toJson()).toList(),
     };

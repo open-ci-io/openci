@@ -22,6 +22,7 @@ WorkflowModelV2 _$WorkflowModelV2FromJson(Map<String, dynamic> json) {
 mixin _$WorkflowModelV2 {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
+  List<OpenCIStep> get steps => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -35,7 +36,7 @@ abstract class $WorkflowModelV2CopyWith<$Res> {
           WorkflowModelV2 value, $Res Function(WorkflowModelV2) then) =
       _$WorkflowModelV2CopyWithImpl<$Res, WorkflowModelV2>;
   @useResult
-  $Res call({String id, String name});
+  $Res call({String id, String name, List<OpenCIStep> steps});
 }
 
 /// @nodoc
@@ -53,6 +54,7 @@ class _$WorkflowModelV2CopyWithImpl<$Res, $Val extends WorkflowModelV2>
   $Res call({
     Object? id = null,
     Object? name = null,
+    Object? steps = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -63,6 +65,10 @@ class _$WorkflowModelV2CopyWithImpl<$Res, $Val extends WorkflowModelV2>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      steps: null == steps
+          ? _value.steps
+          : steps // ignore: cast_nullable_to_non_nullable
+              as List<OpenCIStep>,
     ) as $Val);
   }
 }
@@ -75,7 +81,7 @@ abstract class _$$WorkflowModelV2ImplCopyWith<$Res>
       __$$WorkflowModelV2ImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String name});
+  $Res call({String id, String name, List<OpenCIStep> steps});
 }
 
 /// @nodoc
@@ -91,6 +97,7 @@ class __$$WorkflowModelV2ImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? name = null,
+    Object? steps = null,
   }) {
     return _then(_$WorkflowModelV2Impl(
       id: null == id
@@ -101,6 +108,10 @@ class __$$WorkflowModelV2ImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      steps: null == steps
+          ? _value._steps
+          : steps // ignore: cast_nullable_to_non_nullable
+              as List<OpenCIStep>,
     ));
   }
 }
@@ -108,7 +119,11 @@ class __$$WorkflowModelV2ImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$WorkflowModelV2Impl implements _WorkflowModelV2 {
-  const _$WorkflowModelV2Impl({required this.id, required this.name});
+  const _$WorkflowModelV2Impl(
+      {required this.id,
+      required this.name,
+      required final List<OpenCIStep> steps})
+      : _steps = steps;
 
   factory _$WorkflowModelV2Impl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowModelV2ImplFromJson(json);
@@ -117,10 +132,17 @@ class _$WorkflowModelV2Impl implements _WorkflowModelV2 {
   final String id;
   @override
   final String name;
+  final List<OpenCIStep> _steps;
+  @override
+  List<OpenCIStep> get steps {
+    if (_steps is EqualUnmodifiableListView) return _steps;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_steps);
+  }
 
   @override
   String toString() {
-    return 'WorkflowModelV2(id: $id, name: $name)';
+    return 'WorkflowModelV2(id: $id, name: $name, steps: $steps)';
   }
 
   @override
@@ -129,12 +151,14 @@ class _$WorkflowModelV2Impl implements _WorkflowModelV2 {
         (other.runtimeType == runtimeType &&
             other is _$WorkflowModelV2Impl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.name, name) || other.name == name));
+            (identical(other.name, name) || other.name == name) &&
+            const DeepCollectionEquality().equals(other._steps, _steps));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name);
+  int get hashCode => Object.hash(
+      runtimeType, id, name, const DeepCollectionEquality().hash(_steps));
 
   @JsonKey(ignore: true)
   @override
@@ -154,7 +178,8 @@ class _$WorkflowModelV2Impl implements _WorkflowModelV2 {
 abstract class _WorkflowModelV2 implements WorkflowModelV2 {
   const factory _WorkflowModelV2(
       {required final String id,
-      required final String name}) = _$WorkflowModelV2Impl;
+      required final String name,
+      required final List<OpenCIStep> steps}) = _$WorkflowModelV2Impl;
 
   factory _WorkflowModelV2.fromJson(Map<String, dynamic> json) =
       _$WorkflowModelV2Impl.fromJson;
@@ -163,6 +188,8 @@ abstract class _WorkflowModelV2 implements WorkflowModelV2 {
   String get id;
   @override
   String get name;
+  @override
+  List<OpenCIStep> get steps;
   @override
   @JsonKey(ignore: true)
   _$$WorkflowModelV2ImplCopyWith<_$WorkflowModelV2Impl> get copyWith =>

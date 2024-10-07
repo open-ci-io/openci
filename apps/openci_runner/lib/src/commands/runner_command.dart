@@ -8,6 +8,7 @@ import 'package:http/http.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:runner/src/commands/handle_exception.dart';
+import 'package:runner/src/features/build_job/fetch_workflow.dart';
 import 'package:runner/src/features/build_job/find_job.dart';
 import 'package:runner/src/features/build_job/initialize_firestore.dart';
 import 'package:runner/src/features/command_args/initialize_args.dart';
@@ -110,6 +111,8 @@ class RunnerCommand extends Command<int> {
         loggerSignal.value.info('No job found: ${DateTime.now()}');
         continue;
       }
+      final workflow = await fetchWorkflow(job.workflowId);
+      final steps = workflow.steps;
       try {
         await updateChecks(
           jobId: job.id,
@@ -117,11 +120,14 @@ class RunnerCommand extends Command<int> {
         );
         final vmIp = await vmServiceSignal.value.startVM();
         await sshServiceSignal.value.sshToServer(vmIp);
-        await sshSignal.executeCommandV2(
-          'ls',
-        );
+
+        for (final step in steps) {
+          for (final command in step.commands) {
+            await sshSignal.executeCommandV2(command);
+          }
+        }
+
         await vmServiceSignal.value.stopVM();
-        await vmServiceSignal.value.cleanupVMs();
         await updateChecks(
           jobId: job.id,
           status: OpenCIGitHubChecksStatus.success,

@@ -1,3 +1,7 @@
+## 1.1.4
+
+- add: OpenCIStep model
+
 ## 1.1.3
 
 - update: OpenCIGitHubChecksStatus enum

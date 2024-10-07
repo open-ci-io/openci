@@ -57,7 +57,7 @@ class VMService {
   Future<void> stopVM() async {
     final workingVMName = workingVMNameSignal.value;
     await _tartService.stop(workingVMName);
-    await _tartService.delete(workingVMName);
+    await cleanupVMs();
   }
 
   Future<bool> cleanupVMs() async {
