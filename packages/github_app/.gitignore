@@ -16,3 +16,7 @@ build/
 coverage/
 .env
 deploy.sh
+github.pem
+service_account_decoded.json
+start_ngrok.sh
+dart_frog_dev.sh

@@ -13,26 +13,26 @@ enum ChecksStatus {
   success,
 }
 
-const jobsDomain = 'jobs_v3';
+const jobsDomain = 'build_jobs';
 
 Future<void> markBuildAsStarted(
   String jobDocumentId,
   Firestore firestore,
 ) async {
   await firestore.collection(jobsDomain).doc(jobDocumentId).update({
-    'buildStatus.processing': true,
+    'buildStatus': 'inProgress',
   });
 }
 
 Future<void> markJobAsFailed(String jobDocumentId, Firestore firestore) async {
   await firestore.collection(jobsDomain).doc(jobDocumentId).update({
-    'buildStatus.failure': true,
+    'buildStatus': 'failure',
   });
 }
 
 Future<void> markJobAsSuccess(String jobDocumentId, Firestore firestore) async {
   await firestore.collection(jobsDomain).doc(jobDocumentId).update({
-    'buildStatus.success': true,
+    'buildStatus': 'success',
   });
 }
 
@@ -64,7 +64,7 @@ Future<Response> onRequest(RequestContext context) async {
     }
     print('Job data retrieved');
 
-    final jobData = BuildModel.fromJson(data);
+    final jobData = BuildJob.fromJson(data);
 
     final token = await accessToken(
       jobData.github.installationId,
@@ -79,7 +79,7 @@ Future<Response> onRequest(RequestContext context) async {
     );
 
     final existingCheckRun = await github.checks.checkRuns
-        .getCheckRun(slug, checkRunId: jobData.githubChecks.checkRunId);
+        .getCheckRun(slug, checkRunId: jobData.github.checkRunId);
     print('Existing check run retrieved');
 
     final checkRuns = github.checks.checkRuns;
@@ -113,42 +113,42 @@ Future<Response> onRequest(RequestContext context) async {
     }
     print('Check run updated');
 
-    if (checksStatus == ChecksStatus.success) {
-      final workflowId = jobData.workflowId;
-      final workflowDocumentSnapshot =
-          await firestore.collection('workflows_v1').doc(workflowId).get();
-      final workflowData = workflowDocumentSnapshot.data();
-      if (workflowData == null) {
-        throw Exception('Workflow data is null');
-      }
-      final workflow = WorkflowModel.fromJson(workflowData);
-      final organizationId = workflow.organizationId;
-      final orgDocs =
-          await firestore.collection('organizations').doc(organizationId).get();
-      final orgData = orgDocs.data();
-      if (orgData == null) {
-        throw Exception('Org data is null');
-      }
+    // if (checksStatus == ChecksStatus.success) {
+    //   final workflowId = jobData.workflowId;
+    //   final workflowDocumentSnapshot =
+    //       await firestore.collection('workflows_v1').doc(workflowId).get();
+    //   final workflowData = workflowDocumentSnapshot.data();
+    //   if (workflowData == null) {
+    //     throw Exception('Workflow data is null');
+    //   }
+    //   final workflow = WorkflowModel.fromJson(workflowData);
+    //   final organizationId = workflow.organizationId;
+    //   final orgDocs =
+    //       await firestore.collection('organizations').doc(organizationId).get();
+    //   final orgData = orgDocs.data();
+    //   if (orgData == null) {
+    //     throw Exception('Org data is null');
+    //   }
 
-      final buildNumber = orgData['buildNumber']! as Map<String, dynamic>;
-      final platformBuildNumber = switch (jobData.platform) {
-        TargetPlatform.ios => buildNumber['ios'],
-        TargetPlatform.android => buildNumber['android'],
-      };
+    //   final buildNumber = orgData['buildNumber']! as Map<String, dynamic>;
+    //   final platformBuildNumber = switch (jobData.platform) {
+    //     OpenCITargetPlatform.ios => buildNumber['ios'],
+    //     OpenCITargetPlatform.android => buildNumber['android'],
+    //   };
 
-      final issueNumber = jobData.githubChecks.issueNumber;
-      if (issueNumber == null) {
-        throw Exception('Issue number is null');
-      }
+    //   final issueNumber = jobData.githubChecks.issueNumber;
+    //   if (issueNumber == null) {
+    //     throw Exception('Issue number is null');
+    //   }
 
-      await github.issues.createComment(
-        slug,
-        issueNumber,
-        'Build number: $platformBuildNumber for ${jobData.platform}',
-      );
+    //   await github.issues.createComment(
+    //     slug,
+    //     issueNumber,
+    //     'Build number: $platformBuildNumber for ${jobData.platform}',
+    //   );
 
-      print('issue commented');
-    }
+    //   print('issue commented');
+    // }
 
     return Response(body: 'Success');
   } catch (e, s) {

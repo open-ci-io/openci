@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dart_firebase_admin/dart_firebase_admin.dart';
 import 'package:dart_firebase_admin/firestore.dart';
 
-const workflowCollectionName = 'workflows_v1';
+const workflowCollectionName = 'workflows';
 
 Future<QuerySnapshot<Map<String, Object?>>> getWorkflowQuerySnapshot({
   required Firestore firestore,

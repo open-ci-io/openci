@@ -1,4 +1,4 @@
-enum ActionType {
+enum OpenCIGitHubActionType {
   opened,
   reopened,
   edited,

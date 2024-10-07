@@ -1,12 +1,15 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:args/command_runner.dart';
-import 'package:dart_firebase_admin/dart_firebase_admin.dart';
 import 'package:dart_firebase_admin/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
+import 'package:http/http.dart';
 import 'package:mason_logger/mason_logger.dart';
+import 'package:openci_models/openci_models.dart';
 import 'package:runner/src/commands/handle_exception.dart';
 import 'package:runner/src/features/build_job/find_job.dart';
+import 'package:runner/src/features/build_job/initialize_firestore.dart';
 import 'package:runner/src/features/command_args/initialize_args.dart';
 import 'package:runner/src/services/logger/logger_service.dart';
 import 'package:runner/src/services/process/process_service.dart';
@@ -42,6 +45,29 @@ final nonNullFirestoreClientSignal = computed(() {
   return client;
 });
 
+Future<Response> updateChecks({
+  required String jobId,
+  required OpenCIGitHubChecksStatus status,
+}) async {
+  final url = Uri.parse('http://localhost:8080/update_checks');
+  final body = jsonEncode({
+    'jobId': jobId,
+    'checksStatus': status.name,
+  });
+
+  final response = await post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: body,
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('APIエラー: ${response.body}');
+  }
+
+  return response;
+}
+
 class RunnerCommand extends Command<int> {
   RunnerCommand() {
     argParser
@@ -71,36 +97,41 @@ class RunnerCommand extends Command<int> {
   @override
   Future<int> run() async {
     final appArgs = await initializeApp(argResults);
-
-    final admin = FirebaseAdminApp.initializeApp(
-      appArgs.firebaseProjectName,
-      Credential.fromServiceAccount(
-        File(appArgs.firebaseServiceAccountFileRelativePath),
-      ),
-    );
-    firestoreClientSignal.value = Firestore(admin);
+    initializeFirestore(appArgs);
 
     await sentryServiceSignal.value.initializeSentry(appArgs.sentryDSN);
 
     processServiceSignal.value.watchKeyboardSignals();
 
     while (!shouldExitSignal.value) {
+      await Future<void>.delayed(const Duration(seconds: 1));
+      final job = await findJob();
+      if (job == null) {
+        loggerSignal.value.info('No job found: ${DateTime.now()}');
+        continue;
+      }
       try {
-        await Future<void>.delayed(const Duration(seconds: 1));
-        final job = await findJob();
-        if (job == null) {
-          loggerSignal.value.info('No job found');
-          continue;
-        }
+        await updateChecks(
+          jobId: job.id,
+          status: OpenCIGitHubChecksStatus.inProgress,
+        );
         final vmIp = await vmServiceSignal.value.startVM();
         await sshServiceSignal.value.sshToServer(vmIp);
         await sshSignal.executeCommandV2(
           'ls',
         );
-
+        await vmServiceSignal.value.stopVM();
         await vmServiceSignal.value.cleanupVMs();
+        await updateChecks(
+          jobId: job.id,
+          status: OpenCIGitHubChecksStatus.success,
+        );
       } catch (error, stackTrace) {
         await handleException(error, stackTrace);
+        await updateChecks(
+          jobId: job.id,
+          status: OpenCIGitHubChecksStatus.failure,
+        );
         continue;
       } finally {
         await Future<void>.delayed(const Duration(seconds: 10));

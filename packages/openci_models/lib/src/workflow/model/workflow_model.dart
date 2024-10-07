@@ -16,7 +16,7 @@ class WorkflowModel with _$WorkflowModel {
     WorkflowGitHubConfig? github,
     required WorkflowShorebirdConfig shorebird,
     required String workflowName,
-    required TargetPlatform platform,
+    required OpenCITargetPlatform platform,
     @Default(null) BuildDistributionChannel? distribution,
   }) = _WorkflowModel;
   factory WorkflowModel.fromJson(Map<String, Object?> json) =>
