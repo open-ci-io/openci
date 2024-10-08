@@ -50,6 +50,8 @@ class RunnerCommand extends Command<int> {
         await setInProgress(job.id);
         await vmServiceSignal.value.startVM();
 
+        const githubAccessToken = 'sampleAccessToken';
+
         for (final step in workflow.steps) {
           for (final command in step.commands) {
             await sshSignal.executeCommandV2(command);
