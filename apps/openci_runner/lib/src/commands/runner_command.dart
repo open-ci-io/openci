@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'dart:async';
 import 'dart:io';
 import 'package:args/command_runner.dart';
@@ -5,6 +7,8 @@ import 'package:runner/src/commands/handle_exception.dart';
 import 'package:runner/src/commands/signals.dart';
 import 'package:runner/src/features/build_job/fetch_workflow.dart';
 import 'package:runner/src/features/build_job/find_job.dart';
+import 'package:runner/src/features/build_job/finish_job.dart';
+import 'package:runner/src/features/build_job/run_command.dart';
 import 'package:runner/src/features/build_job/update_checks.dart';
 import 'package:runner/src/features/command_args/initialize_args.dart';
 import 'package:runner/src/services/logger/logger_service.dart';
@@ -49,22 +53,12 @@ class RunnerCommand extends Command<int> {
       try {
         await setInProgress(job.id);
         await vmServiceSignal.value.startVM();
-
-        const githubAccessToken = 'sampleAccessToken';
-
         for (final step in workflow.steps) {
-          for (final command in step.commands) {
-            await sshSignal.executeCommandV2(command);
-          }
+          await executeStepCommands(step.commands, job.github.installationId);
         }
-
-        await vmServiceSignal.value.stopVM();
-        await setSuccess(job.id);
+        await finishJob(job.id);
       } catch (error, stackTrace) {
-        await handleException(error, stackTrace);
-        await setFailure(
-          job.id,
-        );
+        await handleException(error, stackTrace, job.id);
         continue;
       } finally {
         await Future<void>.delayed(const Duration(seconds: 10));
