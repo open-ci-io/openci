@@ -10,5 +10,6 @@
     "jsonwebtoken",
     "mocktail",
     "openci"
-  ]
+  ],
+  "deno.enable": true
 }

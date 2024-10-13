@@ -1,0 +1,6 @@
+{
+    "imports": {
+      "npm:node-emoji": "npm:node-emoji@2.1.0",
+      "npm:ssh2": "npm:ssh2@1.16.0"
+    }
+  }

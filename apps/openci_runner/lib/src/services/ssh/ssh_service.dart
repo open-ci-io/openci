@@ -106,6 +106,36 @@ class SSHService {
     );
   }
 
+  Future<SessionResult> runV3(SSHClient client, String command) async {
+    var sessionStdout = '';
+    var sessionStderr = '';
+    int? exitCode;
+
+    logger.info('command: $command', style: customInfoStyle);
+    final session = await client.execute(command);
+    await session.stdin.close();
+    await session.done;
+    exitCode = session.exitCode;
+    sessionStdout = await streamToString(session.stdout);
+    sessionStderr = await streamToString(session.stderr);
+
+    if (exitCode == 0) {
+      logger
+        ..success('stdout: $sessionStdout')
+        ..success('stderr: $sessionStderr');
+    } else {
+      logger
+        ..err('exitCode: $exitCode, stdout: $sessionStdout')
+        ..err('exitCode: $exitCode, stderr: $sessionStderr');
+    }
+
+    return SessionResult(
+      sessionExitCode: exitCode,
+      sessionStdout: sessionStdout,
+      sessionStderr: sessionStderr,
+    );
+  }
+
   Future<String> streamToString(Stream<Uint8List> stream) async {
     final bytes = await stream.fold<List<int>>(
       [],
