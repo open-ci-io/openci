@@ -13,7 +13,6 @@ Future<BuildJob?> findJob() async {
       )
       .limit(1)
       .get();
-
   if (qs.docs.isEmpty) {
     return null;
   }
