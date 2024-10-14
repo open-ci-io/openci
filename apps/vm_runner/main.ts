@@ -24,17 +24,15 @@ admin.initializeApp({
 let vmIp = "";
 
 while (true) {
-  const qs = await admin.firestore().collection("build_jobs").where(
-    "buildStatus",
-    "==",
-    "queued",
-  ).limit(1).get();
+  const qs = await admin.firestore().collection("build_jobs")
+    .where("buildStatus", "==", "queued")
+    .orderBy("createdAt", "asc")
+    .limit(1)
+    .get();
 
   if (qs.empty) {
     console.info(
-      `[${
-        new Date().toISOString()
-      }] キューに入っているビルドジョブはありません`,
+      `[${new Date().toISOString()}] No queued build jobs found`,
     );
     await delay(1000);
     continue;
@@ -65,21 +63,9 @@ while (true) {
 
   const vmName = uuidv4();
 
-  try {
-    const command = new Deno.Command("tart", {
-      args: ["clone", "sonoma", vmName],
-    });
-    await command.output();
-  } catch (error) {
-    console.error("コマンド実行エラー:", error);
-  }
+  await cloneVM(vmName);
+  runVM(vmName);
 
-  try {
-    const command = new Deno.Command("tart", { args: ["run", vmName] });
-    command.output();
-  } catch (error) {
-    console.error("コマンド実行エラー:", error);
-  }
   while (true) {
     const command = new Deno.Command("tart", { args: ["ip", vmName] });
     const output = await command.output();
@@ -100,7 +86,39 @@ while (true) {
 
   console.info(green("Commands executed"));
 
+  await stopVM(vmName);
+
   await cleanUpVMs();
+}
+
+async function cloneVM(vmName: string): Promise<void> {
+  const baseVMName = "sonoma";
+  try {
+    const command = new Deno.Command("tart", {
+      args: ["clone", baseVMName, vmName],
+    });
+    await command.output();
+  } catch (error) {
+    console.error("Command execution error:", error);
+  }
+}
+
+function runVM(vmName: string): void {
+  try {
+    const command = new Deno.Command("tart", { args: ["run", vmName] });
+    command.output();
+  } catch (error) {
+    console.error("Command execution error:", error);
+  }
+}
+
+async function stopVM(vmName: string): Promise<void> {
+  try {
+    const command = new Deno.Command("tart", { args: ["stop", vmName] });
+    await command.output();
+  } catch (error) {
+    console.error("Command execution error:", error);
+  }
 }
 
 function executeCommands(
@@ -113,7 +131,7 @@ function executeCommands(
     let buffer = "";
 
     conn.on("ready", () => {
-      console.log("クライアント :: 準備完了");
+      console.log("Client :: ready");
       conn.shell((err: any, stream: any) => {
         if (err) {
           reject(err);
@@ -121,7 +139,7 @@ function executeCommands(
         }
 
         stream.on("close", () => {
-          console.log("ストリーム :: クローズ");
+          console.log("Stream :: close");
           conn.end();
           resolve();
         }).on("data", (data: Buffer) => {
@@ -130,7 +148,7 @@ function executeCommands(
           while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
             const line = buffer.slice(0, newlineIndex).trim();
             if (line) {
-              console.log("出力: " + line);
+              console.log("Output: " + line);
             }
             buffer = buffer.slice(newlineIndex + 1);
           }
@@ -161,13 +179,13 @@ function executeCommands(
               const exitCode = parseInt(lines[lines.length - 2], 10);
               if (!isNaN(exitCode)) {
                 if (exitCode === 0) {
-                  console.log(green(`コマンド成功: ${replacedCommand}`));
+                  console.log(green(`Command succeeded: ${replacedCommand}`));
                   commandIndex++;
                   executeNextCommand();
                 } else {
                   console.error(
                     red(
-                      `コマンド失敗: ${replacedCommand}, 終了コード: ${exitCode}`,
+                      `Command failed: ${replacedCommand}, exit code: ${exitCode}`,
                     ),
                   );
                   await setStatusToFailure(jobId);
@@ -258,8 +276,8 @@ async function updateBuildStatus(jobId: string, status: string): Promise<void> {
       throw new Error(`APIエラー: ${response.status} ${response.statusText}`);
     }
 
-    console.log(`ビルドステータスが更新されました: ${status}`);
+    console.log(`Build status updated: ${status}`);
   } catch (error) {
-    console.error(`ビルドステータスの更新に失敗しました: ${error}`);
+    console.error(`Failed to update build status: ${error}`);
   }
 }
