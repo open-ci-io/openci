@@ -13,6 +13,8 @@ import {
 import { cleanUpVMs } from "./vm.ts";
 import { delay } from "https://deno.land/std@0.224.0/async/delay.ts";
 
+const baseUrl = "http://localhost:8080";
+
 admin.initializeApp({
   credential: admin.credential.cert(
     JSON.parse(Deno.readTextFileSync("./service_account.json")),
@@ -29,11 +31,21 @@ while (true) {
   ).limit(1).get();
 
   if (qs.empty) {
-    console.info("キューに入っているビルドジョブはありません");
+    console.info(
+      `[${
+        new Date().toISOString()
+      }] キューに入っているビルドジョブはありません`,
+    );
+    await delay(1000);
     continue;
   }
 
   const job = qs.docs[0].data();
+
+  const jobId = job.id;
+
+  await setStatusToInProgress(jobId);
+
   const workflowId = job.workflowId;
   const workflowDocs = await admin.firestore().collection("workflows").doc(
     workflowId,
@@ -84,8 +96,7 @@ while (true) {
   const steps = workflow.steps;
   console.log("steps", steps);
 
-  await executeCommands(vmIp, steps);
-  await delay(30000);
+  await executeCommands(vmIp, steps, jobId);
 
   console.info(green("Commands executed"));
 
@@ -95,6 +106,7 @@ while (true) {
 function executeCommands(
   vmIp: string,
   steps: any[],
+  jobId: string,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const conn = new Client();
@@ -125,9 +137,10 @@ function executeCommands(
         });
 
         let commandIndex = 0;
-        const executeNextCommand = () => {
+        const executeNextCommand = async () => {
           if (commandIndex >= steps.length) {
             stream.write("exit\n");
+            await setStatusToSuccess(jobId);
             return;
           }
 
@@ -141,7 +154,7 @@ function executeCommands(
           stream.write(`${replacedCommand}; echo $?\n`);
 
           let commandOutput = "";
-          const checkResult = (data: string) => {
+          const checkResult = async (data: string) => {
             commandOutput += data;
             const lines = commandOutput.split("\n");
             if (lines.length >= 2) {
@@ -157,6 +170,7 @@ function executeCommands(
                       `コマンド失敗: ${replacedCommand}, 終了コード: ${exitCode}`,
                     ),
                   );
+                  await setStatusToFailure(jobId);
                   stream.write("exit\n");
                 }
                 stream.removeListener("data", checkResult);
@@ -181,9 +195,7 @@ function executeCommands(
 }
 
 async function getGithubAccessToken(installationId: number): Promise<string> {
-  const _baseUrl = "http://localhost:8080";
-
-  const url = new URL("/installation_token", _baseUrl);
+  const url = new URL("/installation_token", baseUrl);
   const body = JSON.stringify({
     installationId: installationId,
   });
@@ -202,4 +214,52 @@ async function getGithubAccessToken(installationId: number): Promise<string> {
 
   const responseBody = await response.json();
   return responseBody.installation_token.toString();
+}
+
+async function setStatusToInProgress(jobId: string): Promise<void> {
+  await updateBuildStatus(jobId, "inProgress");
+  await admin.firestore().collection("build_jobs").doc(jobId).update({
+    buildStatus: "inProgress",
+  });
+}
+
+async function setStatusToSuccess(jobId: string): Promise<void> {
+  await updateBuildStatus(jobId, "success");
+  await admin.firestore().collection("build_jobs").doc(jobId).update({
+    buildStatus: "success",
+  });
+}
+
+async function setStatusToFailure(jobId: string): Promise<void> {
+  await updateBuildStatus(jobId, "failure");
+  await admin.firestore().collection("build_jobs").doc(jobId).update({
+    buildStatus: "failure",
+  });
+}
+
+async function updateBuildStatus(jobId: string, status: string): Promise<void> {
+  const url = new URL("/update_checks", baseUrl);
+
+  const body = JSON.stringify({
+    jobId: jobId,
+    checksStatus: status,
+  });
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: body,
+    });
+
+    if (!response.ok) {
+      throw new Error(`APIエラー: ${response.status} ${response.statusText}`);
+    }
+
+    console.log(`ビルドステータスが更新されました: ${status}`);
+  } catch (error) {
+    console.error(`ビルドステータスの更新に失敗しました: ${error}`);
+  }
 }
