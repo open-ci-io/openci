@@ -65,21 +65,9 @@ while (true) {
 
   const vmName = uuidv4();
 
-  try {
-    const command = new Deno.Command("tart", {
-      args: ["clone", "sonoma", vmName],
-    });
-    await command.output();
-  } catch (error) {
-    console.error("コマンド実行エラー:", error);
-  }
+  await cloneVM(vmName);
+  await runVM(vmName);
 
-  try {
-    const command = new Deno.Command("tart", { args: ["run", vmName] });
-    command.output();
-  } catch (error) {
-    console.error("コマンド実行エラー:", error);
-  }
   while (true) {
     const command = new Deno.Command("tart", { args: ["ip", vmName] });
     const output = await command.output();
@@ -100,7 +88,39 @@ while (true) {
 
   console.info(green("Commands executed"));
 
+  await stopVM(vmName);
+
   await cleanUpVMs();
+}
+
+async function cloneVM(vmName: string): Promise<void> {
+  const baseVMName = "sonoma";
+  try {
+    const command = new Deno.Command("tart", {
+      args: ["clone", baseVMName, vmName],
+    });
+    await command.output();
+  } catch (error) {
+    console.error("Command execution error:", error);
+  }
+}
+
+async function runVM(vmName: string): Promise<void> {
+  try {
+    const command = new Deno.Command("tart", { args: ["run", vmName] });
+    await command.output();
+  } catch (error) {
+    console.error("Command execution error:", error);
+  }
+}
+
+async function stopVM(vmName: string): Promise<void> {
+  try {
+    const command = new Deno.Command("tart", { args: ["stop", vmName] });
+    await command.output();
+  } catch (error) {
+    console.error("Command execution error:", error);
+  }
 }
 
 function executeCommands(
