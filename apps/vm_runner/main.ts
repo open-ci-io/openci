@@ -24,11 +24,11 @@ admin.initializeApp({
 let vmIp = "";
 
 while (true) {
-  const qs = await admin.firestore().collection("build_jobs").where(
-    "buildStatus",
-    "==",
-    "queued",
-  ).limit(1).get();
+  const qs = await admin.firestore().collection("build_jobs")
+    .where("buildStatus", "==", "queued")
+    .orderBy("createdAt", "asc")
+    .limit(1)
+    .get();
 
   if (qs.empty) {
     console.info(
