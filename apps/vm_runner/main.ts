@@ -5,7 +5,11 @@ import { Buffer } from "node:buffer";
 import admin from "npm:firebase-admin";
 
 import { v4 as uuidv4 } from "npm:uuid";
-import { green, yellow } from "https://deno.land/std@0.224.0/fmt/colors.ts";
+import {
+  green,
+  red,
+  yellow,
+} from "https://deno.land/std@0.224.0/fmt/colors.ts";
 import { cleanUpVMs } from "./vm.ts";
 import { delay } from "https://deno.land/std@0.224.0/async/delay.ts";
 
@@ -97,7 +101,7 @@ function executeCommands(
     let buffer = "";
 
     conn.on("ready", () => {
-      console.log("Client :: ready");
+      console.log("クライアント :: 準備完了");
       conn.shell((err: any, stream: any) => {
         if (err) {
           reject(err);
@@ -105,7 +109,7 @@ function executeCommands(
         }
 
         stream.on("close", () => {
-          console.log("Stream :: closed");
+          console.log("ストリーム :: クローズ");
           conn.end();
           resolve();
         }).on("data", (data: Buffer) => {
@@ -114,27 +118,56 @@ function executeCommands(
           while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
             const line = buffer.slice(0, newlineIndex).trim();
             if (line) {
-              console.log("Output: " + line);
+              console.log("出力: " + line);
             }
             buffer = buffer.slice(newlineIndex + 1);
           }
         });
 
-        for (const step of steps) {
-          for (const command of step.commands) {
-            if (command.includes("${githubAccessToken}")) {
-              const replacedCommand = command.replace(
-                "${githubAccessToken}",
-                "installationToken",
-              );
-              stream.write(replacedCommand + "\n");
-            } else {
-              stream.write(command + "\n");
-            }
+        let commandIndex = 0;
+        const executeNextCommand = () => {
+          if (commandIndex >= steps.length) {
+            stream.write("exit\n");
+            return;
           }
-        }
 
-        stream.write("exit\n"); // セッションを終了
+          const step = steps[commandIndex];
+          const command = step.commands[0]; // 各ステップの最初のコマンドのみを実行
+          const replacedCommand = command.includes("${githubAccessToken}")
+            ? command.replace("${githubAccessToken}", "installationToken")
+            : command;
+
+          // コマンドを実行し、終了コードを取得
+          stream.write(`${replacedCommand}; echo $?\n`);
+
+          let commandOutput = "";
+          const checkResult = (data: string) => {
+            commandOutput += data;
+            const lines = commandOutput.split("\n");
+            if (lines.length >= 2) {
+              const exitCode = parseInt(lines[lines.length - 2], 10);
+              if (!isNaN(exitCode)) {
+                if (exitCode === 0) {
+                  console.log(green(`コマンド成功: ${replacedCommand}`));
+                  commandIndex++;
+                  executeNextCommand();
+                } else {
+                  console.error(
+                    red(
+                      `コマンド失敗: ${replacedCommand}, 終了コード: ${exitCode}`,
+                    ),
+                  );
+                  stream.write("exit\n");
+                }
+                stream.removeListener("data", checkResult);
+              }
+            }
+          };
+
+          stream.on("data", checkResult);
+        };
+
+        executeNextCommand();
       });
     }).on("error", (err: any) => {
       reject(err);
