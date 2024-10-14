@@ -1,0 +1,12 @@
+[debug] [2024-10-13T06:25:41.085Z] [Firebase Plugin] Activating Firebase extension.
+[debug] [2024-10-13T06:25:41.128Z] [Firebase Plugin] VSCode notification server listening on port 40003
+[info] i  dataconnect: downloading dataconnect-emulator-1.5.0... {"metadata":{"emulator":{"name":"dataconnect"},"message":"downloading dataconnect-emulator-1.5.0..."}}
+[debug] [2024-10-13T06:25:41.130Z] >>> [apiv2][query] GET https://storage.googleapis.com/firemat-preview-drop/emulator/dataconnect-emulator-macos-v1.5.0 
+[debug] [2024-10-13T06:25:42.033Z] <<< [apiv2][status] GET https://storage.googleapis.com/firemat-preview-drop/emulator/dataconnect-emulator-macos-v1.5.0 200
+[debug] [2024-10-13T06:25:42.033Z] <<< [apiv2][body] GET https://storage.googleapis.com/firemat-preview-drop/emulator/dataconnect-emulator-macos-v1.5.0 [stream]
+[debug] [2024-10-13T06:25:46.472Z] 'fdc build' failed with error: Unable to build your Data Connect schema and connectors (exit code 1): E1013 15:25:46.468435   34662 cmd.go:41] Error loading data connect config: could not find dataconnect.yaml in `/Users/masahiroaoki/Developer/open-ci/openci/apps/openci_runner/dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"'fdc build' failed with error: Unable to build your Data Connect schema and connectors (exit code 1): E1013 15:25:46.468435   34662 cmd.go:41] Error loading data connect config: could not find dataconnect.yaml in `/Users/masahiroaoki/Developer/open-ci/openci/apps/openci_runner/dataconnect`\n"}}
+[debug] [2024-10-13T11:39:04.416Z] [Firebase Plugin] Activating Firebase extension.
+[debug] [2024-10-13T11:39:04.460Z] [Firebase Plugin] VSCode notification server listening on port 40003
+[debug] [2024-10-13T11:39:04.658Z] 'fdc build' failed with error: Unable to build your Data Connect schema and connectors (exit code 1): E1013 20:39:04.654443   76199 cmd.go:41] Error loading data connect config: could not find dataconnect.yaml in `/Users/masahiroaoki/Developer/open-ci/openci/apps/openci_runner/dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"'fdc build' failed with error: Unable to build your Data Connect schema and connectors (exit code 1): E1013 20:39:04.654443   76199 cmd.go:41] Error loading data connect config: could not find dataconnect.yaml in `/Users/masahiroaoki/Developer/open-ci/openci/apps/openci_runner/dataconnect`\n"}}
