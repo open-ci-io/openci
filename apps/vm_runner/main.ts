@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { Client } from "npm:ssh2";
 import { Buffer } from "node:buffer";
 
@@ -14,7 +15,7 @@ admin.initializeApp({
   ),
 });
 
-var vmIp = "";
+let vmIp = "";
 
 while (true) {
   const qs = await admin.firestore().collection("build_jobs").where(
