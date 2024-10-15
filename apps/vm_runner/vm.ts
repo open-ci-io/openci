@@ -1,4 +1,13 @@
-import { green, yellow } from "https://deno.land/std@0.224.0/fmt/colors.ts";
+import {
+  green,
+  red,
+  yellow,
+} from "https://deno.land/std@0.224.0/fmt/colors.ts";
+import { Buffer } from "node:buffer";
+import { Client } from "npm:ssh2";
+import { baseUrl } from "./base_url.ts";
+import type { Firestore } from "npm:firebase-admin/firestore";
+import { db } from "./main.ts";
 
 export async function cleanUpVMs() {
   while (true) {
@@ -32,5 +41,189 @@ export async function cleanUpVMs() {
 
     console.log(green("全てのVMの削除が完了しました"));
     break;
+  }
+}
+
+export async function cloneVM(vmName: string): Promise<void> {
+  const baseVMName = "sonoma";
+  try {
+    const command = new Deno.Command("tart", {
+      args: ["clone", baseVMName, vmName],
+    });
+    await command.output();
+  } catch (error) {
+    console.error("Command execution error:", error);
+  }
+}
+
+export function runVM(vmName: string): void {
+  try {
+    const command = new Deno.Command("tart", { args: ["run", vmName] });
+    command.output();
+  } catch (error) {
+    console.error("Command execution error:", error);
+  }
+}
+
+export async function stopVM(vmName: string): Promise<void> {
+  try {
+    const command = new Deno.Command("tart", { args: ["stop", vmName] });
+    await command.output();
+  } catch (error) {
+    console.error("Command execution error:", error);
+  }
+}
+
+export function executeCommands(
+  vmIp: string,
+  steps: any[],
+  jobId: string,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const conn = new Client();
+    let buffer = "";
+
+    conn.on("ready", () => {
+      console.log("Client :: ready");
+      conn.shell((err: any, stream: any) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        stream.on("close", () => {
+          console.log("Stream :: close");
+          conn.end();
+          resolve();
+        }).on("data", (data: Buffer) => {
+          buffer += data.toString();
+          let newlineIndex;
+          while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+            const line = buffer.slice(0, newlineIndex).trim();
+            if (line) {
+              console.log("Output: " + line);
+            }
+            buffer = buffer.slice(newlineIndex + 1);
+          }
+        });
+
+        let commandIndex = 0;
+        const executeNextCommand = async () => {
+          if (commandIndex >= steps.length) {
+            stream.write("exit\n");
+            await setStatusToSuccess(jobId);
+            return;
+          }
+
+          const step = steps[commandIndex];
+          const command = step.commands[0]; // 各ステップの最初のコマンドのみを実行
+          const replacedCommand = command.includes("${githubAccessToken}")
+            ? command.replace(
+              "${githubAccessToken}",
+              "installationToken",
+            )
+            : command;
+
+          // コマンドを実行し、終了コードを取得
+          stream.write(`${replacedCommand}; echo $?\n`);
+
+          let commandOutput = "";
+          const checkResult = async (data: string) => {
+            commandOutput += data;
+            const lines = commandOutput.split("\n");
+            if (lines.length >= 2) {
+              const exitCode = parseInt(
+                lines[lines.length - 2],
+                10,
+              );
+              if (!isNaN(exitCode)) {
+                if (exitCode === 0) {
+                  console.log(
+                    green(
+                      `Command succeeded: ${replacedCommand}`,
+                    ),
+                  );
+                  commandIndex++;
+                  executeNextCommand();
+                } else {
+                  console.error(
+                    red(
+                      `Command failed: ${replacedCommand}, exit code: ${exitCode}`,
+                    ),
+                  );
+                  await setStatusToFailure(jobId);
+                  stream.write("exit\n");
+                }
+                stream.removeListener("data", checkResult);
+              }
+            }
+          };
+
+          stream.on("data", checkResult);
+        };
+
+        executeNextCommand();
+      });
+    }).on("error", (err: any) => {
+      reject(err);
+    }).connect({
+      host: vmIp,
+      port: 22,
+      username: "admin",
+      password: "admin",
+    });
+  });
+}
+
+export async function setStatusToInProgress(
+  jobId: string,
+): Promise<void> {
+  await updateBuildStatus(jobId, "inProgress");
+  await db.collection("build_jobs").doc(jobId).update({
+    buildStatus: "inProgress",
+  });
+}
+
+export async function setStatusToSuccess(jobId: string): Promise<void> {
+  await updateBuildStatus(jobId, "success");
+  await db.collection("build_jobs").doc(jobId).update({
+    buildStatus: "success",
+  });
+}
+
+export async function setStatusToFailure(jobId: string): Promise<void> {
+  await updateBuildStatus(jobId, "failure");
+  await db.collection("build_jobs").doc(jobId).update({
+    buildStatus: "failure",
+  });
+}
+
+export async function updateBuildStatus(
+  jobId: string,
+  status: string,
+): Promise<void> {
+  const url = new URL("/update_checks", baseUrl);
+
+  const body = JSON.stringify({
+    jobId: jobId,
+    checksStatus: status,
+  });
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: body,
+    });
+
+    if (!response.ok) {
+      throw new Error(`APIエラー: ${response.status} ${response.statusText}`);
+    }
+
+    console.log(`Build status updated: ${status}`);
+  } catch (error) {
+    console.error(`Failed to update build status: ${error}`);
   }
 }
