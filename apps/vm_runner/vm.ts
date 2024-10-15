@@ -115,7 +115,7 @@ export function executeCommands(
           }
 
           const step = steps[commandIndex];
-          const command = step.commands[0]; // 各ステップの最初のコマンドのみを実行
+          const command = step.commands[0];
           const replacedCommand = command.includes("${githubAccessToken}")
             ? command.replace(
               "${githubAccessToken}",
@@ -123,7 +123,6 @@ export function executeCommands(
             )
             : command;
 
-          // コマンドを実行し、終了コードを取得
           stream.write(`${replacedCommand}; echo $?\n`);
 
           let commandOutput = "";
