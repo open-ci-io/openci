@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import {
   green,
   red,
@@ -5,9 +6,7 @@ import {
 } from "https://deno.land/std@0.224.0/fmt/colors.ts";
 import { Buffer } from "node:buffer";
 import { Client } from "npm:ssh2";
-import { baseUrl } from "./base_url.ts";
-import type { Firestore } from "npm:firebase-admin/firestore";
-import { db } from "./main.ts";
+import { setStatusToFailure, setStatusToSuccess } from "./build_job.ts";
 
 export async function cleanUpVMs() {
   while (true) {
@@ -173,57 +172,4 @@ export function executeCommands(
       password: "admin",
     });
   });
-}
-
-export async function setStatusToInProgress(
-  jobId: string,
-): Promise<void> {
-  await updateBuildStatus(jobId, "inProgress");
-  await db.collection("build_jobs").doc(jobId).update({
-    buildStatus: "inProgress",
-  });
-}
-
-export async function setStatusToSuccess(jobId: string): Promise<void> {
-  await updateBuildStatus(jobId, "success");
-  await db.collection("build_jobs").doc(jobId).update({
-    buildStatus: "success",
-  });
-}
-
-export async function setStatusToFailure(jobId: string): Promise<void> {
-  await updateBuildStatus(jobId, "failure");
-  await db.collection("build_jobs").doc(jobId).update({
-    buildStatus: "failure",
-  });
-}
-
-export async function updateBuildStatus(
-  jobId: string,
-  status: string,
-): Promise<void> {
-  const url = new URL("/update_checks", baseUrl);
-
-  const body = JSON.stringify({
-    jobId: jobId,
-    checksStatus: status,
-  });
-
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: body,
-    });
-
-    if (!response.ok) {
-      throw new Error(`APIエラー: ${response.status} ${response.statusText}`);
-    }
-
-    console.log(`Build status updated: ${status}`);
-  } catch (error) {
-    console.error(`Failed to update build status: ${error}`);
-  }
 }

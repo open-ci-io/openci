@@ -1,10 +1,10 @@
-import { green, red } from "https://deno.land/std@0.224.0/fmt/colors.ts";
 import {
     DocumentSnapshot,
     Firestore,
     QuerySnapshot,
 } from "npm:firebase-admin/firestore";
-import { Client } from "npm:ssh2";
+import { db } from "./main.ts";
+import { baseUrl } from "./base_url.ts";
 
 export async function getBuildJob(db: Firestore): Promise<QuerySnapshot> {
     return await db
@@ -20,4 +20,59 @@ export async function getWorkflowDocs(
     workflowId: string,
 ): Promise<DocumentSnapshot> {
     return await db.collection("workflows").doc(workflowId).get();
+}
+
+export async function setStatusToInProgress(
+    jobId: string,
+): Promise<void> {
+    await updateBuildStatus(jobId, "inProgress");
+    await db.collection("build_jobs").doc(jobId).update({
+        buildStatus: "inProgress",
+    });
+}
+
+export async function setStatusToSuccess(jobId: string): Promise<void> {
+    await updateBuildStatus(jobId, "success");
+    await db.collection("build_jobs").doc(jobId).update({
+        buildStatus: "success",
+    });
+}
+
+export async function setStatusToFailure(jobId: string): Promise<void> {
+    await updateBuildStatus(jobId, "failure");
+    await db.collection("build_jobs").doc(jobId).update({
+        buildStatus: "failure",
+    });
+}
+
+export async function updateBuildStatus(
+    jobId: string,
+    status: string,
+): Promise<void> {
+    const url = new URL("/update_checks", baseUrl);
+
+    const body = JSON.stringify({
+        jobId: jobId,
+        checksStatus: status,
+    });
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: body,
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                `APIエラー: ${response.status} ${response.statusText}`,
+            );
+        }
+
+        console.log(`Build status updated: ${status}`);
+    } catch (error) {
+        console.error(`Failed to update build status: ${error}`);
+    }
 }

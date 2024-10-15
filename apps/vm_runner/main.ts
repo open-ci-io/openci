@@ -1,16 +1,13 @@
 // deno-lint-ignore-file no-explicit-any
 import { v4 as uuidv4 } from "npm:uuid";
 import { green, yellow } from "https://deno.land/std@0.224.0/fmt/colors.ts";
-import {
-  cleanUpVMs,
-  cloneVM,
-  executeCommands,
-  runVM,
-  setStatusToInProgress,
-  stopVM,
-} from "./vm.ts";
+import { cleanUpVMs, cloneVM, executeCommands, runVM, stopVM } from "./vm.ts";
 import { delay } from "https://deno.land/std@0.224.0/async/delay.ts";
-import { getBuildJob, getWorkflowDocs } from "./build_job.ts";
+import {
+  getBuildJob,
+  getWorkflowDocs,
+  setStatusToInProgress,
+} from "./build_job.ts";
 import { cert, initializeApp } from "npm:firebase-admin/app";
 import { getFirestore } from "npm:firebase-admin/firestore";
 import { getGithubAccessToken } from "./github.ts";
