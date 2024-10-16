@@ -1,0 +1,27 @@
+name: dashboard
+description: "A new Flutter project."
+publish_to: 'none' 
+version: 1.0.0+1
+environment:
+  sdk: ^3.5.3
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  font_awesome_flutter: ^10.7.0
+  firebase_auth: ^5.3.1
+  firebase_core: ^3.6.0
+  cloud_firestore: ^5.4.4
+  hooks_riverpod: ^2.5.4
+  flutter_hooks: ^0.20.5
+  riverpod_annotation: ^2.5.3
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  riverpod_generator: ^2.4.3
+  build_runner: ^2.4.13
+  custom_lint: ^0.6.8
+  riverpod_lint: ^2.3.13
+flutter:
+  uses-material-design: true
