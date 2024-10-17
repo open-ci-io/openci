@@ -2,6 +2,7 @@ import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -15,8 +16,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: const ColorScheme.dark(),
         useMaterial3: true,
+        textTheme: GoogleFonts.interTextTheme(),
       ),
       home: const SignUpPage(),
     );
@@ -32,9 +34,6 @@ class SignUpPage extends HookConsumerWidget {
     final passwordTextController = useTextEditingController();
     final formKey = useMemoized(() => GlobalKey<FormState>());
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Welcome to Open CI'),
-      ),
       body: Center(
         child: Container(
           width: 300,
@@ -44,6 +43,14 @@ class SignUpPage extends HookConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const Text(
+                  'Welcome to Open CI',
+                  style: TextStyle(
+                    fontSize: 26,
+                    color: Colors.white,
+                  ),
+                ),
+                verticalMargin40,
                 TextFormField(
                   controller: emailTextController,
                   decoration: const InputDecoration(labelText: 'Email'),
@@ -71,7 +78,12 @@ class SignUpPage extends HookConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      child: const Text('Register'),
+                      style: ElevatedButton.styleFrom(
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 1,
+                        ),
+                      ),
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
                           formKey.currentState!.save();
@@ -79,9 +91,16 @@ class SignUpPage extends HookConsumerWidget {
                               'Email: ${emailTextController.text}, Password: ${passwordTextController.text}');
                         }
                       },
+                      child: const Text('Register'),
                     ),
                     horizontalMargin16,
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 1,
+                        ),
+                      ),
                       child: const Text('Login'),
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
