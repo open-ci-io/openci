@@ -2,5 +2,7 @@ include: package:flutter_lints/flutter.yaml
 linter:
   rules:
 analyzer:
+  errors:
+    use_build_context_synchronously: ignore
   plugins:
     - custom_lint

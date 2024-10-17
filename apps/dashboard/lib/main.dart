@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        colorScheme: const ColorScheme.dark(),
+        colorScheme: const ColorScheme.dark(primary: Colors.blue),
         useMaterial3: true,
         textTheme: GoogleFonts.interTextTheme(),
       ),

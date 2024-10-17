@@ -89,7 +89,7 @@ class SignUpPage extends HookConsumerWidget {
                               'createdAt': Timestamp.now(),
                             });
                           } catch (e) {
-                            print(e);
+                            await showErrorDialog(context, e.toString());
                           }
                         }
                       },
@@ -107,8 +107,6 @@ class SignUpPage extends HookConsumerWidget {
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
                           formKey.currentState!.save();
-                          print(emailTextController.text);
-                          print(passwordTextController.text);
                           try {
                             await FirebaseAuth.instance
                                 .signInWithEmailAndPassword(
@@ -116,7 +114,7 @@ class SignUpPage extends HookConsumerWidget {
                               password: passwordTextController.text,
                             );
                           } catch (e) {
-                            print(e);
+                            await showErrorDialog(context, e.toString());
                           }
                         }
                       },
@@ -130,4 +128,25 @@ class SignUpPage extends HookConsumerWidget {
       ),
     );
   }
+}
+
+Future<void> showErrorDialog(BuildContext context, String errorMessage) {
+  return showAdaptiveDialog(
+    barrierDismissible: true,
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text(
+        'Error',
+        style: TextStyle(
+          color: Colors.blue,
+        ),
+      ),
+      content: Text(
+        errorMessage,
+        style: const TextStyle(
+          color: Colors.blue,
+        ),
+      ),
+    ),
+  );
 }
