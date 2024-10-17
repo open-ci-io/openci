@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -54,6 +56,7 @@ class SignUpPage extends HookConsumerWidget {
                 TextFormField(
                   controller: emailTextController,
                   decoration: const InputDecoration(labelText: 'Email'),
+                  style: const TextStyle(color: Colors.white),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Enter your email';
@@ -64,7 +67,13 @@ class SignUpPage extends HookConsumerWidget {
                 verticalMargin16,
                 TextFormField(
                   controller: passwordTextController,
-                  decoration: const InputDecoration(labelText: 'Password'),
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
+                    hintStyle: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: const TextStyle(color: Colors.white),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -84,11 +93,26 @@ class SignUpPage extends HookConsumerWidget {
                           width: 1,
                         ),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         if (formKey.currentState!.validate()) {
                           formKey.currentState!.save();
-                          print(
-                              'Email: ${emailTextController.text}, Password: ${passwordTextController.text}');
+                          try {
+                            final user = await FirebaseAuth.instance
+                                .createUserWithEmailAndPassword(
+                              email: emailTextController.text,
+                              password: passwordTextController.text,
+                            );
+                            final userId = user.user!.uid;
+                            await FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(userId)
+                                .set({
+                              'userId': userId,
+                              'createdAt': Timestamp.now(),
+                            });
+                          } catch (e) {
+                            print(e);
+                          }
                         }
                       },
                       child: const Text('Register'),
@@ -102,11 +126,18 @@ class SignUpPage extends HookConsumerWidget {
                         ),
                       ),
                       child: const Text('Login'),
-                      onPressed: () {
+                      onPressed: () async {
                         if (formKey.currentState!.validate()) {
                           formKey.currentState!.save();
-                          print(
-                              'Email: ${emailTextController.text}, Password: ${passwordTextController.text}');
+                          try {
+                            await FirebaseAuth.instance
+                                .signInWithEmailAndPassword(
+                              email: emailTextController.text,
+                              password: passwordTextController.text,
+                            );
+                          } catch (e) {
+                            print(e);
+                          }
                         }
                       },
                     ),
