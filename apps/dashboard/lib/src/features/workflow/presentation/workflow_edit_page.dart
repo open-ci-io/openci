@@ -1,4 +1,9 @@
+import 'package:dashboard/src/common_widgets/margins.dart';
+import 'package:dashboard/src/extensions/build_context_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class WorkflowCard extends StatelessWidget {
   final Map<String, dynamic> workflow;
@@ -63,47 +68,41 @@ class WorkflowCard extends StatelessWidget {
   }
 }
 
-class WorkflowDialog extends StatefulWidget {
+final _steps = listSignal<Map<String, dynamic>>([]);
+
+class WorkflowDialog extends HookConsumerWidget {
   final Map<String, dynamic>? workflow;
 
   const WorkflowDialog({super.key, this.workflow});
-
   @override
-  _WorkflowDialogState createState() => _WorkflowDialogState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nameController =
+        useTextEditingController(text: workflow?['name'] ?? '');
+    final flutterVersionController =
+        useTextEditingController(text: workflow?['flutter']?['version'] ?? '');
+    final githubUrlController = useTextEditingController(
+        text: workflow?['github']?['repositoryUrl'] ?? '');
+    final triggerTypeController = useTextEditingController(
+        text: workflow?['github']?['triggerType'] ?? '');
 
-class _WorkflowDialogState extends State<WorkflowDialog> {
-  late TextEditingController _nameController;
-  late TextEditingController _flutterVersionController;
-  late TextEditingController _githubUrlController;
-  late TextEditingController _triggerTypeController;
-  List<Map<String, dynamic>> _steps = [];
+    useEffect(
+      () {
+        _steps.value =
+            List<Map<String, dynamic>>.from(workflow?['steps'] ?? []);
+        return () {};
+      },
+      [workflow],
+    );
 
-  @override
-  void initState() {
-    super.initState();
-    _nameController =
-        TextEditingController(text: widget.workflow?['name'] ?? '');
-    _flutterVersionController = TextEditingController(
-        text: widget.workflow?['flutter']?['version'] ?? '');
-    _githubUrlController = TextEditingController(
-        text: widget.workflow?['github']?['repositoryUrl'] ?? '');
-    _triggerTypeController = TextEditingController(
-        text: widget.workflow?['github']?['triggerType'] ?? '');
-    _steps = List<Map<String, dynamic>>.from(widget.workflow?['steps'] ?? []);
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Dialog(
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.8,
-        height: MediaQuery.of(context).size.height * 0.8,
+        width: context.screenWidth * 0.8,
+        height: context.screenHeight * 0.8,
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             Text(
-              widget.workflow == null ? 'Add Workflow' : 'Edit Workflow',
+              workflow == null ? 'Add Workflow' : 'Edit Workflow',
               style: const TextStyle(color: Colors.white),
             ),
             Expanded(
@@ -113,31 +112,36 @@ class _WorkflowDialogState extends State<WorkflowDialog> {
                   children: [
                     TextField(
                       style: const TextStyle(color: Colors.white),
-                      controller: _nameController,
+                      controller: nameController,
                       decoration:
                           const InputDecoration(labelText: 'Workflow Name'),
                     ),
                     TextField(
                       style: const TextStyle(color: Colors.white),
-                      controller: _flutterVersionController,
+                      controller: flutterVersionController,
                       decoration:
                           const InputDecoration(labelText: 'Flutter Version'),
                     ),
                     TextField(
                       style: const TextStyle(color: Colors.white),
-                      controller: _githubUrlController,
+                      controller: githubUrlController,
                       decoration: const InputDecoration(
                           labelText: 'GitHub Repository URL'),
                     ),
                     TextField(
                       style: const TextStyle(color: Colors.white),
-                      controller: _triggerTypeController,
+                      controller: triggerTypeController,
                       decoration:
                           const InputDecoration(labelText: 'Trigger Type'),
                     ),
-                    const SizedBox(height: 16),
-                    Text('Steps', style: Theme.of(context).textTheme.bodyLarge),
-                    ..._buildStepsList(),
+                    verticalMargin16,
+                    const Text('Steps',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        )),
+                    const _Steps(),
                     ElevatedButton(
                       onPressed: _addStep,
                       child: const Text('Add Step'),
@@ -153,7 +157,7 @@ class _WorkflowDialogState extends State<WorkflowDialog> {
                   child: const Text('Cancel'),
                 ),
                 ElevatedButton(
-                  onPressed: _saveWorkflow,
+                  onPressed: () => _saveWorkflow(context),
                   child: const Text('Save'),
                 ),
               ],
@@ -164,58 +168,11 @@ class _WorkflowDialogState extends State<WorkflowDialog> {
     );
   }
 
-  List<Widget> _buildStepsList() {
-    return _steps.asMap().entries.map((entry) {
-      int index = entry.key;
-      Map<String, dynamic> step = entry.value;
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              TextField(
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(labelText: 'Step Name'),
-                controller: TextEditingController(text: step['name']),
-                onChanged: (value) => _steps[index]['name'] = value,
-              ),
-              TextField(
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                    labelText: 'Commands (comma-separated)'),
-                controller:
-                    TextEditingController(text: step['commands']?.join(', ')),
-                onChanged: (value) =>
-                    _steps[index]['commands'] = value.split(', '),
-              ),
-              OverflowBar(
-                children: [
-                  TextButton(
-                    onPressed: () => _removeStep(index),
-                    child: const Text('Remove'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
-    }).toList();
-  }
-
   void _addStep() {
-    setState(() {
-      _steps.add({'name': '', 'commands': []});
-    });
+    _steps.add({'name': '', 'commands': []});
   }
 
-  void _removeStep(int index) {
-    setState(() {
-      _steps.removeAt(index);
-    });
-  }
-
-  void _saveWorkflow() {
+  void _saveWorkflow(BuildContext context) {
     // Implement Firebase data saving logic here
     // Example:
     // FirebaseFirestore.instance.collection('workflows').add({
@@ -229,13 +186,64 @@ class _WorkflowDialogState extends State<WorkflowDialog> {
     // });
     Navigator.of(context).pop();
   }
+}
+
+class _Steps extends StatelessWidget {
+  const _Steps();
+
+  void _removeStep(int index) {
+    _steps.removeAt(index);
+  }
 
   @override
-  void dispose() {
-    _nameController.dispose();
-    _flutterVersionController.dispose();
-    _githubUrlController.dispose();
-    _triggerTypeController.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Column(
+      children: _steps.watch(context).asMap().entries.map((entry) {
+        final index = entry.key;
+        final step = entry.value;
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Step $index',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Colors.blue,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 12),
+                  ),
+                ),
+                TextField(
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(labelText: 'Step Name'),
+                  controller: TextEditingController(text: step['name']),
+                  onChanged: (value) => _steps[index]['name'] = value,
+                ),
+                TextField(
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                      labelText: 'Commands (comma-separated)'),
+                  controller:
+                      TextEditingController(text: step['commands']?.join(', ')),
+                  onChanged: (value) =>
+                      _steps[index]['commands'] = value.split(', '),
+                ),
+                OverflowBar(
+                  children: [
+                    TextButton(
+                      onPressed: () => _removeStep(index),
+                      child: const Text('Remove'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
   }
 }
