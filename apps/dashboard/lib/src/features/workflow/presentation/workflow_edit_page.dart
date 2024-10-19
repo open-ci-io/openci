@@ -52,7 +52,7 @@ class WorkflowCard extends StatelessWidget {
                 child: const Text('Edit'),
               ),
               Visibility(
-                visible: index > 1,
+                visible: index != 0,
                 child: TextButton(
                   onPressed: () => _showDeleteConfirmation(context),
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
