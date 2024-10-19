@@ -35,7 +35,7 @@ class WorkflowCard extends StatelessWidget {
             title: Text('Trigger Type: ${workflow.github.triggerType.name}'),
           ),
           const ListTile(title: Text('Steps:')),
-          ...workflow.steps.map<Widget>(
+          ...workflow.steps.map(
             (step) => Padding(
               padding: const EdgeInsets.only(left: 16),
               child: ListTile(

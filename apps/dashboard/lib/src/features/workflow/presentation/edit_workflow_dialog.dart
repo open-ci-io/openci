@@ -24,13 +24,25 @@ class EditWorkflowDialog extends HookConsumerWidget {
     final triggerTypeController =
         useTextEditingController(text: workflow?.github.triggerType.name ?? '');
 
+    final scrollController = useScrollController();
+
     useEffect(
       () {
-        _steps.value = workflow?.steps ?? [];
+        final steps = workflow?.steps ?? [];
+        _steps.value = steps.toList();
         return () {};
       },
-      [workflow],
     );
+
+    void smoothScrollToBottom() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeOutCubic,
+        );
+      });
+    }
 
     return Dialog(
       child: Container(
@@ -45,6 +57,7 @@ class EditWorkflowDialog extends HookConsumerWidget {
             ),
             Expanded(
               child: SingleChildScrollView(
+                controller: scrollController,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -84,7 +97,10 @@ class EditWorkflowDialog extends HookConsumerWidget {
                     ),
                     const _Steps(),
                     ElevatedButton(
-                      onPressed: _addStep,
+                      onPressed: () {
+                        _addStep();
+                        smoothScrollToBottom();
+                      },
                       child: const Text('Add Step'),
                     ),
                   ],
