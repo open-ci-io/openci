@@ -120,13 +120,11 @@ class EditWorkflowDialog extends HookConsumerWidget {
     final newWorkflowId =
         FirebaseFirestore.instance.collection('workflows').doc().id;
     final newWorkflow = workflow.copyWith(id: newWorkflowId);
-
+    Navigator.of(context).pop();
     await FirebaseFirestore.instance
         .collection('workflows')
         .doc(newWorkflowId)
         .set(newWorkflow.toJson());
-
-    Navigator.of(context).pop();
   }
 }
 

@@ -77,8 +77,14 @@ class WorkflowCard extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Workflow'),
-        content: Text('Are you sure you want to delete ${workflow.name}?'),
+        title: const Text(
+          'Delete Workflow',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: Text(
+          'Are you sure you want to delete ${workflow.name}?',
+          style: const TextStyle(color: Colors.white),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -86,11 +92,11 @@ class WorkflowCard extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
+              Navigator.of(context).pop();
               await FirebaseFirestore.instance
                   .collection('workflows')
                   .doc(workflow.id)
                   .delete();
-              Navigator.of(context).pop();
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Delete'),
