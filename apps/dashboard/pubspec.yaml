@@ -13,8 +13,10 @@ dependencies:
     sdk: flutter
   flutter_hooks: ^0.20.5
   font_awesome_flutter: ^10.7.0
+  freezed_annotation: ^2.4.4
   google_fonts: ^6.2.1
   hooks_riverpod: ^2.5.4
+  json_annotation: ^4.9.0
   riverpod_annotation: ^2.5.3
   signals_flutter: ^5.5.0
 dev_dependencies:
@@ -23,6 +25,8 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
   riverpod_generator: ^2.4.3
   riverpod_lint: ^2.3.13
 flutter:

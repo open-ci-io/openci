@@ -1,12 +1,13 @@
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/extensions/build_context_extension.dart';
+import 'package:dashboard/src/features/workflow/domain/workflow_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 class WorkflowCard extends StatelessWidget {
-  final Map<String, dynamic> workflow;
+  final WorkflowModel workflow;
 
   const WorkflowCard({super.key, required this.workflow});
 
@@ -19,32 +20,33 @@ class WorkflowCard extends StatelessWidget {
         side: const BorderSide(color: Colors.blue, width: 1),
       ),
       child: ExpansionTile(
+        expansionAnimationStyle: AnimationStyle(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOutCubic,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
           side: const BorderSide(color: Colors.blue, width: 1),
         ),
-        title: Text(workflow['name'] ?? 'Unnamed Workflow'),
-        subtitle:
-            Text('Flutter: ${workflow['flutter']?['version'] ?? 'Unknown'}'),
+        title: Text(workflow.name),
+        subtitle: Text('Flutter: ${workflow.flutter.version}'),
         children: [
           ListTile(
-              title: Text(
-                  'GitHub: ${workflow['github']?['repositoryUrl'] ?? 'Unknown'}')),
+            title: Text('GitHub: ${workflow.github.repositoryUrl}'),
+          ),
           ListTile(
-              title: Text(
-                  'Trigger Type: ${workflow['github']?['triggerType'] ?? 'Unknown'}')),
+            title: Text('Trigger Type: ${workflow.github.triggerType.name}'),
+          ),
           const ListTile(title: Text('Steps:')),
-          ...?workflow['steps']
-              ?.map<Widget>(
-                (step) => Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: ListTile(
-                    title: Text(step['name'] ?? 'Unnamed Step'),
-                    subtitle: Text(step['commands']?.join(', ') ?? ''),
-                  ),
-                ),
-              )
-              .toList(),
+          ...workflow.steps.map<Widget>(
+            (step) => Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: ListTile(
+                title: Text(step.name),
+                subtitle: Text(step.commands.join(', ')),
+              ),
+            ),
+          ),
           OverflowBar(
             children: [
               TextButton(
@@ -59,11 +61,10 @@ class WorkflowCard extends StatelessWidget {
     );
   }
 
-  void _showWorkflowDialog(BuildContext context,
-      {Map<String, dynamic>? workflow}) {
+  void _showWorkflowDialog(BuildContext context, {WorkflowModel? workflow}) {
     showDialog(
       context: context,
-      builder: (context) => WorkflowDialog(workflow: workflow),
+      builder: (context) => WorkflowDialog(workflow),
     );
   }
 }
@@ -71,24 +72,24 @@ class WorkflowCard extends StatelessWidget {
 final _steps = listSignal<Map<String, dynamic>>([]);
 
 class WorkflowDialog extends HookConsumerWidget {
-  final Map<String, dynamic>? workflow;
+  const WorkflowDialog(this.workflow, {super.key});
 
-  const WorkflowDialog({super.key, this.workflow});
+  final WorkflowModel? workflow;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nameController =
-        useTextEditingController(text: workflow?['name'] ?? '');
+    final nameController = useTextEditingController(text: workflow?.name ?? '');
     final flutterVersionController =
-        useTextEditingController(text: workflow?['flutter']?['version'] ?? '');
-    final githubUrlController = useTextEditingController(
-        text: workflow?['github']?['repositoryUrl'] ?? '');
-    final triggerTypeController = useTextEditingController(
-        text: workflow?['github']?['triggerType'] ?? '');
+        useTextEditingController(text: workflow?.flutter.version ?? '');
+    final githubUrlController =
+        useTextEditingController(text: workflow?.github.repositoryUrl ?? '');
+    final triggerTypeController =
+        useTextEditingController(text: workflow?.github.triggerType.name ?? '');
 
     useEffect(
       () {
-        _steps.value =
-            List<Map<String, dynamic>>.from(workflow?['steps'] ?? []);
+        _steps.value = List<Map<String, dynamic>>.from(
+            workflow?.steps.map((step) => step.toJson()).toList() ?? []);
         return () {};
       },
       [workflow],
