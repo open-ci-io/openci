@@ -7,7 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-final _steps = listSignal<WorkflowModelStep>([]);
+final _workflowState = signal<WorkflowModel?>(null);
 
 class EditWorkflowDialog extends HookConsumerWidget {
   const EditWorkflowDialog(this.workflow, {super.key});
@@ -28,12 +28,12 @@ class EditWorkflowDialog extends HookConsumerWidget {
 
     useEffect(
       () {
-        final steps = workflow?.steps ?? [];
-        _steps.value = steps.toList();
+        _workflowState.value = workflow;
         return () {};
       },
     );
 
+    // 新しいステップが追加されたときのスムーズなスクロールを行う関数
     void smoothScrollToBottom() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         scrollController.animateTo(
@@ -51,9 +51,11 @@ class EditWorkflowDialog extends HookConsumerWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Text(
-              workflow == null ? 'Add Workflow' : 'Edit Workflow',
-              style: const TextStyle(color: Colors.white),
+            Watch(
+              (context) => Text(
+                _workflowState.value == null ? 'Add Workflow' : 'Edit Workflow',
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -126,7 +128,11 @@ class EditWorkflowDialog extends HookConsumerWidget {
   }
 
   void _addStep() {
-    _steps.add(const WorkflowModelStep());
+    final steps = _workflowState.value!.steps.toList()
+      ..add(const WorkflowModelStep());
+    _workflowState.value = _workflowState.value?.copyWith(
+      steps: steps,
+    );
   }
 
   Future<void> _saveWorkflow(
@@ -148,63 +154,68 @@ class _Steps extends StatelessWidget {
   const _Steps();
 
   void _removeStep(int index) {
-    _steps.removeAt(index);
+    final steps = _workflowState.value!.steps.toList()..removeLast();
+    _workflowState.value = _workflowState.value?.copyWith(steps: steps);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: _steps.watch(context).asMap().entries.map((entry) {
-        final index = entry.key;
-        final step = entry.value;
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Step $index',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.blue,
-                          fontStyle: FontStyle.italic,
-                          fontSize: 12,
-                        ),
-                  ),
-                ),
-                TextField(
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(labelText: 'Step Name'),
-                  controller: TextEditingController(text: step.name),
-                  onChanged: (value) {
-                    _steps[index] = step.copyWith(name: value);
-                  },
-                ),
-                TextField(
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Commands (comma-separated)',
-                  ),
-                  controller:
-                      TextEditingController(text: step.commands.join(', ')),
-                  onChanged: (value) {
-                    _steps[index] = step.copyWith(commands: value.split(', '));
-                  },
-                ),
-                OverflowBar(
-                  children: [
-                    TextButton(
-                      onPressed: () => _removeStep(index),
-                      child: const Text('Remove'),
+    return Watch((context) {
+      final steps = _workflowState.value?.steps ?? [];
+
+      return Column(
+        children: steps.asMap().entries.map((entry) {
+          final index = entry.key;
+          final step = entry.value;
+          return Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Step $index',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Colors.blue,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 12,
+                          ),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  TextField(
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(labelText: 'Step Name'),
+                    controller: TextEditingController(text: step.name),
+                    onChanged: (value) {
+                      steps[index] = step.copyWith(name: value);
+                    },
+                  ),
+                  TextField(
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: 'Commands (comma-separated)',
+                    ),
+                    controller:
+                        TextEditingController(text: step.commands.join(', ')),
+                    onChanged: (value) {
+                      steps[index] = step.copyWith(commands: value.split(', '));
+                    },
+                  ),
+                  OverflowBar(
+                    children: [
+                      TextButton(
+                        onPressed: () => _removeStep(index),
+                        child: const Text('Remove'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      }).toList(),
-    );
+          );
+        }).toList(),
+      );
+    });
   }
 }

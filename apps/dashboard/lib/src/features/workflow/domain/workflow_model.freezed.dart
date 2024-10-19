@@ -186,11 +186,11 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
           : github // ignore: cast_nullable_to_non_nullable
               as WorkflowModelGitHub,
       owners: null == owners
-          ? _value._owners
+          ? _value.owners
           : owners // ignore: cast_nullable_to_non_nullable
               as List<String>,
       steps: null == steps
-          ? _value._steps
+          ? _value.steps
           : steps // ignore: cast_nullable_to_non_nullable
               as List<WorkflowModelStep>,
     ));
@@ -205,10 +205,8 @@ class _$WorkflowModelImpl implements _WorkflowModel {
       required this.id,
       required this.flutter,
       required this.github,
-      required final List<String> owners,
-      required final List<WorkflowModelStep> steps})
-      : _owners = owners,
-        _steps = steps;
+      required this.owners,
+      required this.steps});
 
   factory _$WorkflowModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowModelImplFromJson(json);
@@ -221,21 +219,10 @@ class _$WorkflowModelImpl implements _WorkflowModel {
   final WorkflowModelFlutter flutter;
   @override
   final WorkflowModelGitHub github;
-  final List<String> _owners;
   @override
-  List<String> get owners {
-    if (_owners is EqualUnmodifiableListView) return _owners;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_owners);
-  }
-
-  final List<WorkflowModelStep> _steps;
+  final List<String> owners;
   @override
-  List<WorkflowModelStep> get steps {
-    if (_steps is EqualUnmodifiableListView) return _steps;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_steps);
-  }
+  final List<WorkflowModelStep> steps;
 
   @override
   String toString() {
@@ -251,8 +238,8 @@ class _$WorkflowModelImpl implements _WorkflowModel {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.flutter, flutter) || other.flutter == flutter) &&
             (identical(other.github, github) || other.github == github) &&
-            const DeepCollectionEquality().equals(other._owners, _owners) &&
-            const DeepCollectionEquality().equals(other._steps, _steps));
+            const DeepCollectionEquality().equals(other.owners, owners) &&
+            const DeepCollectionEquality().equals(other.steps, steps));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -263,8 +250,8 @@ class _$WorkflowModelImpl implements _WorkflowModel {
       id,
       flutter,
       github,
-      const DeepCollectionEquality().hash(_owners),
-      const DeepCollectionEquality().hash(_steps));
+      const DeepCollectionEquality().hash(owners),
+      const DeepCollectionEquality().hash(steps));
 
   /// Create a copy of WorkflowModel
   /// with the given fields replaced by the non-null parameter values.
@@ -732,7 +719,7 @@ class __$$WorkflowModelStepImplCopyWithImpl<$Res>
           : name // ignore: cast_nullable_to_non_nullable
               as String,
       commands: null == commands
-          ? _value._commands
+          ? _value.commands
           : commands // ignore: cast_nullable_to_non_nullable
               as List<String>,
     ));
@@ -743,8 +730,7 @@ class __$$WorkflowModelStepImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$WorkflowModelStepImpl implements _WorkflowModelStep {
   const _$WorkflowModelStepImpl(
-      {this.name = '', final List<String> commands = const <String>[]})
-      : _commands = commands;
+      {this.name = '', this.commands = const <String>[]});
 
   factory _$WorkflowModelStepImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowModelStepImplFromJson(json);
@@ -752,14 +738,9 @@ class _$WorkflowModelStepImpl implements _WorkflowModelStep {
   @override
   @JsonKey()
   final String name;
-  final List<String> _commands;
   @override
   @JsonKey()
-  List<String> get commands {
-    if (_commands is EqualUnmodifiableListView) return _commands;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_commands);
-  }
+  final List<String> commands;
 
   @override
   String toString() {
@@ -772,13 +753,13 @@ class _$WorkflowModelStepImpl implements _WorkflowModelStep {
         (other.runtimeType == runtimeType &&
             other is _$WorkflowModelStepImpl &&
             (identical(other.name, name) || other.name == name) &&
-            const DeepCollectionEquality().equals(other._commands, _commands));
+            const DeepCollectionEquality().equals(other.commands, commands));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, name, const DeepCollectionEquality().hash(_commands));
+      runtimeType, name, const DeepCollectionEquality().hash(commands));
 
   /// Create a copy of WorkflowModelStep
   /// with the given fields replaced by the non-null parameter values.

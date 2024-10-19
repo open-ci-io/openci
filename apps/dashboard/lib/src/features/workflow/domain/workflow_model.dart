@@ -8,7 +8,7 @@ enum GitHubTriggerType {
   pullRequest,
 }
 
-@freezed
+@Freezed(makeCollectionsUnmodifiable: false)
 class WorkflowModel with _$WorkflowModel {
   const factory WorkflowModel({
     required String name,
@@ -41,7 +41,7 @@ class WorkflowModelGitHub with _$WorkflowModelGitHub {
       _$WorkflowModelGitHubFromJson(json);
 }
 
-@freezed
+@Freezed(makeCollectionsUnmodifiable: false)
 class WorkflowModelStep with _$WorkflowModelStep {
   const factory WorkflowModelStep({
     @Default('') String name,
