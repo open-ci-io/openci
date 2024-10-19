@@ -10,9 +10,14 @@ import 'package:signals_flutter/signals_flutter.dart';
 final _workflowState = signal<WorkflowModel?>(null);
 
 class EditWorkflowDialog extends HookConsumerWidget {
-  const EditWorkflowDialog(this.workflow, {super.key});
+  const EditWorkflowDialog(
+    this.workflow, {
+    super.key,
+    this.isNewWorkflow = false,
+  });
 
   final WorkflowModel? workflow;
+  final bool isNewWorkflow;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -116,7 +121,22 @@ class EditWorkflowDialog extends HookConsumerWidget {
                   child: const Text('Cancel'),
                 ),
                 ElevatedButton(
-                  onPressed: () => _saveWorkflow(context, workflow!),
+                  onPressed: () async {
+                    _workflowState.value = _workflowState.value?.copyWith(
+                      name: nameController.text,
+                      flutter: WorkflowModelFlutter(
+                        version: flutterVersionController.text,
+                      ),
+                      github: WorkflowModelGitHub(
+                        repositoryUrl: githubUrlController.text,
+                        triggerType: GitHubTriggerType.values.byName(
+                          triggerTypeController.text,
+                        ),
+                      ),
+                    );
+                    Navigator.of(context).pop();
+                    await _saveWorkflow(context);
+                  },
                   child: const Text('Save'),
                 ),
               ],
@@ -127,6 +147,14 @@ class EditWorkflowDialog extends HookConsumerWidget {
     );
   }
 
+  Future<void> _saveWorkflow(BuildContext context) async {
+    if (isNewWorkflow) {
+      await _createNewWorkflow(context);
+    } else {
+      await _updateWorkflow(context);
+    }
+  }
+
   void _addStep() {
     final steps = _workflowState.value!.steps.toList()
       ..add(const WorkflowModelStep());
@@ -135,18 +163,23 @@ class EditWorkflowDialog extends HookConsumerWidget {
     );
   }
 
-  Future<void> _saveWorkflow(
+  Future<void> _createNewWorkflow(
     BuildContext context,
-    WorkflowModel workflow,
   ) async {
     final newWorkflowId =
         FirebaseFirestore.instance.collection('workflows').doc().id;
-    final newWorkflow = workflow.copyWith(id: newWorkflowId);
-    Navigator.of(context).pop();
+    _workflowState.value = _workflowState.value?.copyWith(id: newWorkflowId);
     await FirebaseFirestore.instance
         .collection('workflows')
         .doc(newWorkflowId)
-        .set(newWorkflow.toJson());
+        .set(_workflowState.value!.toJson());
+  }
+
+  Future<void> _updateWorkflow(BuildContext context) async {
+    await FirebaseFirestore.instance
+        .collection('workflows')
+        .doc(_workflowState.value!.id)
+        .set(_workflowState.value!.toJson());
   }
 }
 
@@ -183,23 +216,29 @@ class _Steps extends StatelessWidget {
                           ),
                     ),
                   ),
-                  TextField(
+                  TextFormField(
                     style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(labelText: 'Step Name'),
-                    controller: TextEditingController(text: step.name),
+                    initialValue: step.name,
                     onChanged: (value) {
-                      steps[index] = step.copyWith(name: value);
+                      final newSteps = _workflowState.value!.steps.toList();
+                      newSteps[index] = step.copyWith(name: value);
+                      _workflowState.value =
+                          _workflowState.value?.copyWith(steps: newSteps);
                     },
                   ),
-                  TextField(
+                  TextFormField(
                     style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
                       labelText: 'Commands (comma-separated)',
                     ),
-                    controller:
-                        TextEditingController(text: step.commands.join(', ')),
+                    initialValue: step.commands.join(', '),
                     onChanged: (value) {
-                      steps[index] = step.copyWith(commands: value.split(', '));
+                      final newSteps = _workflowState.value!.steps.toList();
+                      newSteps[index] =
+                          step.copyWith(commands: value.split(', '));
+                      _workflowState.value =
+                          _workflowState.value?.copyWith(steps: newSteps);
                     },
                   ),
                   OverflowBar(

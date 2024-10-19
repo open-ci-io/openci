@@ -81,7 +81,7 @@ class WorkflowPage extends StatelessWidget {
   }) {
     showDialog<void>(
       context: context,
-      builder: (context) => EditWorkflowDialog(workflow),
+      builder: (context) => EditWorkflowDialog(workflow, isNewWorkflow: true),
     );
   }
 }
