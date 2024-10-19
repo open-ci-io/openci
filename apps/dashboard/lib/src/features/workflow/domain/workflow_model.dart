@@ -44,8 +44,8 @@ class WorkflowModelGitHub with _$WorkflowModelGitHub {
 @freezed
 class WorkflowModelStep with _$WorkflowModelStep {
   const factory WorkflowModelStep({
-    required String name,
-    required List<String> commands,
+    @Default('') String name,
+    @Default(<String>[]) List<String> commands,
   }) = _WorkflowModelStep;
   factory WorkflowModelStep.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelStepFromJson(json);

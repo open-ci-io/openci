@@ -25,10 +25,10 @@ Map<String, dynamic> _$$WorkflowModelImplToJson(_$WorkflowModelImpl instance) =>
     <String, dynamic>{
       'name': instance.name,
       'id': instance.id,
-      'flutter': instance.flutter,
-      'github': instance.github,
+      'flutter': instance.flutter.toJson(),
+      'github': instance.github.toJson(),
       'owners': instance.owners,
-      'steps': instance.steps,
+      'steps': instance.steps.map((e) => e.toJson()).toList(),
     };
 
 _$WorkflowModelFlutterImpl _$$WorkflowModelFlutterImplFromJson(
@@ -65,9 +65,11 @@ const _$GitHubTriggerTypeEnumMap = {
 _$WorkflowModelStepImpl _$$WorkflowModelStepImplFromJson(
         Map<String, dynamic> json) =>
     _$WorkflowModelStepImpl(
-      name: json['name'] as String,
-      commands:
-          (json['commands'] as List<dynamic>).map((e) => e as String).toList(),
+      name: json['name'] as String? ?? '',
+      commands: (json['commands'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const <String>[],
     );
 
 Map<String, dynamic> _$$WorkflowModelStepImplToJson(

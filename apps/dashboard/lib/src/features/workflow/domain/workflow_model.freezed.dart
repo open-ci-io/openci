@@ -743,16 +743,18 @@ class __$$WorkflowModelStepImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$WorkflowModelStepImpl implements _WorkflowModelStep {
   const _$WorkflowModelStepImpl(
-      {required this.name, required final List<String> commands})
+      {this.name = '', final List<String> commands = const <String>[]})
       : _commands = commands;
 
   factory _$WorkflowModelStepImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowModelStepImplFromJson(json);
 
   @override
+  @JsonKey()
   final String name;
   final List<String> _commands;
   @override
+  @JsonKey()
   List<String> get commands {
     if (_commands is EqualUnmodifiableListView) return _commands;
     // ignore: implicit_dynamic_type
@@ -797,8 +799,8 @@ class _$WorkflowModelStepImpl implements _WorkflowModelStep {
 
 abstract class _WorkflowModelStep implements WorkflowModelStep {
   const factory _WorkflowModelStep(
-      {required final String name,
-      required final List<String> commands}) = _$WorkflowModelStepImpl;
+      {final String name,
+      final List<String> commands}) = _$WorkflowModelStepImpl;
 
   factory _WorkflowModelStep.fromJson(Map<String, dynamic> json) =
       _$WorkflowModelStepImpl.fromJson;
