@@ -203,7 +203,7 @@ class _Steps extends StatelessWidget {
           return Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
-              side: const BorderSide(color: Colors.blue, width: 0.3),
+              side: const BorderSide(color: Colors.blue, width: 0.4),
             ),
             child: Padding(
               padding: const EdgeInsets.all(8),
