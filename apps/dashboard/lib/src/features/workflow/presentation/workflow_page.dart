@@ -42,32 +42,37 @@ class WorkflowPage extends StatelessWidget {
               )
               .toList();
           return SingleChildScrollView(
-            child: Column(
-              children: [
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: workflows.length,
-                  itemBuilder: (_, index) {
-                    final workflow = workflows[index];
-                    return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: WorkflowCard(workflow: workflow, index: index),
-                    );
-                  },
-                ),
-                verticalMargin40,
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    side: BorderSide(
-                      color: context.primaryColor,
+            child: Center(
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: context.screenWidth / 2,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: workflows.length,
+                      itemBuilder: (_, index) {
+                        final workflow = workflows[index];
+                        return Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: WorkflowCard(workflow: workflow, index: index),
+                        );
+                      },
                     ),
                   ),
-                  onPressed: () async =>
-                      _showWorkflowDialog(context, workflow: workflows.first),
-                  child: const Text('New Workflow'),
-                ),
-              ],
+                  verticalMargin40,
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      side: BorderSide(
+                        color: context.primaryColor,
+                      ),
+                    ),
+                    onPressed: () async =>
+                        _showWorkflowDialog(context, workflow: workflows.first),
+                    child: const Text('New Workflow'),
+                  ),
+                ],
+              ),
             ),
           );
         },
