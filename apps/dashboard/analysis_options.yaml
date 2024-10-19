@@ -1,8 +1,13 @@
 include: package:pedantic_mono/analysis_options.yaml
-linter:
-  rules:
+
 analyzer:
   errors:
     use_build_context_synchronously: ignore
   plugins:
     - custom_lint
+  exclude:
+    - '**/*.g.dart'
+    - '**/*.freezed.dart'
+
+linter:
+  rules:

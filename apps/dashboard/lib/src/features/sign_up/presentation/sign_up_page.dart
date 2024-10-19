@@ -14,12 +14,12 @@ class SignUpPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final emailTextController = useTextEditingController();
     final passwordTextController = useTextEditingController();
-    final formKey = useMemoized(() => GlobalKey<FormState>());
+    final formKey = useMemoized(GlobalKey<FormState>.new);
     return Scaffold(
       body: Center(
         child: Container(
           width: 300,
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Form(
             key: formKey,
             child: Column(
@@ -70,7 +70,6 @@ class SignUpPage extends HookConsumerWidget {
                       style: ElevatedButton.styleFrom(
                         side: BorderSide(
                           color: Theme.of(context).colorScheme.primary,
-                          width: 1,
                         ),
                       ),
                       onPressed: () async {
@@ -90,7 +89,12 @@ class SignUpPage extends HookConsumerWidget {
                               'userId': userId,
                               'createdAt': Timestamp.now(),
                             });
-                          } catch (e) {
+                          } on FirebaseAuthException catch (e) {
+                            await showErrorDialog(
+                              context,
+                              e.message ?? 'An error occurred',
+                            );
+                          } on Exception catch (e) {
                             await showErrorDialog(context, e.toString());
                           }
                         }
@@ -102,7 +106,6 @@ class SignUpPage extends HookConsumerWidget {
                       style: ElevatedButton.styleFrom(
                         side: BorderSide(
                           color: context.primaryColor,
-                          width: 1,
                         ),
                       ),
                       child: const Text('Login'),
@@ -115,7 +118,12 @@ class SignUpPage extends HookConsumerWidget {
                               email: emailTextController.text,
                               password: passwordTextController.text,
                             );
-                          } catch (e) {
+                          } on FirebaseAuthException catch (e) {
+                            await showErrorDialog(
+                              context,
+                              e.message ?? 'An error occurred',
+                            );
+                          } on Exception catch (e) {
                             await showErrorDialog(context, e.toString());
                           }
                         }

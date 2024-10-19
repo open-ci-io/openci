@@ -4,10 +4,9 @@ import 'package:dashboard/src/features/workflow/presentation/edit_workflow_dialo
 import 'package:flutter/material.dart';
 
 class WorkflowCard extends StatelessWidget {
+  const WorkflowCard({super.key, required this.workflow, required this.index});
   final WorkflowModel workflow;
   final int index;
-
-  const WorkflowCard({super.key, required this.workflow, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +14,7 @@ class WorkflowCard extends StatelessWidget {
       margin: const EdgeInsets.all(8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        side: const BorderSide(color: Colors.blue, width: 1),
+        side: const BorderSide(color: Colors.blue),
       ),
       child: ExpansionTile(
         expansionAnimationStyle: AnimationStyle(
@@ -24,7 +23,7 @@ class WorkflowCard extends StatelessWidget {
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: Colors.blue, width: 1),
+          side: const BorderSide(color: Colors.blue),
         ),
         title: Text(workflow.name),
         subtitle: Text('Flutter: ${workflow.flutter.version}'),
