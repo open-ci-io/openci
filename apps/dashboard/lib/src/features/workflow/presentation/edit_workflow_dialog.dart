@@ -7,7 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-final _workflowState = signal<WorkflowModel?>(null);
+final _workflowStateSignal = signal<WorkflowModel?>(null);
 
 class EditWorkflowDialog extends HookConsumerWidget {
   const EditWorkflowDialog(
@@ -33,7 +33,7 @@ class EditWorkflowDialog extends HookConsumerWidget {
 
     useEffect(
       () {
-        _workflowState.value = workflow;
+        _workflowStateSignal.value = workflow;
         return () {};
       },
     );
@@ -58,7 +58,9 @@ class EditWorkflowDialog extends HookConsumerWidget {
           children: [
             Watch(
               (context) => Text(
-                _workflowState.value == null ? 'Add Workflow' : 'Edit Workflow',
+                _workflowStateSignal.value == null
+                    ? 'Add Workflow'
+                    : 'Edit Workflow',
                 style: const TextStyle(color: Colors.white),
               ),
             ),
@@ -122,7 +124,8 @@ class EditWorkflowDialog extends HookConsumerWidget {
                 ),
                 TextButton(
                   onPressed: () async {
-                    _workflowState.value = _workflowState.value?.copyWith(
+                    _workflowStateSignal.value =
+                        _workflowStateSignal.value?.copyWith(
                       name: nameController.text,
                       flutter: WorkflowModelFlutter(
                         version: flutterVersionController.text,
@@ -156,9 +159,9 @@ class EditWorkflowDialog extends HookConsumerWidget {
   }
 
   void _addStep() {
-    final steps = _workflowState.value!.steps.toList()
+    final steps = _workflowStateSignal.value!.steps.toList()
       ..add(const WorkflowModelStep());
-    _workflowState.value = _workflowState.value?.copyWith(
+    _workflowStateSignal.value = _workflowStateSignal.value?.copyWith(
       steps: steps,
     );
   }
@@ -168,18 +171,19 @@ class EditWorkflowDialog extends HookConsumerWidget {
   ) async {
     final newWorkflowId =
         FirebaseFirestore.instance.collection('workflows').doc().id;
-    _workflowState.value = _workflowState.value?.copyWith(id: newWorkflowId);
+    _workflowStateSignal.value =
+        _workflowStateSignal.value?.copyWith(id: newWorkflowId);
     await FirebaseFirestore.instance
         .collection('workflows')
         .doc(newWorkflowId)
-        .set(_workflowState.value!.toJson());
+        .set(_workflowStateSignal.value!.toJson());
   }
 
   Future<void> _updateWorkflow(BuildContext context) async {
     await FirebaseFirestore.instance
         .collection('workflows')
-        .doc(_workflowState.value!.id)
-        .set(_workflowState.value!.toJson());
+        .doc(_workflowStateSignal.value!.id)
+        .set(_workflowStateSignal.value!.toJson());
   }
 }
 
@@ -187,14 +191,15 @@ class _Steps extends StatelessWidget {
   const _Steps();
 
   void _removeStep(int index) {
-    final steps = _workflowState.value!.steps.toList()..removeLast();
-    _workflowState.value = _workflowState.value?.copyWith(steps: steps);
+    final steps = _workflowStateSignal.value!.steps.toList()..removeLast();
+    _workflowStateSignal.value =
+        _workflowStateSignal.value?.copyWith(steps: steps);
   }
 
   @override
   Widget build(BuildContext context) {
     return Watch((context) {
-      final steps = _workflowState.value?.steps ?? [];
+      final steps = _workflowStateSignal.value?.steps ?? [];
 
       return Column(
         children: steps.asMap().entries.map((entry) {
@@ -225,10 +230,11 @@ class _Steps extends StatelessWidget {
                     decoration: const InputDecoration(labelText: 'Step Name'),
                     initialValue: step.name,
                     onChanged: (value) {
-                      final newSteps = _workflowState.value!.steps.toList();
+                      final newSteps =
+                          _workflowStateSignal.value!.steps.toList();
                       newSteps[index] = step.copyWith(name: value);
-                      _workflowState.value =
-                          _workflowState.value?.copyWith(steps: newSteps);
+                      _workflowStateSignal.value =
+                          _workflowStateSignal.value?.copyWith(steps: newSteps);
                     },
                   ),
                   TextFormField(
@@ -238,11 +244,12 @@ class _Steps extends StatelessWidget {
                     ),
                     initialValue: step.commands.join(', '),
                     onChanged: (value) {
-                      final newSteps = _workflowState.value!.steps.toList();
+                      final newSteps =
+                          _workflowStateSignal.value!.steps.toList();
                       newSteps[index] =
                           step.copyWith(commands: value.split(', '));
-                      _workflowState.value =
-                          _workflowState.value?.copyWith(steps: newSteps);
+                      _workflowStateSignal.value =
+                          _workflowStateSignal.value?.copyWith(steps: newSteps);
                     },
                   ),
                   OverflowBar(
