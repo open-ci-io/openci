@@ -103,7 +103,7 @@ class EditWorkflowDialog extends HookConsumerWidget {
                       ),
                     ),
                     const _Steps(),
-                    ElevatedButton(
+                    TextButton(
                       onPressed: () {
                         _addStep();
                         smoothScrollToBottom();
@@ -120,7 +120,7 @@ class EditWorkflowDialog extends HookConsumerWidget {
                   onPressed: () => Navigator.of(context).pop(),
                   child: const Text('Cancel'),
                 ),
-                ElevatedButton(
+                TextButton(
                   onPressed: () async {
                     _workflowState.value = _workflowState.value?.copyWith(
                       name: nameController.text,
@@ -201,6 +201,10 @@ class _Steps extends StatelessWidget {
           final index = entry.key;
           final step = entry.value;
           return Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: const BorderSide(color: Colors.blue, width: 0.3),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(8),
               child: Column(
