@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/extensions/build_context_extension.dart';
-import 'package:dashboard/src/features/workflow/domain/workflow_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:openci_models/openci_models.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 final _workflowStateSignal = signal<WorkflowModel?>(null);

@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/extensions/build_context_extension.dart';
-import 'package:dashboard/src/features/workflow/domain/workflow_model.dart';
 import 'package:dashboard/src/features/workflow/presentation/edit_workflow_dialog.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_edit_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:openci_models/openci_models.dart';
 
 class WorkflowPage extends StatelessWidget {
   const WorkflowPage({super.key});
