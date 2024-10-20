@@ -30,11 +30,9 @@ Future<Response> onRequest(RequestContext context) async {
   final installationId = data['installation']['id'] as int;
   final token =
       await accessToken(installationId, env.pemBase64, env.githubAppId);
-  print('token: $token');
   final github = GitHub(auth: Authentication.withToken(token));
   final slug = RepositorySlug.full(fullName);
 
-  print('action: $action');
   if ((action == OpenCIGitHubActionType.opened ||
           action == OpenCIGitHubActionType.reopened ||
           action == OpenCIGitHubActionType.synchronize ||
@@ -93,7 +91,13 @@ Future<void> handlePullRequestAction(
   );
 
   for (final docs in qs.docs) {
-    final workflow = WorkflowModelV2.fromJson(docs.data());
+    final workflow = WorkflowModel.fromJson(docs.data());
+
+    if (workflow.github.baseBranch != baseRef) {
+      print('base branch is not matched');
+      continue;
+    }
+
     final result = await github.checks.checkRuns.createCheckRun(
       slug,
       name: workflow.name,
