@@ -32,6 +32,9 @@ class WorkflowCard extends StatelessWidget {
             title: Text('GitHub: ${workflow.github.repositoryUrl}'),
           ),
           ListTile(
+            title: Text('Base Branch: ${workflow.github.baseBranch}'),
+          ),
+          ListTile(
             title: Text('Trigger Type: ${workflow.github.triggerType.name}'),
           ),
           const ListTile(title: Text('Steps:')),

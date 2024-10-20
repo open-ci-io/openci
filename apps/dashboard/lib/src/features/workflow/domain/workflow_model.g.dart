@@ -48,6 +48,7 @@ _$WorkflowModelGitHubImpl _$$WorkflowModelGitHubImplFromJson(
     _$WorkflowModelGitHubImpl(
       repositoryUrl: json['repositoryUrl'] as String,
       triggerType: $enumDecode(_$GitHubTriggerTypeEnumMap, json['triggerType']),
+      baseBranch: json['baseBranch'] as String,
     );
 
 Map<String, dynamic> _$$WorkflowModelGitHubImplToJson(
@@ -55,6 +56,7 @@ Map<String, dynamic> _$$WorkflowModelGitHubImplToJson(
     <String, dynamic>{
       'repositoryUrl': instance.repositoryUrl,
       'triggerType': _$GitHubTriggerTypeEnumMap[instance.triggerType]!,
+      'baseBranch': instance.baseBranch,
     };
 
 const _$GitHubTriggerTypeEnumMap = {

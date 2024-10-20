@@ -26,6 +26,8 @@ class EditWorkflowDialog extends HookConsumerWidget {
         useTextEditingController(text: workflow?.flutter.version ?? '');
     final githubUrlController =
         useTextEditingController(text: workflow?.github.repositoryUrl ?? '');
+    final baseBranchController =
+        useTextEditingController(text: workflow?.github.baseBranch ?? '');
     final triggerTypeController =
         useTextEditingController(text: workflow?.github.triggerType.name ?? '');
 
@@ -91,6 +93,12 @@ class EditWorkflowDialog extends HookConsumerWidget {
                     ),
                     TextField(
                       style: const TextStyle(color: Colors.white),
+                      controller: baseBranchController,
+                      decoration:
+                          const InputDecoration(labelText: 'Base Branch'),
+                    ),
+                    TextField(
+                      style: const TextStyle(color: Colors.white),
                       controller: triggerTypeController,
                       decoration:
                           const InputDecoration(labelText: 'Trigger Type'),
@@ -135,6 +143,7 @@ class EditWorkflowDialog extends HookConsumerWidget {
                         triggerType: GitHubTriggerType.values.byName(
                           triggerTypeController.text,
                         ),
+                        baseBranch: baseBranchController.text,
                       ),
                     );
                     Navigator.of(context).pop();

@@ -36,6 +36,7 @@ class WorkflowModelGitHub with _$WorkflowModelGitHub {
   const factory WorkflowModelGitHub({
     required String repositoryUrl,
     required GitHubTriggerType triggerType,
+    required String baseBranch,
   }) = _WorkflowModelGitHub;
   factory WorkflowModelGitHub.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelGitHubFromJson(json);
