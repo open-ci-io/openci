@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dashboard/src/features/workflow/domain/workflow_model.dart';
 import 'package:dashboard/src/features/workflow/presentation/edit_workflow_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:openci_models/openci_models.dart';
 
 class WorkflowCard extends StatelessWidget {
   const WorkflowCard({super.key, required this.workflow, required this.index});
@@ -30,6 +30,9 @@ class WorkflowCard extends StatelessWidget {
         children: [
           ListTile(
             title: Text('GitHub: ${workflow.github.repositoryUrl}'),
+          ),
+          ListTile(
+            title: Text('Base Branch: ${workflow.github.baseBranch}'),
           ),
           ListTile(
             title: Text('Trigger Type: ${workflow.github.triggerType.name}'),
