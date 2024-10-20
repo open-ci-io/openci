@@ -1,5 +1,5 @@
 name: dashboard
-description: "A new Flutter project."
+description: "An app for managing OpenCI workflows"
 publish_to: 'none'
 version: 1.0.0+1
 environment:

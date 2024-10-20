@@ -1,2 +1,5 @@
 service_account.json
 deno.lock
+vm_runner
+run.sh
+compile.sh
