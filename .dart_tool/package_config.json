@@ -117,7 +117,7 @@
     },
     {
       "name": "melos",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/melos-6.1.0",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/melos-6.2.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -260,7 +260,7 @@
       "languageVersion": "3.0"
     }
   ],
-  "generated": "2024-10-18T09:43:32.609147Z",
+  "generated": "2024-10-20T15:27:03.720099Z",
   "generator": "pub",
   "generatorVersion": "3.5.3",
   "flutterRoot": "file:///Users/masahiroaoki/Developer/flutter",
