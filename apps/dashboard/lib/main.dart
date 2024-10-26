@@ -13,6 +13,8 @@ void main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
+const Color primaryColor = Color(0xff03dac6);
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        colorScheme: const ColorScheme.dark(primary: Colors.blue),
+        colorScheme: const ColorScheme.dark(primary: primaryColor),
         useMaterial3: true,
         textTheme: GoogleFonts.interTextTheme(),
       ),
