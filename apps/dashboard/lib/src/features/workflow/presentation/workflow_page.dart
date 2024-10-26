@@ -109,7 +109,7 @@ class _WorkflowListItem extends StatelessWidget {
                   context,
                   MaterialPageRoute<void>(
                     fullscreenDialog: true,
-                    builder: (context) => WorkflowEditor(workflow: model),
+                    builder: (context) => WorkflowEditor(workflowModel: model),
                   ),
                 );
               },

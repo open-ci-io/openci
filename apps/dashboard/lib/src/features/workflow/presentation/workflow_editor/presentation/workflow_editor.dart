@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:openci_models/openci_models.dart';
 
 class WorkflowEditor extends StatefulWidget {
-  const WorkflowEditor({super.key, this.workflow});
-  final WorkflowModel? workflow;
+  const WorkflowEditor({super.key, this.workflowModel});
+  final WorkflowModel? workflowModel;
 
   @override
   State<WorkflowEditor> createState() => _WorkflowEditorState();
@@ -22,20 +22,21 @@ class _WorkflowEditorState extends State<WorkflowEditor> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.workflow?.name ?? '');
+    _nameController =
+        TextEditingController(text: widget.workflowModel?.name ?? '');
     _flutterVersionController = TextEditingController(
-      text: widget.workflow?.flutter.version ?? '',
+      text: widget.workflowModel?.flutter.version ?? '',
     );
     _repoUrlController = TextEditingController(
-      text: widget.workflow?.github.repositoryUrl ?? '',
+      text: widget.workflowModel?.github.repositoryUrl ?? '',
     );
     _baseBranchController = TextEditingController(
-      text: widget.workflow?.github.baseBranch ?? '',
+      text: widget.workflowModel?.github.baseBranch ?? '',
     );
-    _owners = List<String>.from(widget.workflow?.owners ?? []);
-    _steps = List<WorkflowModelStep>.from(widget.workflow?.steps ?? []);
+    _owners = List<String>.from(widget.workflowModel?.owners ?? []);
+    _steps = List<WorkflowModelStep>.from(widget.workflowModel?.steps ?? []);
     _triggerType =
-        widget.workflow?.github.triggerType ?? GitHubTriggerType.push;
+        widget.workflowModel?.github.triggerType ?? GitHubTriggerType.push;
   }
 
   @override
@@ -51,7 +52,7 @@ class _WorkflowEditorState extends State<WorkflowEditor> {
     if (_formKey.currentState?.validate() ?? false) {
       final workflow = WorkflowModel(
         name: _nameController.text,
-        id: widget.workflow?.id ?? DateTime.now().toString(),
+        id: widget.workflowModel?.id ?? DateTime.now().toString(),
         flutter: WorkflowModelFlutter(version: _flutterVersionController.text),
         github: WorkflowModelGitHub(
           repositoryUrl: _repoUrlController.text,
@@ -69,8 +70,9 @@ class _WorkflowEditorState extends State<WorkflowEditor> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            Text(widget.workflow == null ? 'Create Workflow' : 'Edit Workflow'),
+        title: Text(
+          widget.workflowModel == null ? 'Create Workflow' : 'Edit Workflow',
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.save),
