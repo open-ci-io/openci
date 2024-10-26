@@ -2,84 +2,12 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
-import 'package:dashboard/src/features/workflow/presentation/workflow_editor.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 final _isEdit = signal(false);
-
-class _WorkflowListItem extends StatelessWidget {
-  const _WorkflowListItem({
-    required this.workflow,
-  });
-
-  final WorkflowItem workflow;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(
-        Icons.account_tree_outlined,
-        color: Colors.white,
-      ),
-      title: Text(
-        workflow.title,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-        ),
-      ),
-      subtitle: Text(
-        'Latest: ${workflow.lastUpdated}',
-        style: const TextStyle(
-          color: Colors.grey,
-          fontSize: 12,
-        ),
-      ),
-      trailing: _isEdit.watch(context)
-          ? IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    fullscreenDialog: true,
-                    builder: (context) => WorkflowEditor(workflow: workflow),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.edit),
-            )
-          : Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  workflow.runCount.toString(),
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16,
-                  ),
-                ),
-                const Icon(
-                  Icons.chevron_right,
-                  color: Colors.grey,
-                ),
-              ],
-            ),
-    );
-  }
-}
-
-class WorkflowItem {
-  WorkflowItem({
-    required this.title,
-    required this.lastUpdated,
-    required this.runCount,
-  });
-  final String title;
-  final String lastUpdated;
-  final int runCount;
-}
 
 class WorkflowPage extends StatelessWidget {
   const WorkflowPage({super.key});
@@ -129,6 +57,7 @@ class WorkflowPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final workflow = workflows[index];
               return _WorkflowListItem(
+                model: workflow,
                 workflow: WorkflowItem(
                   title: workflow.name,
                   lastUpdated: DateTime.now().toIso8601String(),
@@ -141,4 +70,78 @@ class WorkflowPage extends StatelessWidget {
       ),
     );
   }
+}
+
+class _WorkflowListItem extends StatelessWidget {
+  const _WorkflowListItem({
+    required this.workflow,
+    required this.model,
+  });
+
+  final WorkflowItem workflow;
+  final WorkflowModel? model;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(
+        Icons.account_tree_outlined,
+        color: Colors.white,
+      ),
+      title: Text(
+        workflow.title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+        ),
+      ),
+      subtitle: Text(
+        'Latest: ${workflow.lastUpdated}',
+        style: const TextStyle(
+          color: Colors.grey,
+          fontSize: 12,
+        ),
+      ),
+      trailing: _isEdit.watch(context)
+          ? IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    fullscreenDialog: true,
+                    builder: (context) => WorkflowEditor(workflow: model),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.edit),
+            )
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  workflow.runCount.toString(),
+                  style: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right,
+                  color: Colors.grey,
+                ),
+              ],
+            ),
+    );
+  }
+}
+
+class WorkflowItem {
+  WorkflowItem({
+    required this.title,
+    required this.lastUpdated,
+    required this.runCount,
+  });
+  final String title;
+  final String lastUpdated;
+  final int runCount;
 }

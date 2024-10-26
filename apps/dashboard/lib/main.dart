@@ -22,9 +22,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        colorScheme: const ColorScheme.dark(primary: primaryColor),
+        colorScheme: const ColorScheme.dark(
+          primary: primaryColor,
+        ),
         useMaterial3: true,
-        textTheme: GoogleFonts.interTextTheme(),
+        textTheme: GoogleFonts.interTextTheme(
+          ThemeData.dark().textTheme,
+        ),
       ),
       home: const AuthGate(),
     );
