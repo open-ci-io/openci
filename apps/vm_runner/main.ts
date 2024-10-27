@@ -82,6 +82,7 @@ while (true) {
     await executeCommands(vmIp, steps, jobId);
 
     console.info(green("Commands executed"));
+
     await stopVM(vmName);
     await cleanUpVMs();
   } catch (error) {
