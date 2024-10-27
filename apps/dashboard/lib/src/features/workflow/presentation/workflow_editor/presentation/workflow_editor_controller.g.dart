@@ -7,7 +7,7 @@ part of 'workflow_editor_controller.dart';
 // **************************************************************************
 
 String _$workflowEditorControllerHash() =>
-    r'2e59026e785012642a82a0bcbabfb74a6c1333af';
+    r'e780907d19cc4c9acb57194ca8d0c7bd7d398596';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -31,11 +31,11 @@ class _SystemHash {
 }
 
 abstract class _$WorkflowEditorController
-    extends BuildlessAutoDisposeNotifier<WorkflowModel?> {
-  late final WorkflowModel? workflowModel;
+    extends BuildlessAutoDisposeNotifier<WorkflowModel> {
+  late final WorkflowModel workflowModel;
 
-  WorkflowModel? build(
-    WorkflowModel? workflowModel,
+  WorkflowModel build(
+    WorkflowModel workflowModel,
   );
 }
 
@@ -44,13 +44,13 @@ abstract class _$WorkflowEditorController
 const workflowEditorControllerProvider = WorkflowEditorControllerFamily();
 
 /// See also [WorkflowEditorController].
-class WorkflowEditorControllerFamily extends Family<WorkflowModel?> {
+class WorkflowEditorControllerFamily extends Family<WorkflowModel> {
   /// See also [WorkflowEditorController].
   const WorkflowEditorControllerFamily();
 
   /// See also [WorkflowEditorController].
   WorkflowEditorControllerProvider call(
-    WorkflowModel? workflowModel,
+    WorkflowModel workflowModel,
   ) {
     return WorkflowEditorControllerProvider(
       workflowModel,
@@ -83,10 +83,10 @@ class WorkflowEditorControllerFamily extends Family<WorkflowModel?> {
 
 /// See also [WorkflowEditorController].
 class WorkflowEditorControllerProvider extends AutoDisposeNotifierProviderImpl<
-    WorkflowEditorController, WorkflowModel?> {
+    WorkflowEditorController, WorkflowModel> {
   /// See also [WorkflowEditorController].
   WorkflowEditorControllerProvider(
-    WorkflowModel? workflowModel,
+    WorkflowModel workflowModel,
   ) : this._internal(
           () => WorkflowEditorController()..workflowModel = workflowModel,
           from: workflowEditorControllerProvider,
@@ -111,10 +111,10 @@ class WorkflowEditorControllerProvider extends AutoDisposeNotifierProviderImpl<
     required this.workflowModel,
   }) : super.internal();
 
-  final WorkflowModel? workflowModel;
+  final WorkflowModel workflowModel;
 
   @override
-  WorkflowModel? runNotifierBuild(
+  WorkflowModel runNotifierBuild(
     covariant WorkflowEditorController notifier,
   ) {
     return notifier.build(
@@ -139,7 +139,7 @@ class WorkflowEditorControllerProvider extends AutoDisposeNotifierProviderImpl<
   }
 
   @override
-  AutoDisposeNotifierProviderElement<WorkflowEditorController, WorkflowModel?>
+  AutoDisposeNotifierProviderElement<WorkflowEditorController, WorkflowModel>
       createElement() {
     return _WorkflowEditorControllerProviderElement(this);
   }
@@ -160,18 +160,18 @@ class WorkflowEditorControllerProvider extends AutoDisposeNotifierProviderImpl<
 }
 
 mixin WorkflowEditorControllerRef
-    on AutoDisposeNotifierProviderRef<WorkflowModel?> {
+    on AutoDisposeNotifierProviderRef<WorkflowModel> {
   /// The parameter `workflowModel` of this provider.
-  WorkflowModel? get workflowModel;
+  WorkflowModel get workflowModel;
 }
 
 class _WorkflowEditorControllerProviderElement
     extends AutoDisposeNotifierProviderElement<WorkflowEditorController,
-        WorkflowModel?> with WorkflowEditorControllerRef {
+        WorkflowModel> with WorkflowEditorControllerRef {
   _WorkflowEditorControllerProviderElement(super.provider);
 
   @override
-  WorkflowModel? get workflowModel =>
+  WorkflowModel get workflowModel =>
       (origin as WorkflowEditorControllerProvider).workflowModel;
 }
 // ignore_for_file: type=lint

@@ -79,7 +79,7 @@ class _WorkflowListItem extends StatelessWidget {
   });
 
   final WorkflowItem workflow;
-  final WorkflowModel? model;
+  final WorkflowModel model;
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +109,7 @@ class _WorkflowListItem extends StatelessWidget {
                   context,
                   MaterialPageRoute<void>(
                     fullscreenDialog: true,
-                    builder: (context) => WorkflowEditor(workflowModel: model),
+                    builder: (context) => WorkflowEditor(model),
                   ),
                 );
               },
