@@ -20,6 +20,19 @@ class WorkflowModel with _$WorkflowModel {
   }) = _WorkflowModel;
   factory WorkflowModel.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelFromJson(json);
+
+  factory WorkflowModel.empty(String docId, String uid) => WorkflowModel(
+        name: 'New Workflow',
+        id: docId,
+        flutter: WorkflowModelFlutter(version: '3.24.4'),
+        github: WorkflowModelGitHub(
+          repositoryUrl: 'https://github.com/example/repo',
+          triggerType: GitHubTriggerType.push,
+          baseBranch: 'main',
+        ),
+        owners: [uid],
+        steps: [],
+      );
 }
 
 @freezed
