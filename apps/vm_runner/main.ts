@@ -4,7 +4,7 @@ import * as Sentry from "npm:@sentry/deno";
 import { cert, initializeApp } from "npm:firebase-admin/app";
 import { getFirestore } from "npm:firebase-admin/firestore";
 import { v4 as uuidv4 } from "npm:uuid";
-import { baseUrl } from "./base_url.ts";
+import { baseUrl } from "./prod_urls.ts";
 import {
   getBuildJob,
   getWorkflowDocs,

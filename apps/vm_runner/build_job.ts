@@ -4,7 +4,7 @@ import {
     QuerySnapshot,
 } from "npm:firebase-admin/firestore";
 import { db } from "./main.ts";
-import { baseUrl } from "./base_url.ts";
+import { baseUrl } from "./prod_urls.ts";
 
 export async function getBuildJob(db: Firestore): Promise<QuerySnapshot> {
     return await db
