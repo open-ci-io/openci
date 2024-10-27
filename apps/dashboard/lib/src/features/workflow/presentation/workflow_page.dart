@@ -3,17 +3,20 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_page_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 final _isEdit = signal(false);
 
-class WorkflowPage extends StatelessWidget {
+class WorkflowPage extends ConsumerWidget {
   const WorkflowPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.watch(workflowPageControllerProvider.notifier);
     return Scaffold(
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -28,7 +31,7 @@ class WorkflowPage extends StatelessWidget {
           verticalMargin16,
           FloatingActionButton(
             heroTag: 'add',
-            onPressed: () {},
+            onPressed: controller.addWorkflow,
             child: const Icon(Icons.add),
           ),
         ],
@@ -72,7 +75,7 @@ class WorkflowPage extends StatelessWidget {
   }
 }
 
-class _WorkflowListItem extends StatelessWidget {
+class _WorkflowListItem extends ConsumerWidget {
   const _WorkflowListItem({
     required this.workflow,
     required this.model,
@@ -82,7 +85,8 @@ class _WorkflowListItem extends StatelessWidget {
   final WorkflowModel model;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.watch(workflowPageControllerProvider.notifier);
     return ListTile(
       leading: const Icon(
         Icons.account_tree_outlined,
@@ -103,17 +107,31 @@ class _WorkflowListItem extends StatelessWidget {
         ),
       ),
       trailing: _isEdit.watch(context)
-          ? IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    fullscreenDialog: true,
-                    builder: (context) => WorkflowEditor(model),
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        fullscreenDialog: true,
+                        builder: (context) => WorkflowEditor(model),
+                      ),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.edit,
+                    color: Colors.white,
                   ),
-                );
-              },
-              icon: const Icon(Icons.edit),
+                ),
+                IconButton(
+                  onPressed: () => controller.deleteWorkflow(model.id),
+                  icon: const Icon(
+                    Icons.delete,
+                  ),
+                ),
+              ],
             )
           : Row(
               mainAxisSize: MainAxisSize.min,
