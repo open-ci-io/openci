@@ -3,6 +3,7 @@ import 'package:dashboard/src/features/workflow/presentation/workflow_editor/pre
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/github_section/presentation/github_section.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/owner/presentation/owner_section.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/steps/presentation/steps_section.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
@@ -13,6 +14,9 @@ class WorkflowEditor extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final controller =
+        ref.watch(workflowEditorControllerProvider(workflowModel).notifier);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -22,7 +26,10 @@ class WorkflowEditor extends ConsumerWidget {
           TextButton.icon(
             icon: const Icon(Icons.save),
             label: const Text('Save'),
-            onPressed: () {},
+            onPressed: () async {
+              Navigator.pop(context);
+              await controller.save();
+            },
           ),
           horizontalMargin32,
         ],

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'workflow_editor_controller.g.dart';
@@ -74,5 +75,12 @@ class WorkflowEditorController extends _$WorkflowEditorController {
     final commands = steps[stepIndex].commands.toList()..removeAt(commandIndex);
     steps[stepIndex] = steps[stepIndex].copyWith(commands: commands);
     state = state.copyWith(steps: steps);
+  }
+
+  Future<void> save() async {
+    await FirebaseFirestore.instance
+        .collection('workflows')
+        .doc(state.id)
+        .set(state.toJson());
   }
 }
