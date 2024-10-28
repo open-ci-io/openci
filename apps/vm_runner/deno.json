@@ -2,6 +2,6 @@
   "imports": {
     "npm:node-emoji": "npm:node-emoji@2.1.0",
     "npm:ssh2": "npm:ssh2@1.16.0",
-    "npm:firebase-admin": "npm:firebase-admin@12.6.0"
+    "npm:firebase-admin": "npm:firebase-admin@12.7.0"
   }
 }

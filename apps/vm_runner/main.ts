@@ -1,7 +1,12 @@
 import { delay } from "https://deno.land/std@0.224.0/async/delay.ts";
 import { green, yellow } from "https://deno.land/std@0.224.0/fmt/colors.ts";
 import * as Sentry from "npm:@sentry/deno";
-import { cert, initializeApp } from "npm:firebase-admin/app";
+import {
+  cert,
+  deleteApp,
+  getApps,
+  initializeApp,
+} from "npm:firebase-admin/app";
 import { getFirestore } from "npm:firebase-admin/firestore";
 import { v4 as uuidv4 } from "npm:uuid";
 import { baseUrl } from "./prod_urls.ts";
@@ -13,23 +18,30 @@ import {
 import { getGithubAccessToken } from "./github.ts";
 import { cleanUpVMs, cloneVM, executeCommands, runVM, stopVM } from "./vm.ts";
 
-initializeApp({
-  credential: cert(
-    JSON.parse(Deno.readTextFileSync("./service_account.json")),
-  ),
-});
-
 Sentry.init({
   dsn:
     "https://5eafbb12527af61e3e9ad00c76a84485@o4507005123166208.ingest.us.sentry.io/4508194852765696",
 });
 
-export const db = getFirestore();
-
-let vmIp = "";
-
 while (true) {
   const vmName = uuidv4();
+
+  // Delete existing Firebase apps
+  const apps = getApps();
+  await Promise.all(apps.map((app) => deleteApp(app)));
+
+  initializeApp({
+    credential: cert(
+      JSON.parse(Deno.readTextFileSync("./service_account.json")),
+    ),
+  });
+
+  const db = getFirestore();
+  db.settings({
+    preferRest: true,
+  });
+
+  let vmIp = "";
 
   try {
     const qs = await getBuildJob(db);
@@ -44,7 +56,7 @@ while (true) {
     const job = qs.docs[0].data();
     const jobId = job.id;
 
-    await setStatusToInProgress(jobId);
+    await setStatusToInProgress(db, jobId);
 
     const workflowId = job.workflowId;
     const workflowDocs = await getWorkflowDocs(db, workflowId);
@@ -79,7 +91,7 @@ while (true) {
     const steps = workflow.steps;
     console.log("steps", steps);
 
-    await executeCommands(vmIp, steps, jobId);
+    await executeCommands(db, vmIp, steps, jobId);
 
     console.info(green("Commands executed"));
 
@@ -99,5 +111,8 @@ while (true) {
       }
     }
     await delay(5000);
+  } finally {
+    const apps = getApps();
+    await Promise.all(apps.map((app) => deleteApp(app)));
   }
 }
