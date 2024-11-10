@@ -8,6 +8,7 @@ import '../bin/firebase/firebase_service.dart';
 import '../bin/jwt_service.dart';
 
 enum ChecksStatus {
+  queued,
   inProgress,
   failure,
   success,
@@ -85,6 +86,8 @@ Future<Response> onRequest(RequestContext context) async {
     final checkRuns = github.checks.checkRuns;
 
     switch (checksStatus) {
+      case ChecksStatus.queued:
+        print('Queued');
       case ChecksStatus.inProgress:
         await markBuildAsStarted(jobId, firestore);
         await checkRuns.updateCheckRun(

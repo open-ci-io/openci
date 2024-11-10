@@ -11,7 +11,7 @@ export async function getBuildJob(db: Firestore): Promise<QuerySnapshot> {
         .where("buildStatus", "==", "queued")
         .orderBy("createdAt", "asc")
         .limit(1)
-        .get();
+        .get(); 
 }
 
 export async function getWorkflowDocs(

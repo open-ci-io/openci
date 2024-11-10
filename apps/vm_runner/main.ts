@@ -1,5 +1,9 @@
 import { delay } from "https://deno.land/std@0.224.0/async/delay.ts";
-import { green, yellow } from "https://deno.land/std@0.224.0/fmt/colors.ts";
+import {
+  green,
+  red,
+  yellow,
+} from "https://deno.land/std@0.224.0/fmt/colors.ts";
 import * as Sentry from "npm:@sentry/deno";
 import {
   cert,
@@ -13,10 +17,14 @@ import { baseUrl } from "./prod_urls.ts";
 import {
   getBuildJob,
   getWorkflowDocs,
+  setStatusToFailure,
   setStatusToInProgress,
+  setStatusToSuccess,
 } from "./build_job.ts";
 import { getGithubAccessToken } from "./github.ts";
-import { cleanUpVMs, cloneVM, executeCommands, runVM, stopVM } from "./vm.ts";
+import { cleanUpVMs, cloneVM, runVM, stopVM } from "./vm.ts";
+import { NodeSSH } from "npm:node-ssh";
+import { executeSteps } from "./execute_command.ts";
 
 Sentry.init({
   dsn:
@@ -42,6 +50,8 @@ while (true) {
   });
 
   let vmIp = "";
+  let jobId = null;
+  const ssh = new NodeSSH();
 
   try {
     const qs = await getBuildJob(db);
@@ -54,7 +64,7 @@ while (true) {
     }
 
     const job = qs.docs[0].data();
-    const jobId = job.id;
+    jobId = job.id;
 
     await setStatusToInProgress(db, jobId);
 
@@ -91,13 +101,28 @@ while (true) {
     const steps = workflow.steps;
     console.log("steps", steps);
 
-    await executeCommands(db, vmIp, steps, jobId);
+    await ssh.connect({
+      host: vmIp,
+      username: "admin",
+      password: "admin",
+    });
 
-    console.info(green("Commands executed"));
+    await executeSteps(db, steps, ssh);
+
+    const docs = await db.collection("build_jobs").doc(jobId).get();
+    const updatedJob = docs.data();
+    if (updatedJob?.status === "success") {
+      await setStatusToSuccess(db, jobId);
+      console.info(green("Commands executed successfully"));
+    } else {
+      await setStatusToFailure(db, jobId);
+      console.error(red("Commands failed"));
+    }
 
     await stopVM(vmName);
     await cleanUpVMs();
   } catch (error) {
+    await setStatusToFailure(db, jobId);
     console.error(`Error occurred during job execution: ${error}`);
     Sentry.captureException(error);
 
@@ -114,5 +139,6 @@ while (true) {
   } finally {
     const apps = getApps();
     await Promise.all(apps.map((app) => deleteApp(app)));
+    ssh.dispose();
   }
 }

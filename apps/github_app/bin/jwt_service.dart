@@ -10,9 +10,6 @@ Future<String> accessToken(
   String githubAppId,
 ) async {
   try {
-    print('installationId: $installationId');
-    print('base64Pem: $base64Pem');
-    print('githubAppId: $githubAppId');
     final pem = utf8.decode(base64Decode(base64Pem));
     final file = File('./github.pem');
     file.writeAsStringSync(pem);
@@ -45,7 +42,6 @@ Future<String> accessToken(
 
     if (response.statusCode == 201) {
       final accessToken = jsonDecode(response.body)['token'];
-      print('Access token: $accessToken');
       return accessToken.toString();
     } else {
       print('Failed to retrieve access token: ${response.body}');
