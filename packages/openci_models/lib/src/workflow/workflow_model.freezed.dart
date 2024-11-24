@@ -20,6 +20,7 @@ WorkflowModel _$WorkflowModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$WorkflowModel {
+  String get currentWorkingDirectory => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get id => throw _privateConstructorUsedError;
   WorkflowModelFlutter get flutter => throw _privateConstructorUsedError;
@@ -40,7 +41,8 @@ abstract class $WorkflowModelCopyWith<$Res> {
       _$WorkflowModelCopyWithImpl<$Res, WorkflowModel>;
   @useResult
   $Res call(
-      {String name,
+      {String currentWorkingDirectory,
+      String name,
       String id,
       WorkflowModelFlutter flutter,
       WorkflowModelGitHub github,
@@ -64,6 +66,7 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? currentWorkingDirectory = null,
     Object? name = null,
     Object? id = null,
     Object? flutter = null,
@@ -72,6 +75,10 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
     Object? steps = null,
   }) {
     return _then(_value.copyWith(
+      currentWorkingDirectory: null == currentWorkingDirectory
+          ? _value.currentWorkingDirectory
+          : currentWorkingDirectory // ignore: cast_nullable_to_non_nullable
+              as String,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -125,7 +132,8 @@ abstract class _$$WorkflowModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String name,
+      {String currentWorkingDirectory,
+      String name,
       String id,
       WorkflowModelFlutter flutter,
       WorkflowModelGitHub github,
@@ -149,6 +157,7 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? currentWorkingDirectory = null,
     Object? name = null,
     Object? id = null,
     Object? flutter = null,
@@ -157,6 +166,10 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
     Object? steps = null,
   }) {
     return _then(_$WorkflowModelImpl(
+      currentWorkingDirectory: null == currentWorkingDirectory
+          ? _value.currentWorkingDirectory
+          : currentWorkingDirectory // ignore: cast_nullable_to_non_nullable
+              as String,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -189,7 +202,8 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$WorkflowModelImpl implements _WorkflowModel {
   const _$WorkflowModelImpl(
-      {required this.name,
+      {required this.currentWorkingDirectory,
+      required this.name,
       required this.id,
       required this.flutter,
       required this.github,
@@ -199,6 +213,8 @@ class _$WorkflowModelImpl implements _WorkflowModel {
   factory _$WorkflowModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowModelImplFromJson(json);
 
+  @override
+  final String currentWorkingDirectory;
   @override
   final String name;
   @override
@@ -214,7 +230,7 @@ class _$WorkflowModelImpl implements _WorkflowModel {
 
   @override
   String toString() {
-    return 'WorkflowModel(name: $name, id: $id, flutter: $flutter, github: $github, owners: $owners, steps: $steps)';
+    return 'WorkflowModel(currentWorkingDirectory: $currentWorkingDirectory, name: $name, id: $id, flutter: $flutter, github: $github, owners: $owners, steps: $steps)';
   }
 
   @override
@@ -222,6 +238,9 @@ class _$WorkflowModelImpl implements _WorkflowModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$WorkflowModelImpl &&
+            (identical(
+                    other.currentWorkingDirectory, currentWorkingDirectory) ||
+                other.currentWorkingDirectory == currentWorkingDirectory) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.flutter, flutter) || other.flutter == flutter) &&
@@ -234,6 +253,7 @@ class _$WorkflowModelImpl implements _WorkflowModel {
   @override
   int get hashCode => Object.hash(
       runtimeType,
+      currentWorkingDirectory,
       name,
       id,
       flutter,
@@ -257,7 +277,8 @@ class _$WorkflowModelImpl implements _WorkflowModel {
 
 abstract class _WorkflowModel implements WorkflowModel {
   const factory _WorkflowModel(
-      {required final String name,
+      {required final String currentWorkingDirectory,
+      required final String name,
       required final String id,
       required final WorkflowModelFlutter flutter,
       required final WorkflowModelGitHub github,
@@ -267,6 +288,8 @@ abstract class _WorkflowModel implements WorkflowModel {
   factory _WorkflowModel.fromJson(Map<String, dynamic> json) =
       _$WorkflowModelImpl.fromJson;
 
+  @override
+  String get currentWorkingDirectory;
   @override
   String get name;
   @override
@@ -613,7 +636,7 @@ WorkflowModelStep _$WorkflowModelStepFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$WorkflowModelStep {
   String get name => throw _privateConstructorUsedError;
-  List<String> get commands => throw _privateConstructorUsedError;
+  String get command => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -627,7 +650,7 @@ abstract class $WorkflowModelStepCopyWith<$Res> {
           WorkflowModelStep value, $Res Function(WorkflowModelStep) then) =
       _$WorkflowModelStepCopyWithImpl<$Res, WorkflowModelStep>;
   @useResult
-  $Res call({String name, List<String> commands});
+  $Res call({String name, String command});
 }
 
 /// @nodoc
@@ -644,17 +667,17 @@ class _$WorkflowModelStepCopyWithImpl<$Res, $Val extends WorkflowModelStep>
   @override
   $Res call({
     Object? name = null,
-    Object? commands = null,
+    Object? command = null,
   }) {
     return _then(_value.copyWith(
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      commands: null == commands
-          ? _value.commands
-          : commands // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+      command: null == command
+          ? _value.command
+          : command // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -667,7 +690,7 @@ abstract class _$$WorkflowModelStepImplCopyWith<$Res>
       __$$WorkflowModelStepImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String name, List<String> commands});
+  $Res call({String name, String command});
 }
 
 /// @nodoc
@@ -682,17 +705,17 @@ class __$$WorkflowModelStepImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? name = null,
-    Object? commands = null,
+    Object? command = null,
   }) {
     return _then(_$WorkflowModelStepImpl(
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      commands: null == commands
-          ? _value.commands
-          : commands // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+      command: null == command
+          ? _value.command
+          : command // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -700,8 +723,7 @@ class __$$WorkflowModelStepImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$WorkflowModelStepImpl implements _WorkflowModelStep {
-  const _$WorkflowModelStepImpl(
-      {this.name = '', this.commands = const <String>[]});
+  const _$WorkflowModelStepImpl({this.name = '', this.command = ''});
 
   factory _$WorkflowModelStepImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowModelStepImplFromJson(json);
@@ -711,11 +733,11 @@ class _$WorkflowModelStepImpl implements _WorkflowModelStep {
   final String name;
   @override
   @JsonKey()
-  final List<String> commands;
+  final String command;
 
   @override
   String toString() {
-    return 'WorkflowModelStep(name: $name, commands: $commands)';
+    return 'WorkflowModelStep(name: $name, command: $command)';
   }
 
   @override
@@ -724,13 +746,12 @@ class _$WorkflowModelStepImpl implements _WorkflowModelStep {
         (other.runtimeType == runtimeType &&
             other is _$WorkflowModelStepImpl &&
             (identical(other.name, name) || other.name == name) &&
-            const DeepCollectionEquality().equals(other.commands, commands));
+            (identical(other.command, command) || other.command == command));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, name, const DeepCollectionEquality().hash(commands));
+  int get hashCode => Object.hash(runtimeType, name, command);
 
   @JsonKey(ignore: true)
   @override
@@ -748,9 +769,8 @@ class _$WorkflowModelStepImpl implements _WorkflowModelStep {
 }
 
 abstract class _WorkflowModelStep implements WorkflowModelStep {
-  const factory _WorkflowModelStep(
-      {final String name,
-      final List<String> commands}) = _$WorkflowModelStepImpl;
+  const factory _WorkflowModelStep({final String name, final String command}) =
+      _$WorkflowModelStepImpl;
 
   factory _WorkflowModelStep.fromJson(Map<String, dynamic> json) =
       _$WorkflowModelStepImpl.fromJson;
@@ -758,7 +778,7 @@ abstract class _WorkflowModelStep implements WorkflowModelStep {
   @override
   String get name;
   @override
-  List<String> get commands;
+  String get command;
   @override
   @JsonKey(ignore: true)
   _$$WorkflowModelStepImplCopyWith<_$WorkflowModelStepImpl> get copyWith =>

@@ -1,3 +1,4 @@
+import 'package:dashboard/src/features/build/presentation/build_logs.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -42,95 +43,106 @@ class BuildHistoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.withOpacity(0.2),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (context) => const RunDetailsScreen(),
           ),
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Success/Failure Icon
-          Icon(
-            isSuccess ? Icons.check_circle : Icons.error,
-            color: isSuccess ? Colors.teal : Colors.red,
-            size: 24,
-          ),
-          const SizedBox(width: 12),
-
-          // Main Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 4),
-
-                // Subtitle
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Tags and Time Info
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    // Duration
-                    _Tag(
-                      icon: Icons.timer_outlined,
-                      text: duration,
-                    ),
-
-                    // Time Ago
-                    _Tag(
-                      icon: Icons.access_time,
-                      text: timeAgo,
-                    ),
-
-                    _Tag(
-                      icon: FontAwesomeIcons.codeBranch,
-                      text: branch,
-                      iconSize: 10,
-                    ),
-
-                    // Additional Tags
-                    ...tags.map(
-                      (tag) => _Tag(
-                        icon: Icons.tag,
-                        text: tag,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.grey.withOpacity(0.2),
             ),
           ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Success/Failure Icon
+            Icon(
+              isSuccess ? Icons.check_circle : Icons.error,
+              color: isSuccess ? Colors.green : Colors.red,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
 
-          // More Options
-          IconButton(
-            icon: const Icon(Icons.more_horiz),
-            onPressed: () {},
-            color: Colors.grey[600],
-          ),
-        ],
+            // Main Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+
+                  // Subtitle
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Tags and Time Info
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      // Duration
+                      _Tag(
+                        icon: Icons.timer_outlined,
+                        text: duration,
+                      ),
+
+                      // Time Ago
+                      _Tag(
+                        icon: Icons.access_time,
+                        text: timeAgo,
+                      ),
+
+                      _Tag(
+                        icon: FontAwesomeIcons.codeBranch,
+                        text: branch,
+                        iconSize: 10,
+                      ),
+
+                      // Additional Tags
+                      ...tags.map(
+                        (tag) => _Tag(
+                          icon: Icons.tag,
+                          text: tag,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // More Options
+            IconButton(
+              icon: const Icon(Icons.more_horiz),
+              onPressed: () {},
+              color: Colors.grey[600],
+            ),
+          ],
+        ),
       ),
     );
   }

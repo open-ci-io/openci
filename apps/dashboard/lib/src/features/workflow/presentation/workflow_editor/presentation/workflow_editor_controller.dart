@@ -14,6 +14,10 @@ class WorkflowEditorController extends _$WorkflowEditorController {
     state = state.copyWith.flutter(version: version);
   }
 
+  void updateCurrentWorkingDirectory(String currentWorkingDirectory) {
+    state = state.copyWith(currentWorkingDirectory: currentWorkingDirectory);
+  }
+
   void updateWorkflowName(String name) {
     state = state.copyWith(name: name);
   }
@@ -55,25 +59,9 @@ class WorkflowEditorController extends _$WorkflowEditorController {
     state = state.copyWith(steps: steps);
   }
 
-  void addCommand(int stepIndex) {
+  void updateCommand(int stepIndex, String command) {
     final steps = state.steps.toList();
-    steps[stepIndex] =
-        steps[stepIndex].copyWith(commands: [...steps[stepIndex].commands, '']);
-    state = state.copyWith(steps: steps);
-  }
-
-  void updateCommand(int stepIndex, int commandIndex, String command) {
-    final steps = state.steps.toList();
-    final commands = steps[stepIndex].commands.toList();
-    commands[commandIndex] = command;
-    steps[stepIndex] = steps[stepIndex].copyWith(commands: commands);
-    state = state.copyWith(steps: steps);
-  }
-
-  void removeCommand(int stepIndex, int commandIndex) {
-    final steps = state.steps.toList();
-    final commands = steps[stepIndex].commands.toList()..removeAt(commandIndex);
-    steps[stepIndex] = steps[stepIndex].copyWith(commands: commands);
+    steps[stepIndex] = steps[stepIndex].copyWith(command: command);
     state = state.copyWith(steps: steps);
   }
 

@@ -3,6 +3,9 @@
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
   },
+  "eslint.workingDirectories": [
+    { "mode": "auto" }
+  ],
   "cSpell.words": [
     "dartssh",
     "dotenv",
@@ -11,8 +14,8 @@
     "mocktail",
     "openci"
   ],
-  "deno.enable": true,
-  "deno.lint": true,
+  "deno.enable": false,
+  "deno.lint": false,
   "[json]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },

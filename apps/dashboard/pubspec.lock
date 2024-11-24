@@ -274,10 +274,10 @@ packages:
     dependency: transitive
     description:
       name: dart_firebase_admin
-      sha256: "5c09e4fcef4f5b67a7acea5793648d802bf0336b4598e8b0cb2e8b1ac5fce3cd"
+      sha256: a50cc3b6f976296ff76e75e7af7a0f22b51dc20b1b380cf4a19a91bb4f02a2c5
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.1"
+    version: "0.4.0"
   dart_jsonwebtoken:
     dependency: transitive
     description:
@@ -872,10 +872,10 @@ packages:
     dependency: "direct main"
     description:
       name: signals_flutter
-      sha256: "2d9678e39d698ca633c8609872354797511f2af33b4d4ee7b6bfeb487aad6258"
+      sha256: cd8064f0f013a85e68441ca7bc659b858b7742b23973fa84e588c206069e16aa
       url: "https://pub.dev"
     source: hosted
-    version: "5.5.0"
+    version: "5.5.1"
   sky_engine:
     dependency: transitive
     description: flutter

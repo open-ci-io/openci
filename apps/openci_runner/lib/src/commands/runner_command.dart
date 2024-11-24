@@ -2,17 +2,25 @@ import 'dart:async';
 
 import 'package:args/command_runner.dart';
 import 'package:dart_firebase_admin/firestore.dart';
+import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_models/openci_models.dart';
-import 'package:openci_runner/src/features/clone_vm.dart';
 import 'package:openci_runner/src/features/get_build_jobs.dart';
 import 'package:openci_runner/src/features/get_github_access_token.dart';
 import 'package:openci_runner/src/features/get_workflow.dart';
-import 'package:openci_runner/src/features/run_vm.dart';
+import 'package:openci_runner/src/features/run.dart';
+import 'package:openci_runner/src/features/tart_vm/clone_vm.dart';
+import 'package:openci_runner/src/features/tart_vm/delete_vm.dart';
+import 'package:openci_runner/src/features/tart_vm/get_vm_ip.dart';
+import 'package:openci_runner/src/features/tart_vm/run_vm.dart';
+import 'package:openci_runner/src/features/tart_vm/stop_vm.dart';
+import 'package:openci_runner/src/features/tart_vm/vm_name.dart';
 import 'package:openci_runner/src/features/update_build_status.dart';
-import 'package:openci_runner/src/features/vm_name.dart';
 import 'package:openci_runner/src/firebase/firebase_admin.dart';
-import 'package:openci_runner/src/features/get_vm_ip.dart';
+import 'package:openci_runner/src/service/dartssh2/dartssh2_service.dart';
+import 'package:signals/signals.dart';
+
+final firestoreSignal = signal<Firestore?>(null);
 
 /// {@template sample_command}
 ///
@@ -40,14 +48,19 @@ class RunnerCommand extends Command<int> {
 
   final Logger _logger;
 
-  void _loggerWithTimestamp(String message) {
-    _logger.info('[${DateTime.now().toIso8601String()}]: $message');
+  void _log(String message, {bool isSuccess = false}) {
+    switch (isSuccess) {
+      case true:
+        _logger.success('[${DateTime.now().toIso8601String()}]: $message');
+      case false:
+        _logger.info('[${DateTime.now().toIso8601String()}]: $message');
+    }
   }
 
   Future<BuildJob?> _tryGetBuildJob(Firestore firestore) async {
     final buildJob = await getBuildJob(firestore);
     if (buildJob == null) {
-      _loggerWithTimestamp(
+      _log(
         'No build jobs found. Waiting 1 second before retrying.',
       );
       await Future<void>.delayed(const Duration(seconds: 1));
@@ -62,33 +75,60 @@ class RunnerCommand extends Command<int> {
       'service_account.json',
     );
     final firestore = Firestore(admin);
+    firestoreSignal.value = firestore;
 
     while (true) {
       final buildJob = await _tryGetBuildJob(firestore);
       if (buildJob == null) continue;
-      _loggerWithTimestamp('Found ${buildJob.toJson()} build jobs');
+      _log('Found ${buildJob.toJson()} build jobs');
 
       await updateBuildStatus(
         jobId: buildJob.id,
-        status: OpenCIGitHubChecksStatus.inProgress,
       );
 
+      final workflow = await getWorkflowModel(firestore, buildJob.workflowId);
+      if (workflow == null) {
+        _log('Workflow not found');
+        throw Exception('Workflow not found');
+      }
+      final token = await getGithubAccessToken(
+        buildJob.github.installationId,
+      );
+      _log('Successfully got GitHub access token: $token', isSuccess: true);
+
+      final vmName = getVMName();
+
+      await cloneVM(vmName);
+      unawaited(runVM(vmName));
+      final vmIp = await getVMIp(vmName);
+      _log('VM IP: $vmIp');
+      _log('VM is ready', isSuccess: true);
+
+      final client = SSHClient(
+        await SSHSocket.connect(vmIp, 22),
+        username: 'admin',
+        onPasswordRequest: () => 'admin',
+      );
+
+      // Add git clone command with PAT
+      final repoUrl = buildJob.github.repositoryUrl;
+      final cloneCommand =
+          'git clone https://x-access-token:$token@${repoUrl.replaceFirst("https://", "")}';
+      await runCommand(
+        client: client,
+        command: cloneCommand,
+        currentWorkingDirectory: null,
+      );
+
+      await runCommand(
+        client: client,
+        command: 'ls',
+        currentWorkingDirectory: workflow.currentWorkingDirectory,
+      );
       await Future<void>.delayed(const Duration(seconds: 100));
-      // final workflow = await getWorkflowModel(firestore, buildJob.workflowId);
-      // if (workflow == null) {
-      //   _loggerWithTimestamp('Workflow not found');
-      //   throw Exception('Workflow not found');
-      // }
-      // final token = await getGithubAccessToken(
-      //   buildJob.github.installationId,
-      // );
 
-      // final vmName = getVMName();
-
-      // await cloneVM(vmName);
-      // unawaited(runVM(vmName));
-      // final vmIp = await getVMIp(vmName, _logger);
-      // print('VM IP: $vmIp');
+      await stopVM(vmName);
+      await deleteVM(vmName);
     }
   }
 }

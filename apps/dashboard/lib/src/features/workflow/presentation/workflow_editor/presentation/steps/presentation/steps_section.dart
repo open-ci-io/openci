@@ -90,7 +90,7 @@ class _StepItem extends ConsumerWidget {
                   onChanged: (value) => controller.updateStepName(index, value),
                 ),
                 verticalMargin16,
-                _CommandsList(
+                _Command(
                   step: step,
                   stepIndex: index,
                   workflowModel: workflowModel,
@@ -109,8 +109,8 @@ class _StepItem extends ConsumerWidget {
   }
 }
 
-class _CommandsList extends ConsumerWidget {
-  const _CommandsList({
+class _Command extends ConsumerWidget {
+  const _Command({
     required this.step,
     required this.stepIndex,
     required this.workflowModel,
@@ -124,37 +124,15 @@ class _CommandsList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final controller =
         ref.watch(workflowEditorControllerProvider(workflowModel).notifier);
+    final command = step.command;
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: step.commands.length + 1,
-      itemBuilder: (context, commandIndex) {
-        if (commandIndex == step.commands.length) {
-          return ListTile(
-            leading: const Icon(Icons.add),
-            title: const Text('Add Command'),
-            onTap: () => controller.addCommand(stepIndex),
-          );
-        }
-        return ListTile(
-          title: TextFormField(
-            initialValue: step.commands[commandIndex],
-            decoration: InputDecoration(
-              labelText: 'Command ${commandIndex + 1}',
-            ),
-            onChanged: (value) => controller.updateCommand(
-              stepIndex,
-              commandIndex,
-              value,
-            ),
-          ),
-          trailing: IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () => controller.removeCommand(stepIndex, commandIndex),
-          ),
-        );
-      },
+    return TextFormField(
+      initialValue: command.isEmpty ? 'echo "Hello, World!"' : command,
+      decoration: const InputDecoration(
+        labelText: 'Command',
+        border: OutlineInputBorder(),
+      ),
+      onChanged: (value) => controller.updateStepName(stepIndex, value),
     );
   }
 }

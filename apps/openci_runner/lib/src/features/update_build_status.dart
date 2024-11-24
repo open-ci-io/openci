@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/constants/prod_urls.dart';
+import 'package:openci_runner/src/service/logger_service.dart';
 
 Future<void> updateBuildStatus({
   required String jobId,
-  OpenCIGitHubChecksStatus status = OpenCIGitHubChecksStatus.success,
+  OpenCIGitHubChecksStatus status = OpenCIGitHubChecksStatus.inProgress,
 }) async {
   await _postUpdateBuildStatus(jobId: jobId, status: status.name);
 }
@@ -15,6 +16,7 @@ Future<void> _postUpdateBuildStatus({
   required String status,
 }) async {
   final url = Uri.parse('$baseUrl/update_checks');
+  final logger = loggerSignal.value;
 
   final body = jsonEncode({
     'jobId': jobId,
@@ -28,7 +30,7 @@ Future<void> _postUpdateBuildStatus({
       body: body,
     );
 
-    print('Response: ${response.body}');
+    logger.info('Response: ${response.body}');
 
     if (response.statusCode != 200) {
       throw Exception(
@@ -36,8 +38,8 @@ Future<void> _postUpdateBuildStatus({
       );
     }
 
-    print('Build status updated: $status');
+    logger.success('Build status updated: $status');
   } catch (error) {
-    print('Failed to update build status: $error');
+    logger.err('Failed to update build status: $error');
   }
 }

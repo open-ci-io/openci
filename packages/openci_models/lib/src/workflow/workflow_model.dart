@@ -11,6 +11,7 @@ enum GitHubTriggerType {
 @Freezed(makeCollectionsUnmodifiable: false)
 class WorkflowModel with _$WorkflowModel {
   const factory WorkflowModel({
+    required String currentWorkingDirectory,
     required String name,
     required String id,
     required WorkflowModelFlutter flutter,
@@ -22,6 +23,7 @@ class WorkflowModel with _$WorkflowModel {
       _$WorkflowModelFromJson(json);
 
   factory WorkflowModel.empty(String docId, String uid) => WorkflowModel(
+        currentWorkingDirectory: '',
         name: 'New Workflow',
         id: docId,
         flutter: WorkflowModelFlutter(version: '3.24.4'),
@@ -59,7 +61,7 @@ class WorkflowModelGitHub with _$WorkflowModelGitHub {
 class WorkflowModelStep with _$WorkflowModelStep {
   const factory WorkflowModelStep({
     @Default('') String name,
-    @Default(<String>[]) List<String> commands,
+    @Default('') String command,
   }) = _WorkflowModelStep;
   factory WorkflowModelStep.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelStepFromJson(json);
