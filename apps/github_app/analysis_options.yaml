@@ -1,9 +1,0 @@
-include: package:pedantic_mono/analysis_options.yaml
-linter:
-  rules:
-
-analyzer:
-  exclude:
-    - "**/*.freezed.dart"
-    - "**/*.g.dart"
-    - /build

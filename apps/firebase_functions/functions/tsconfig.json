@@ -11,7 +11,10 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "*": ["*", "*.ts"]
+      "*": [
+        "*",
+        "*.ts"
+      ]
     },
     "esModuleInterop": true,
     "allowJs": true

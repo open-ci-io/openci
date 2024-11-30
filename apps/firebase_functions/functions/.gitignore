@@ -8,4 +8,4 @@ typings/
 # Node.js dependency directory
 node_modules/
 
-.env
+src/constants/urls.ts
