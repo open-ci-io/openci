@@ -8,6 +8,7 @@ part of 'workflow_model.dart';
 
 _$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
     _$WorkflowModelImpl(
+      currentWorkingDirectory: json['currentWorkingDirectory'] as String,
       name: json['name'] as String,
       id: json['id'] as String,
       flutter: WorkflowModelFlutter.fromJson(
@@ -23,6 +24,7 @@ _$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$WorkflowModelImplToJson(_$WorkflowModelImpl instance) =>
     <String, dynamic>{
+      'currentWorkingDirectory': instance.currentWorkingDirectory,
       'name': instance.name,
       'id': instance.id,
       'flutter': instance.flutter.toJson(),
@@ -68,15 +70,12 @@ _$WorkflowModelStepImpl _$$WorkflowModelStepImplFromJson(
         Map<String, dynamic> json) =>
     _$WorkflowModelStepImpl(
       name: json['name'] as String? ?? '',
-      commands: (json['commands'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const <String>[],
+      command: json['command'] as String? ?? '',
     );
 
 Map<String, dynamic> _$$WorkflowModelStepImplToJson(
         _$WorkflowModelStepImpl instance) =>
     <String, dynamic>{
       'name': instance.name,
-      'commands': instance.commands,
+      'command': instance.command,
     };

@@ -3,8 +3,7 @@ import {
     Firestore,
     QuerySnapshot,
 } from "npm:firebase-admin/firestore";
-import { db } from "./main.ts";
-import { baseUrl } from "./base_url.ts";
+import { baseUrl } from "./prod_urls.ts";
 
 export async function getBuildJob(db: Firestore): Promise<QuerySnapshot> {
     return await db
@@ -12,7 +11,7 @@ export async function getBuildJob(db: Firestore): Promise<QuerySnapshot> {
         .where("buildStatus", "==", "queued")
         .orderBy("createdAt", "asc")
         .limit(1)
-        .get();
+        .get(); 
 }
 
 export async function getWorkflowDocs(
@@ -23,6 +22,7 @@ export async function getWorkflowDocs(
 }
 
 export async function setStatusToInProgress(
+    db: Firestore,
     jobId: string,
 ): Promise<void> {
     await updateBuildStatus(jobId, "inProgress");
@@ -31,14 +31,20 @@ export async function setStatusToInProgress(
     });
 }
 
-export async function setStatusToSuccess(jobId: string): Promise<void> {
+export async function setStatusToSuccess(
+    db: Firestore,
+    jobId: string,
+): Promise<void> {
     await updateBuildStatus(jobId, "success");
     await db.collection("build_jobs").doc(jobId).update({
         buildStatus: "success",
     });
 }
 
-export async function setStatusToFailure(jobId: string): Promise<void> {
+export async function setStatusToFailure(
+    db: Firestore,
+    jobId: string,
+): Promise<void> {
     await updateBuildStatus(jobId, "failure");
     await db.collection("build_jobs").doc(jobId).update({
         buildStatus: "failure",

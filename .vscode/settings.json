@@ -3,6 +3,11 @@
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
   },
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
   "cSpell.words": [
     "dartssh",
     "dotenv",
@@ -11,18 +16,4 @@
     "mocktail",
     "openci"
   ],
-  "deno.enable": true,
-  "deno.lint": true,
-  "[json]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
-  },
-  "[javascript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
-  }
 }

@@ -7,6 +7,7 @@ import {
 import { Buffer } from "node:buffer";
 import { Client } from "npm:ssh2";
 import { setStatusToFailure, setStatusToSuccess } from "./build_job.ts";
+import { Firestore } from "npm:firebase-admin/firestore";
 
 export async function cleanUpVMs() {
   while (true) {
@@ -74,6 +75,7 @@ export async function stopVM(vmName: string): Promise<void> {
 }
 
 export function executeCommands(
+  db: Firestore,
   vmIp: string,
   steps: any[],
   jobId: string,
@@ -110,7 +112,7 @@ export function executeCommands(
         const executeNextCommand = async () => {
           if (commandIndex >= steps.length) {
             stream.write("exit\n");
-            await setStatusToSuccess(jobId);
+            await setStatusToSuccess(db, jobId);
             return;
           }
 
@@ -149,7 +151,7 @@ export function executeCommands(
                       `Command failed: ${replacedCommand}, exit code: ${exitCode}`,
                     ),
                   );
-                  await setStatusToFailure(jobId);
+                  await setStatusToFailure(db, jobId);
                   stream.write("exit\n");
                 }
                 stream.removeListener("data", checkResult);

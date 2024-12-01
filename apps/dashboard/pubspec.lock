@@ -274,10 +274,10 @@ packages:
     dependency: transitive
     description:
       name: dart_firebase_admin
-      sha256: "5c09e4fcef4f5b67a7acea5793648d802bf0336b4598e8b0cb2e8b1ac5fce3cd"
+      sha256: a50cc3b6f976296ff76e75e7af7a0f22b51dc20b1b380cf4a19a91bb4f02a2c5
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.1"
+    version: "0.4.0"
   dart_jsonwebtoken:
     dependency: transitive
     description:

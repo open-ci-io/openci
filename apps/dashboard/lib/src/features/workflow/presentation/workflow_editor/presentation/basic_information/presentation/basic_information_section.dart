@@ -55,6 +55,21 @@ class BasicInfoSection extends ConsumerWidget {
               },
               onChanged: controller.updateFlutterVersion,
             ),
+            verticalMargin16,
+            TextFormField(
+              initialValue: workflowModel.currentWorkingDirectory,
+              decoration: const InputDecoration(
+                labelText: 'Current Working Directory',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Please enter current working directory';
+                }
+                return null;
+              },
+              onChanged: controller.updateCurrentWorkingDirectory,
+            ),
           ],
         ),
       ),
