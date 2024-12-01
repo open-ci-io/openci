@@ -12,10 +12,34 @@ import {
 	type OpenCIGithub,
 	OpenCIGitHubChecksStatus,
 } from "../models/BuildJob.js";
+import { Webhooks } from "@octokit/webhooks";
 
 export const githubApp = onRequest(
-	{ secrets: ["APP_ID", "PRIVATE_KEY"] },
+	{ secrets: ["APP_ID", "PRIVATE_KEY", "GITHUB_WEBHOOK_SECRET"] },
 	async (request, response) => {
+		const secret = process.env.GITHUB_WEBHOOK_SECRET;
+		if (!secret) {
+			response.status(500).send("Webhook secret is not configured");
+			return;
+		}
+
+		const webhooks = new Webhooks({ secret });
+
+		try {
+			const signature = request.get("x-hub-signature-256") as string;
+			const rawBody = JSON.stringify(request.body);
+			const isValid = await webhooks.verify(rawBody, signature);
+			if (isValid === false) {
+				console.log("Webhook signature verification failed");
+				response.status(401).send("Webhook signature verification failed");
+				return;
+			}
+		} catch (error) {
+			console.error("Webhook signature verification failed:", error);
+			response.status(401).send("Webhook signature verification failed");
+			return;
+		}
+
 		const name =
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			request.get("x-github-event") || (request.get("X-GitHub-Event") as any);

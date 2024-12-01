@@ -1,15 +1,17 @@
-import { onDocumentUpdated } from "firebase-functions/firestore";
+import { onDocumentUpdated } from "firebase-functions/v2/firestore";
 import { Octokit } from "@octokit/rest";
-import { getGitHubInstallationTokenUrl } from "../constants/urls.js";
 import { buildJobsCollectionName } from "../firestore_path.js";
 import {
 	type OpenCIGithub,
 	OpenCIGitHubChecksStatus,
 } from "../models/BuildJob.js";
-import https from "axios";
+import { getGitHubInstallationToken } from "./get_github_installation_token.js";
 
 export const updateGitHubCheckStatus = onDocumentUpdated(
-	`${buildJobsCollectionName}/{buildJobId}`,
+	{
+		document: `${buildJobsCollectionName}/{buildJobId}`,
+		secrets: ["APP_ID", "PRIVATE_KEY", "GITHUB_WEBHOOK_SECRET"],
+	},
 	async (event) => {
 		const beforeData = event.data?.before.data();
 		const afterData = event.data?.after.data();
@@ -19,8 +21,20 @@ export const updateGitHubCheckStatus = onDocumentUpdated(
 			return;
 		}
 
+		const appId = process.env.APP_ID;
+		const privateKey = process.env.PRIVATE_KEY;
+
+		if (!appId || !privateKey) {
+			console.error("Missing appId or privateKey");
+			return;
+		}
+
 		const github = afterData.github as OpenCIGithub;
-		const token = await _getGitHubInstallationToken(github.installationId);
+		const token = await getGitHubInstallationToken(
+			github.installationId,
+			appId,
+			privateKey,
+		);
 		const octokit = new Octokit({ auth: token });
 
 		if (
@@ -69,11 +83,4 @@ async function setGitHubCheckStatusToCompleted(
 		status: "completed",
 		conclusion: conclusion,
 	});
-}
-
-async function _getGitHubInstallationToken(installationId: number) {
-	const response = await https.post(getGitHubInstallationTokenUrl, {
-		installationId: installationId,
-	});
-	return response.data.installationToken;
 }
