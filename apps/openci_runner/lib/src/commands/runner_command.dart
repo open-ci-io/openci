@@ -17,7 +17,6 @@ import 'package:openci_runner/src/features/tart_vm/stop_vm.dart';
 import 'package:openci_runner/src/features/tart_vm/vm_name.dart';
 import 'package:openci_runner/src/features/update_build_status.dart';
 import 'package:openci_runner/src/firebase/firebase_admin.dart';
-import 'package:openci_runner/src/service/dartssh2/dartssh2_service.dart';
 import 'package:signals/signals.dart';
 
 final firestoreSignal = signal<Firestore?>(null);

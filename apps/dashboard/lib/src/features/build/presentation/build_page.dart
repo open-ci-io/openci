@@ -47,7 +47,7 @@ class BuildHistoryItem extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
+          MaterialPageRoute<void>(
             fullscreenDialog: true,
             builder: (context) => const RunDetailsScreen(),
           ),
