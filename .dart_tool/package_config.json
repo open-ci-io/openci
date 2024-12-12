@@ -2,14 +2,56 @@
   "configVersion": 2,
   "packages": [
     {
-      "name": "ansi_styles",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/ansi_styles-0.3.2+1",
+      "name": "_discoveryapis_commons",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/_discoveryapis_commons-1.0.7",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "_fe_analyzer_shared",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/_fe_analyzer_shared-76.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "_flutterfire_internals",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/_flutterfire_internals-1.3.47",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "_macros",
+      "rootUri": "file:///Users/masahiroaoki/Developer/flutter/bin/cache/dart-sdk/pkg/_macros",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "adaptive_number",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/adaptive_number-1.0.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
+      "name": "analyzer",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/analyzer-6.11.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "analyzer_plugin",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/analyzer_plugin-0.11.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "args",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/args-2.5.0",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/args-2.6.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "asn1lib",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/asn1lib-1.5.8",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -26,22 +68,94 @@
       "languageVersion": "2.17"
     },
     {
-      "name": "charcode",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/charcode-1.3.1",
+      "name": "build",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/build-2.4.1",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "2.19"
     },
     {
-      "name": "cli_launcher",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/cli_launcher-0.3.1",
+      "name": "build_config",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/build_config-1.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.14"
+    },
+    {
+      "name": "build_daemon",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/build_daemon-4.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "build_resolvers",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/build_resolvers-2.4.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "build_runner",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/build_runner-2.4.13",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "build_runner_core",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/build_runner_core-7.3.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "build_verify",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/build_verify-3.1.0",
       "packageUri": "lib/",
       "languageVersion": "2.18"
     },
     {
-      "name": "cli_util",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/cli_util-0.4.1",
+      "name": "build_version",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/build_version-2.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "built_collection",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/built_collection-5.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "built_value",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/built_value-8.9.2",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+    },
+    {
+      "name": "characters",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/characters-1.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "checked_yaml",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/checked_yaml-2.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
+      "name": "ci",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/ci-0.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "cli_completion",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/cli_completion-0.5.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "cli_util",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/cli_util-0.4.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "clock",
@@ -50,20 +164,248 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "cloud_firestore",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/cloud_firestore-5.5.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "cloud_firestore_platform_interface",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/cloud_firestore_platform_interface-6.5.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "cloud_firestore_web",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/cloud_firestore_web-4.3.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "code_builder",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/code_builder-4.10.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
       "name": "collection",
       "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/collection-1.19.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
     {
-      "name": "conventional_commit",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/conventional_commit-0.6.0+1",
+      "name": "convert",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/convert-3.1.2",
       "packageUri": "lib/",
-      "languageVersion": "2.18"
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "coverage",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/coverage-1.11.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "crypto",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/crypto-3.0.6",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "cupertino_icons",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.8",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
+    },
+    {
+      "name": "custom_lint",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/custom_lint-0.7.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "custom_lint_builder",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/custom_lint_builder-0.7.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "custom_lint_core",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/custom_lint_core-0.7.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "custom_lint_visitor",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/custom_lint_visitor-1.0.0+6.11.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "dart_firebase_admin",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/dart_firebase_admin-0.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "dart_jsonwebtoken",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/dart_jsonwebtoken-2.14.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "dart_style",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/dart_style-2.3.7",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "dartssh2",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/dartssh2-2.11.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "dotenv",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/dotenv-4.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.16"
+    },
+    {
+      "name": "ed25519_edwards",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/ed25519_edwards-0.3.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "equatable",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/equatable-2.0.7",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "fake_async",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/fake_async-1.3.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "ffi",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/ffi-2.1.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
     },
     {
       "name": "file",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/file-7.0.0",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/file-7.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "firebase_auth",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/firebase_auth-5.3.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "firebase_auth_platform_interface",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/firebase_auth_platform_interface-7.4.10",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "firebase_auth_web",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/firebase_auth_web-5.13.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "firebase_core",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/firebase_core-3.8.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "firebase_core_platform_interface",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/firebase_core_platform_interface-5.3.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "firebase_core_web",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/firebase_core_web-2.18.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "firebaseapis",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/firebaseapis-0.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "fixnum",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/fixnum-1.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
+    },
+    {
+      "name": "flutter",
+      "rootUri": "file:///Users/masahiroaoki/Developer/flutter/packages/flutter",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "flutter_hooks",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/flutter_hooks-0.20.5",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "flutter_lints",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/flutter_lints-5.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "flutter_riverpod",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/flutter_riverpod-2.6.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "flutter_test",
+      "rootUri": "file:///Users/masahiroaoki/Developer/flutter/packages/flutter_test",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "flutter_web_plugins",
+      "rootUri": "file:///Users/masahiroaoki/Developer/flutter/packages/flutter_web_plugins",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "font_awesome_flutter",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/font_awesome_flutter-10.8.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "freezed",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/freezed-2.5.7",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "freezed_annotation",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/freezed_annotation-2.4.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "frontend_server_client",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/frontend_server_client-4.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -74,20 +416,56 @@
       "languageVersion": "2.19"
     },
     {
-      "name": "graphs",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/graphs-2.3.1",
+      "name": "google_fonts",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/google_fonts-6.2.1",
       "packageUri": "lib/",
-      "languageVersion": "2.18"
+      "languageVersion": "2.14"
+    },
+    {
+      "name": "google_identity_services_web",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/google_identity_services_web-0.3.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "googleapis_auth",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/googleapis_auth-1.6.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "graphs",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/graphs-2.3.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "hooks_riverpod",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/hooks_riverpod-2.6.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "hotreloader",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/hotreloader-4.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "http",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/http-1.2.1",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/http-1.2.2",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
+      "name": "http_multi_server",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/http_multi_server-3.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "http_parser",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/http_parser-4.1.0",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/http_parser-4.1.1",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -99,9 +477,15 @@
     },
     {
       "name": "io",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/io-1.0.4",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/io-1.0.5",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "js",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/js-0.7.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
     },
     {
       "name": "json_annotation",
@@ -110,16 +494,64 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "json_serializable",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/json_serializable-6.9.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "leak_tracker",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/leak_tracker-10.0.7",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "leak_tracker_flutter_testing",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/leak_tracker_flutter_testing-3.0.8",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "leak_tracker_testing",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/leak_tracker_testing-3.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "lints",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/lints-5.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "logging",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/logging-1.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "macros",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/macros-0.1.3-main.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "mason_logger",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/mason_logger-0.3.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
       "name": "matcher",
       "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/matcher-0.12.16+1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
-      "name": "melos",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/melos-6.2.0",
+      "name": "material_color_utilities",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/material_color_utilities-0.11.1",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "2.17"
     },
     {
       "name": "meta",
@@ -128,10 +560,28 @@
       "languageVersion": "2.12"
     },
     {
-      "name": "mustache_template",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/mustache_template-2.0.0",
+      "name": "mime",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/mime-2.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "mocktail",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/mocktail-1.0.4",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "node_preamble",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/node_preamble-2.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "package_config",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/package_config-2.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "path",
@@ -140,8 +590,68 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "path_provider",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/path_provider-2.1.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "path_provider_android",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/path_provider_android-2.2.15",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "path_provider_foundation",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "path_provider_linux",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
+      "name": "path_provider_platform_interface",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/path_provider_platform_interface-2.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "path_provider_windows",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "pedantic_mono",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/pedantic_mono-1.29.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "pinenacl",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/pinenacl-0.6.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "platform",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/platform-3.1.5",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/platform-3.1.6",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "plugin_platform_interface",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/plugin_platform_interface-2.1.8",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "pointycastle",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/pointycastle-3.9.1",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -152,40 +662,148 @@
       "languageVersion": "2.12"
     },
     {
-      "name": "process",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/process-5.0.2",
+      "name": "preact_signals",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/preact_signals-1.8.3",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "2.14"
     },
     {
-      "name": "prompts",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/prompts-2.0.0",
+      "name": "process",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/process-5.0.3",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "process_run",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/process_run-1.2.2+1",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
     },
     {
       "name": "pub_semver",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/pub_semver-2.1.4",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/pub_semver-2.1.5",
       "packageUri": "lib/",
-      "languageVersion": "2.17"
+      "languageVersion": "3.4"
     },
     {
       "name": "pub_updater",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/pub_updater-0.4.0",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/pub_updater-0.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "pubspec_parse",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/pubspec_parse-1.3.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
-      "name": "pubspec",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/pubspec-2.3.0",
+      "name": "riverpod",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/riverpod-2.6.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "riverpod_analyzer_utils",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/riverpod_analyzer_utils-0.5.8",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "riverpod_annotation",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/riverpod_annotation-2.6.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "riverpod_generator",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/riverpod_generator-2.6.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "riverpod_lint",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/riverpod_lint-2.6.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "rxdart",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/rxdart-0.28.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
-      "name": "quiver",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/quiver-3.2.1",
+      "name": "shelf",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/shelf-1.4.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "shelf_packages_handler",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/shelf_packages_handler-3.0.2",
       "packageUri": "lib/",
       "languageVersion": "2.17"
+    },
+    {
+      "name": "shelf_static",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/shelf_static-1.1.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "shelf_web_socket",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/shelf_web_socket-2.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "signals",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/signals-6.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "signals_core",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/signals_core-6.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "signals_flutter",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/signals_flutter-6.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "sky_engine",
+      "rootUri": "file:///Users/masahiroaoki/Developer/flutter/bin/cache/pkg/sky_engine",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "source_gen",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/source_gen-1.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "source_helper",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/source_helper-1.3.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
+      "name": "source_map_stack_trace",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/source_map_stack_trace-2.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "source_maps",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/source_maps-0.10.13",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
     },
     {
       "name": "source_span",
@@ -194,10 +812,22 @@
       "languageVersion": "2.18"
     },
     {
-      "name": "stack_trace",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/stack_trace-1.11.1",
+      "name": "sprintf",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/sprintf-7.0.0",
       "packageUri": "lib/",
-      "languageVersion": "2.18"
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "stack_trace",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/stack_trace-1.12.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "state_notifier",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/state_notifier-1.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "stream_channel",
@@ -206,10 +836,22 @@
       "languageVersion": "2.19"
     },
     {
-      "name": "string_scanner",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/string_scanner-1.2.0",
+      "name": "stream_transform",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/stream_transform-2.1.0",
       "packageUri": "lib/",
-      "languageVersion": "2.18"
+      "languageVersion": "2.14"
+    },
+    {
+      "name": "string_scanner",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/string_scanner-1.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
+    },
+    {
+      "name": "synchronized",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/synchronized-3.3.0+3",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
     },
     {
       "name": "term_glyph",
@@ -218,26 +860,98 @@
       "languageVersion": "2.12"
     },
     {
-      "name": "test_api",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/test_api-0.7.2",
+      "name": "test",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/test-1.25.8",
       "packageUri": "lib/",
-      "languageVersion": "3.2"
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "test_api",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/test_api-0.7.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "test_core",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/test_core-0.6.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "timing",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/timing-1.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.14"
     },
     {
       "name": "typed_data",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/typed_data-1.3.2",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/typed_data-1.4.0",
       "packageUri": "lib/",
-      "languageVersion": "2.17"
+      "languageVersion": "3.5"
     },
     {
-      "name": "uri",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/uri-1.0.0",
+      "name": "uuid",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/uuid-4.5.1",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "vector_math",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/vector_math-2.1.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.14"
+    },
+    {
+      "name": "very_good_analysis",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/very_good_analysis-6.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "vm_service",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/vm_service-14.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "watcher",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/watcher-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "web",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/web-0.5.1",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/web-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "web_socket",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/web_socket-0.1.6",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "web_socket_channel",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/web_socket_channel-3.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "webkit_inspection_protocol",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/webkit_inspection_protocol-1.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "win32",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/win32-5.9.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "xdg_directories",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/xdg_directories-1.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -248,22 +962,40 @@
       "languageVersion": "2.19"
     },
     {
-      "name": "yaml_edit",
-      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/yaml_edit-2.2.1",
-      "packageUri": "lib/",
-      "languageVersion": "3.0"
-    },
-    {
       "name": "openci",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "cicd_sandbox_app",
+      "rootUri": "../apps/cicd_sandbox_app",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "dashboard",
+      "rootUri": "../apps/dashboard",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "openci_runner",
+      "rootUri": "../apps/openci_runner",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "openci_models",
+      "rootUri": "../packages/openci_models",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
     }
   ],
-  "generated": "2024-11-01T18:21:24.904174Z",
+  "generated": "2024-12-12T02:13:50.040122Z",
   "generator": "pub",
-  "generatorVersion": "3.5.3",
+  "generatorVersion": "3.6.0",
   "flutterRoot": "file:///Users/masahiroaoki/Developer/flutter",
-  "flutterVersion": "3.24.3",
+  "flutterVersion": "3.27.0",
   "pubCache": "file:///Users/masahiroaoki/.pub-cache"
 }
