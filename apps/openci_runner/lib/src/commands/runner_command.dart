@@ -32,18 +32,19 @@ class RunnerCommand extends Command<int> {
   RunnerCommand({
     required Logger logger,
   }) : _logger = logger {
-    argParser.addOption(
-      'pem-path',
-      abbr: 'p',
-      help: 'GitHub App Private Key (pem) Path',
-      mandatory: true,
-    );
-    argParser.addOption(
-      'service-account-path',
-      abbr: 's',
-      help: 'Firebase Service Account Json Path',
-      mandatory: true,
-    );
+    argParser
+      ..addOption(
+        'pem-path',
+        abbr: 'p',
+        help: 'GitHub App Private Key (pem) Path',
+        mandatory: true,
+      )
+      ..addOption(
+        'service-account-path',
+        abbr: 's',
+        help: 'Firebase Service Account Json Path',
+        mandatory: true,
+      );
   }
 
   @override
@@ -122,7 +123,6 @@ class RunnerCommand extends Command<int> {
         onPasswordRequest: () => 'admin',
       );
 
-      // Add git clone command with PAT
       final repoUrl = buildJob.github.repositoryUrl;
       final cloneCommand =
           'git clone https://x-access-token:$token@${repoUrl.replaceFirst("https://", "")}';
@@ -137,7 +137,6 @@ class RunnerCommand extends Command<int> {
         command: 'ls',
         currentWorkingDirectory: workflow.currentWorkingDirectory,
       );
-      await Future<void>.delayed(const Duration(seconds: 100));
 
       await stopVM(vmName);
       await deleteVM(vmName);

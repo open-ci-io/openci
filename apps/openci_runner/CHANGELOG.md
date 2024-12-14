@@ -1,3 +1,6 @@
+## 0.8.2
+- fix: tart runner
+
 ## 0.8.1
 - fix: tart vm name
 
