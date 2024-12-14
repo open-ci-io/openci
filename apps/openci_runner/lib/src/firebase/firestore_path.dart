@@ -1,1 +1,1 @@
-const buildJobsCollectionPath = 'build_jobs';
+const buildJobsCollectionPath = 'build_jobs_v2';
