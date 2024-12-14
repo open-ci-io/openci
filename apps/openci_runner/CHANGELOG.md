@@ -1,3 +1,6 @@
+## 0.8.1
+- fix: tart vm name
+
 ## 0.8.0
 - update: CLI
 
