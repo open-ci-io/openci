@@ -1,6 +1,6 @@
 import 'package:dart_firebase_admin/firestore.dart';
 import 'package:openci_models/openci_models.dart';
-import 'package:openci_runner/src/firebase/firestore_path.dart';
+import 'package:openci_models/src/firebase/firestore_path.dart';
 
 Future<QuerySnapshot<Map<String, dynamic>>?> _getBuildJobQuerySnapshot(
   Firestore firestore,
