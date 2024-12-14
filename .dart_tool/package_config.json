@@ -410,6 +410,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "github",
+      "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/github-9.24.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "glob",
       "rootUri": "file:///Users/masahiroaoki/.pub-cache/hosted/pub.dev/glob-2.1.2",
       "packageUri": "lib/",
@@ -992,7 +998,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2024-12-14T06:10:07.162096Z",
+  "generated": "2024-12-14T08:44:40.391878Z",
   "generator": "pub",
   "generatorVersion": "3.6.0",
   "flutterRoot": "file:///Users/masahiroaoki/Developer/flutter",

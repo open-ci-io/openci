@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:dart_firebase_admin/firestore.dart';
@@ -6,7 +7,6 @@ import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/features/get_build_jobs.dart';
-import 'package:openci_runner/src/features/get_github_access_token.dart';
 import 'package:openci_runner/src/features/get_workflow.dart';
 import 'package:openci_runner/src/features/run.dart';
 import 'package:openci_runner/src/features/tart_vm/clone_vm.dart';
@@ -17,6 +17,7 @@ import 'package:openci_runner/src/features/tart_vm/stop_vm.dart';
 import 'package:openci_runner/src/features/tart_vm/vm_name.dart';
 import 'package:openci_runner/src/features/update_build_status.dart';
 import 'package:openci_runner/src/firebase/firebase_admin.dart';
+import 'package:openci_runner/src/service/github/get_github_installation_token.dart';
 import 'package:signals_core/signals_core.dart';
 
 final firestoreSignal = signal<Firestore?>(null);
@@ -31,11 +32,17 @@ class RunnerCommand extends Command<int> {
   RunnerCommand({
     required Logger logger,
   }) : _logger = logger {
-    argParser.addFlag(
-      'cyan',
-      abbr: 'c',
-      help: 'Prints the same joke, but in cyan',
-      negatable: false,
+    argParser.addOption(
+      'pem-path',
+      abbr: 'p',
+      help: 'GitHub App Private Key (pem) Path',
+      mandatory: true,
+    );
+    argParser.addOption(
+      'service-account-path',
+      abbr: 's',
+      help: 'Firebase Service Account Json Path',
+      mandatory: true,
     );
   }
 
@@ -69,9 +76,13 @@ class RunnerCommand extends Command<int> {
 
   @override
   Future<int> run() async {
+    final pemPath = argResults?['pem-path'] as String;
+    final pem = File(pemPath).readAsStringSync();
+    final serviceAccountPath = argResults?['service-account-path'] as String;
+
     final admin = await initializeFirebaseAdminApp(
       'open-ci-release',
-      'service_account.json',
+      serviceAccountPath,
     );
     final firestore = Firestore(admin);
     firestoreSignal.value = firestore;
@@ -90,8 +101,10 @@ class RunnerCommand extends Command<int> {
         _log('Workflow not found');
         throw Exception('Workflow not found');
       }
-      final token = await getGithubAccessToken(
-        buildJob.github.installationId,
+      final token = await getGitHubInstallationToken(
+        installationId: buildJob.github.installationId,
+        appId: buildJob.github.appId,
+        privateKey: pem,
       );
       _log('Successfully got GitHub access token: $token', isSuccess: true);
 
