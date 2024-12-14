@@ -1,3 +1,7 @@
+## 1.2.0
+
+- update: models
+
 ## 1.1.4
 
 - add: OpenCIStep model

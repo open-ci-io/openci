@@ -1,7 +1,6 @@
 name: openci_runner
-description: A Very Good Project created by Very Good CLI.
-version: 0.0.1
-publish_to: none
+description: OpenCI Runner
+version: 0.8.0
 
 environment:
   sdk: '^3.6.0'
@@ -15,8 +14,7 @@ dependencies:
   github: ^9.24.0
   http: ^1.2.2
   mason_logger: ^0.3.0
-  openci_models:
-    path: ../../packages/openci_models
+  openci_models: ^1.2.0
   process_run: ^1.2.2
   pub_updater: ^0.5.0
   signals_core: ^6.0.2

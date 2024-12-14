@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_models/openci_models.dart';
-import 'package:signals/signals.dart';
+import 'package:signals_core/signals_core.dart';
 
 final dartSSH2ServiceSignal = signal(DartSSH2Service());
 
