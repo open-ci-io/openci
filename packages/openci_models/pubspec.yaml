@@ -4,7 +4,7 @@ version: 1.2.0
 repository: https://github.com/open-ci-io/openci/tree/develop/packages/openci_models
 
 environment:
-  sdk: '^3.6.0'
+  sdk: ^3.6.0
 resolution: workspace
 
 dependencies:

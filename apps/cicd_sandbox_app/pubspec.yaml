@@ -1,12 +1,9 @@
 name: cicd_sandbox_app
 description: "A new Flutter project."
-
 publish_to: "none"
-
 version: 1.0.0+1
-
 environment:
-  sdk: '^3.6.0'
+  sdk: ^3.6.0
 resolution: workspace
 
 dependencies:
