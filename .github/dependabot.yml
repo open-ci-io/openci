@@ -4,3 +4,18 @@ updates:
     directory: "/apps/cicd_sandbox_app"
     schedule:
       interval: "daily"
+
+  - package-ecosystem: "pub"
+    directory: "/apps/dashboard"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "pub"
+    directory: "/apps/openci_runner"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/openci_models"
+    schedule:
+      interval: "daily"
