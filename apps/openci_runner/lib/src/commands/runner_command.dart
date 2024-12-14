@@ -140,6 +140,10 @@ class RunnerCommand extends Command<int> {
 
       await stopVM(vmName);
       await deleteVM(vmName);
+      await updateBuildStatus(
+        jobId: buildJob.id,
+        status: OpenCIGitHubChecksStatus.success,
+      );
     }
   }
 }
