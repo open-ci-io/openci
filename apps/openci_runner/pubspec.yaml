@@ -5,7 +5,7 @@ repository: https://github.com/open-ci-io/openci/tree/develop/apps/openci_runner
 homepage: https://open-ci.io
 environment:
   sdk: ^3.6.0
-resolution: workspace
+# resolution: workspace
 dependencies:
   args: ^2.5.0
   cli_completion: ^0.5.1
