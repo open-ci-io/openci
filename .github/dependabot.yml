@@ -2,24 +2,28 @@ version: 2
 updates:
   - package-ecosystem: "pub"
     directory: "/apps/cicd_sandbox_app"
+    open-pull-requests-limit: 10
     schedule:
       interval: "daily"
     versioning-strategy: "increase"
 
   - package-ecosystem: "pub"
     directory: "/apps/dashboard"
+    open-pull-requests-limit: 10
     schedule:
       interval: "daily"
     versioning-strategy: "increase"
 
   - package-ecosystem: "pub"
     directory: "/apps/openci_runner"
+    open-pull-requests-limit: 10
     schedule:
       interval: "daily"
     versioning-strategy: "increase"
 
   - package-ecosystem: "pub"
     directory: "/packages/openci_models"
+    open-pull-requests-limit: 10
     schedule:
       interval: "daily"
     versioning-strategy: "increase"
