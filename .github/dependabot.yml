@@ -1,0 +1,6 @@
+version: 2
+updates:
+  - package-ecosystem: "pub"
+    directory: "/apps/cicd_sandbox_app"
+    schedule:
+      interval: "daily"
