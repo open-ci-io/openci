@@ -103,9 +103,6 @@ class RunnerCommand extends Command<int> {
           throw Exception('Workflow not found');
         }
 
-        print('workflow: ${workflow.toJson()}');
-
-        print('steps: ${workflow.steps}');
         final token = await getGitHubInstallationToken(
           installationId: buildJob.github.installationId,
           appId: buildJob.github.appId,

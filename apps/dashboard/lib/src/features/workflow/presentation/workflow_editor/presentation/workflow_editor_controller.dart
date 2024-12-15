@@ -44,7 +44,13 @@ class WorkflowEditorController extends _$WorkflowEditorController {
   }
 
   void addStep() {
-    final steps = state.steps.toList()..add(const WorkflowModelStep());
+    final steps = state.steps.toList()
+      ..add(
+        const WorkflowModelStep(
+          name: 'New Step',
+          command: 'echo "Hello, World!"',
+        ),
+      );
     state = state.copyWith(steps: steps);
   }
 
