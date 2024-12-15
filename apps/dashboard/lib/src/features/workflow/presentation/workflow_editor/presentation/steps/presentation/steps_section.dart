@@ -88,7 +88,6 @@ class _StepItem extends ConsumerWidget {
                     border: OutlineInputBorder(),
                   ),
                   onChanged: (value) {
-                    print('value: $value');
                     controller.updateStepName(index, value);
                   },
                 ),
