@@ -136,16 +136,14 @@ class RunnerCommand extends Command<int> {
           currentWorkingDirectory: null,
         );
 
-        final commandsList = workflow.steps.map((e) => e.commands).toList();
+        final commandsList = workflow.steps.map((e) => e.command).toList();
 
         for (final command in commandsList) {
-          for (final command in command) {
-            await runCommand(
-              client: client,
-              command: command,
-              currentWorkingDirectory: workflow.currentWorkingDirectory,
-            );
-          }
+          await runCommand(
+            client: client,
+            command: command,
+            currentWorkingDirectory: workflow.currentWorkingDirectory,
+          );
         }
 
         await stopVM(vmName);

@@ -1,3 +1,7 @@
+## 1.2.4
+
+- update: WorkflowModelStep
+
 ## 1.2.3
 
 - update: WorkflowModelStep

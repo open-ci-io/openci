@@ -1,3 +1,7 @@
+## 0.8.5
+
+- fix: workflow runner
+
 ## 0.8.4
 
 - fix: update build status

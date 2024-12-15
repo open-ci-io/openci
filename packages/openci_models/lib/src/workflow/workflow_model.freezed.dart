@@ -679,7 +679,7 @@ WorkflowModelStep _$WorkflowModelStepFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$WorkflowModelStep {
   String get name => throw _privateConstructorUsedError;
-  List<String> get commands => throw _privateConstructorUsedError;
+  String get command => throw _privateConstructorUsedError;
 
   /// Serializes this WorkflowModelStep to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -697,7 +697,7 @@ abstract class $WorkflowModelStepCopyWith<$Res> {
           WorkflowModelStep value, $Res Function(WorkflowModelStep) then) =
       _$WorkflowModelStepCopyWithImpl<$Res, WorkflowModelStep>;
   @useResult
-  $Res call({String name, List<String> commands});
+  $Res call({String name, String command});
 }
 
 /// @nodoc
@@ -716,17 +716,17 @@ class _$WorkflowModelStepCopyWithImpl<$Res, $Val extends WorkflowModelStep>
   @override
   $Res call({
     Object? name = null,
-    Object? commands = null,
+    Object? command = null,
   }) {
     return _then(_value.copyWith(
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      commands: null == commands
-          ? _value.commands
-          : commands // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+      command: null == command
+          ? _value.command
+          : command // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -739,7 +739,7 @@ abstract class _$$WorkflowModelStepImplCopyWith<$Res>
       __$$WorkflowModelStepImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String name, List<String> commands});
+  $Res call({String name, String command});
 }
 
 /// @nodoc
@@ -756,17 +756,17 @@ class __$$WorkflowModelStepImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? name = null,
-    Object? commands = null,
+    Object? command = null,
   }) {
     return _then(_$WorkflowModelStepImpl(
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      commands: null == commands
-          ? _value.commands
-          : commands // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+      command: null == command
+          ? _value.command
+          : command // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -774,7 +774,7 @@ class __$$WorkflowModelStepImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$WorkflowModelStepImpl implements _WorkflowModelStep {
-  const _$WorkflowModelStepImpl({this.name = '', this.commands = const []});
+  const _$WorkflowModelStepImpl({this.name = '', this.command = ''});
 
   factory _$WorkflowModelStepImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowModelStepImplFromJson(json);
@@ -784,11 +784,11 @@ class _$WorkflowModelStepImpl implements _WorkflowModelStep {
   final String name;
   @override
   @JsonKey()
-  final List<String> commands;
+  final String command;
 
   @override
   String toString() {
-    return 'WorkflowModelStep(name: $name, commands: $commands)';
+    return 'WorkflowModelStep(name: $name, command: $command)';
   }
 
   @override
@@ -797,13 +797,12 @@ class _$WorkflowModelStepImpl implements _WorkflowModelStep {
         (other.runtimeType == runtimeType &&
             other is _$WorkflowModelStepImpl &&
             (identical(other.name, name) || other.name == name) &&
-            const DeepCollectionEquality().equals(other.commands, commands));
+            (identical(other.command, command) || other.command == command));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, name, const DeepCollectionEquality().hash(commands));
+  int get hashCode => Object.hash(runtimeType, name, command);
 
   /// Create a copy of WorkflowModelStep
   /// with the given fields replaced by the non-null parameter values.
@@ -823,9 +822,8 @@ class _$WorkflowModelStepImpl implements _WorkflowModelStep {
 }
 
 abstract class _WorkflowModelStep implements WorkflowModelStep {
-  const factory _WorkflowModelStep(
-      {final String name,
-      final List<String> commands}) = _$WorkflowModelStepImpl;
+  const factory _WorkflowModelStep({final String name, final String command}) =
+      _$WorkflowModelStepImpl;
 
   factory _WorkflowModelStep.fromJson(Map<String, dynamic> json) =
       _$WorkflowModelStepImpl.fromJson;
@@ -833,7 +831,7 @@ abstract class _WorkflowModelStep implements WorkflowModelStep {
   @override
   String get name;
   @override
-  List<String> get commands;
+  String get command;
 
   /// Create a copy of WorkflowModelStep
   /// with the given fields replaced by the non-null parameter values.

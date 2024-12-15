@@ -61,7 +61,7 @@ class WorkflowModelGitHub with _$WorkflowModelGitHub {
 class WorkflowModelStep with _$WorkflowModelStep {
   const factory WorkflowModelStep({
     @Default('') String name,
-    @Default([]) List<String> commands,
+    @Default('') String command,
   }) = _WorkflowModelStep;
   factory WorkflowModelStep.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelStepFromJson(json);
