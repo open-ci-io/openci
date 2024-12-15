@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 /// GitHub Appのインストールトークンを取得する
 Future<String> getGitHubInstallationToken({

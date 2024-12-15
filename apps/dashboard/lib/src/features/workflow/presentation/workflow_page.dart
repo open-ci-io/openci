@@ -7,7 +7,7 @@ import 'package:dashboard/src/features/workflow/presentation/workflow_page_contr
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+import 'package:signals/signals_flutter.dart';
 
 final _isEdit = signal(false);
 
