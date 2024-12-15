@@ -7,6 +7,7 @@ part 'workflow_editor_controller.g.dart';
 class WorkflowEditorController extends _$WorkflowEditorController {
   @override
   WorkflowModel build(WorkflowModel workflowModel) {
+    print('build: ${workflowModel.toJson()}');
     return workflowModel;
   }
 
@@ -44,7 +45,13 @@ class WorkflowEditorController extends _$WorkflowEditorController {
   }
 
   void addStep() {
-    final steps = state.steps.toList()..add(const WorkflowModelStep());
+    final steps = state.steps.toList()
+      ..add(
+        const WorkflowModelStep(
+          name: 'New Step',
+          command: 'echo "Hello, World!"',
+        ),
+      );
     state = state.copyWith(steps: steps);
   }
 
@@ -66,6 +73,7 @@ class WorkflowEditorController extends _$WorkflowEditorController {
   }
 
   Future<void> save() async {
+    print('state: ${state.toJson()}');
     await FirebaseFirestore.instance
         .collection('workflows')
         .doc(state.id)

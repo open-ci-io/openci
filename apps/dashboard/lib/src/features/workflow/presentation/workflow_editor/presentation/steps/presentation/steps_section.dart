@@ -41,7 +41,7 @@ class StepsSection extends ConsumerWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: steps.length,
-              itemBuilder: (context, index) {
+              itemBuilder: (_, index) {
                 return _StepItem(
                   step: steps[index],
                   index: index,
@@ -75,7 +75,7 @@ class _StepItem extends ConsumerWidget {
     return Card(
       elevation: 0,
       child: ExpansionTile(
-        title: Text(step.name.isEmpty ? 'Step ${index + 1}' : step.name),
+        title: Text(step.name),
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
@@ -87,7 +87,10 @@ class _StepItem extends ConsumerWidget {
                     labelText: 'Step Name',
                     border: OutlineInputBorder(),
                   ),
-                  onChanged: (value) => controller.updateStepName(index, value),
+                  onChanged: (value) {
+                    print('value: $value');
+                    controller.updateStepName(index, value);
+                  },
                 ),
                 verticalMargin16,
                 _Command(
@@ -127,12 +130,12 @@ class _Command extends ConsumerWidget {
     final command = step.command;
 
     return TextFormField(
-      initialValue: command.isEmpty ? 'echo "Hello, World!"' : command,
+      initialValue: command,
       decoration: const InputDecoration(
         labelText: 'Command',
         border: OutlineInputBorder(),
       ),
-      onChanged: (value) => controller.updateStepName(stepIndex, value),
+      onChanged: (value) => controller.updateCommand(stepIndex, value),
     );
   }
 }
