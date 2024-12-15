@@ -14,8 +14,9 @@ dependencies:
   dartssh2: ^2.10.0
   github: ^9.24.0
   http: ^1.2.2
+  logger: ^2.5.0
   mason_logger: ^0.3.0
-  openci_models: ^1.2.0
+  openci_models: ^1.2.3
   process_run: ^1.2.2
   pub_updater: ^0.5.0
   signals_core: ^6.0.2

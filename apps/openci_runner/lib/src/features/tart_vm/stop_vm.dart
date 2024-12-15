@@ -12,7 +12,7 @@ Future<void> stopVM(String vmName) async {
     if (result.first.exitCode != 0) {
       throw Exception('Failed to stop VM: ${result.first.stderr}');
     }
-    logger.success('Successfully stopped VM: $vmName');
+    logger.info('Successfully stopped VM: $vmName');
   } catch (error) {
     logger.err('Failed to stop VM: $error');
     rethrow;

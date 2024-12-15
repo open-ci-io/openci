@@ -28,8 +28,12 @@ mixin _$BuildJob {
   @TimestampConverter()
   Timestamp? get createdAt => throw _privateConstructorUsedError;
 
+  /// Serializes this BuildJob to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of BuildJob
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $BuildJobCopyWith<BuildJob> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -59,6 +63,8 @@ class _$BuildJobCopyWithImpl<$Res, $Val extends BuildJob>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of BuildJob
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -92,6 +98,8 @@ class _$BuildJobCopyWithImpl<$Res, $Val extends BuildJob>
     ) as $Val);
   }
 
+  /// Create a copy of BuildJob
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $OpenCIGithubCopyWith<$Res> get github {
@@ -128,6 +136,8 @@ class __$$BuildJobImplCopyWithImpl<$Res>
       _$BuildJobImpl _value, $Res Function(_$BuildJobImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of BuildJob
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -208,12 +218,14 @@ class _$BuildJobImpl implements _BuildJob {
                 other.createdAt == createdAt));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, buildStatus, github, id, workflowId, createdAt);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of BuildJob
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$BuildJobImplCopyWith<_$BuildJobImpl> get copyWith =>
@@ -249,8 +261,11 @@ abstract class _BuildJob implements BuildJob {
   @override
   @TimestampConverter()
   Timestamp? get createdAt;
+
+  /// Create a copy of BuildJob
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$BuildJobImplCopyWith<_$BuildJobImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -271,8 +286,12 @@ mixin _$OpenCIGithub {
   String get baseBranch => throw _privateConstructorUsedError;
   String get buildBranch => throw _privateConstructorUsedError;
 
+  /// Serializes this OpenCIGithub to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of OpenCIGithub
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $OpenCIGithubCopyWith<OpenCIGithub> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -305,6 +324,8 @@ class _$OpenCIGithubCopyWithImpl<$Res, $Val extends OpenCIGithub>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of OpenCIGithub
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -387,6 +408,8 @@ class __$$OpenCIGithubImplCopyWithImpl<$Res>
       _$OpenCIGithubImpl _value, $Res Function(_$OpenCIGithubImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of OpenCIGithub
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -506,7 +529,7 @@ class _$OpenCIGithubImpl implements _OpenCIGithub {
                 other.buildBranch == buildBranch));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -520,7 +543,9 @@ class _$OpenCIGithubImpl implements _OpenCIGithub {
       baseBranch,
       buildBranch);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of OpenCIGithub
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$OpenCIGithubImplCopyWith<_$OpenCIGithubImpl> get copyWith =>
@@ -567,8 +592,11 @@ abstract class _OpenCIGithub implements OpenCIGithub {
   String get baseBranch;
   @override
   String get buildBranch;
+
+  /// Create a copy of OpenCIGithub
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$OpenCIGithubImplCopyWith<_$OpenCIGithubImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

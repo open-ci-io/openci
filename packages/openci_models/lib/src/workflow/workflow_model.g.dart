@@ -70,12 +70,15 @@ _$WorkflowModelStepImpl _$$WorkflowModelStepImplFromJson(
         Map<String, dynamic> json) =>
     _$WorkflowModelStepImpl(
       name: json['name'] as String? ?? '',
-      command: json['command'] as String? ?? '',
+      commands: (json['commands'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$WorkflowModelStepImplToJson(
         _$WorkflowModelStepImpl instance) =>
     <String, dynamic>{
       'name': instance.name,
-      'command': instance.command,
+      'commands': instance.commands,
     };

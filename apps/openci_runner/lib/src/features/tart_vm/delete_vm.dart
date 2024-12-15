@@ -12,7 +12,7 @@ Future<void> deleteVM(String vmName) async {
     if (result.first.exitCode != 0) {
       throw Exception('Failed to delete VM: ${result.first.stderr}');
     }
-    logger.success('Successfully deleted VM: $vmName');
+    logger.info('Successfully deleted VM: $vmName');
   } catch (error) {
     logger.err('Failed to delete VM: $error');
     rethrow;
