@@ -92,58 +92,65 @@ class RunnerCommand extends Command<int> {
       final buildJob = await _tryGetBuildJob(firestore);
       if (buildJob == null) continue;
       _log('Found ${buildJob.toJson()} build jobs');
+      try {
+        await updateBuildStatus(
+          jobId: buildJob.id,
+        );
 
-      await updateBuildStatus(
-        jobId: buildJob.id,
-      );
+        final workflow = await getWorkflowModel(firestore, buildJob.workflowId);
+        if (workflow == null) {
+          _log('Workflow not found');
+          throw Exception('Workflow not found');
+        }
+        final token = await getGitHubInstallationToken(
+          installationId: buildJob.github.installationId,
+          appId: buildJob.github.appId,
+          privateKey: pem,
+        );
+        _log('Successfully got GitHub access token: $token', isSuccess: true);
 
-      final workflow = await getWorkflowModel(firestore, buildJob.workflowId);
-      if (workflow == null) {
-        _log('Workflow not found');
-        throw Exception('Workflow not found');
+        final vmName = getVMName();
+
+        await cloneVM(vmName);
+        unawaited(runVM(vmName));
+        final vmIp = await getVMIp(vmName);
+        _log('VM IP: $vmIp');
+        _log('VM is ready', isSuccess: true);
+
+        final client = SSHClient(
+          await SSHSocket.connect(vmIp, 22),
+          username: 'admin',
+          onPasswordRequest: () => 'admin',
+        );
+
+        final repoUrl = buildJob.github.repositoryUrl;
+        final cloneCommand =
+            'git clone https://x-access-token:$token@${repoUrl.replaceFirst("https://", "")}';
+        await runCommand(
+          client: client,
+          command: cloneCommand,
+          currentWorkingDirectory: null,
+        );
+
+        await runCommand(
+          client: client,
+          command: 'ls',
+          currentWorkingDirectory: workflow.currentWorkingDirectory,
+        );
+
+        await stopVM(vmName);
+        await deleteVM(vmName);
+        await updateBuildStatus(
+          jobId: buildJob.id,
+          status: OpenCIGitHubChecksStatus.success,
+        );
+      } catch (e) {
+        await updateBuildStatus(
+          jobId: buildJob.id,
+          status: OpenCIGitHubChecksStatus.failure,
+        );
+        _log('Error: $e');
       }
-      final token = await getGitHubInstallationToken(
-        installationId: buildJob.github.installationId,
-        appId: buildJob.github.appId,
-        privateKey: pem,
-      );
-      _log('Successfully got GitHub access token: $token', isSuccess: true);
-
-      final vmName = getVMName();
-
-      await cloneVM(vmName);
-      unawaited(runVM(vmName));
-      final vmIp = await getVMIp(vmName);
-      _log('VM IP: $vmIp');
-      _log('VM is ready', isSuccess: true);
-
-      final client = SSHClient(
-        await SSHSocket.connect(vmIp, 22),
-        username: 'admin',
-        onPasswordRequest: () => 'admin',
-      );
-
-      final repoUrl = buildJob.github.repositoryUrl;
-      final cloneCommand =
-          'git clone https://x-access-token:$token@${repoUrl.replaceFirst("https://", "")}';
-      await runCommand(
-        client: client,
-        command: cloneCommand,
-        currentWorkingDirectory: null,
-      );
-
-      await runCommand(
-        client: client,
-        command: 'ls',
-        currentWorkingDirectory: workflow.currentWorkingDirectory,
-      );
-
-      await stopVM(vmName);
-      await deleteVM(vmName);
-      await updateBuildStatus(
-        jobId: buildJob.id,
-        status: OpenCIGitHubChecksStatus.success,
-      );
     }
   }
 }
