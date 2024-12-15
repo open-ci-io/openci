@@ -12,7 +12,7 @@ class RunDetailsScreen extends StatelessWidget {
         actions: [
           Chip(
             label: const Text('RUNNING'),
-            backgroundColor: Colors.blue.withOpacity(0.2),
+            backgroundColor: Colors.blue.withValues(alpha: 0.2),
             side: BorderSide.none,
           ),
           const SizedBox(width: 16),
@@ -327,7 +327,7 @@ class _LogLine extends StatelessWidget {
               color: Theme.of(context)
                   .colorScheme
                   .onSurfaceVariant
-                  .withOpacity(0.7),
+                  .withValues(alpha: 0.7),
               fontFamily: 'monospace',
               fontSize: 12,
             ),
