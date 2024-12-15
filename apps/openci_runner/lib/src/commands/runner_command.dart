@@ -102,6 +102,10 @@ class RunnerCommand extends Command<int> {
           _log('Workflow not found');
           throw Exception('Workflow not found');
         }
+
+        print('workflow: ${workflow.toJson()}');
+
+        print('steps: ${workflow.steps}');
         final token = await getGitHubInstallationToken(
           installationId: buildJob.github.installationId,
           appId: buildJob.github.appId,
@@ -132,17 +136,17 @@ class RunnerCommand extends Command<int> {
           currentWorkingDirectory: null,
         );
 
-        final commands = workflow.steps.map((e) => e.command).toList();
+        final commandsList = workflow.steps.map((e) => e.commands).toList();
 
-        for (final command in commands) {
-          await runCommand(
-            client: client,
-            command: command,
-            currentWorkingDirectory: workflow.currentWorkingDirectory,
-          );
+        for (final command in commandsList) {
+          for (final command in command) {
+            await runCommand(
+              client: client,
+              command: command,
+              currentWorkingDirectory: workflow.currentWorkingDirectory,
+            );
+          }
         }
-
-        // ここでコマンドを実行
 
         await stopVM(vmName);
         await deleteVM(vmName);
@@ -155,7 +159,7 @@ class RunnerCommand extends Command<int> {
           jobId: buildJob.id,
           status: OpenCIGitHubChecksStatus.failure,
         );
-        _log('Error: $e');
+        _log('Error: $e, Try to run again');
       }
     }
   }

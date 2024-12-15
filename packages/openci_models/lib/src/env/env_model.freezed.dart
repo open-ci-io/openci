@@ -25,8 +25,12 @@ mixin _$EnvModel {
   String get pemBase64 => throw _privateConstructorUsedError;
   String get githubAppId => throw _privateConstructorUsedError;
 
+  /// Serializes this EnvModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of EnvModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $EnvModelCopyWith<EnvModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -53,6 +57,8 @@ class _$EnvModelCopyWithImpl<$Res, $Val extends EnvModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of EnvModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -105,6 +111,8 @@ class __$$EnvModelImplCopyWithImpl<$Res>
       _$EnvModelImpl _value, $Res Function(_$EnvModelImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of EnvModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -177,12 +185,14 @@ class _$EnvModelImpl implements _EnvModel {
                 other.githubAppId == githubAppId));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, firebaseServiceAccountBase64,
       firebaseProjectName, pemBase64, githubAppId);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of EnvModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$EnvModelImplCopyWith<_$EnvModelImpl> get copyWith =>
@@ -214,8 +224,11 @@ abstract class _EnvModel implements EnvModel {
   String get pemBase64;
   @override
   String get githubAppId;
+
+  /// Create a copy of EnvModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$EnvModelImplCopyWith<_$EnvModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

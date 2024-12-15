@@ -26,7 +26,7 @@ class DartSSH2Service {
   }) async {
     final fullCommand =
         '$_defaultCommand$_commandSeparator${_cwd(currentWorkingDirectory)}$command';
-    final logger = Logger()..info('Executing command: $fullCommand');
+    Logger().info('Executing command: $fullCommand');
     final session = await client.execute(fullCommand);
     await session.stdin.close();
 
@@ -39,7 +39,6 @@ class DartSSH2Service {
     if (exitCode == null) {
       throw Exception('exitCode is null');
     }
-    logger.success('Command executed successfully');
 
     final result = SessionResult(
       stdout: output,

@@ -28,8 +28,12 @@ mixin _$WorkflowModel {
   List<String> get owners => throw _privateConstructorUsedError;
   List<WorkflowModelStep> get steps => throw _privateConstructorUsedError;
 
+  /// Serializes this WorkflowModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of WorkflowModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $WorkflowModelCopyWith<WorkflowModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -63,6 +67,8 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of WorkflowModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -106,6 +112,8 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
     ) as $Val);
   }
 
+  /// Create a copy of WorkflowModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $WorkflowModelFlutterCopyWith<$Res> get flutter {
@@ -114,6 +122,8 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
     });
   }
 
+  /// Create a copy of WorkflowModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $WorkflowModelGitHubCopyWith<$Res> get github {
@@ -154,6 +164,8 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
       _$WorkflowModelImpl _value, $Res Function(_$WorkflowModelImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of WorkflowModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -249,7 +261,7 @@ class _$WorkflowModelImpl implements _WorkflowModel {
             const DeepCollectionEquality().equals(other.steps, steps));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -261,7 +273,9 @@ class _$WorkflowModelImpl implements _WorkflowModel {
       const DeepCollectionEquality().hash(owners),
       const DeepCollectionEquality().hash(steps));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of WorkflowModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$WorkflowModelImplCopyWith<_$WorkflowModelImpl> get copyWith =>
@@ -302,8 +316,11 @@ abstract class _WorkflowModel implements WorkflowModel {
   List<String> get owners;
   @override
   List<WorkflowModelStep> get steps;
+
+  /// Create a copy of WorkflowModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$WorkflowModelImplCopyWith<_$WorkflowModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -316,8 +333,12 @@ WorkflowModelFlutter _$WorkflowModelFlutterFromJson(Map<String, dynamic> json) {
 mixin _$WorkflowModelFlutter {
   String get version => throw _privateConstructorUsedError;
 
+  /// Serializes this WorkflowModelFlutter to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of WorkflowModelFlutter
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $WorkflowModelFlutterCopyWith<WorkflowModelFlutter> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -342,6 +363,8 @@ class _$WorkflowModelFlutterCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of WorkflowModelFlutter
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -375,6 +398,8 @@ class __$$WorkflowModelFlutterImplCopyWithImpl<$Res>
       $Res Function(_$WorkflowModelFlutterImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of WorkflowModelFlutter
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -413,11 +438,13 @@ class _$WorkflowModelFlutterImpl implements _WorkflowModelFlutter {
             (identical(other.version, version) || other.version == version));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, version);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of WorkflowModelFlutter
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$WorkflowModelFlutterImplCopyWith<_$WorkflowModelFlutterImpl>
@@ -442,8 +469,11 @@ abstract class _WorkflowModelFlutter implements WorkflowModelFlutter {
 
   @override
   String get version;
+
+  /// Create a copy of WorkflowModelFlutter
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$WorkflowModelFlutterImplCopyWith<_$WorkflowModelFlutterImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -458,8 +488,12 @@ mixin _$WorkflowModelGitHub {
   GitHubTriggerType get triggerType => throw _privateConstructorUsedError;
   String get baseBranch => throw _privateConstructorUsedError;
 
+  /// Serializes this WorkflowModelGitHub to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of WorkflowModelGitHub
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $WorkflowModelGitHubCopyWith<WorkflowModelGitHub> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -484,6 +518,8 @@ class _$WorkflowModelGitHubCopyWithImpl<$Res, $Val extends WorkflowModelGitHub>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of WorkflowModelGitHub
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -528,6 +564,8 @@ class __$$WorkflowModelGitHubImplCopyWithImpl<$Res>
       $Res Function(_$WorkflowModelGitHubImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of WorkflowModelGitHub
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -588,12 +626,14 @@ class _$WorkflowModelGitHubImpl implements _WorkflowModelGitHub {
                 other.baseBranch == baseBranch));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, repositoryUrl, triggerType, baseBranch);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of WorkflowModelGitHub
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$WorkflowModelGitHubImplCopyWith<_$WorkflowModelGitHubImpl> get copyWith =>
@@ -623,8 +663,11 @@ abstract class _WorkflowModelGitHub implements WorkflowModelGitHub {
   GitHubTriggerType get triggerType;
   @override
   String get baseBranch;
+
+  /// Create a copy of WorkflowModelGitHub
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$WorkflowModelGitHubImplCopyWith<_$WorkflowModelGitHubImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -636,10 +679,14 @@ WorkflowModelStep _$WorkflowModelStepFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$WorkflowModelStep {
   String get name => throw _privateConstructorUsedError;
-  String get command => throw _privateConstructorUsedError;
+  List<String> get commands => throw _privateConstructorUsedError;
 
+  /// Serializes this WorkflowModelStep to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of WorkflowModelStep
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $WorkflowModelStepCopyWith<WorkflowModelStep> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -650,7 +697,7 @@ abstract class $WorkflowModelStepCopyWith<$Res> {
           WorkflowModelStep value, $Res Function(WorkflowModelStep) then) =
       _$WorkflowModelStepCopyWithImpl<$Res, WorkflowModelStep>;
   @useResult
-  $Res call({String name, String command});
+  $Res call({String name, List<String> commands});
 }
 
 /// @nodoc
@@ -663,21 +710,23 @@ class _$WorkflowModelStepCopyWithImpl<$Res, $Val extends WorkflowModelStep>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of WorkflowModelStep
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? name = null,
-    Object? command = null,
+    Object? commands = null,
   }) {
     return _then(_value.copyWith(
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      command: null == command
-          ? _value.command
-          : command // ignore: cast_nullable_to_non_nullable
-              as String,
+      commands: null == commands
+          ? _value.commands
+          : commands // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ) as $Val);
   }
 }
@@ -690,7 +739,7 @@ abstract class _$$WorkflowModelStepImplCopyWith<$Res>
       __$$WorkflowModelStepImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String name, String command});
+  $Res call({String name, List<String> commands});
 }
 
 /// @nodoc
@@ -701,21 +750,23 @@ class __$$WorkflowModelStepImplCopyWithImpl<$Res>
       $Res Function(_$WorkflowModelStepImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of WorkflowModelStep
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? name = null,
-    Object? command = null,
+    Object? commands = null,
   }) {
     return _then(_$WorkflowModelStepImpl(
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      command: null == command
-          ? _value.command
-          : command // ignore: cast_nullable_to_non_nullable
-              as String,
+      commands: null == commands
+          ? _value.commands
+          : commands // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
@@ -723,7 +774,7 @@ class __$$WorkflowModelStepImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$WorkflowModelStepImpl implements _WorkflowModelStep {
-  const _$WorkflowModelStepImpl({this.name = '', this.command = ''});
+  const _$WorkflowModelStepImpl({this.name = '', this.commands = const []});
 
   factory _$WorkflowModelStepImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowModelStepImplFromJson(json);
@@ -733,11 +784,11 @@ class _$WorkflowModelStepImpl implements _WorkflowModelStep {
   final String name;
   @override
   @JsonKey()
-  final String command;
+  final List<String> commands;
 
   @override
   String toString() {
-    return 'WorkflowModelStep(name: $name, command: $command)';
+    return 'WorkflowModelStep(name: $name, commands: $commands)';
   }
 
   @override
@@ -746,14 +797,17 @@ class _$WorkflowModelStepImpl implements _WorkflowModelStep {
         (other.runtimeType == runtimeType &&
             other is _$WorkflowModelStepImpl &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.command, command) || other.command == command));
+            const DeepCollectionEquality().equals(other.commands, commands));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, name, command);
+  int get hashCode => Object.hash(
+      runtimeType, name, const DeepCollectionEquality().hash(commands));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of WorkflowModelStep
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$WorkflowModelStepImplCopyWith<_$WorkflowModelStepImpl> get copyWith =>
@@ -769,8 +823,9 @@ class _$WorkflowModelStepImpl implements _WorkflowModelStep {
 }
 
 abstract class _WorkflowModelStep implements WorkflowModelStep {
-  const factory _WorkflowModelStep({final String name, final String command}) =
-      _$WorkflowModelStepImpl;
+  const factory _WorkflowModelStep(
+      {final String name,
+      final List<String> commands}) = _$WorkflowModelStepImpl;
 
   factory _WorkflowModelStep.fromJson(Map<String, dynamic> json) =
       _$WorkflowModelStepImpl.fromJson;
@@ -778,9 +833,12 @@ abstract class _WorkflowModelStep implements WorkflowModelStep {
   @override
   String get name;
   @override
-  String get command;
+  List<String> get commands;
+
+  /// Create a copy of WorkflowModelStep
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$WorkflowModelStepImplCopyWith<_$WorkflowModelStepImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

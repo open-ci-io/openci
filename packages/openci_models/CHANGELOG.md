@@ -1,3 +1,11 @@
+## 1.2.3
+
+- update: WorkflowModelStep
+
+## 1.2.2
+
+- update: vmBaseName
+
 ## 1.2.1
 
 - update: vmBaseName
