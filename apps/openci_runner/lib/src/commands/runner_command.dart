@@ -132,11 +132,17 @@ class RunnerCommand extends Command<int> {
           currentWorkingDirectory: null,
         );
 
-        await runCommand(
-          client: client,
-          command: 'ls',
-          currentWorkingDirectory: workflow.currentWorkingDirectory,
-        );
+        final commands = workflow.steps.map((e) => e.command).toList();
+
+        for (final command in commands) {
+          await runCommand(
+            client: client,
+            command: command,
+            currentWorkingDirectory: workflow.currentWorkingDirectory,
+          );
+        }
+
+        // ここでコマンドを実行
 
         await stopVM(vmName);
         await deleteVM(vmName);

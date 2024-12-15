@@ -2,7 +2,6 @@ import 'package:openci_runner/src/service/logger_service.dart';
 import 'package:process_run/process_run.dart';
 
 Future<void> cloneVM(String vmName) async {
-  const baseVMName = 'ventura';
   final logger = loggerSignal.value;
 
   try {
