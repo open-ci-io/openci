@@ -4,8 +4,7 @@ publish_to: 'none'
 version: 1.0.0+1
 environment:
   sdk: ^3.6.0
-# resolution: workspace
-
+  
 dependencies:
   cloud_firestore: ^5.5.1
   cupertino_icons: ^1.0.8
