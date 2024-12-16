@@ -683,7 +683,7 @@ packages:
       path: "../../packages/openci_models"
       relative: true
     source: path
-    version: "1.2.4"
+    version: "1.2.5"
   package_config:
     dependency: transitive
     description:

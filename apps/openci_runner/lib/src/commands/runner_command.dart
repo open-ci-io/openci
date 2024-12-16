@@ -131,6 +131,7 @@ class RunnerCommand extends Command<int> {
           client: client,
           command: cloneCommand,
           currentWorkingDirectory: null,
+          jobId: buildJob.id,
         );
 
         final commandsList = workflow.steps.map((e) => e.command).toList();
@@ -140,6 +141,7 @@ class RunnerCommand extends Command<int> {
             client: client,
             command: command,
             currentWorkingDirectory: workflow.currentWorkingDirectory,
+            jobId: buildJob.id,
           );
         }
 
