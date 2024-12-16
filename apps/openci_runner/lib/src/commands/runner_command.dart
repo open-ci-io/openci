@@ -17,6 +17,7 @@ import 'package:openci_runner/src/features/tart_vm/stop_vm.dart';
 import 'package:openci_runner/src/features/tart_vm/vm_name.dart';
 import 'package:openci_runner/src/features/update_build_status.dart';
 import 'package:openci_runner/src/firebase/firebase_admin.dart';
+import 'package:openci_runner/src/service/github/clone_command.dart';
 import 'package:openci_runner/src/service/github/get_github_installation_token.dart';
 import 'package:signals_core/signals_core.dart';
 
@@ -124,11 +125,14 @@ class RunnerCommand extends Command<int> {
         );
 
         final repoUrl = buildJob.github.repositoryUrl;
-        final cloneCommand =
-            'git clone https://x-access-token:$token@${repoUrl.replaceFirst("https://", "")}';
+
         await runCommand(
           client: client,
-          command: cloneCommand,
+          command: cloneCommand(
+            repoUrl,
+            buildJob.github.buildBranch,
+            token,
+          ),
           currentWorkingDirectory: null,
           jobId: buildJob.id,
         );
