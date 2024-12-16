@@ -6,3 +6,4 @@ export 'src/workflow/workflow_model.dart';
 export 'src/session_result/session_result.dart';
 export 'src/firebase/firestore_path.dart';
 export 'src/vm/vm_base_name.dart';
+export 'src/job/domain/command_log.dart';

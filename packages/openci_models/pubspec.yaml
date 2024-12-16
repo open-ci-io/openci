@@ -1,11 +1,10 @@
 name: openci_models
 description: OpenCI Models
-version: 1.2.4
+version: 1.2.7
 repository: https://github.com/open-ci-io/openci/tree/develop/packages/openci_models
 
 environment:
   sdk: ^3.6.0
-# resolution: workspace
 
 dependencies:
   dart_firebase_admin: ^0.4.0
