@@ -2,11 +2,5 @@ name: openci
 publish_to: none
 environment:
   sdk: ^3.6.0
-# workspace:
-#   - apps/cicd_sandbox_app
-#   - apps/dashboard
-#   - apps/openci_runner
-#   - packages/openci_models
-
 dev_dependencies:
   melos: ^6.2.0

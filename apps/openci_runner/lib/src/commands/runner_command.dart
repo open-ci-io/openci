@@ -92,6 +92,7 @@ class RunnerCommand extends Command<int> {
       final buildJob = await _tryGetBuildJob(firestore);
       if (buildJob == null) continue;
       _log('Found ${buildJob.toJson()} build jobs');
+      final vmName = getVMName();
       try {
         await updateBuildStatus(
           jobId: buildJob.id,
@@ -109,8 +110,6 @@ class RunnerCommand extends Command<int> {
           privateKey: pem,
         );
         _log('Successfully got GitHub access token: $token', isSuccess: true);
-
-        final vmName = getVMName();
 
         await cloneVM(vmName);
         unawaited(runVM(vmName));
@@ -131,6 +130,7 @@ class RunnerCommand extends Command<int> {
           client: client,
           command: cloneCommand,
           currentWorkingDirectory: null,
+          jobId: buildJob.id,
         );
 
         final commandsList = workflow.steps.map((e) => e.command).toList();
@@ -140,11 +140,10 @@ class RunnerCommand extends Command<int> {
             client: client,
             command: command,
             currentWorkingDirectory: workflow.currentWorkingDirectory,
+            jobId: buildJob.id,
           );
         }
 
-        await stopVM(vmName);
-        await deleteVM(vmName);
         await updateBuildStatus(
           jobId: buildJob.id,
           status: OpenCIGitHubChecksStatus.success,
@@ -155,6 +154,9 @@ class RunnerCommand extends Command<int> {
           status: OpenCIGitHubChecksStatus.failure,
         );
         _log('Error: $e, Try to run again');
+      } finally {
+        await stopVM(vmName);
+        await deleteVM(vmName);
       }
     }
   }

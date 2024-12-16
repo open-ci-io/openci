@@ -1,3 +1,15 @@
+## 1.2.7
+
+- update: CommandLog model
+
+## 1.2.6
+
+- update: CommandLog model
+
+## 1.2.5
+
+- add: CommandLog model
+
 ## 1.2.4
 
 - update: WorkflowModelStep

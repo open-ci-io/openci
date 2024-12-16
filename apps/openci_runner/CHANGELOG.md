@@ -1,3 +1,19 @@
+## 0.8.9
+
+- fix: #105
+
+## 0.8.8
+
+- fix: command log
+
+## 0.8.7
+
+- fix: command log
+
+## 0.8.6
+
+- fix: command log
+
 ## 0.8.5
 
 - fix: workflow runner
