@@ -3,7 +3,7 @@ import 'package:dashboard/src/features/build/presentation/build_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+import 'package:signals/signals_flutter.dart';
 
 final _index = signal(0);
 
