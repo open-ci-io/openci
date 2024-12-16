@@ -22,7 +22,7 @@ CommandLog _$CommandLogFromJson(Map<String, dynamic> json) {
 mixin _$CommandLog {
   String get command => throw _privateConstructorUsedError;
   String get log => throw _privateConstructorUsedError;
-  @TimestampConverter()
+  @DateTimeConverter()
   DateTime get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this CommandLog to a JSON map.
@@ -42,7 +42,7 @@ abstract class $CommandLogCopyWith<$Res> {
       _$CommandLogCopyWithImpl<$Res, CommandLog>;
   @useResult
   $Res call(
-      {String command, String log, @TimestampConverter() DateTime createdAt});
+      {String command, String log, @DateTimeConverter() DateTime createdAt});
 }
 
 /// @nodoc
@@ -90,7 +90,7 @@ abstract class _$$CommandLogImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String command, String log, @TimestampConverter() DateTime createdAt});
+      {String command, String log, @DateTimeConverter() DateTime createdAt});
 }
 
 /// @nodoc
@@ -133,7 +133,7 @@ class _$CommandLogImpl implements _CommandLog {
   const _$CommandLogImpl(
       {required this.command,
       required this.log,
-      @TimestampConverter() required this.createdAt});
+      @DateTimeConverter() required this.createdAt});
 
   factory _$CommandLogImpl.fromJson(Map<String, dynamic> json) =>
       _$$CommandLogImplFromJson(json);
@@ -143,7 +143,7 @@ class _$CommandLogImpl implements _CommandLog {
   @override
   final String log;
   @override
-  @TimestampConverter()
+  @DateTimeConverter()
   final DateTime createdAt;
 
   @override
@@ -186,7 +186,7 @@ abstract class _CommandLog implements CommandLog {
   const factory _CommandLog(
           {required final String command,
           required final String log,
-          @TimestampConverter() required final DateTime createdAt}) =
+          @DateTimeConverter() required final DateTime createdAt}) =
       _$CommandLogImpl;
 
   factory _CommandLog.fromJson(Map<String, dynamic> json) =
@@ -197,7 +197,7 @@ abstract class _CommandLog implements CommandLog {
   @override
   String get log;
   @override
-  @TimestampConverter()
+  @DateTimeConverter()
   DateTime get createdAt;
 
   /// Create a copy of CommandLog

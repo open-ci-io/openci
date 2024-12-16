@@ -10,12 +10,13 @@ _$CommandLogImpl _$$CommandLogImplFromJson(Map<String, dynamic> json) =>
     _$CommandLogImpl(
       command: json['command'] as String,
       log: json['log'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt:
+          const DateTimeConverter().fromJson(json['createdAt'] as Timestamp),
     );
 
 Map<String, dynamic> _$$CommandLogImplToJson(_$CommandLogImpl instance) =>
     <String, dynamic>{
       'command': instance.command,
       'log': instance.log,
-      'createdAt': instance.createdAt.toIso8601String(),
+      'createdAt': const DateTimeConverter().toJson(instance.createdAt),
     };

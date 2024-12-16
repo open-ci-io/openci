@@ -1,3 +1,7 @@
+## 1.2.7
+
+- update: CommandLog model
+
 ## 1.2.6
 
 - update: CommandLog model
