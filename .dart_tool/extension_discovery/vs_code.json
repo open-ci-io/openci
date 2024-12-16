@@ -1,1 +1,10 @@
-{"version":2,"entries":[{"package":"openci","rootUri":"../","packageUri":"lib/"}]}
+{
+    "version": 2,
+    "entries": [
+        {
+            "package": "openci",
+            "rootUri": "../",
+            "packageUri": "lib/"
+        }
+    ]
+}
