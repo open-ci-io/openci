@@ -9,14 +9,18 @@ part of 'command_log.dart';
 _$CommandLogImpl _$$CommandLogImplFromJson(Map<String, dynamic> json) =>
     _$CommandLogImpl(
       command: json['command'] as String,
-      log: json['log'] as String,
+      logStdout: json['logStdout'] as String,
+      logStderr: json['logStderr'] as String,
       createdAt:
           const DateTimeConverter().fromJson(json['createdAt'] as Timestamp),
+      exitCode: (json['exitCode'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$CommandLogImplToJson(_$CommandLogImpl instance) =>
     <String, dynamic>{
       'command': instance.command,
-      'log': instance.log,
+      'logStdout': instance.logStdout,
+      'logStderr': instance.logStderr,
       'createdAt': const DateTimeConverter().toJson(instance.createdAt),
+      'exitCode': instance.exitCode,
     };

@@ -9,8 +9,10 @@ part 'command_log.g.dart';
 class CommandLog with _$CommandLog {
   const factory CommandLog({
     required String command,
-    required String log,
+    required String logStdout,
+    required String logStderr,
     @DateTimeConverter() required DateTime createdAt,
+    required int exitCode,
   }) = _CommandLog;
 
   factory CommandLog.fromJson(Map<String, Object?> json) =>

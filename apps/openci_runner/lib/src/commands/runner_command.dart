@@ -14,11 +14,11 @@ import 'package:openci_runner/src/features/tart_vm/delete_vm.dart';
 import 'package:openci_runner/src/features/tart_vm/get_vm_ip.dart';
 import 'package:openci_runner/src/features/tart_vm/run_vm.dart';
 import 'package:openci_runner/src/features/tart_vm/stop_vm.dart';
-import 'package:openci_runner/src/features/tart_vm/vm_name.dart';
 import 'package:openci_runner/src/features/update_build_status.dart';
 import 'package:openci_runner/src/firebase/firebase_admin.dart';
 import 'package:openci_runner/src/service/github/clone_command.dart';
 import 'package:openci_runner/src/service/github/get_github_installation_token.dart';
+import 'package:openci_runner/src/service/uuid_service.dart';
 import 'package:signals_core/signals_core.dart';
 
 final firestoreSignal = signal<Firestore?>(null);
@@ -80,7 +80,8 @@ class RunnerCommand extends Command<int> {
       );
       if (buildJob == null) continue;
       _log('Found ${buildJob.toJson()} build jobs');
-      final vmName = getVMName();
+      final vmName = generateUUID;
+      final logId = generateUUID;
       try {
         await updateBuildStatus(
           jobId: buildJob.id,
@@ -114,6 +115,7 @@ class RunnerCommand extends Command<int> {
         final repoUrl = buildJob.github.repositoryUrl;
 
         await runCommand(
+          logId: logId,
           client: client,
           command: cloneCommand(
             repoUrl,
@@ -128,6 +130,7 @@ class RunnerCommand extends Command<int> {
 
         for (final command in commandsList) {
           await runCommand(
+            logId: logId,
             client: client,
             command: command,
             currentWorkingDirectory: workflow.currentWorkingDirectory,
