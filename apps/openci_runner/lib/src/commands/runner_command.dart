@@ -23,13 +23,7 @@ import 'package:signals_core/signals_core.dart';
 
 final firestoreSignal = signal<Firestore?>(null);
 
-/// {@template sample_command}
-///
-/// `openci_runner sample`
-/// A [Command] to exemplify a sub command
-/// {@endtemplate}
 class RunnerCommand extends Command<int> {
-  /// {@macro sample_command}
   RunnerCommand({
     required Logger logger,
   }) : _logger = logger {
@@ -65,17 +59,6 @@ class RunnerCommand extends Command<int> {
     }
   }
 
-  Future<BuildJob?> _tryGetBuildJob(Firestore firestore) async {
-    final buildJob = await getBuildJob(firestore);
-    if (buildJob == null) {
-      _log(
-        'No build jobs found. Waiting 1 second before retrying.',
-      );
-      await Future<void>.delayed(const Duration(seconds: 1));
-    }
-    return buildJob;
-  }
-
   @override
   Future<int> run() async {
     final pemPath = argResults?['pem-path'] as String;
@@ -90,7 +73,11 @@ class RunnerCommand extends Command<int> {
     firestoreSignal.value = firestore;
 
     while (true) {
-      final buildJob = await _tryGetBuildJob(firestore);
+      final buildJob = await tryGetBuildJob(
+        firestore: firestore,
+        log: () =>
+            _log('No build jobs found. Waiting 1 second before retrying.'),
+      );
       if (buildJob == null) continue;
       _log('Found ${buildJob.toJson()} build jobs');
       final vmName = getVMName();
