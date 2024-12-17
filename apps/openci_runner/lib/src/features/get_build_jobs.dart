@@ -29,3 +29,15 @@ Future<BuildJob?> getBuildJob(
   }
   return BuildJob.fromJson(qs.docs.first.data());
 }
+
+Future<BuildJob?> tryGetBuildJob({
+  required Firestore firestore,
+  required void Function() log,
+}) async {
+  final buildJob = await getBuildJob(firestore);
+  if (buildJob == null) {
+    log();
+    await Future<void>.delayed(const Duration(seconds: 1));
+  }
+  return buildJob;
+}
