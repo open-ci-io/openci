@@ -1,3 +1,7 @@
+## 0.8.15
+
+- update: openci_models
+
 ## 0.8.14
 
 - update: openci_models

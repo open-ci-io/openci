@@ -1,5 +1,6 @@
 import 'package:dart_firebase_admin/firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:openci_models/src/converters/timestamp_converter.dart';
 
 part 'build_job.freezed.dart';
 part 'build_job.g.dart';
@@ -41,33 +42,4 @@ class OpenCIGithub with _$OpenCIGithub {
 
   factory OpenCIGithub.fromJson(Map<String, dynamic> json) =>
       _$OpenCIGithubFromJson(json);
-}
-
-class TimestampConverter implements JsonConverter<Timestamp, Object> {
-  const TimestampConverter();
-  @override
-  Timestamp fromJson(Object json) {
-    if (json is Timestamp) {
-      return json;
-    }
-    if (json is Map<String, dynamic>) {
-      final seconds = json['seconds'] as int;
-      return Timestamp.fromMillis(seconds * 1000);
-    }
-    throw Exception('Incompatible Timestamp format');
-  }
-
-  @override
-  Object toJson(Timestamp timestamp) => timestamp;
-}
-
-class DateTimeConverter implements JsonConverter<DateTime, Timestamp> {
-  const DateTimeConverter();
-
-  @override
-  DateTime fromJson(Timestamp timestamp) =>
-      DateTime.fromMillisecondsSinceEpoch(timestamp.seconds * 1000);
-
-  @override
-  Timestamp toJson(DateTime dateTime) => Timestamp.fromDate(dateTime);
 }
