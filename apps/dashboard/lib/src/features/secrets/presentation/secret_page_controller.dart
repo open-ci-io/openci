@@ -23,19 +23,3 @@ Stream<QuerySnapshot> secretStream(Ref ref) {
       )
       .snapshots();
 }
-
-class Secret {
-  Secret({
-    required this.key,
-    required this.value,
-  });
-
-  factory Secret.fromJson(Map<String, dynamic> json) {
-    return Secret(
-      key: json['key'].toString(),
-      value: json['value'].toString(),
-    );
-  }
-  final String key;
-  final String value;
-}

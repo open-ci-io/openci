@@ -1,3 +1,7 @@
+## 1.2.10
+
+- add: OpenciSecret model
+
 ## 1.2.9
 
 - add: exitCode to CommandLog model

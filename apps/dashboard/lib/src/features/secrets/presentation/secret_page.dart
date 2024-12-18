@@ -35,7 +35,7 @@ class SecretPage extends ConsumerWidget {
             child: ListView.builder(
               itemCount: data.docs.length,
               itemBuilder: (context, index) {
-                final secret = Secret.fromJson(
+                final secret = OpenciSecret.fromJson(
                   data.docs[index].data()! as Map<String, dynamic>,
                 );
                 return Card(
