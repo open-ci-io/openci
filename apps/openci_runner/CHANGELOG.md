@@ -1,3 +1,7 @@
+## 0.8.12
+
+- fix: command log
+
 ## 0.8.11
 
 - update README

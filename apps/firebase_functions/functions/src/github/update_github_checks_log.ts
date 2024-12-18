@@ -5,6 +5,7 @@ import type { OpenCIGithub } from "../models/BuildJob.js";
 import { getGitHubInstallationToken } from "./get_github_installation_token.js";
 import { firestore } from "../index.js";
 import type { CommandLog } from "../models/CommandLog.js";
+import isSecret from "is-secret";
 
 export const updateGitHubChecksLog = onDocumentWritten(
 	{
@@ -15,8 +16,6 @@ export const updateGitHubChecksLog = onDocumentWritten(
 		const buildJobId = event.params.buildJobId;
 
 		const document = event.data?.after.data();
-
-		console.log(`document: ${document}`);
 
 		if (!document) {
 			console.log("No document data found");
@@ -89,13 +88,28 @@ export function formatLogs(logs: CommandLog[]): string {
 			const timestamp = log.createdAt.toDate().toISOString();
 			const exitCodeStatus = log.exitCode === 0 ? "SUCCESS" : "FAILED";
 
+			const maskSecret = (value: string) => {
+				if (!value) return value;
+				const maskedGitHubUrl = value.replace(
+					/(https:\/\/)[^@]*(@github\.com)/g,
+					"$1[REDACTED]$2",
+				);
+				return isSecret.value(maskedGitHubUrl) ? "********" : maskedGitHubUrl;
+			};
+
+			const maskedData = {
+				command: maskSecret(log.command),
+				stdout: maskSecret(log.logStdout),
+				stderr: maskSecret(log.logStderr),
+			};
+
 			return [
-				`[${timestamp}] Command: ${log.command}`,
+				`[${timestamp}] Command: ${maskedData.command}`,
 				`Exit Code: ${log.exitCode} (${exitCodeStatus})`,
 				"stdout:",
-				log.logStdout,
+				maskedData.stdout,
 				"stderr:",
-				log.logStderr,
+				maskedData.stderr,
 				"---",
 			].join("\n");
 		})
