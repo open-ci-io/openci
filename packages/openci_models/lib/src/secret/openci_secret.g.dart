@@ -13,9 +13,9 @@ _$OpenciSecretImpl _$$OpenciSecretImplFromJson(Map<String, dynamic> json) =>
       owners:
           (json['owners'] as List<dynamic>).map((e) => e as String).toList(),
       createdAt:
-          const DateTimeConverter().fromJson(json['createdAt'] as Timestamp),
+          const TimestampConverter().fromJson(json['createdAt'] as Object),
       updatedAt:
-          const DateTimeConverter().fromJson(json['updatedAt'] as Timestamp),
+          const TimestampConverter().fromJson(json['updatedAt'] as Object),
     );
 
 Map<String, dynamic> _$$OpenciSecretImplToJson(_$OpenciSecretImpl instance) =>
@@ -23,6 +23,6 @@ Map<String, dynamic> _$$OpenciSecretImplToJson(_$OpenciSecretImpl instance) =>
       'key': instance.key,
       'value': instance.value,
       'owners': instance.owners,
-      'createdAt': const DateTimeConverter().toJson(instance.createdAt),
-      'updatedAt': const DateTimeConverter().toJson(instance.updatedAt),
+      'createdAt': const TimestampConverter().toJson(instance.createdAt),
+      'updatedAt': const TimestampConverter().toJson(instance.updatedAt),
     };

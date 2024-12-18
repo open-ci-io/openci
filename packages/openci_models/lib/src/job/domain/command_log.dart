@@ -11,7 +11,7 @@ class CommandLog with _$CommandLog {
     required String command,
     required String logStdout,
     required String logStderr,
-    @DateTimeConverter() required DateTime createdAt,
+    @TimestampConverter() required Timestamp createdAt,
     required int exitCode,
   }) = _CommandLog;
 
