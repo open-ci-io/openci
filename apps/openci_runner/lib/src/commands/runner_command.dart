@@ -62,11 +62,11 @@ class RunnerCommand extends Command<int> {
   Future<Map<String, String>> _fetchSecrets({
     required String workflowId,
     required Firestore firestore,
+    required List<String> owners,
   }) async {
     final secretsSnapshot = await firestore
-        .collection('secrets_v1')
-        .doc(workflowId)
-        .collection('secrets')
+        .collection(secretsCollectionPath)
+        .where('owners', WhereFilter.arrayContainsAny, owners)
         .get();
 
     return Map.fromEntries(
@@ -164,6 +164,7 @@ class RunnerCommand extends Command<int> {
         final secrets = await _fetchSecrets(
           workflowId: workflow.id,
           firestore: firestore,
+          owners: workflow.owners,
         );
 
         for (final command in commandsList) {

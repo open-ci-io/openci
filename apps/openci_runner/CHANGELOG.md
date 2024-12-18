@@ -1,3 +1,7 @@
+## 0.8.13
+
+- feat: support secret
+
 ## 0.8.12
 
 - fix: command log
