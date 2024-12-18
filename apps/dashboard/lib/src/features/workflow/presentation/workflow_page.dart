@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page_controller.dart';
@@ -17,6 +16,7 @@ class WorkflowPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(workflowPageControllerProvider.notifier);
+    final stream = ref.watch(workflowStreamProvider);
     return Scaffold(
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -36,40 +36,40 @@ class WorkflowPage extends ConsumerWidget {
           ),
         ],
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('workflows').snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('An error occurred: ${snapshot.error}'));
-          }
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final workflows = snapshot.data!.docs
+      body: stream.when(
+        data: (data) {
+          final workflows = data.docs
               .map(
                 (e) =>
                     WorkflowModel.fromJson(e.data()! as Map<String, dynamic>),
               )
               .toList();
-          return ListView.separated(
-            itemCount: workflows.length,
-            separatorBuilder: (context, index) => const Divider(
-              color: Color(0xFF2C2C2E),
-              height: 1,
+          return Padding(
+            padding: const EdgeInsets.all(24),
+            child: ListView.separated(
+              itemCount: workflows.length,
+              separatorBuilder: (context, index) => const Divider(
+                color: Color(0xFF2C2C2E),
+                height: 1,
+              ),
+              itemBuilder: (context, index) {
+                final workflow = workflows[index];
+                return _WorkflowListItem(
+                  model: workflow,
+                  workflow: WorkflowItem(
+                    title: workflow.name,
+                    lastUpdated: DateTime.now().toIso8601String(),
+                    runCount: Random().nextInt(1000),
+                  ),
+                );
+              },
             ),
-            itemBuilder: (context, index) {
-              final workflow = workflows[index];
-              return _WorkflowListItem(
-                model: workflow,
-                workflow: WorkflowItem(
-                  title: workflow.name,
-                  lastUpdated: DateTime.now().toIso8601String(),
-                  runCount: Random().nextInt(1000),
-                ),
-              );
-            },
           );
         },
+        error: (error, stackTrace) {
+          return Center(child: Text('An error occurred: $error'));
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );
   }
