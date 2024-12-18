@@ -1,3 +1,11 @@
+## 1.2.9
+
+- add: exitCode to CommandLog model
+
+## 1.2.8
+
+- update: CommandLog model
+
 ## 1.2.7
 
 - update: CommandLog model

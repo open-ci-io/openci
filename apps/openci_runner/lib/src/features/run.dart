@@ -1,3 +1,4 @@
+import 'package:dart_firebase_admin/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/commands/runner_command.dart';
@@ -9,6 +10,7 @@ Future<void> runCommand({
   required String command,
   required String? currentWorkingDirectory,
   required String jobId,
+  required String logId,
 }) async {
   final dartSSH2Service = dartSSH2ServiceSignal.value;
   final firestore = firestoreSignal.value!;
@@ -17,7 +19,16 @@ Future<void> runCommand({
       .collection(buildJobsCollectionPath)
       .doc(jobId)
       .collection('logs')
-      .doc();
+      .doc(logId);
+
+  final docs = await ref.get();
+  if (!docs.exists) {
+    await ref.set({
+      'logs': [],
+      'createdAt': DateTime.now(),
+    });
+  }
+
   await dartSSH2Service.executeCommand(
     client: client,
     command: command,
@@ -25,11 +36,16 @@ Future<void> runCommand({
     onDoneError: (result) async {
       final log = CommandLog(
         command: command,
-        log: result.stderr,
+        logStdout: result.stdout,
+        logStderr: result.stderr,
         createdAt: DateTime.now(),
+        exitCode: result.exitCode,
       );
 
-      await ref.set(log.toJson());
+      await ref.update({
+        'logs': FieldValue.arrayUnion([log.toJson()]),
+      });
+
       logger.err(
         'Command failed: stdout: ${result.stdout}, stderr: ${result.stderr}',
       );
@@ -40,11 +56,15 @@ Future<void> runCommand({
     onDoneSuccess: (result) async {
       final log = CommandLog(
         command: command,
-        log: result.stderr,
+        logStdout: result.stdout,
+        logStderr: result.stderr,
         createdAt: DateTime.now(),
+        exitCode: result.exitCode,
       );
 
-      await ref.set(log.toJson());
+      await ref.update({
+        'logs': FieldValue.arrayUnion([log.toJson()]),
+      });
       logger.info(
         'Command executed successfully: stdout: ${result.stdout}, stderr: ${result.stderr}',
       );

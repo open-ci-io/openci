@@ -6,6 +6,9 @@ import {
 	OpenCIGitHubChecksStatus,
 } from "../models/BuildJob.js";
 import { getGitHubInstallationToken } from "./get_github_installation_token.js";
+import { firestore } from "../index.js";
+import { formatLogs } from "./update_github_checks_log.js";
+import type { CommandLog } from "../models/CommandLog.js";
 
 export const updateGitHubCheckStatus = onDocumentUpdated(
 	{
@@ -15,6 +18,8 @@ export const updateGitHubCheckStatus = onDocumentUpdated(
 	async (event) => {
 		const beforeData = event.data?.before.data();
 		const afterData = event.data?.after.data();
+
+		const buildJobId = event.params.buildJobId;
 
 		if (!beforeData || !afterData) {
 			console.log("No before or after data");
@@ -46,17 +51,48 @@ export const updateGitHubCheckStatus = onDocumentUpdated(
 			beforeData.buildStatus === OpenCIGitHubChecksStatus.IN_PROGRESS &&
 			afterData.buildStatus === OpenCIGitHubChecksStatus.SUCCESS
 		) {
-			await setGitHubCheckStatusToCompleted(octokit, github, "success");
+			const formattedLogs = await getLogs(buildJobId);
+			await setGitHubCheckStatusToCompleted(
+				octokit,
+				github,
+				"success",
+				formattedLogs,
+			);
 		} else if (
 			beforeData.buildStatus === OpenCIGitHubChecksStatus.IN_PROGRESS &&
 			afterData.buildStatus === OpenCIGitHubChecksStatus.FAILURE
 		) {
-			await setGitHubCheckStatusToCompleted(octokit, github, "failure");
+			const formattedLogs = await getLogs(buildJobId);
+			await setGitHubCheckStatusToCompleted(
+				octokit,
+				github,
+				"failure",
+				formattedLogs,
+			);
 		} else {
 			console.log("No status change");
 		}
 	},
 );
+
+async function getLogs(buildJobId: string): Promise<string> {
+	const logQs = await firestore
+		.collection(buildJobsCollectionName)
+		.doc(buildJobId)
+		.collection("logs")
+		.get();
+
+	if (logQs.empty) {
+		console.log("No logs found");
+		throw new Error("No logs found");
+	}
+
+	const logData = logQs.docs[0].data();
+	const logs = logData.logs as CommandLog[];
+
+	const formattedLogs = formatLogs(logs);
+	return formattedLogs;
+}
 
 async function setGitHubCheckStatusToInProgress(
 	octokit: Octokit,
@@ -75,6 +111,7 @@ async function setGitHubCheckStatusToCompleted(
 	octokit: Octokit,
 	github: OpenCIGithub,
 	conclusion: "success" | "failure",
+	logs: string,
 ) {
 	await octokit.checks.update({
 		owner: github.owner,
@@ -82,5 +119,10 @@ async function setGitHubCheckStatusToCompleted(
 		check_run_id: github.checkRunId,
 		status: "completed",
 		conclusion: conclusion,
+		output: {
+			title: "Updated Build Results",
+			summary: "Build progress update",
+			text: logs,
+		},
 	});
 }

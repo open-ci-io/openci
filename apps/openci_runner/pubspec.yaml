@@ -1,6 +1,6 @@
 name: openci_runner
 description: OpenCI Runner
-version: 0.8.11
+version: 0.8.12
 repository: https://github.com/open-ci-io/openci/tree/develop/apps/openci_runner
 homepage: https://open-ci.io
 environment:
@@ -15,7 +15,7 @@ dependencies:
   http: ^1.2.2
   logger: ^2.5.0
   mason_logger: ^0.3.0
-  openci_models: ^1.2.7
+  openci_models: ^1.2.9
   process_run: ^1.2.2
   pub_updater: ^0.5.0
   signals_core: ^6.0.2
