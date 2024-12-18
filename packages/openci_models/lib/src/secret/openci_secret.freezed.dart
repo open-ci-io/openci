@@ -23,10 +23,10 @@ mixin _$OpenciSecret {
   String get key => throw _privateConstructorUsedError;
   String get value => throw _privateConstructorUsedError;
   List<String> get owners => throw _privateConstructorUsedError;
-  @TimestampConverter()
-  Timestamp get createdAt => throw _privateConstructorUsedError;
-  @TimestampConverter()
-  Timestamp get updatedAt => throw _privateConstructorUsedError;
+  @DateTimeConverter()
+  DateTime get createdAt => throw _privateConstructorUsedError;
+  @DateTimeConverter()
+  DateTime get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this OpenciSecret to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -48,8 +48,8 @@ abstract class $OpenciSecretCopyWith<$Res> {
       {String key,
       String value,
       List<String> owners,
-      @TimestampConverter() Timestamp createdAt,
-      @TimestampConverter() Timestamp updatedAt});
+      @DateTimeConverter() DateTime createdAt,
+      @DateTimeConverter() DateTime updatedAt});
 }
 
 /// @nodoc
@@ -70,8 +70,8 @@ class _$OpenciSecretCopyWithImpl<$Res, $Val extends OpenciSecret>
     Object? key = null,
     Object? value = null,
     Object? owners = null,
-    Object? createdAt = freezed,
-    Object? updatedAt = freezed,
+    Object? createdAt = null,
+    Object? updatedAt = null,
   }) {
     return _then(_value.copyWith(
       key: null == key
@@ -86,14 +86,14 @@ class _$OpenciSecretCopyWithImpl<$Res, $Val extends OpenciSecret>
           ? _value.owners
           : owners // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      createdAt: freezed == createdAt
+      createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as Timestamp,
-      updatedAt: freezed == updatedAt
+              as DateTime,
+      updatedAt: null == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as Timestamp,
+              as DateTime,
     ) as $Val);
   }
 }
@@ -110,8 +110,8 @@ abstract class _$$OpenciSecretImplCopyWith<$Res>
       {String key,
       String value,
       List<String> owners,
-      @TimestampConverter() Timestamp createdAt,
-      @TimestampConverter() Timestamp updatedAt});
+      @DateTimeConverter() DateTime createdAt,
+      @DateTimeConverter() DateTime updatedAt});
 }
 
 /// @nodoc
@@ -130,8 +130,8 @@ class __$$OpenciSecretImplCopyWithImpl<$Res>
     Object? key = null,
     Object? value = null,
     Object? owners = null,
-    Object? createdAt = freezed,
-    Object? updatedAt = freezed,
+    Object? createdAt = null,
+    Object? updatedAt = null,
   }) {
     return _then(_$OpenciSecretImpl(
       key: null == key
@@ -146,14 +146,14 @@ class __$$OpenciSecretImplCopyWithImpl<$Res>
           ? _value._owners
           : owners // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      createdAt: freezed == createdAt
+      createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as Timestamp,
-      updatedAt: freezed == updatedAt
+              as DateTime,
+      updatedAt: null == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as Timestamp,
+              as DateTime,
     ));
   }
 }
@@ -165,8 +165,8 @@ class _$OpenciSecretImpl implements _OpenciSecret {
       {required this.key,
       required this.value,
       required final List<String> owners,
-      @TimestampConverter() required this.createdAt,
-      @TimestampConverter() required this.updatedAt})
+      @DateTimeConverter() required this.createdAt,
+      @DateTimeConverter() required this.updatedAt})
       : _owners = owners;
 
   factory _$OpenciSecretImpl.fromJson(Map<String, dynamic> json) =>
@@ -185,11 +185,11 @@ class _$OpenciSecretImpl implements _OpenciSecret {
   }
 
   @override
-  @TimestampConverter()
-  final Timestamp createdAt;
+  @DateTimeConverter()
+  final DateTime createdAt;
   @override
-  @TimestampConverter()
-  final Timestamp updatedAt;
+  @DateTimeConverter()
+  final DateTime updatedAt;
 
   @override
   String toString() {
@@ -204,19 +204,16 @@ class _$OpenciSecretImpl implements _OpenciSecret {
             (identical(other.key, key) || other.key == key) &&
             (identical(other.value, value) || other.value == value) &&
             const DeepCollectionEquality().equals(other._owners, _owners) &&
-            const DeepCollectionEquality().equals(other.createdAt, createdAt) &&
-            const DeepCollectionEquality().equals(other.updatedAt, updatedAt));
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      key,
-      value,
-      const DeepCollectionEquality().hash(_owners),
-      const DeepCollectionEquality().hash(createdAt),
-      const DeepCollectionEquality().hash(updatedAt));
+  int get hashCode => Object.hash(runtimeType, key, value,
+      const DeepCollectionEquality().hash(_owners), createdAt, updatedAt);
 
   /// Create a copy of OpenciSecret
   /// with the given fields replaced by the non-null parameter values.
@@ -239,8 +236,8 @@ abstract class _OpenciSecret implements OpenciSecret {
           {required final String key,
           required final String value,
           required final List<String> owners,
-          @TimestampConverter() required final Timestamp createdAt,
-          @TimestampConverter() required final Timestamp updatedAt}) =
+          @DateTimeConverter() required final DateTime createdAt,
+          @DateTimeConverter() required final DateTime updatedAt}) =
       _$OpenciSecretImpl;
 
   factory _OpenciSecret.fromJson(Map<String, dynamic> json) =
@@ -253,11 +250,11 @@ abstract class _OpenciSecret implements OpenciSecret {
   @override
   List<String> get owners;
   @override
-  @TimestampConverter()
-  Timestamp get createdAt;
+  @DateTimeConverter()
+  DateTime get createdAt;
   @override
-  @TimestampConverter()
-  Timestamp get updatedAt;
+  @DateTimeConverter()
+  DateTime get updatedAt;
 
   /// Create a copy of OpenciSecret
   /// with the given fields replaced by the non-null parameter values.

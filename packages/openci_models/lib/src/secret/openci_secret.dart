@@ -11,8 +11,8 @@ class OpenciSecret with _$OpenciSecret {
     required String key,
     required String value,
     required List<String> owners,
-    @TimestampConverter() required Timestamp createdAt,
-    @TimestampConverter() required Timestamp updatedAt,
+    @DateTimeConverter() required DateTime createdAt,
+    @DateTimeConverter() required DateTime updatedAt,
   }) = _OpenciSecret;
   factory OpenciSecret.fromJson(Map<String, Object?> json) =>
       _$OpenciSecretFromJson(json);

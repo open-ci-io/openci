@@ -38,7 +38,7 @@ Future<void> runCommand({
         command: command,
         logStdout: result.stdout,
         logStderr: result.stderr,
-        createdAt: Timestamp.now(),
+        createdAt: DateTime.now(),
         exitCode: result.exitCode,
       );
 
@@ -58,7 +58,7 @@ Future<void> runCommand({
         command: command,
         logStdout: result.stdout,
         logStderr: result.stderr,
-        createdAt: Timestamp.now(),
+        createdAt: DateTime.now(),
         exitCode: result.exitCode,
       );
 

@@ -1,3 +1,7 @@
+## 1.2.11
+
+- update: OpenciSecret model
+
 ## 1.2.10
 
 - add: OpenciSecret model

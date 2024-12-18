@@ -1,4 +1,3 @@
-import 'package:dart_firebase_admin/firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:openci_models/openci_models.dart';
 
@@ -11,7 +10,7 @@ class CommandLog with _$CommandLog {
     required String command,
     required String logStdout,
     required String logStderr,
-    @TimestampConverter() required Timestamp createdAt,
+    @DateTimeConverter() required DateTime createdAt,
     required int exitCode,
   }) = _CommandLog;
 

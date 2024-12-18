@@ -23,8 +23,8 @@ mixin _$CommandLog {
   String get command => throw _privateConstructorUsedError;
   String get logStdout => throw _privateConstructorUsedError;
   String get logStderr => throw _privateConstructorUsedError;
-  @TimestampConverter()
-  Timestamp get createdAt => throw _privateConstructorUsedError;
+  @DateTimeConverter()
+  DateTime get createdAt => throw _privateConstructorUsedError;
   int get exitCode => throw _privateConstructorUsedError;
 
   /// Serializes this CommandLog to a JSON map.
@@ -47,7 +47,7 @@ abstract class $CommandLogCopyWith<$Res> {
       {String command,
       String logStdout,
       String logStderr,
-      @TimestampConverter() Timestamp createdAt,
+      @DateTimeConverter() DateTime createdAt,
       int exitCode});
 }
 
@@ -69,7 +69,7 @@ class _$CommandLogCopyWithImpl<$Res, $Val extends CommandLog>
     Object? command = null,
     Object? logStdout = null,
     Object? logStderr = null,
-    Object? createdAt = freezed,
+    Object? createdAt = null,
     Object? exitCode = null,
   }) {
     return _then(_value.copyWith(
@@ -85,10 +85,10 @@ class _$CommandLogCopyWithImpl<$Res, $Val extends CommandLog>
           ? _value.logStderr
           : logStderr // ignore: cast_nullable_to_non_nullable
               as String,
-      createdAt: freezed == createdAt
+      createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as Timestamp,
+              as DateTime,
       exitCode: null == exitCode
           ? _value.exitCode
           : exitCode // ignore: cast_nullable_to_non_nullable
@@ -109,7 +109,7 @@ abstract class _$$CommandLogImplCopyWith<$Res>
       {String command,
       String logStdout,
       String logStderr,
-      @TimestampConverter() Timestamp createdAt,
+      @DateTimeConverter() DateTime createdAt,
       int exitCode});
 }
 
@@ -129,7 +129,7 @@ class __$$CommandLogImplCopyWithImpl<$Res>
     Object? command = null,
     Object? logStdout = null,
     Object? logStderr = null,
-    Object? createdAt = freezed,
+    Object? createdAt = null,
     Object? exitCode = null,
   }) {
     return _then(_$CommandLogImpl(
@@ -145,10 +145,10 @@ class __$$CommandLogImplCopyWithImpl<$Res>
           ? _value.logStderr
           : logStderr // ignore: cast_nullable_to_non_nullable
               as String,
-      createdAt: freezed == createdAt
+      createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as Timestamp,
+              as DateTime,
       exitCode: null == exitCode
           ? _value.exitCode
           : exitCode // ignore: cast_nullable_to_non_nullable
@@ -164,7 +164,7 @@ class _$CommandLogImpl implements _CommandLog {
       {required this.command,
       required this.logStdout,
       required this.logStderr,
-      @TimestampConverter() required this.createdAt,
+      @DateTimeConverter() required this.createdAt,
       required this.exitCode});
 
   factory _$CommandLogImpl.fromJson(Map<String, dynamic> json) =>
@@ -177,8 +177,8 @@ class _$CommandLogImpl implements _CommandLog {
   @override
   final String logStderr;
   @override
-  @TimestampConverter()
-  final Timestamp createdAt;
+  @DateTimeConverter()
+  final DateTime createdAt;
   @override
   final int exitCode;
 
@@ -197,15 +197,16 @@ class _$CommandLogImpl implements _CommandLog {
                 other.logStdout == logStdout) &&
             (identical(other.logStderr, logStderr) ||
                 other.logStderr == logStderr) &&
-            const DeepCollectionEquality().equals(other.createdAt, createdAt) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
             (identical(other.exitCode, exitCode) ||
                 other.exitCode == exitCode));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, command, logStdout, logStderr,
-      const DeepCollectionEquality().hash(createdAt), exitCode);
+  int get hashCode => Object.hash(
+      runtimeType, command, logStdout, logStderr, createdAt, exitCode);
 
   /// Create a copy of CommandLog
   /// with the given fields replaced by the non-null parameter values.
@@ -228,7 +229,7 @@ abstract class _CommandLog implements CommandLog {
       {required final String command,
       required final String logStdout,
       required final String logStderr,
-      @TimestampConverter() required final Timestamp createdAt,
+      @DateTimeConverter() required final DateTime createdAt,
       required final int exitCode}) = _$CommandLogImpl;
 
   factory _CommandLog.fromJson(Map<String, dynamic> json) =
@@ -241,8 +242,8 @@ abstract class _CommandLog implements CommandLog {
   @override
   String get logStderr;
   @override
-  @TimestampConverter()
-  Timestamp get createdAt;
+  @DateTimeConverter()
+  DateTime get createdAt;
   @override
   int get exitCode;
 
