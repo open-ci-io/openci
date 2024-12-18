@@ -1,5 +1,6 @@
+import 'package:dart_firebase_admin/firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:openci_models/openci_models.dart';
+import 'package:openci_models/src/converters/date_time_converter.dart';
 
 part 'openci_secret.freezed.dart';
 part 'openci_secret.g.dart';

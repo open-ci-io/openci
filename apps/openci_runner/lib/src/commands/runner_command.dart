@@ -59,6 +59,40 @@ class RunnerCommand extends Command<int> {
     }
   }
 
+  Future<Map<String, String>> _fetchSecrets({
+    required String workflowId,
+    required Firestore firestore,
+    required List<String> owners,
+  }) async {
+    final secretsSnapshot = await firestore
+        .collection(secretsCollectionPath)
+        .where('owners', WhereFilter.arrayContainsAny, owners)
+        .get();
+
+    return Map.fromEntries(
+      secretsSnapshot.docs.map(
+        (doc) => MapEntry(
+          doc.data()['key']! as String,
+          doc.data()['value']! as String,
+        ),
+      ),
+    );
+  }
+
+  String _replaceEnvironmentVariables({
+    required String command,
+    required Map<String, String> secrets,
+  }) {
+    var processedCommand = command;
+    for (final entry in secrets.entries) {
+      processedCommand = processedCommand.replaceAll(
+        '\$${entry.key}',
+        entry.value,
+      );
+    }
+    return processedCommand;
+  }
+
   @override
   Future<int> run() async {
     final pemPath = argResults?['pem-path'] as String;
@@ -127,12 +161,22 @@ class RunnerCommand extends Command<int> {
         );
 
         final commandsList = workflow.steps.map((e) => e.command).toList();
+        final secrets = await _fetchSecrets(
+          workflowId: workflow.id,
+          firestore: firestore,
+          owners: workflow.owners,
+        );
 
         for (final command in commandsList) {
+          final processedCommand = _replaceEnvironmentVariables(
+            command: command,
+            secrets: secrets,
+          );
+
           await runCommand(
             logId: logId,
             client: client,
-            command: command,
+            command: processedCommand,
             currentWorkingDirectory: workflow.currentWorkingDirectory,
             jobId: buildJob.id,
           );
