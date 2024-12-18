@@ -1,8 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'workflow_page_controller.g.dart';
+
+@riverpod
+Stream<QuerySnapshot> workflowStream(Ref ref) {
+  return FirebaseFirestore.instance
+      .collection('workflows')
+      .where('owners', arrayContains: FirebaseAuth.instance.currentUser!.uid)
+      .snapshots();
+}
 
 @riverpod
 class WorkflowPageController extends _$WorkflowPageController {

@@ -7,7 +7,7 @@ part of 'workflow_editor_controller.dart';
 // **************************************************************************
 
 String _$workflowEditorControllerHash() =>
-    r'0d6dea603a65090ec7dbe18fd3c45554d87f85ca';
+    r'0585c8b3aef5af4c86989f3cf4efc355dcd62beb';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -159,6 +159,8 @@ class WorkflowEditorControllerProvider extends AutoDisposeNotifierProviderImpl<
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin WorkflowEditorControllerRef
     on AutoDisposeNotifierProviderRef<WorkflowModel> {
   /// The parameter `workflowModel` of this provider.
@@ -175,4 +177,4 @@ class _WorkflowEditorControllerProviderElement
       (origin as WorkflowEditorControllerProvider).workflowModel;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
