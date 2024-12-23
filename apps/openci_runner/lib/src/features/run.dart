@@ -25,7 +25,7 @@ Future<void> runCommand({
   if (!docs.exists) {
     await ref.set({
       'logs': [],
-      'createdAt': DateTime.now(),
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
     });
   }
 
@@ -38,7 +38,7 @@ Future<void> runCommand({
         command: command,
         logStdout: result.stdout,
         logStderr: result.stderr,
-        createdAt: DateTime.now(),
+        createdAt: DateTime.now().millisecondsSinceEpoch,
         exitCode: result.exitCode,
       );
 
@@ -58,7 +58,7 @@ Future<void> runCommand({
         command: command,
         logStdout: result.stdout,
         logStderr: result.stderr,
-        createdAt: DateTime.now(),
+        createdAt: DateTime.now().millisecondsSinceEpoch,
         exitCode: result.exitCode,
       );
 

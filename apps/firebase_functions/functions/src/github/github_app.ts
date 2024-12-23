@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { type Context, Probot } from "probot";
-import { FieldValue } from "firebase-admin/firestore";
 import { v4 as uuidv4 } from "uuid";
 import { getWorkflowQuerySnapshot } from "../workflow/get_workflow_query_snapshot.js";
 import { createChecks } from "./create_checks.js";
@@ -143,7 +142,7 @@ const appFunction = async (app: Probot) => {
 							github: github,
 							id: documentId,
 							workflowId: workflowsDocs.id,
-							createdAt: FieldValue.serverTimestamp(),
+							createdAt: Math.floor(Date.now() / 1000),
 						};
 						console.log("buildJob", buildJob);
 

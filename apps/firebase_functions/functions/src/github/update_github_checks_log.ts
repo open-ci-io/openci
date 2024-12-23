@@ -83,13 +83,17 @@ async function setGitHubCheckStatusToInProgress(
 }
 
 export function formatLogs(logs: CommandLog[]): string {
+	console.log("logs", logs);
 	return logs
 		.map((log) => {
-			const timestamp = log.createdAt.toDate().toISOString();
+			console.log("log", log);
+			const normalizedTimestamp = Math.floor(Number(log.createdAt) / 1000);
+			console.log("normalizedTimestamp", normalizedTimestamp);
+			const timestamp = new Date(normalizedTimestamp * 1000).toISOString();
+			console.log("timestamp", timestamp);
 			const exitCodeStatus = log.exitCode === 0 ? "SUCCESS" : "FAILED";
 
 			const maskSecret = (value: string) => {
-				if (!value) return value;
 				const maskedGitHubUrl = value.replace(
 					/(https:\/\/)[^@]*(@github\.com)/g,
 					"$1[REDACTED]$2",

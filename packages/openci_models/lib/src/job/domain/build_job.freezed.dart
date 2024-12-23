@@ -25,8 +25,7 @@ mixin _$BuildJob {
   OpenCIGithub get github => throw _privateConstructorUsedError;
   String get id => throw _privateConstructorUsedError;
   String get workflowId => throw _privateConstructorUsedError;
-  @TimestampConverter()
-  Timestamp? get createdAt => throw _privateConstructorUsedError;
+  int? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this BuildJob to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -48,7 +47,7 @@ abstract class $BuildJobCopyWith<$Res> {
       OpenCIGithub github,
       String id,
       String workflowId,
-      @TimestampConverter() Timestamp? createdAt});
+      int? createdAt});
 
   $OpenCIGithubCopyWith<$Res> get github;
 }
@@ -94,7 +93,7 @@ class _$BuildJobCopyWithImpl<$Res, $Val extends BuildJob>
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as Timestamp?,
+              as int?,
     ) as $Val);
   }
 
@@ -122,7 +121,7 @@ abstract class _$$BuildJobImplCopyWith<$Res>
       OpenCIGithub github,
       String id,
       String workflowId,
-      @TimestampConverter() Timestamp? createdAt});
+      int? createdAt});
 
   @override
   $OpenCIGithubCopyWith<$Res> get github;
@@ -167,7 +166,7 @@ class __$$BuildJobImplCopyWithImpl<$Res>
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as Timestamp?,
+              as int?,
     ));
   }
 }
@@ -180,7 +179,7 @@ class _$BuildJobImpl implements _BuildJob {
       required this.github,
       required this.id,
       required this.workflowId,
-      @TimestampConverter() this.createdAt = null});
+      this.createdAt = null});
 
   factory _$BuildJobImpl.fromJson(Map<String, dynamic> json) =>
       _$$BuildJobImplFromJson(json);
@@ -195,8 +194,7 @@ class _$BuildJobImpl implements _BuildJob {
   final String workflowId;
   @override
   @JsonKey()
-  @TimestampConverter()
-  final Timestamp? createdAt;
+  final int? createdAt;
 
   @override
   String toString() {
@@ -245,7 +243,7 @@ abstract class _BuildJob implements BuildJob {
       required final OpenCIGithub github,
       required final String id,
       required final String workflowId,
-      @TimestampConverter() final Timestamp? createdAt}) = _$BuildJobImpl;
+      final int? createdAt}) = _$BuildJobImpl;
 
   factory _BuildJob.fromJson(Map<String, dynamic> json) =
       _$BuildJobImpl.fromJson;
@@ -259,8 +257,7 @@ abstract class _BuildJob implements BuildJob {
   @override
   String get workflowId;
   @override
-  @TimestampConverter()
-  Timestamp? get createdAt;
+  int? get createdAt;
 
   /// Create a copy of BuildJob
   /// with the given fields replaced by the non-null parameter values.

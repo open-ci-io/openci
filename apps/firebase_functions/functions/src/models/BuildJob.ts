@@ -1,11 +1,9 @@
-import type { FieldValue } from "firebase-admin/firestore";
-
 export interface BuildJob {
 	buildStatus: OpenCIGitHubChecksStatus;
 	github: OpenCIGithub;
 	id: string;
 	workflowId: string;
-	createdAt: FieldValue;
+	createdAt: number;
 }
 
 export enum OpenCIGitHubChecksStatus {

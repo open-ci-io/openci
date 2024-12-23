@@ -1,6 +1,4 @@
-import 'package:dart_firebase_admin/firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:openci_models/src/converters/timestamp_converter.dart';
 
 part 'build_job.freezed.dart';
 part 'build_job.g.dart';
@@ -19,7 +17,7 @@ class BuildJob with _$BuildJob {
     required OpenCIGithub github,
     required String id,
     required String workflowId,
-    @TimestampConverter() @Default(null) Timestamp? createdAt,
+    @Default(null) int? createdAt,
   }) = _BuildJob;
 
   factory BuildJob.fromJson(Map<String, dynamic> json) =>

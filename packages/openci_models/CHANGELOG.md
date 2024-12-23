@@ -1,3 +1,7 @@
+## 1.2.14
+
+- update: CommandLog model
+
 ## 1.2.13
 
 - update: Converters

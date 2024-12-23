@@ -11,8 +11,7 @@ _$CommandLogImpl _$$CommandLogImplFromJson(Map<String, dynamic> json) =>
       command: json['command'] as String,
       logStdout: json['logStdout'] as String,
       logStderr: json['logStderr'] as String,
-      createdAt:
-          const DateTimeConverter().fromJson(json['createdAt'] as Timestamp),
+      createdAt: (json['createdAt'] as num).toInt(),
       exitCode: (json['exitCode'] as num).toInt(),
     );
 
@@ -21,6 +20,6 @@ Map<String, dynamic> _$$CommandLogImplToJson(_$CommandLogImpl instance) =>
       'command': instance.command,
       'logStdout': instance.logStdout,
       'logStderr': instance.logStderr,
-      'createdAt': const DateTimeConverter().toJson(instance.createdAt),
+      'createdAt': instance.createdAt,
       'exitCode': instance.exitCode,
     };
