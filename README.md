@@ -1,3 +1,5 @@
+Test for Push Trigger
+
 # Goals of OpenCI
 
 1. Super fast loading of dashboards
