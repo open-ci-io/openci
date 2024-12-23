@@ -5,7 +5,7 @@ packages:
   - packages/**
 
 scripts:
-  openci-runner:
+  cli:
     run: cd apps/openci_runner && dart run openci_runner runner --pem-path ./github_apps.pem --service-account-path ./service_account.json 
 
   firebase-functions:

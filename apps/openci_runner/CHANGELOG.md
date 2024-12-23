@@ -1,3 +1,7 @@
+## 0.9.0
+
+- feat: push trigger
+
 ## 0.8.16
 
 - fix: command log

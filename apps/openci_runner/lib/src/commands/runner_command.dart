@@ -193,9 +193,14 @@ class RunnerCommand extends Command<int> {
         );
         _log('Error: $e, Try to run again');
       } finally {
-        await stopVM(vmName);
-        await deleteVM(vmName);
+        try {
+          await stopVM(vmName);
+          await deleteVM(vmName);
+        } catch (e) {
+          _log('Error: $e, Try to run again');
+        }
       }
+      continue;
     }
   }
 }

@@ -1,6 +1,6 @@
 name: openci_runner
 description: OpenCI Runner
-version: 0.8.16
+version: 0.9.0
 repository: https://github.com/open-ci-io/openci/tree/develop/apps/openci_runner
 homepage: https://open-ci.io
 environment:
