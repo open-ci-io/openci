@@ -1,19 +1,17 @@
-import 'package:dart_firebase_admin/firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:openci_models/src/converters/date_time_converter.dart';
 
 part 'openci_secret.freezed.dart';
 part 'openci_secret.g.dart';
 
 @freezed
-class OpenciSecret with _$OpenciSecret {
-  const factory OpenciSecret({
+class OpenCISecret with _$OpenCISecret {
+  const factory OpenCISecret({
     required String key,
     required String value,
     required List<String> owners,
-    @DateTimeConverter() required DateTime createdAt,
-    @DateTimeConverter() required DateTime updatedAt,
-  }) = _OpenciSecret;
-  factory OpenciSecret.fromJson(Map<String, Object?> json) =>
-      _$OpenciSecretFromJson(json);
+    required int createdAt,
+    required int updatedAt,
+  }) = _OpenCISecret;
+  factory OpenCISecret.fromJson(Map<String, Object?> json) =>
+      _$OpenCISecretFromJson(json);
 }

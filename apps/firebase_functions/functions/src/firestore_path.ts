@@ -1,2 +1,2 @@
-export const buildJobsCollectionName = "build_jobs_v2";
+export const buildJobsCollectionName = "build_jobs_v3";
 export const workflowCollectionName = "workflows";

@@ -23,8 +23,7 @@ mixin _$CommandLog {
   String get command => throw _privateConstructorUsedError;
   String get logStdout => throw _privateConstructorUsedError;
   String get logStderr => throw _privateConstructorUsedError;
-  @DateTimeConverter()
-  DateTime get createdAt => throw _privateConstructorUsedError;
+  int get createdAt => throw _privateConstructorUsedError;
   int get exitCode => throw _privateConstructorUsedError;
 
   /// Serializes this CommandLog to a JSON map.
@@ -47,7 +46,7 @@ abstract class $CommandLogCopyWith<$Res> {
       {String command,
       String logStdout,
       String logStderr,
-      @DateTimeConverter() DateTime createdAt,
+      int createdAt,
       int exitCode});
 }
 
@@ -88,7 +87,7 @@ class _$CommandLogCopyWithImpl<$Res, $Val extends CommandLog>
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as int,
       exitCode: null == exitCode
           ? _value.exitCode
           : exitCode // ignore: cast_nullable_to_non_nullable
@@ -109,7 +108,7 @@ abstract class _$$CommandLogImplCopyWith<$Res>
       {String command,
       String logStdout,
       String logStderr,
-      @DateTimeConverter() DateTime createdAt,
+      int createdAt,
       int exitCode});
 }
 
@@ -148,7 +147,7 @@ class __$$CommandLogImplCopyWithImpl<$Res>
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as int,
       exitCode: null == exitCode
           ? _value.exitCode
           : exitCode // ignore: cast_nullable_to_non_nullable
@@ -164,7 +163,7 @@ class _$CommandLogImpl implements _CommandLog {
       {required this.command,
       required this.logStdout,
       required this.logStderr,
-      @DateTimeConverter() required this.createdAt,
+      required this.createdAt,
       required this.exitCode});
 
   factory _$CommandLogImpl.fromJson(Map<String, dynamic> json) =>
@@ -177,8 +176,7 @@ class _$CommandLogImpl implements _CommandLog {
   @override
   final String logStderr;
   @override
-  @DateTimeConverter()
-  final DateTime createdAt;
+  final int createdAt;
   @override
   final int exitCode;
 
@@ -229,7 +227,7 @@ abstract class _CommandLog implements CommandLog {
       {required final String command,
       required final String logStdout,
       required final String logStderr,
-      @DateTimeConverter() required final DateTime createdAt,
+      required final int createdAt,
       required final int exitCode}) = _$CommandLogImpl;
 
   factory _CommandLog.fromJson(Map<String, dynamic> json) =
@@ -242,8 +240,7 @@ abstract class _CommandLog implements CommandLog {
   @override
   String get logStderr;
   @override
-  @DateTimeConverter()
-  DateTime get createdAt;
+  int get createdAt;
   @override
   int get exitCode;
 

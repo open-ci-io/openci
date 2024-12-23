@@ -1,3 +1,7 @@
+## 0.8.16
+
+- fix: command log
+
 ## 0.8.15
 
 - update: openci_models

@@ -13,9 +13,7 @@ _$BuildJobImpl _$$BuildJobImplFromJson(Map<String, dynamic> json) =>
       github: OpenCIGithub.fromJson(json['github'] as Map<String, dynamic>),
       id: json['id'] as String,
       workflowId: json['workflowId'] as String,
-      createdAt: _$JsonConverterFromJson<Object, Timestamp>(
-              json['createdAt'], const TimestampConverter().fromJson) ??
-          null,
+      createdAt: (json['createdAt'] as num?)?.toInt() ?? null,
     );
 
 Map<String, dynamic> _$$BuildJobImplToJson(_$BuildJobImpl instance) =>
@@ -24,8 +22,7 @@ Map<String, dynamic> _$$BuildJobImplToJson(_$BuildJobImpl instance) =>
       'github': instance.github.toJson(),
       'id': instance.id,
       'workflowId': instance.workflowId,
-      'createdAt': _$JsonConverterToJson<Object, Timestamp>(
-          instance.createdAt, const TimestampConverter().toJson),
+      'createdAt': instance.createdAt,
     };
 
 const _$OpenCIGitHubChecksStatusEnumMap = {
@@ -34,18 +31,6 @@ const _$OpenCIGitHubChecksStatusEnumMap = {
   OpenCIGitHubChecksStatus.failure: 'failure',
   OpenCIGitHubChecksStatus.success: 'success',
 };
-
-Value? _$JsonConverterFromJson<Json, Value>(
-  Object? json,
-  Value? Function(Json json) fromJson,
-) =>
-    json == null ? null : fromJson(json as Json);
-
-Json? _$JsonConverterToJson<Json, Value>(
-  Value? value,
-  Json? Function(Value value) toJson,
-) =>
-    value == null ? null : toJson(value);
 
 _$OpenCIGithubImpl _$$OpenCIGithubImplFromJson(Map<String, dynamic> json) =>
     _$OpenCIGithubImpl(
