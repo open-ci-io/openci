@@ -1,4 +1,4 @@
-Test for Push Trigger 0
+Test for Push Trigger 1
 
 # Goals of OpenCI
 
