@@ -85,13 +85,13 @@ const appFunction = async (app: Probot) => {
 				const _payload = pullRequestContext.payload;
 
 				const pullRequest = _payload.pull_request;
-				const installationId = _payload.installation;
+				const installation = _payload.installation;
+				if (installation == null) {
+					throw new Error("installation is null, please check it.");
+				}
 				const githubRepositoryUrl = pullRequest.base.repo.html_url;
 				const baseBranch = pullRequest.base.ref;
 				const currentBranch = pullRequest.head.ref;
-				if (installationId == null) {
-					throw new Error("installationId is null, please check it.");
-				}
 
 				const workflowQuerySnapshot = await getWorkflowQuerySnapshot(
 					githubRepositoryUrl,
@@ -129,7 +129,7 @@ const appFunction = async (app: Probot) => {
 							repositoryUrl: githubRepositoryUrl,
 							owner: context.payload.repository.owner.login,
 							repositoryName: context.payload.repository.name,
-							installationId: installationId.id,
+							installationId: installation.id,
 							appId: Number(appId),
 							checkRunId: _checks.data.id,
 							baseBranch: baseBranch,
@@ -144,7 +144,74 @@ const appFunction = async (app: Probot) => {
 							workflowId: workflowsDocs.id,
 							createdAt: Math.floor(Date.now() / 1000),
 						};
-						console.log("buildJob", buildJob);
+
+						await firestore
+							.collection(buildJobsCollectionName)
+							.doc(buildJob.id)
+							.set(buildJob);
+					}
+				}
+			} else if (context.name === "push") {
+				const pushContext = context as Context<"push">;
+				const _payload = pushContext.payload;
+
+				const installation = _payload.installation;
+				if (installation == null) {
+					throw new Error("installation is undefined, please check it.");
+				}
+
+				const githubRepositoryUrl = _payload.repository.html_url;
+				const baseBranch = _payload.ref.replace("refs/heads/", "");
+
+				const workflowQuerySnapshot = await getWorkflowQuerySnapshot(
+					githubRepositoryUrl,
+					"push",
+					firestore,
+				);
+
+				for (const workflowsDocs of workflowQuerySnapshot.docs) {
+					const workflowData = workflowsDocs.data();
+					const { github, name } = workflowData;
+					const branchPattern = github.branchPattern;
+					let condition = false;
+
+					if (github.baseBranch === baseBranch) {
+						if (branchPattern == null) {
+							condition = true;
+						} else if (branchPattern != null) {
+							if (branchPattern.includes(branchPattern)) {
+								condition = true;
+							}
+						}
+					}
+
+					if (condition) {
+						const _checks = await createChecks(pushContext, name);
+
+						const appId = process.env.APP_ID;
+						if (appId == null) {
+							throw new Error("appId is null, please check it.");
+						}
+
+						const github: OpenCIGithub = {
+							repositoryUrl: githubRepositoryUrl,
+							owner: context.payload.repository.owner.login,
+							repositoryName: context.payload.repository.name,
+							installationId: installation.id,
+							appId: Number(appId),
+							checkRunId: _checks.data.id,
+							baseBranch: baseBranch,
+							buildBranch: baseBranch,
+						};
+						const documentId = uuidv4();
+
+						const buildJob: BuildJob = {
+							buildStatus: OpenCIGitHubChecksStatus.QUEUED,
+							github: github,
+							id: documentId,
+							workflowId: workflowsDocs.id,
+							createdAt: Math.floor(Date.now() / 1000),
+						};
 
 						await firestore
 							.collection(buildJobsCollectionName)

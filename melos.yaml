@@ -8,7 +8,7 @@ scripts:
   openci-runner:
     run: cd apps/openci_runner && dart run openci_runner runner --pem-path ./github_apps.pem --service-account-path ./service_account.json 
 
-  firebase-functions:
+  deploy-faas:
     run: cd apps/firebase_functions && firebase deploy --only functions
 
     
