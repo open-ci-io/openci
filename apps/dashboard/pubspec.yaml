@@ -19,6 +19,7 @@ dependencies:
   json_annotation: ^4.9.0
   openci_models:
     path: ../../packages/openci_models
+    version: 1.2.14
   riverpod_annotation: ^2.5.3
   signals: ^6.0.2
   uuid: ^4.5.1
