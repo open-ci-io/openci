@@ -1,5 +1,7 @@
 # Goals of OpenCI
 
+The best CI/CD service for you and me.
+
 1. Super fast loading of dashboards
 2. Extremely easy setup of CI/CD
 3. No charges for builds during setup
