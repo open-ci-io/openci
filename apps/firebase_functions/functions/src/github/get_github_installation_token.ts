@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
-import axios, { isAxiosError } from "axios";
+import { createAppAuth } from "@octokit/auth-app";
+import { Octokit } from "@octokit/rest";
 
 export async function getGitHubInstallationToken(
 	installationId: number,
@@ -10,43 +10,21 @@ export async function getGitHubInstallationToken(
 		throw new Error("Missing required parameters");
 	}
 
+	const appOctokit = new Octokit({
+		authStrategy: createAppAuth,
+		auth: {
+			appId: appId,
+			privateKey: privateKey,
+			installationId: installationId,
+		},
+	});
+
 	try {
-		const token = generateJWT(appId, privateKey);
-		console.log(`jwtToken: ${token}`);
-		const { data } = await axios.post(
-			`https://api.github.com/app/installations/${installationId}/access_tokens`,
-			{},
-			{
-				headers: {
-					Accept: "application/vnd.github.v3+json",
-					Authorization: `Bearer ${token}`,
-				},
-				timeout: 5000,
-			},
-		);
-
-		console.log(`data: ${data}`);
-		console.log(`data.token: ${data.token}`);
-
+		const { data } = await appOctokit.rest.apps.createInstallationAccessToken({
+			installation_id: installationId,
+		});
 		return data.token;
 	} catch (error) {
-		if (isAxiosError(error)) {
-			console.error("GitHub API error:", error.response?.data || error.message);
-		}
-		throw error;
+		throw new Error(`Error creating installation token: ${error}`);
 	}
-}
-
-function generateJWT(appId: string, privateKey: string): string {
-	const now = Math.floor(Date.now() / 1000);
-
-	return jwt.sign(
-		{
-			iat: now - 60,
-			exp: now + 10 * 60,
-			iss: appId,
-		},
-		privateKey,
-		{ algorithm: "RS256" },
-	);
 }
