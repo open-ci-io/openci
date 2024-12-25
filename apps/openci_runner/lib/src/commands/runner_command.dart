@@ -19,6 +19,7 @@ import 'package:openci_runner/src/firebase/firebase_admin.dart';
 import 'package:openci_runner/src/service/github/clone_command.dart';
 import 'package:openci_runner/src/service/github/get_github_installation_token.dart';
 import 'package:openci_runner/src/service/uuid_service.dart';
+import 'package:sentry/sentry.dart';
 import 'package:signals_core/signals_core.dart';
 
 final firestoreSignal = signal<Firestore?>(null);
@@ -39,6 +40,11 @@ class RunnerCommand extends Command<int> {
         abbr: 's',
         help: 'Firebase Service Account Json Path',
         mandatory: true,
+      )
+      ..addOption(
+        'sentry-dsn',
+        abbr: 'd',
+        help: 'Sentry DSN',
       );
   }
 
@@ -98,109 +104,128 @@ class RunnerCommand extends Command<int> {
     final pemPath = argResults?['pem-path'] as String;
     final pem = File(pemPath).readAsStringSync();
     final serviceAccountPath = argResults?['service-account-path'] as String;
+    final sentryDsn = argResults?['sentry-dsn'] as String?;
 
-    final admin = await initializeFirebaseAdminApp(
-      'open-ci-release',
-      serviceAccountPath,
+    await Sentry.init(
+      (options) {
+        options.dsn = sentryDsn;
+      },
+      appRunner: () async {
+        final admin = await initializeFirebaseAdminApp(
+          'open-ci-release',
+          serviceAccountPath,
+        );
+        final firestore = Firestore(admin);
+        firestoreSignal.value = firestore;
+
+        while (true) {
+          final buildJob = await tryGetBuildJob(
+            firestore: firestore,
+            log: () =>
+                _log('No build jobs found. Waiting 1 second before retrying.'),
+          );
+          if (buildJob == null) continue;
+          _log('Found ${buildJob.toJson()} build jobs');
+          final vmName = generateUUID;
+          final logId = generateUUID;
+          try {
+            await updateBuildStatus(
+              jobId: buildJob.id,
+            );
+
+            final workflow =
+                await getWorkflowModel(firestore, buildJob.workflowId);
+            if (workflow == null) {
+              _log('Workflow not found');
+              throw Exception('Workflow not found');
+            }
+
+            final token = await getGitHubInstallationToken(
+              installationId: buildJob.github.installationId,
+              appId: buildJob.github.appId,
+              privateKey: pem,
+            );
+            _log(
+              'Successfully got GitHub access token: $token',
+              isSuccess: true,
+            );
+
+            await cloneVM(vmName);
+            unawaited(runVM(vmName));
+            final vmIp = await getVMIp(vmName);
+            _log('VM IP: $vmIp');
+            _log('VM is ready', isSuccess: true);
+
+            final client = SSHClient(
+              await SSHSocket.connect(vmIp, 22),
+              username: 'admin',
+              onPasswordRequest: () => 'admin',
+            );
+
+            final repoUrl = buildJob.github.repositoryUrl;
+
+            await runCommand(
+              logId: logId,
+              client: client,
+              command: cloneCommand(
+                repoUrl,
+                buildJob.github.buildBranch,
+                token,
+              ),
+              currentWorkingDirectory: null,
+              jobId: buildJob.id,
+            );
+
+            final commandsList = workflow.steps.map((e) => e.command).toList();
+            final secrets = await _fetchSecrets(
+              workflowId: workflow.id,
+              firestore: firestore,
+              owners: workflow.owners,
+            );
+
+            for (final command in commandsList) {
+              final processedCommand = _replaceEnvironmentVariables(
+                command: command,
+                secrets: secrets,
+              );
+
+              await runCommand(
+                logId: logId,
+                client: client,
+                command: processedCommand,
+                currentWorkingDirectory: workflow.currentWorkingDirectory,
+                jobId: buildJob.id,
+              );
+            }
+
+            await updateBuildStatus(
+              jobId: buildJob.id,
+              status: OpenCIGitHubChecksStatus.success,
+            );
+          } catch (e, stackTrace) {
+            await updateBuildStatus(
+              jobId: buildJob.id,
+              status: OpenCIGitHubChecksStatus.failure,
+            );
+            await Sentry.captureException(e, stackTrace: stackTrace);
+            _log('Error: $e, Try to run again');
+          } finally {
+            try {
+              await stopVM(vmName);
+              await deleteVM(vmName);
+            } catch (e, stackTrace) {
+              await updateBuildStatus(
+                jobId: buildJob.id,
+                status: OpenCIGitHubChecksStatus.failure,
+              );
+              await Sentry.captureException(e, stackTrace: stackTrace);
+              _log('Failed to stop or delete VM, $e');
+            }
+          }
+          continue;
+        }
+      },
     );
-    final firestore = Firestore(admin);
-    firestoreSignal.value = firestore;
-
-    while (true) {
-      final buildJob = await tryGetBuildJob(
-        firestore: firestore,
-        log: () =>
-            _log('No build jobs found. Waiting 1 second before retrying.'),
-      );
-      if (buildJob == null) continue;
-      _log('Found ${buildJob.toJson()} build jobs');
-      final vmName = generateUUID;
-      final logId = generateUUID;
-      try {
-        await updateBuildStatus(
-          jobId: buildJob.id,
-        );
-
-        final workflow = await getWorkflowModel(firestore, buildJob.workflowId);
-        if (workflow == null) {
-          _log('Workflow not found');
-          throw Exception('Workflow not found');
-        }
-
-        final token = await getGitHubInstallationToken(
-          installationId: buildJob.github.installationId,
-          appId: buildJob.github.appId,
-          privateKey: pem,
-        );
-        _log('Successfully got GitHub access token: $token', isSuccess: true);
-
-        await cloneVM(vmName);
-        unawaited(runVM(vmName));
-        final vmIp = await getVMIp(vmName);
-        _log('VM IP: $vmIp');
-        _log('VM is ready', isSuccess: true);
-
-        final client = SSHClient(
-          await SSHSocket.connect(vmIp, 22),
-          username: 'admin',
-          onPasswordRequest: () => 'admin',
-        );
-
-        final repoUrl = buildJob.github.repositoryUrl;
-
-        await runCommand(
-          logId: logId,
-          client: client,
-          command: cloneCommand(
-            repoUrl,
-            buildJob.github.buildBranch,
-            token,
-          ),
-          currentWorkingDirectory: null,
-          jobId: buildJob.id,
-        );
-
-        final commandsList = workflow.steps.map((e) => e.command).toList();
-        final secrets = await _fetchSecrets(
-          workflowId: workflow.id,
-          firestore: firestore,
-          owners: workflow.owners,
-        );
-
-        for (final command in commandsList) {
-          final processedCommand = _replaceEnvironmentVariables(
-            command: command,
-            secrets: secrets,
-          );
-
-          await runCommand(
-            logId: logId,
-            client: client,
-            command: processedCommand,
-            currentWorkingDirectory: workflow.currentWorkingDirectory,
-            jobId: buildJob.id,
-          );
-        }
-
-        await updateBuildStatus(
-          jobId: buildJob.id,
-          status: OpenCIGitHubChecksStatus.success,
-        );
-      } catch (e) {
-        await updateBuildStatus(
-          jobId: buildJob.id,
-          status: OpenCIGitHubChecksStatus.failure,
-        );
-        _log('Error: $e, Try to run again');
-      } finally {
-        try {
-          await stopVM(vmName);
-          await deleteVM(vmName);
-        } catch (e) {
-          _log('Error: $e, Try to run again');
-        }
-      }
-      continue;
-    }
+    return 0;
   }
 }

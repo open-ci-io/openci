@@ -1,3 +1,15 @@
+## 0.9.3
+
+- fix: update jwt expiration time
+
+## 0.9.2
+
+- feat: sentry integration
+
+## 0.9.1
+
+- fix: set build status to failure if failed to stop or delete VM
+
 ## 0.9.0
 
 - feat: push trigger
