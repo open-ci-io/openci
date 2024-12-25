@@ -5,8 +5,8 @@ packages:
   - packages/**
 
 scripts:
-  openci-runner:
-    run: cd apps/openci_runner && dart run openci_runner runner --pem-path ./github_apps.pem --service-account-path ./service_account.json 
+  cli:
+    run: cd apps/openci_runner && dart run openci_runner runner --pem-path ./github_apps.pem --service-account-path ./service_account.json --sentry-dsn https://e66e5ae0245821f62a4b235d829dc3fb@o4507005123166208.ingest.us.sentry.io/4507005125197824
 
   deploy-faas:
     run: cd apps/firebase_functions && firebase deploy --only functions

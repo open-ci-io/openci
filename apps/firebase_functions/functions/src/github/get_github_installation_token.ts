@@ -25,7 +25,6 @@ export async function getGitHubInstallationToken(
 		});
 		return data.token;
 	} catch (error) {
-		console.error("Error creating installation token:", error);
-		throw error;
+		throw new Error(`Error creating installation token: ${error}`);
 	}
 }

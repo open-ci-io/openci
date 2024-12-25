@@ -49,8 +49,7 @@ String _createJWT({
   final jwt = JWT(
     {
       'iat': now.millisecondsSinceEpoch ~/ 1000,
-      'exp':
-          now.add(const Duration(minutes: 10)).millisecondsSinceEpoch ~/ 1000,
+      'exp': now.add(const Duration(minutes: 5)).millisecondsSinceEpoch ~/ 1000,
       'iss': appId,
     },
   );
