@@ -27,6 +27,15 @@ class WorkflowPageController extends _$WorkflowPageController {
     await ref.set(workflow.toJson());
   }
 
+  Future<void> duplicateWorkflow(WorkflowModel workflow) async {
+    final ref = FirebaseFirestore.instance.collection('workflows').doc();
+    final newWorkflow = workflow.copyWith(
+      id: ref.id,
+      name: '${workflow.name} (Copy)',
+    );
+    await ref.set(newWorkflow.toJson());
+  }
+
   Future<void> deleteWorkflow(String docId) async {
     await FirebaseFirestore.instance
         .collection('workflows')

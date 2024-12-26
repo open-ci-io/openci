@@ -25,7 +25,7 @@ final workflowStreamProvider =
 // ignore: unused_element
 typedef WorkflowStreamRef = AutoDisposeStreamProviderRef<QuerySnapshot>;
 String _$workflowPageControllerHash() =>
-    r'a25a5705fda0f3be3e42fce46fc4b042b3e35d91';
+    r'9d1f2b1b855cda75206a2f74cc04bdd070824bad';
 
 /// See also [WorkflowPageController].
 @ProviderFor(WorkflowPageController)
