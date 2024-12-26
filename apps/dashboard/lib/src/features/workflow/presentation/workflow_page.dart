@@ -126,6 +126,13 @@ class _WorkflowListItem extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
+                  onPressed: () => controller.duplicateWorkflow(model),
+                  icon: const Icon(
+                    Icons.copy,
+                    color: Colors.white,
+                  ),
+                ),
+                IconButton(
                   onPressed: () => controller.deleteWorkflow(model.id),
                   icon: const Icon(
                     Icons.delete,
