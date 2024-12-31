@@ -186,7 +186,7 @@ class _DialogBody extends HookConsumerWidget {
                           .update({
                         'key': keyController.text,
                         'value': valueController.text,
-                        'updatedAt': Timestamp.now(),
+                        'updatedAt': DateTime.now().millisecondsSinceEpoch,
                       });
                     } else {
                       await FirebaseFirestore.instance
@@ -195,8 +195,8 @@ class _DialogBody extends HookConsumerWidget {
                         'key': keyController.text,
                         'value': valueController.text,
                         'owners': [FirebaseAuth.instance.currentUser!.uid],
-                        'createdAt': Timestamp.now(),
-                        'updatedAt': Timestamp.now(),
+                        'createdAt': DateTime.now().millisecondsSinceEpoch,
+                        'updatedAt': DateTime.now().millisecondsSinceEpoch,
                       });
                     }
                     Navigator.of(context).pop();
