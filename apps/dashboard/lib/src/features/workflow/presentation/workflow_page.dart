@@ -1,14 +1,10 @@
 import 'dart:math';
 
-import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
-import 'package:signals/signals_flutter.dart';
-
-final _isEdit = signal(false);
 
 class WorkflowPage extends ConsumerWidget {
   const WorkflowPage({super.key});
@@ -18,23 +14,10 @@ class WorkflowPage extends ConsumerWidget {
     final controller = ref.watch(workflowPageControllerProvider.notifier);
     final stream = ref.watch(workflowStreamProvider);
     return Scaffold(
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            heroTag: 'edit',
-            onPressed: () {
-              _isEdit.value = !_isEdit.value;
-            },
-            child: Icon(_isEdit.watch(context) ? Icons.auto_graph : Icons.edit),
-          ),
-          verticalMargin16,
-          FloatingActionButton(
-            heroTag: 'add',
-            onPressed: controller.addWorkflow,
-            child: const Icon(Icons.add),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'add',
+        onPressed: controller.addWorkflow,
+        child: const Icon(Icons.add),
       ),
       body: stream.when(
         data: (data) {
@@ -106,56 +89,39 @@ class _WorkflowListItem extends ConsumerWidget {
           fontSize: 12,
         ),
       ),
-      trailing: _isEdit.watch(context)
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        fullscreenDialog: true,
-                        builder: (context) => WorkflowEditor(model),
-                      ),
-                    );
-                  },
-                  icon: const Icon(
-                    Icons.edit,
-                    color: Colors.white,
-                  ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  fullscreenDialog: true,
+                  builder: (context) => WorkflowEditor(model),
                 ),
-                IconButton(
-                  onPressed: () => controller.duplicateWorkflow(model),
-                  icon: const Icon(
-                    Icons.copy,
-                    color: Colors.white,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => controller.deleteWorkflow(model.id),
-                  icon: const Icon(
-                    Icons.delete,
-                  ),
-                ),
-              ],
-            )
-          : Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  workflow.runCount.toString(),
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16,
-                  ),
-                ),
-                const Icon(
-                  Icons.chevron_right,
-                  color: Colors.grey,
-                ),
-              ],
+              );
+            },
+            icon: const Icon(
+              Icons.edit,
+              color: Colors.white,
             ),
+          ),
+          IconButton(
+            onPressed: () => controller.duplicateWorkflow(model),
+            icon: const Icon(
+              Icons.copy,
+              color: Colors.white,
+            ),
+          ),
+          IconButton(
+            onPressed: () => controller.deleteWorkflow(model.id),
+            icon: const Icon(
+              Icons.delete,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
