@@ -1,6 +1,8 @@
 import 'package:dashboard/src/common_widgets/margins.dart';
+import 'package:dashboard/src/features/secrets/presentation/secret_page_controller.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
@@ -99,6 +101,76 @@ class _StepItem extends HookConsumerWidget {
                 verticalMargin16,
                 _Command(
                   commandTextEditingController,
+                ),
+                verticalMargin8,
+                TextButton(
+                  onPressed: () async {
+                    await showAdaptiveDialog<void>(
+                      barrierDismissible: true,
+                      context: context,
+                      builder: (context) => Consumer(
+                        builder: (context, ref, child) {
+                          final stream = ref.watch(secretStreamProvider);
+                          return Dialog(
+                            child: stream.when(
+                              data: (data) {
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    verticalMargin8,
+                                    const Text(
+                                      'Secrets',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    verticalMargin8,
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: data.docs.length,
+                                      itemBuilder: (context, index) {
+                                        final secret = data.docs[index].data()!
+                                            as Map<String, dynamic>;
+                                        return Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              secret['key'].toString(),
+                                            ),
+                                            IconButton(
+                                              onPressed: () {
+                                                Clipboard.setData(
+                                                  ClipboardData(
+                                                    text: secret['key']
+                                                        .toString(),
+                                                  ),
+                                                );
+                                              },
+                                              icon: const Icon(Icons.copy),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                              error: (error, stackTrace) {
+                                return const Text('Error');
+                              },
+                              loading: () {
+                                return const Text('Loading');
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                  child: const Text('Show Secrets'),
                 ),
                 verticalMargin8,
                 TextButton(
