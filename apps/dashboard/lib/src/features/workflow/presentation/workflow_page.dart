@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page_controller.dart';
 import 'package:flutter/material.dart';
@@ -39,11 +37,6 @@ class WorkflowPage extends ConsumerWidget {
                 final workflow = workflows[index];
                 return _WorkflowListItem(
                   model: workflow,
-                  workflow: WorkflowItem(
-                    title: workflow.name,
-                    lastUpdated: DateTime.now().toIso8601String(),
-                    runCount: Random().nextInt(1000),
-                  ),
                 );
               },
             ),
@@ -60,11 +53,9 @@ class WorkflowPage extends ConsumerWidget {
 
 class _WorkflowListItem extends ConsumerWidget {
   const _WorkflowListItem({
-    required this.workflow,
     required this.model,
   });
 
-  final WorkflowItem workflow;
   final WorkflowModel model;
 
   @override
@@ -74,17 +65,10 @@ class _WorkflowListItem extends ConsumerWidget {
     final iconWidth = screenWidth * 0.05;
     return ListTile(
       title: Text(
-        workflow.title,
+        model.name,
         style: const TextStyle(
           color: Colors.white,
           fontSize: 16,
-        ),
-      ),
-      subtitle: Text(
-        'Latest: ${workflow.lastUpdated}',
-        style: const TextStyle(
-          color: Colors.grey,
-          fontSize: 12,
         ),
       ),
       contentPadding: EdgeInsets.zero,
@@ -180,15 +164,4 @@ class _WorkflowListItem extends ConsumerWidget {
             ),
     );
   }
-}
-
-class WorkflowItem {
-  WorkflowItem({
-    required this.title,
-    required this.lastUpdated,
-    required this.runCount,
-  });
-  final String title;
-  final String lastUpdated;
-  final int runCount;
 }
