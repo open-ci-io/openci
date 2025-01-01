@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/features/secrets/presentation/secret_page_controller.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -43,7 +46,11 @@ class SecretPage extends ConsumerWidget {
                   child: ListTile(
                     title: Text(secret.key),
                     subtitle: Text(
-                      secret.value.replaceAll(RegExp(r'.'), '*'),
+                      secret.value.length > 16
+                          ? secret.value
+                              .substring(0, 16)
+                              .replaceAll(RegExp(r'.'), '*')
+                          : secret.value.replaceAll(RegExp(r'.'), '*'),
                     ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -165,6 +172,19 @@ class _DialogBody extends HookConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                TextButton(
+                  onPressed: () async {
+                    final result = await FilePicker.platform.pickFiles();
+                    if (result == null) {
+                      return;
+                    }
+                    final file = result.files.first;
+                    final bytes = await file.xFile.readAsBytes();
+                    valueController.text = base64Encode(bytes);
+                  },
+                  child: const Text('Select File'),
+                ),
+                const SizedBox(width: 8),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
                   child: const Text('Cancel'),
