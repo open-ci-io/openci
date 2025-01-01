@@ -4,6 +4,7 @@ import 'package:dashboard/src/features/secrets/presentation/secret_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:signals/signals_flutter.dart';
 
 final _index = signal(0);
@@ -13,15 +14,32 @@ class TopPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    const destinations = [
+      NavigationDestination(
+        icon: Icon(Icons.auto_graph),
+        label: 'Workflows',
+      ),
+      NavigationDestination(
+        icon: Icon(Icons.lock),
+        label: 'Secrets',
+      ),
+      NavigationDestination(
+        icon: Icon(Icons.build),
+        label: 'Builds',
+      ),
+    ];
+
+    return AdaptiveScaffold(
+      transitionDuration: Duration.zero,
+      selectedIndex: _index.watch(context),
+      onSelectedIndexChange: (value) => _index.value = value,
+      destinations: destinations,
       appBar: AppBar(
         title: const Padding(
           padding: EdgeInsets.only(top: 20),
           child: Text(
             'OpenCI v0.2.0',
-            style: TextStyle(
-              fontSize: 16,
-            ),
+            style: TextStyle(fontSize: 16),
           ),
         ),
         centerTitle: true,
@@ -33,43 +51,7 @@ class TopPage extends StatelessWidget {
           horizontalMargin20,
         ],
       ),
-      body: Row(
-        children: [
-          NavigationRail(
-            labelType: NavigationRailLabelType.all,
-            selectedIndex: _index.watch(context),
-            onDestinationSelected: (value) {
-              _index.value = value;
-            },
-            destinations: const [
-              NavigationRailDestination(
-                icon: Icon(Icons.auto_graph),
-                label: Text(
-                  'Workflows',
-                  style: TextStyle(fontSize: 12, color: Colors.white),
-                ),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.lock),
-                label: Text(
-                  'Secrets',
-                  style: TextStyle(fontSize: 12, color: Colors.white),
-                ),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.build),
-                label: Text(
-                  'Builds',
-                  style: TextStyle(fontSize: 12, color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-          Expanded(
-            child: _pages[_index.watch(context)],
-          ),
-        ],
-      ),
+      body: (_) => _pages[_index.watch(context)],
     );
   }
 }

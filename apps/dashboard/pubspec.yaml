@@ -13,6 +13,7 @@ dependencies:
   firebase_core: ^3.6.0
   flutter:
     sdk: flutter
+  flutter_adaptive_scaffold: ^0.3.1
   flutter_hooks: ^0.20.5
   font_awesome_flutter: ^10.7.0
   google_fonts: ^6.2.1
