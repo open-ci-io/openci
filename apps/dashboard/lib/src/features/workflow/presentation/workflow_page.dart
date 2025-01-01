@@ -129,6 +129,7 @@ class _WorkflowListItem extends ConsumerWidget {
                         ),
                         ElevatedButton(
                           onPressed: () {
+                            Navigator.pop(context);
                             Navigator.push(
                               context,
                               MaterialPageRoute<void>(
@@ -136,8 +137,6 @@ class _WorkflowListItem extends ConsumerWidget {
                                 builder: (context) => WorkflowEditor(model),
                               ),
                             );
-
-                            Navigator.pop(context);
                           },
                           child: const Text('Edit'),
                         ),

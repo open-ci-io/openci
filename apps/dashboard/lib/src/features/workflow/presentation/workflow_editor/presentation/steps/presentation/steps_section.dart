@@ -37,17 +37,19 @@ class StepsSection extends ConsumerWidget {
               ],
             ),
             verticalMargin16,
-            ListView.builder(
-              shrinkWrap: true,
+            ReorderableListView.builder(
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: steps.length,
-              itemBuilder: (_, index) {
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
                 return _StepItem(
+                  key: UniqueKey(),
                   step: steps[index],
                   index: index,
                   workflowModel: workflowModel,
                 );
               },
+              itemCount: steps.length,
+              onReorder: controller.reorderStep,
             ),
           ],
         ),
@@ -58,6 +60,7 @@ class StepsSection extends ConsumerWidget {
 
 class _StepItem extends ConsumerWidget {
   const _StepItem({
+    super.key,
     required this.step,
     required this.index,
     required this.workflowModel,
