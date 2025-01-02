@@ -35,7 +35,7 @@ class StepsSection extends ConsumerWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.add),
-                  onPressed: controller.addStep,
+                  onPressed: () => controller.addStepByIndex(steps.length),
                 ),
               ],
             ),
@@ -191,6 +191,11 @@ class _StepItem extends HookConsumerWidget {
                   );
               },
               child: const Text('Save Step'),
+            ),
+            verticalMargin8,
+            TextButton(
+              onPressed: () => controller.addStepByIndex(index + 1),
+              child: const Text('Add Step'),
             ),
             verticalMargin8,
             TextButton(
