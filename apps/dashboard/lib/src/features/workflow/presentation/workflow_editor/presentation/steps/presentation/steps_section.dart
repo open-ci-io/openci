@@ -220,7 +220,6 @@ class _Command extends ConsumerWidget {
       decoration: const InputDecoration(
         labelText: 'Command',
         border: OutlineInputBorder(),
-        alignLabelWithHint: true,
       ),
       keyboardType: TextInputType.multiline,
       maxLines: null,
