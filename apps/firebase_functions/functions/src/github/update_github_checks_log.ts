@@ -98,7 +98,11 @@ export function formatLogs(logs: CommandLog[]): string {
 					/(https:\/\/)[^@]*(@github\.com)/g,
 					"$1[REDACTED]$2",
 				);
-				return isSecret.value(maskedGitHubUrl) ? "********" : maskedGitHubUrl;
+				const maskedBase64 = maskedGitHubUrl.replace(
+					/[A-Za-z0-9+/]{50,}={0,2}/g,
+					"[BASE64_REDACTED]",
+				);
+				return isSecret.value(maskedBase64) ? "********" : maskedBase64;
 			};
 
 			const maskedData = {
