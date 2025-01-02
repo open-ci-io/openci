@@ -84,129 +84,124 @@ class _StepItem extends HookConsumerWidget {
 
     return Card(
       elevation: 0,
-      child: ExpansionTile(
-        title: Text(step.name),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: stepNameTextEditingController,
-                  decoration: const InputDecoration(
-                    labelText: 'Step Name',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                verticalMargin16,
-                _Command(
-                  commandTextEditingController,
-                ),
-                verticalMargin8,
-                TextButton(
-                  onPressed: () async {
-                    await showAdaptiveDialog<void>(
-                      barrierDismissible: true,
-                      context: context,
-                      builder: (context) => Consumer(
-                        builder: (context, ref, child) {
-                          final stream = ref.watch(secretStreamProvider);
-                          return Dialog(
-                            child: stream.when(
-                              data: (data) {
-                                return Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    verticalMargin8,
-                                    const Text(
-                                      'Secrets',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    verticalMargin8,
-                                    ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount: data.docs.length,
-                                      itemBuilder: (context, index) {
-                                        final secret = data.docs[index].data()!
-                                            as Map<String, dynamic>;
-                                        return Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              secret['key'].toString(),
-                                            ),
-                                            IconButton(
-                                              onPressed: () async {
-                                                await Clipboard.setData(
-                                                  ClipboardData(
-                                                    text: '\$${secret['key']}',
-                                                  ),
-                                                );
-                                                Navigator.of(context).pop();
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text(
-                                                      'Secret copied to clipboard',
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              icon: const Icon(Icons.copy),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                              error: (error, stackTrace) {
-                                return const Text('Error');
-                              },
-                              loading: () {
-                                return const Text('Loading');
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
-                  child: const Text('Show Secrets'),
-                ),
-                verticalMargin8,
-                TextButton(
-                  onPressed: () {
-                    controller
-                      ..updateStepName(
-                        index,
-                        stepNameTextEditingController.text,
-                      )
-                      ..updateCommand(
-                        index,
-                        commandTextEditingController.text,
-                      );
-                  },
-                  child: const Text('Save Step'),
-                ),
-                verticalMargin8,
-                TextButton(
-                  onPressed: () => controller.removeStep(index),
-                  child: const Text(
-                    'Remove Step',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ),
-              ],
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            TextFormField(
+              controller: stepNameTextEditingController,
+              decoration: const InputDecoration(
+                labelText: 'Step Name',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-        ],
+            verticalMargin16,
+            _Command(
+              commandTextEditingController,
+            ),
+            verticalMargin8,
+            TextButton(
+              onPressed: () async {
+                await showAdaptiveDialog<void>(
+                  barrierDismissible: true,
+                  context: context,
+                  builder: (context) => Consumer(
+                    builder: (context, ref, child) {
+                      final stream = ref.watch(secretStreamProvider);
+                      return Dialog(
+                        child: stream.when(
+                          data: (data) {
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                verticalMargin8,
+                                const Text(
+                                  'Secrets',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                verticalMargin8,
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: data.docs.length,
+                                  itemBuilder: (context, index) {
+                                    final secret = data.docs[index].data()!
+                                        as Map<String, dynamic>;
+                                    return Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          secret['key'].toString(),
+                                        ),
+                                        IconButton(
+                                          onPressed: () async {
+                                            await Clipboard.setData(
+                                              ClipboardData(
+                                                text: '\$${secret['key']}',
+                                              ),
+                                            );
+                                            Navigator.of(context).pop();
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Secret copied to clipboard',
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          icon: const Icon(Icons.copy),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                          error: (error, stackTrace) {
+                            return const Text('Error');
+                          },
+                          loading: () {
+                            return const Text('Loading');
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+              child: const Text('Show Secrets'),
+            ),
+            verticalMargin8,
+            TextButton(
+              onPressed: () {
+                controller
+                  ..updateStepName(
+                    index,
+                    stepNameTextEditingController.text,
+                  )
+                  ..updateCommand(
+                    index,
+                    commandTextEditingController.text,
+                  );
+              },
+              child: const Text('Save Step'),
+            ),
+            verticalMargin8,
+            TextButton(
+              onPressed: () => controller.removeStep(index),
+              child: const Text(
+                'Remove Step',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
