@@ -36,7 +36,7 @@ class WorkflowPage extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final workflow = workflows[index];
                 return _WorkflowListItem(
-                  model: workflow,
+                  workflowModel: workflow,
                 );
               },
             ),
@@ -53,10 +53,10 @@ class WorkflowPage extends ConsumerWidget {
 
 class _WorkflowListItem extends ConsumerWidget {
   const _WorkflowListItem({
-    required this.model,
+    required this.workflowModel,
   });
 
-  final WorkflowModel model;
+  final WorkflowModel workflowModel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -65,11 +65,29 @@ class _WorkflowListItem extends ConsumerWidget {
     final iconWidth = screenWidth * 0.05;
     return ListTile(
       title: Text(
-        model.name,
+        workflowModel.name,
         style: const TextStyle(
           color: Colors.white,
           fontSize: 16,
         ),
+      ),
+      subtitle: Row(
+        children: [
+          Text(
+            workflowModel.github.triggerType.name,
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            workflowModel.github.baseBranch,
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            workflowModel.currentWorkingDirectory,
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+        ],
       ),
       contentPadding: EdgeInsets.zero,
       trailing: screenWidth > 400
@@ -84,7 +102,7 @@ class _WorkflowListItem extends ConsumerWidget {
                         context,
                         MaterialPageRoute<void>(
                           fullscreenDialog: true,
-                          builder: (context) => WorkflowEditor(model),
+                          builder: (context) => WorkflowEditor(workflowModel),
                         ),
                       );
                     },
@@ -97,7 +115,8 @@ class _WorkflowListItem extends ConsumerWidget {
                 SizedBox(
                   width: iconWidth,
                   child: IconButton(
-                    onPressed: () => controller.duplicateWorkflow(model),
+                    onPressed: () =>
+                        controller.duplicateWorkflow(workflowModel),
                     icon: const Icon(
                       Icons.copy,
                       color: Colors.white,
@@ -107,7 +126,8 @@ class _WorkflowListItem extends ConsumerWidget {
                 SizedBox(
                   width: iconWidth,
                   child: IconButton(
-                    onPressed: () => controller.deleteWorkflow(model.id),
+                    onPressed: () =>
+                        controller.deleteWorkflow(workflowModel.id),
                     icon: const Icon(
                       Icons.delete,
                     ),
@@ -134,7 +154,8 @@ class _WorkflowListItem extends ConsumerWidget {
                               context,
                               MaterialPageRoute<void>(
                                 fullscreenDialog: true,
-                                builder: (context) => WorkflowEditor(model),
+                                builder: (context) =>
+                                    WorkflowEditor(workflowModel),
                               ),
                             );
                           },
@@ -142,14 +163,14 @@ class _WorkflowListItem extends ConsumerWidget {
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            controller.duplicateWorkflow(model);
+                            controller.duplicateWorkflow(workflowModel);
                             Navigator.pop(context);
                           },
                           child: const Text('Duplicate'),
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            controller.deleteWorkflow(model.id);
+                            controller.deleteWorkflow(workflowModel.id);
                             Navigator.pop(context);
                           },
                           child: const Text('Delete'),

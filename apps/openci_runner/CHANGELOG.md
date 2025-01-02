@@ -1,3 +1,7 @@
+## 0.9.4
+
+- fix: polling interval to 5 seconds
+
 ## 0.9.3
 
 - fix: update jwt expiration time
