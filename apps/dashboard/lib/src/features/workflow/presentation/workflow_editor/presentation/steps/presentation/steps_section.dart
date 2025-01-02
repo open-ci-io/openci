@@ -221,6 +221,9 @@ class _Command extends ConsumerWidget {
         labelText: 'Command',
         border: OutlineInputBorder(),
       ),
+      keyboardType: TextInputType.multiline,
+      maxLines: null,
+      minLines: 1,
     );
   }
 }
