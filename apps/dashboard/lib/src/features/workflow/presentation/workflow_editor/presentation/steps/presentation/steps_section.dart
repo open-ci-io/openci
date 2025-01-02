@@ -141,11 +141,19 @@ class _StepItem extends HookConsumerWidget {
                                               secret['key'].toString(),
                                             ),
                                             IconButton(
-                                              onPressed: () {
-                                                Clipboard.setData(
+                                              onPressed: () async {
+                                                await Clipboard.setData(
                                                   ClipboardData(
-                                                    text: secret['key']
-                                                        .toString(),
+                                                    text: '\$${secret['key']}',
+                                                  ),
+                                                );
+                                                Navigator.of(context).pop();
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      'Secret copied to clipboard',
+                                                    ),
                                                   ),
                                                 );
                                               },
