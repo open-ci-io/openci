@@ -71,7 +71,7 @@ class _WorkflowListItem extends ConsumerWidget {
           fontSize: 16,
         ),
       ),
-      subtitle: Row(
+      subtitle: Wrap(
         children: [
           Text(
             workflowModel.github.triggerType.name,
