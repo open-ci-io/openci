@@ -23,6 +23,7 @@ import 'package:sentry/sentry.dart';
 import 'package:signals_core/signals_core.dart';
 
 final firestoreSignal = signal<Firestore?>(null);
+const pollingInterval = Duration(seconds: 5);
 
 class RunnerCommand extends Command<int> {
   RunnerCommand({
@@ -121,8 +122,9 @@ class RunnerCommand extends Command<int> {
         while (true) {
           final buildJob = await tryGetBuildJob(
             firestore: firestore,
-            log: () =>
-                _log('No build jobs found. Waiting 1 second before retrying.'),
+            log: () => _log(
+              'No build jobs found. Waiting ${pollingInterval.inSeconds} seconds before retrying.',
+            ),
           );
           if (buildJob == null) continue;
           _log('Found ${buildJob.toJson()} build jobs');

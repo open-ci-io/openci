@@ -1,5 +1,6 @@
 import 'package:dart_firebase_admin/firestore.dart';
 import 'package:openci_models/openci_models.dart';
+import 'package:openci_runner/src/commands/runner_command.dart';
 
 Future<QuerySnapshot<Map<String, dynamic>>?> _getBuildJobQuerySnapshot(
   Firestore firestore,
@@ -37,7 +38,7 @@ Future<BuildJob?> tryGetBuildJob({
   final buildJob = await getBuildJob(firestore);
   if (buildJob == null) {
     log();
-    await Future<void>.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(pollingInterval);
   }
   return buildJob;
 }
