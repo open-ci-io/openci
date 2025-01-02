@@ -1,5 +1,4 @@
 import 'package:dashboard/src/common_widgets/margins.dart';
-import 'package:dashboard/src/features/build/presentation/build_page.dart';
 import 'package:dashboard/src/features/secrets/presentation/secret_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,10 +21,6 @@ class TopPage extends StatelessWidget {
       NavigationDestination(
         icon: Icon(Icons.lock),
         label: 'Secrets',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.build),
-        label: 'Builds',
       ),
     ];
 
@@ -59,5 +54,4 @@ class TopPage extends StatelessWidget {
 final _pages = [
   const WorkflowPage(),
   const SecretPage(),
-  const BuildPage(),
 ];
