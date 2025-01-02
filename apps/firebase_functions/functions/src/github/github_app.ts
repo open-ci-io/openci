@@ -76,7 +76,7 @@ const appFunction = async (app: Probot) => {
 			"pull_request.reopened",
 			"pull_request.synchronize",
 			// For debugging purposes
-			"pull_request.edited",
+			// "pull_request.edited",
 			"push",
 		],
 		async (context: Context<"pull_request"> | Context<"push">) => {
