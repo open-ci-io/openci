@@ -1,0 +1,19 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow create: if request.auth.uid != null;
+    }
+    match /workflows/{workflowId} {
+      allow create: if request.auth.uid != null;
+      allow read, update, delete: if request.auth.uid != null 
+        && resource.data.owners.hasAny([request.auth.uid]);
+    }
+    match /secrets_v1/{secretId} {
+      allow create: if request.auth.uid != null;
+      allow read, update, delete: if request.auth.uid != null 
+        && resource.data.owners.hasAny([request.auth.uid]);
+    }
+  }
+}
