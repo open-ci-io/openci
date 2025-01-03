@@ -13,8 +13,15 @@
         "lib/firebase_options.dart": {
           "projectId": "open-ci-release",
           "configurations": {
-            "macos": "1:226435817638:ios:8c55ee64c68d635ec1d467"
+            "android": "1:226435817638:android:6848f67578b6d77ac1d467"
           }
+        }
+      },
+      "android": {
+        "default": {
+          "projectId": "open-ci-release",
+          "appId": "1:226435817638:android:6848f67578b6d77ac1d467",
+          "fileOutput": "android/app/google-services.json"
         }
       }
     }
