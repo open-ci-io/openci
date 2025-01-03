@@ -78,8 +78,37 @@ const appFunction = async (app: Probot) => {
 			// For debugging purposes
 			// "pull_request.edited",
 			"push",
+			"check_run.rerequested",
 		],
-		async (context: Context<"pull_request"> | Context<"push">) => {
+		async (
+			context: Context<"pull_request"> | Context<"push"> | Context<"check_run">,
+		) => {
+			if (context.name === "check_run") {
+				const checkRunContext = context as Context<"check_run">;
+				const _payload = checkRunContext.payload;
+				const checkRunId = _payload.check_run.id;
+
+				const checkRun = await firestore
+					.collection(buildJobsCollectionName)
+					.where("github.checkRunId", "==", checkRunId)
+					.get();
+
+				if (checkRun.docs.length === 0) {
+					console.log("Check run not found");
+					return;
+				}
+
+				const buildJob = checkRun.docs[0].data();
+				await firestore
+					.collection(buildJobsCollectionName)
+					.doc(buildJob.id)
+					.update({
+						buildStatus: OpenCIGitHubChecksStatus.QUEUED,
+					});
+
+				return;
+			}
+
 			if (context.name === "pull_request") {
 				const pullRequestContext = context as Context<"pull_request">;
 				const _payload = pullRequestContext.payload;
