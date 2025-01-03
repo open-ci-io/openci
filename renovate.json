@@ -1,0 +1,40 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:recommended"
+    ],
+    "timezone": "Asia/Tokyo",
+    "schedule": [
+        "every day"
+    ],
+    "packageRules": [
+        {
+            "matchUpdateTypes": [
+                "minor",
+                "patch"
+            ],
+            "automerge": false
+        },
+        {
+            "matchDepTypes": [
+                "devDependencies"
+            ],
+            "automerge": false
+        },
+        {
+            "matchManagers": [
+                "pub"
+            ],
+            "matchFileNames": [
+                "apps/*/pubspec.yaml",
+                "packages/*/pubspec.yaml"
+            ],
+            "groupName": "Flutter/Dart dependencies"
+        }
+    ],
+    "labels": [
+        "dependencies"
+    ],
+    "prHourlyLimit": 2,
+    "prConcurrentLimit": 10
+}
