@@ -85,11 +85,8 @@ const appFunction = async (app: Probot) => {
 		) => {
 			if (context.name === "check_run") {
 				const checkRunContext = context as Context<"check_run">;
-				console.log("checkRunContext", checkRunContext);
 				const _payload = checkRunContext.payload;
-				console.log("checkRunContext", _payload);
 				const checkRunId = _payload.check_run.id;
-				console.log("checkRunId", checkRunId);
 
 				const checkRun = await firestore
 					.collection(buildJobsCollectionName)
@@ -102,7 +99,6 @@ const appFunction = async (app: Probot) => {
 				}
 
 				const buildJob = checkRun.docs[0].data();
-				console.log("buildJob", buildJob);
 				await firestore
 					.collection(buildJobsCollectionName)
 					.doc(buildJob.id)
