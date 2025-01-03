@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:dart_firebase_admin/dart_firebase_admin.dart';
+import 'package:dart_firebase_admin_plus/dart_firebase_admin.dart';
 
 Future<FirebaseAdminApp> initializeFirebaseAdminApp(
   String projectId,
