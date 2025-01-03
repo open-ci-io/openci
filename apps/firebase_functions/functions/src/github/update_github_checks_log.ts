@@ -102,7 +102,13 @@ export function formatLogs(logs: CommandLog[]): string {
 					/[A-Za-z0-9+/]{50,}={0,2}/g,
 					"[BASE64_REDACTED]",
 				);
-				return isSecret.value(maskedBase64) ? "********" : maskedBase64;
+				const maskedFirebaseToken = maskedBase64.replace(
+					/1\/\/[A-Za-z0-9_-]+/g,
+					"[FIREBASE_TOKEN_REDACTED]",
+				);
+				return isSecret.value(maskedFirebaseToken)
+					? "********"
+					: maskedFirebaseToken;
 			};
 
 			const maskedData = {
