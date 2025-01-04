@@ -69,11 +69,6 @@ export const updateGitHubCheckStatus = onDocumentUpdated(
 				"failure",
 				formattedLogs,
 			);
-		} else if (
-			beforeData.buildStatus === OpenCIGitHubChecksStatus.FAILURE &&
-			afterData.buildStatus === OpenCIGitHubChecksStatus.IN_PROGRESS
-		) {
-			await setGitHubCheckStatusToInProgress(octokit, github);
 		} else {
 			console.log("No status change");
 		}
