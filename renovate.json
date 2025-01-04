@@ -7,6 +7,9 @@
     "schedule": [
         "before 9am"
     ],
+    "enabledManagers": [
+        "pub"
+    ],
     "packageRules": [
         {
             "matchManagers": [
@@ -19,6 +22,13 @@
             "groupName": "Flutter/Dart dependencies",
             "automerge": false
         }
+    ],
+    "ignorePaths": [
+        "**/node_modules/**",
+        "**/android/**",
+        "**/ios/**",
+        "**/macos/**",
+        "**/.github/**"
     ],
     "labels": [
         "dependencies"
