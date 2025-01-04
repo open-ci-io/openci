@@ -1,3 +1,11 @@
+## 0.9.6
+
+- fix: transaction for firestore
+
+## 0.9.5
+
+- update: support transaction for firestore
+
 ## 0.9.4
 
 - fix: polling interval to 5 seconds

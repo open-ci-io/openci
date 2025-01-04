@@ -6,7 +6,7 @@ Future<QuerySnapshot<Map<String, dynamic>>?> _getBuildJobQuerySnapshot(
   Firestore firestore,
 ) async {
   return firestore.runTransaction((transaction) async {
-    final qs = await firestore
+    final querySnapshot = await firestore
         .collection(buildJobsCollectionPath)
         .where(
           'buildStatus',
@@ -17,18 +17,24 @@ Future<QuerySnapshot<Map<String, dynamic>>?> _getBuildJobQuerySnapshot(
         .limit(1)
         .get();
 
-    if (qs.docs.isEmpty) {
+    if (querySnapshot.docs.isEmpty) {
       return null;
     }
 
-    // Update the status to prevent other runners from processing the same job
-    final docRef = qs.docs.first.ref;
-    transaction.update(docRef, {
+    final doc = querySnapshot.docs.first;
+    final freshDoc = await transaction.get(doc.ref);
+
+    if (freshDoc.data()?['buildStatus'] !=
+        OpenCIGitHubChecksStatus.queued.name) {
+      return null;
+    }
+
+    transaction.update(doc.ref, {
       'buildStatus': OpenCIGitHubChecksStatus.inProgress.name,
       'updatedAt': DateTime.now().toIso8601String(),
     });
 
-    return qs;
+    return querySnapshot;
   });
 }
 
