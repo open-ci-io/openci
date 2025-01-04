@@ -5,22 +5,9 @@
     ],
     "timezone": "Asia/Tokyo",
     "schedule": [
-        "every day"
+        "before 9am"
     ],
     "packageRules": [
-        {
-            "matchUpdateTypes": [
-                "minor",
-                "patch"
-            ],
-            "automerge": false
-        },
-        {
-            "matchDepTypes": [
-                "devDependencies"
-            ],
-            "automerge": false
-        },
         {
             "matchManagers": [
                 "pub"
@@ -29,7 +16,8 @@
                 "apps/*/pubspec.yaml",
                 "packages/*/pubspec.yaml"
             ],
-            "groupName": "Flutter/Dart dependencies"
+            "groupName": "Flutter/Dart dependencies",
+            "automerge": false
         }
     ],
     "labels": [
