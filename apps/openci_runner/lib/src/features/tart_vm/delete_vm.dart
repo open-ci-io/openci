@@ -1,8 +1,9 @@
 import 'package:mason_logger/mason_logger.dart';
+import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/service/logger_service.dart';
 import 'package:process_run/process_run.dart';
 
-Future<void> deleteVM(String vmName) async {
+Future<void> _deleteVM(String vmName) async {
   final logger = loggerSignal.value;
   try {
     final shell = Shell();
@@ -32,10 +33,10 @@ Future<void> cleanUpVMs() async {
       final parts = line.trim().split(RegExp(r'\s+'));
       if (parts.length >= 2) {
         final vmName = parts[1];
-        if (vmName != 'sonoma') {
+        if (vmName != vmBaseName) {
           logger.info('Deleting VM: $vmName');
           try {
-            await deleteVM(vmName);
+            await _deleteVM(vmName);
             logger.success('Successfully deleted $vmName');
           } catch (error) {
             logger.warn('Error deleting $vmName: $error');

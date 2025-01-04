@@ -1,4 +1,4 @@
-import 'package:dart_firebase_admin/firestore.dart';
+import 'package:dart_firebase_admin_plus/firestore.dart';
 import 'package:openci_models/openci_models.dart';
 
 Future<QuerySnapshot<Map<String, dynamic>>?> getWorkflow(

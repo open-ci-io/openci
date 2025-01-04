@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:dart_firebase_admin/firestore.dart';
+import 'package:dart_firebase_admin_plus/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_models/openci_models.dart';
@@ -214,7 +214,7 @@ class RunnerCommand extends Command<int> {
           } finally {
             try {
               await stopVM(vmName);
-              await deleteVM(vmName);
+              await cleanUpVMs();
             } catch (e, stackTrace) {
               await updateBuildStatus(
                 jobId: buildJob.id,
