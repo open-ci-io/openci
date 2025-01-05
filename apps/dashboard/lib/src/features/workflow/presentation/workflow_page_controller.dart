@@ -10,6 +10,7 @@ Stream<QuerySnapshot> workflowStream(Ref ref) {
   return FirebaseFirestore.instance
       .collection('workflows')
       .where('owners', arrayContains: FirebaseAuth.instance.currentUser!.uid)
+      .orderBy('name')
       .snapshots();
 }
 
