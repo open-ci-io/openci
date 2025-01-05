@@ -5,7 +5,7 @@
     ],
     "timezone": "Asia/Tokyo",
     "schedule": [
-        "before 9am"
+        "before 9am on monday"
     ],
     "enabledManagers": [
         "pub"
