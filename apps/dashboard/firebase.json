@@ -13,7 +13,7 @@
                 "lib/firebase_options.dart": {
                     "projectId": "open-ci-release",
                     "configurations": {
-                        "ios": "1:226435817638:ios:d9846352cd5a26b6c1d467"
+                        "macos": "1:226435817638:ios:8c55ee64c68d635ec1d467"
                     }
                 }
             },
