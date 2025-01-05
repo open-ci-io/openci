@@ -1,3 +1,4 @@
+import 'package:dashboard/src/common_widgets/dialogs.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page_controller.dart';
 import 'package:flutter/material.dart';
@@ -128,8 +129,15 @@ class _WorkflowListItem extends ConsumerWidget {
                 SizedBox(
                   width: iconWidth,
                   child: IconButton(
-                    onPressed: () =>
-                        controller.deleteWorkflow(workflowModel.id),
+                    onPressed: () {
+                      showDeleteDialog(
+                        title: 'Delete Workflow',
+                        context: context,
+                        onDelete: () {
+                          controller.deleteWorkflow(workflowModel.id);
+                        },
+                      );
+                    },
                     icon: const Icon(
                       Icons.delete,
                     ),

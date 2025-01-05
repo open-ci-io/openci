@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dashboard/src/common_widgets/dialogs.dart';
 import 'package:dashboard/src/features/secrets/presentation/secret_page_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -71,32 +72,15 @@ class SecretPage extends ConsumerWidget {
                         ),
                         IconButton(
                           onPressed: () {
-                            showAdaptiveDialog<void>(
+                            showDeleteDialog(
+                              title: 'Delete Secret',
                               context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Delete Secret'),
-                                content: const Text(
-                                  'Are you sure you want to delete this secret?',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      FirebaseFirestore.instance
-                                          .collection(secretsCollectionPath)
-                                          .doc(data.docs[index].id)
-                                          .delete();
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Delete'),
-                                  ),
-                                ],
-                              ),
+                              onDelete: () {
+                                FirebaseFirestore.instance
+                                    .collection(secretsCollectionPath)
+                                    .doc(data.docs[index].id)
+                                    .delete();
+                              },
                             );
                           },
                           icon: const Icon(Icons.delete),
