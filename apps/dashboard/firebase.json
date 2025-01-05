@@ -1,33 +1,41 @@
 {
-  "flutter": {
-    "platforms": {
-      "macos": {
-        "default": {
-          "projectId": "open-ci-release",
-          "appId": "1:226435817638:ios:8c55ee64c68d635ec1d467",
-          "uploadDebugSymbols": false,
-          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+    "flutter": {
+        "platforms": {
+            "macos": {
+                "default": {
+                    "projectId": "open-ci-release",
+                    "appId": "1:226435817638:ios:8c55ee64c68d635ec1d467",
+                    "uploadDebugSymbols": false,
+                    "fileOutput": "macos/Runner/GoogleService-Info.plist"
+                }
+            },
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "open-ci-release",
+                    "configurations": {
+                        "ios": "1:226435817638:ios:d9846352cd5a26b6c1d467"
+                    }
+                }
+            },
+            "android": {
+                "default": {
+                    "projectId": "open-ci-release",
+                    "appId": "1:226435817638:android:6848f67578b6d77ac1d467",
+                    "fileOutput": "android/app/google-services.json"
+                }
+            },
+            "ios": {
+                "default": {
+                    "projectId": "open-ci-release",
+                    "appId": "1:226435817638:ios:d9846352cd5a26b6c1d467",
+                    "uploadDebugSymbols": false,
+                    "fileOutput": "ios/Runner/GoogleService-Info.plist"
+                }
+            }
         }
-      },
-      "dart": {
-        "lib/firebase_options.dart": {
-          "projectId": "open-ci-release",
-          "configurations": {
-            "android": "1:226435817638:android:6848f67578b6d77ac1d467"
-          }
-        }
-      },
-      "android": {
-        "default": {
-          "projectId": "open-ci-release",
-          "appId": "1:226435817638:android:6848f67578b6d77ac1d467",
-          "fileOutput": "android/app/google-services.json"
-        }
-      }
+    },
+    "firestore": {
+        "rules": "firestore.rules",
+        "indexes": "firestore.indexes.json"
     }
-  },
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  }
 }
