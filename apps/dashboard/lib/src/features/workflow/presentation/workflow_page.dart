@@ -43,7 +43,9 @@ class WorkflowPage extends ConsumerWidget {
           );
         },
         error: (error, stackTrace) {
-          return Center(child: Text('An error occurred: $error'));
+          return Center(
+            child: SelectableText('An error occurred: $error'),
+          );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
