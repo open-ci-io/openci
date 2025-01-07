@@ -57,11 +57,12 @@ export const updateGitHubChecksLog = onDocumentWritten(
 		);
 		const octokit = new Octokit({ auth: token });
 
-		await setGitHubCheckStatusToInProgress(
-			octokit,
-			openciGitHub,
-			formatLog(document as CommandLog),
-		);
+		const oldLog = await getCheckRunOutput(octokit, openciGitHub);
+		const newLog = formatLog(document as CommandLog);
+
+		const combinedLogs = [oldLog, newLog].filter(Boolean).join("\n\n");
+
+		await setGitHubCheckStatusToInProgress(octokit, openciGitHub, combinedLogs);
 	},
 );
 
@@ -136,4 +137,22 @@ export function formatLogs(logs: CommandLog[]): string {
 			return formatLog(log);
 		})
 		.join("\n\n");
+}
+
+async function getCheckRunOutput(
+	octokit: Octokit,
+	github: OpenCIGithub,
+): Promise<string | null> {
+	try {
+		const response = await octokit.checks.get({
+			owner: github.owner,
+			repo: github.repositoryName,
+			check_run_id: github.checkRunId,
+		});
+
+		return response.data.output?.text ?? null;
+	} catch (error) {
+		console.error("Failed to get check run output:", error);
+		return null;
+	}
 }
