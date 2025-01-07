@@ -89,8 +89,8 @@ async function getLogs(buildJobId: string): Promise<string> {
 		throw new Error("No logs found");
 	}
 
-	const logData = logQs.docs[0].data();
-	const logs = logData.logs as CommandLog[];
+	const logData = logQs.docs;
+	const logs = logData.map((doc) => doc.data() as CommandLog);
 
 	const formattedLogs = formatLogs(logs);
 	return formattedLogs;

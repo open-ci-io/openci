@@ -129,7 +129,6 @@ class RunnerCommand extends Command<int> {
           if (buildJob == null) continue;
           _log('Found ${buildJob.toJson()} build jobs');
           final vmName = generateUUID;
-          final logId = generateUUID;
           try {
             await updateBuildStatus(
               jobId: buildJob.id,
@@ -167,7 +166,6 @@ class RunnerCommand extends Command<int> {
             final repoUrl = buildJob.github.repositoryUrl;
 
             await runCommand(
-              logId: logId,
               client: client,
               command: cloneCommand(
                 repoUrl,
@@ -192,7 +190,6 @@ class RunnerCommand extends Command<int> {
               );
 
               await runCommand(
-                logId: logId,
                 client: client,
                 command: processedCommand,
                 currentWorkingDirectory: workflow.currentWorkingDirectory,

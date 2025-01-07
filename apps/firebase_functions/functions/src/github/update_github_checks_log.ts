@@ -60,7 +60,7 @@ export const updateGitHubChecksLog = onDocumentWritten(
 		await setGitHubCheckStatusToInProgress(
 			octokit,
 			openciGitHub,
-			formatLogs(document.logs),
+			formatLog(document as CommandLog),
 		);
 	},
 );
@@ -82,48 +82,58 @@ async function setGitHubCheckStatusToInProgress(
 	});
 }
 
+function formatLog(log: CommandLog): string {
+	console.log("log", log);
+
+	const normalizedTimestamp = Math.floor(Number(log.createdAt) / 1000);
+	const timestamp = new Date(normalizedTimestamp * 1000).toISOString();
+	console.log("timestamp + log", timestamp + log);
+	const exitCodeStatus = log.exitCode === 0 ? "SUCCESS" : "FAILED";
+
+	const maskSecret = (value: string) => {
+		const maskedGitHubUrl = value.replace(
+			/(https:\/\/)[^@]*(@github\.com)/g,
+			"$1[REDACTED]$2",
+		);
+		const maskedBase64 = maskedGitHubUrl.replace(
+			/[A-Za-z0-9+/]{50,}={0,2}/g,
+			"[BASE64_REDACTED]",
+		);
+		const maskedFirebaseToken = maskedBase64.replace(
+			/1\/\/[A-Za-z0-9_-]+/g,
+			"[FIREBASE_TOKEN_REDACTED]",
+		);
+		return isSecret.value(maskedFirebaseToken)
+			? "********"
+			: maskedFirebaseToken;
+	};
+
+	const maskedData = {
+		command: maskSecret(log.command),
+		stdout: maskSecret(log.logStdout),
+		stderr: maskSecret(log.logStderr),
+	};
+
+	const result = [
+		`[${timestamp}] Command: ${maskedData.command}`,
+		`Exit Code: ${log.exitCode} (${exitCodeStatus})`,
+		"stdout:",
+		maskedData.stdout,
+		"stderr:",
+		maskedData.stderr,
+		"---",
+	].join("\n");
+
+	console.log("result", result);
+
+	return result;
+}
+
 export function formatLogs(logs: CommandLog[]): string {
 	console.log("logs", logs);
 	return logs
 		.map((log) => {
-			const normalizedTimestamp = Math.floor(Number(log.createdAt) / 1000);
-			const timestamp = new Date(normalizedTimestamp * 1000).toISOString();
-			console.log("timestamp + log", timestamp + log);
-			const exitCodeStatus = log.exitCode === 0 ? "SUCCESS" : "FAILED";
-
-			const maskSecret = (value: string) => {
-				const maskedGitHubUrl = value.replace(
-					/(https:\/\/)[^@]*(@github\.com)/g,
-					"$1[REDACTED]$2",
-				);
-				const maskedBase64 = maskedGitHubUrl.replace(
-					/[A-Za-z0-9+/]{50,}={0,2}/g,
-					"[BASE64_REDACTED]",
-				);
-				const maskedFirebaseToken = maskedBase64.replace(
-					/1\/\/[A-Za-z0-9_-]+/g,
-					"[FIREBASE_TOKEN_REDACTED]",
-				);
-				return isSecret.value(maskedFirebaseToken)
-					? "********"
-					: maskedFirebaseToken;
-			};
-
-			const maskedData = {
-				command: maskSecret(log.command),
-				stdout: maskSecret(log.logStdout),
-				stderr: maskSecret(log.logStderr),
-			};
-
-			return [
-				`[${timestamp}] Command: ${maskedData.command}`,
-				`Exit Code: ${log.exitCode} (${exitCodeStatus})`,
-				"stdout:",
-				maskedData.stdout,
-				"stderr:",
-				maskedData.stderr,
-				"---",
-			].join("\n");
+			return formatLog(log);
 		})
 		.join("\n\n");
 }

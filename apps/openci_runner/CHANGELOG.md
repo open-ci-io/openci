@@ -1,3 +1,19 @@
+## 0.9.10
+
+- fix: log
+
+## 0.9.9
+
+- fix: log
+
+## 0.9.8
+
+- fix: log
+
+## 0.9.7
+
+- fix: log
+
 ## 0.9.6
 
 - fix: transaction for firestore
