@@ -71,6 +71,8 @@ export const updateGitHubCheckStatus = onDocumentUpdated(
 			);
 		} else {
 			console.log("No status change");
+			console.log(`beforeData.buildStatus: ${beforeData.buildStatus}`);
+			console.log(`afterData.buildStatus: ${afterData.buildStatus}`);
 		}
 	},
 );

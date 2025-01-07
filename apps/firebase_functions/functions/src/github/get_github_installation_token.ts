@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "@octokit/rest";
 
@@ -26,16 +27,6 @@ export async function getGitHubInstallationToken(
 		return data.token;
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	} catch (error: any) {
-		/**
-		 * Octokit 経由でのエラーは多岐にわたりますが、
-		 * - error.status にステータスコードが入っている
-		 * - error.message にメッセージが入っている
-		 * というケースが多いです。
-		 *
-		 * ここでステータスコードやメッセージを判定し、
-		 * 特定のエラー（たとえばタイムアウトや GitHub 側の 5xx エラーなど）に
-		 * 適したメッセージをユーザーに返すようにします。
-		 */
 		if (error.status === 504 || /timed out/i.test(error.message)) {
 			throw new Error(
 				"We couldn't respond to your request in time. Sorry about that. " +
@@ -48,7 +39,6 @@ export async function getGitHubInstallationToken(
 					"Please try again later. If the problem persists, contact us.",
 			);
 		}
-		// その他の場合
 		throw new Error(`Error creating installation token: ${error.message}`);
 	}
 }

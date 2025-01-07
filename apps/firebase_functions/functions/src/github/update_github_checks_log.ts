@@ -86,11 +86,9 @@ export function formatLogs(logs: CommandLog[]): string {
 	console.log("logs", logs);
 	return logs
 		.map((log) => {
-			console.log("log", log);
 			const normalizedTimestamp = Math.floor(Number(log.createdAt) / 1000);
-			console.log("normalizedTimestamp", normalizedTimestamp);
 			const timestamp = new Date(normalizedTimestamp * 1000).toISOString();
-			console.log("timestamp", timestamp);
+			console.log("timestamp + log", timestamp + log);
 			const exitCodeStatus = log.exitCode === 0 ? "SUCCESS" : "FAILED";
 
 			const maskSecret = (value: string) => {
