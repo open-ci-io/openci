@@ -58,10 +58,12 @@ export const updateGitHubChecksLog = onDocumentWritten(
 		const octokit = new Octokit({ auth: token });
 
 		const oldLog = await getCheckRunOutput(octokit, openciGitHub);
+		console.log("oldLog", oldLog);
 		const newLog = formatLog(document as CommandLog);
+		console.log("newLog", newLog);
 
 		const combinedLogs = [oldLog, newLog].filter(Boolean).join("\n\n");
-
+		console.log("combinedLogs", combinedLogs);
 		await setGitHubCheckStatusToInProgress(octokit, openciGitHub, combinedLogs);
 	},
 );
@@ -149,6 +151,8 @@ async function getCheckRunOutput(
 			repo: github.repositoryName,
 			check_run_id: github.checkRunId,
 		});
+
+		console.log("getCheckRunOutput", response);
 
 		return response.data.output?.text ?? null;
 	} catch (error) {
