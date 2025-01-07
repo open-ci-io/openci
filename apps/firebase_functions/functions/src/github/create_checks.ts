@@ -1,7 +1,7 @@
 import type { Context } from "probot";
 
 export async function createChecks(
-	context: Context<"pull_request"> | Context<"push">,
+	context: Context<"pull_request"> | Context<"push"> | Context<"check_run">,
 	name: string,
 ) {
 	let headSha = "";
@@ -11,6 +11,9 @@ export async function createChecks(
 	} else if (context.name === "push") {
 		const _context = context as Context<"push">;
 		headSha = _context.payload.after;
+	} else if (context.name === "check_run") {
+		const _context = context as Context<"check_run">;
+		headSha = _context.payload.check_run.head_sha;
 	}
 	try {
 		return await context.octokit.checks.create({

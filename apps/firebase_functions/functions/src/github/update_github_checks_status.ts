@@ -69,11 +69,6 @@ export const updateGitHubCheckStatus = onDocumentUpdated(
 				"failure",
 				formattedLogs,
 			);
-		} else if (
-			beforeData.buildStatus === OpenCIGitHubChecksStatus.FAILURE &&
-			afterData.buildStatus === OpenCIGitHubChecksStatus.QUEUED
-		) {
-			await setGitHubCheckStatusToQueued(octokit, github);
 		} else {
 			console.log("No status change");
 		}
@@ -109,18 +104,6 @@ async function setGitHubCheckStatusToInProgress(
 		check_run_id: github.checkRunId,
 		status: "in_progress",
 		started_at: new Date().toISOString(),
-	});
-}
-
-async function setGitHubCheckStatusToQueued(
-	octokit: Octokit,
-	github: OpenCIGithub,
-) {
-	await octokit.checks.update({
-		owner: github.owner,
-		repo: github.repositoryName,
-		check_run_id: github.checkRunId,
-		status: "queued",
 	});
 }
 

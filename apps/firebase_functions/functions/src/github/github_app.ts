@@ -85,6 +85,7 @@ const appFunction = async (app: Probot) => {
 				const checkRunContext = context as Context<"check_run">;
 				const _payload = checkRunContext.payload;
 				const checkRunId = _payload.check_run.id;
+				const name = _payload.check_run.name;
 
 				const checkRun = await firestore
 					.collection(buildJobsCollectionName)
@@ -97,11 +98,30 @@ const appFunction = async (app: Probot) => {
 				}
 
 				const buildJob = checkRun.docs[0].data();
+
+				const logQs = await firestore
+					.collection(buildJobsCollectionName)
+					.doc(buildJob.id)
+					.collection("logs")
+					.get();
+
+				for (const log of logQs.docs) {
+					await firestore
+						.collection(buildJobsCollectionName)
+						.doc(buildJob.id)
+						.collection("logs")
+						.doc(log.id)
+						.delete();
+				}
+
+				const _checks = await createChecks(checkRunContext, name);
+
 				await firestore
 					.collection(buildJobsCollectionName)
 					.doc(buildJob.id)
 					.update({
 						buildStatus: OpenCIGitHubChecksStatus.QUEUED,
+						"github.checkRunId": _checks.data.id,
 					});
 
 				return;
