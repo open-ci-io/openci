@@ -66,18 +66,22 @@ func main() {
 			for {
 				infoLogger.Printf("Starting VM Runner with key path: %s", cmd.String("f"))
 
-				runFirestoreTransaction(ctx, firestoreClient, infoLogger)
-
-				secretsRef := firestoreClient.Collection("secrets_v1")
-				secretDocs, err := secretsRef.Documents(ctx).GetAll()
+				buildJobSnap, err := runFirestoreTransaction(ctx, firestoreClient, infoLogger)
 				if err != nil {
-					sentry.CaptureMessage(fmt.Sprintf("error fetching secrets: %v", err))
-					return fmt.Errorf("error fetching secrets: %v", err)
+					sentry.CaptureMessage(fmt.Sprintf("error running firestore transaction: %v", err))
+					return fmt.Errorf("error running firestore transaction: %v", err)
 				}
 
-				secretDoc := secretDocs[0]
-				infoLogger.Printf("Found secret document: %v", secretDoc.Ref.ID)
-				fmt.Printf("secretDoc: %v\n", secretDoc.Data())
+				if buildJobSnap == nil {
+					infoLogger.Printf("No valid document found.")
+					time.Sleep(1 * time.Second)
+					continue
+				}
+
+				buildJob := buildJobSnap.Data()
+
+				infoLogger.Printf("Found build job document: %v", buildJobSnap.Ref.ID)
+				fmt.Printf("buildJob: %v\n", buildJob)
 				time.Sleep(1 * time.Second)
 			}
 
@@ -85,9 +89,10 @@ func main() {
 	}).Run(context.Background(), os.Args)
 }
 
-func runFirestoreTransaction(ctx context.Context, firestoreClient *firestore.Client, infoLogger *log.Logger) error {
-	return firestoreClient.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
-		// build_jobs_v3コレクションからbuildStatus == "queued"のものをcreatedAtで昇順に並べ、1件のみ取得
+func runFirestoreTransaction(ctx context.Context, firestoreClient *firestore.Client, infoLogger *log.Logger) (*firestore.DocumentSnapshot, error) {
+	var resultSnap *firestore.DocumentSnapshot
+
+	err := firestoreClient.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
 		buildJobsRef := firestoreClient.Collection("build_jobs_v3").
 			Where("buildStatus", "==", "queued").
 			OrderBy("createdAt", firestore.Asc).
@@ -98,7 +103,6 @@ func runFirestoreTransaction(ctx context.Context, firestoreClient *firestore.Cli
 			return fmt.Errorf("failed to fetch build jobs: %v", err)
 		}
 
-		// 該当ドキュメントが無い場合は早期リターン
 		if len(buildJobDocs) == 0 {
 			return nil
 		}
@@ -109,13 +113,13 @@ func runFirestoreTransaction(ctx context.Context, firestoreClient *firestore.Cli
 			return fmt.Errorf("failed to get document snapshot: %v", err)
 		}
 
-		// buildStatusが"queued"でなければ早期リターン
 		freshStatus, ok := freshDocSnap.Data()["buildStatus"].(string)
 		if !ok {
+			resultSnap = freshDocSnap
 			return nil
 		}
+
 		if freshStatus == "queued" {
-			// buildStatusを"inProgress"にし、updatedAtを更新
 			err = tx.Update(docRef, []firestore.Update{
 				{
 					Path:  "buildStatus",
@@ -129,12 +133,19 @@ func runFirestoreTransaction(ctx context.Context, firestoreClient *firestore.Cli
 			if err != nil {
 				return fmt.Errorf("failed to update document: %v", err)
 			}
-
 			infoLogger.Printf("Document %s updated to inProgress.", docRef.ID)
 		} else {
+			resultSnap = nil
 			return nil
 		}
 
+		resultSnap = freshDocSnap
 		return nil
 	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resultSnap, nil
 }
