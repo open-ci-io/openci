@@ -79,8 +79,16 @@ func main() {
 				}
 
 				buildJob := buildJobSnap.Data()
-
 				infoLogger.Printf("Found build job document: %v", buildJobSnap.Ref.ID)
+
+				workflowSnap, err := firestoreClient.Collection("workflows").Documents(ctx).GetAll()
+				if err != nil {
+					sentry.CaptureMessage(fmt.Sprintf("error fetching workflows: %v", err))
+					return fmt.Errorf("error fetching workflows: %v", err)
+				}
+
+				infoLogger.Printf("Found workflow documents: %v", workflowSnap)
+
 				fmt.Printf("buildJob: %v\n", buildJob)
 				time.Sleep(1 * time.Second)
 			}
