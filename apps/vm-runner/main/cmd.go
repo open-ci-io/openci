@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
 	"github.com/fatih/color"
 	"github.com/getsentry/sentry-go"
@@ -54,29 +55,20 @@ func main() {
 				return fmt.Errorf("error initializing app: %v", err)
 			}
 
-			firestore, err := app.Firestore(ctx)
+			firestoreClient, err := app.Firestore(ctx)
 			if err != nil {
 				sentry.CaptureMessage(fmt.Sprintf("error initializing firestore: %v", err))
 				return fmt.Errorf("error initializing firestore: %v", err)
 			}
 
-			defer firestore.Close()
+			defer firestoreClient.Close()
 
 			for {
 				infoLogger.Printf("Starting VM Runner with key path: %s", cmd.String("f"))
 
-				buildJobsRef := firestore.Collection("build_jobs_v3").Limit(1)
-				buildJobDocs, err := buildJobsRef.Documents(ctx).GetAll()
-				if err != nil {
-					sentry.CaptureMessage(fmt.Sprintf("error fetching build jobs: %v", err))
-					return fmt.Errorf("error fetching build jobs: %v", err)
-				}
+				runFirestoreTransaction(ctx, firestoreClient, infoLogger)
 
-				buildJobDoc := buildJobDocs[0]
-				infoLogger.Printf("Processing build job: %v", buildJobDoc.Ref.ID)
-				fmt.Printf("doc: %v\n", buildJobDoc.Data())
-
-				secretsRef := firestore.Collection("secrets_v1")
+				secretsRef := firestoreClient.Collection("secrets_v1")
 				secretDocs, err := secretsRef.Documents(ctx).GetAll()
 				if err != nil {
 					sentry.CaptureMessage(fmt.Sprintf("error fetching secrets: %v", err))
@@ -91,4 +83,58 @@ func main() {
 
 		},
 	}).Run(context.Background(), os.Args)
+}
+
+func runFirestoreTransaction(ctx context.Context, firestoreClient *firestore.Client, infoLogger *log.Logger) error {
+	return firestoreClient.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
+		// build_jobs_v3コレクションからbuildStatus == "queued"のものをcreatedAtで昇順に並べ、1件のみ取得
+		buildJobsRef := firestoreClient.Collection("build_jobs_v3").
+			Where("buildStatus", "==", "queued").
+			OrderBy("createdAt", firestore.Asc).
+			Limit(1)
+
+		buildJobDocs, err := buildJobsRef.Documents(ctx).GetAll()
+		if err != nil {
+			return fmt.Errorf("failed to fetch build jobs: %v", err)
+		}
+
+		// 該当ドキュメントが無い場合は早期リターン
+		if len(buildJobDocs) == 0 {
+			return nil
+		}
+
+		docRef := buildJobDocs[0].Ref
+		freshDocSnap, err := tx.Get(docRef)
+		if err != nil {
+			return fmt.Errorf("failed to get document snapshot: %v", err)
+		}
+
+		// buildStatusが"queued"でなければ早期リターン
+		freshStatus, ok := freshDocSnap.Data()["buildStatus"].(string)
+		if !ok {
+			return nil
+		}
+		if freshStatus == "queued" {
+			// buildStatusを"inProgress"にし、updatedAtを更新
+			err = tx.Update(docRef, []firestore.Update{
+				{
+					Path:  "buildStatus",
+					Value: "inProgress",
+				},
+				{
+					Path:  "updatedAt",
+					Value: time.Now(),
+				},
+			})
+			if err != nil {
+				return fmt.Errorf("failed to update document: %v", err)
+			}
+
+			infoLogger.Printf("Document %s updated to inProgress.", docRef.ID)
+		} else {
+			return nil
+		}
+
+		return nil
+	})
 }
