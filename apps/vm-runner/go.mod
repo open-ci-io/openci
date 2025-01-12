@@ -5,7 +5,9 @@ go 1.23.3
 require github.com/urfave/cli/v3 v3.0.0-beta1
 
 require (
+	cloud.google.com/go/firestore v1.18.0
 	firebase.google.com/go v3.13.0+incompatible
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/color v1.18.0
 	github.com/getsentry/sentry-go v0.31.1
 	google.golang.org/api v0.216.0
@@ -17,7 +19,6 @@ require (
 	cloud.google.com/go/auth v0.13.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.6 // indirect
 	cloud.google.com/go/compute/metadata v0.6.0 // indirect
-	cloud.google.com/go/firestore v1.18.0 // indirect
 	cloud.google.com/go/iam v1.2.2 // indirect
 	cloud.google.com/go/longrunning v0.6.2 // indirect
 	cloud.google.com/go/monitoring v1.21.2 // indirect

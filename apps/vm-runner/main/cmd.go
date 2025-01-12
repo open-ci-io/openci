@@ -3,12 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
+	"encoding/json"
+
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/fatih/color"
 	"github.com/getsentry/sentry-go"
 	"github.com/urfave/cli/v3"
@@ -35,11 +40,17 @@ func main() {
 				Usage:    "Sentry DSN",
 				Required: true,
 			},
+			&cli.StringFlag{
+				Name:     "p",
+				Usage:    "GitHub App's .pem",
+				Required: true,
+			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 
 			sentryDSN := cmd.String("s")
 			keyPath := cmd.String("f")
+			pemPath := cmd.String("p")
 
 			if err := InitializeSentry(sentryDSN); err != nil {
 				log.Fatalf("sentry initialization failed: %s", err)
@@ -81,13 +92,23 @@ func main() {
 				buildJob := buildJobSnap.Data()
 				infoLogger.Printf("Found build job document: %v", buildJobSnap.Ref.ID)
 
-				workflowSnap, err := firestoreClient.Collection("workflows").Documents(ctx).GetAll()
+				workflowSnaps, err := firestoreClient.Collection("workflows").Documents(ctx).GetAll()
 				if err != nil {
 					sentry.CaptureMessage(fmt.Sprintf("error fetching workflows: %v", err))
 					return fmt.Errorf("error fetching workflows: %v", err)
 				}
 
-				infoLogger.Printf("Found workflow documents: %v", workflowSnap)
+				infoLogger.Printf("Found workflowSnaps: %v", workflowSnaps)
+
+				github := buildJob["github"].(map[string]interface{})
+
+				installationToken, err := getGitHubInstallationToken(pemPath, github["installationId"].(int64), github["appId"].(int64))
+				if err != nil {
+					sentry.CaptureMessage(fmt.Sprintf("error getting GitHub installation token: %v", err))
+					return fmt.Errorf("error getting GitHub installation token: %v", err)
+				}
+
+				infoLogger.Printf("Installation token: %s", installationToken)
 
 				fmt.Printf("buildJob: %v\n", buildJob)
 				time.Sleep(1 * time.Second)
@@ -95,6 +116,67 @@ func main() {
 
 		},
 	}).Run(context.Background(), os.Args)
+}
+
+func getGitHubInstallationToken(pemPath string, installationID int64, appID int64) (string, error) {
+	pemBytes, err := os.ReadFile(pemPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to read pem file: %v", err)
+	}
+
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(pemBytes)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse private key: %v", err)
+	}
+
+	now := time.Now()
+	claims := jwt.StandardClaims{
+		IssuedAt:  now.Unix(),
+		ExpiresAt: now.Add(9 * time.Minute).Unix(),
+		Issuer:    fmt.Sprintf("%d", appID),
+	}
+
+	jwtToken, err := jwt.NewWithClaims(jwt.SigningMethodRS256, claims).SignedString(privateKey)
+	if err != nil {
+		return "", fmt.Errorf("failed to sign jwt: %v", err)
+	}
+
+	url := fmt.Sprintf("https://api.github.com/app/installations/%d/access_tokens", installationID)
+	req, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to create request for installation token: %v", err)
+	}
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", jwtToken))
+	req.Header.Set("Accept", "application/vnd.github.v3+json")
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to request GitHub installation token: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusCreated {
+		return "", fmt.Errorf("failed to get installation token, status code: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read response body: %v", err)
+	}
+
+	var tokenResponse struct {
+		Token string `json:"token"`
+	}
+	if err := json.Unmarshal(body, &tokenResponse); err != nil {
+		return "", fmt.Errorf("failed to unmarshal token response: %v", err)
+	}
+
+	if len(tokenResponse.Token) == 0 {
+		return "", fmt.Errorf("installation token not found in response")
+	}
+
+	return tokenResponse.Token, nil
 }
 
 func runFirestoreTransaction(ctx context.Context, firestoreClient *firestore.Client, infoLogger *log.Logger) (*firestore.DocumentSnapshot, error) {
