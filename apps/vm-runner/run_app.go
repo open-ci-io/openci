@@ -52,13 +52,7 @@ func RunApp(ctx context.Context, cmd *cli.Command) error {
 func handleVMProcess(infoLogger, errorLogger *log.Logger) error {
 	vmName := uuid.New().String()
 
-	defer func() {
-		ExecuteCommand("tart", "stop", vmName)
-		infoLogger.Printf("VM stopped: %s", vmName)
-
-		ExecuteCommand("tart", "delete", vmName)
-		infoLogger.Printf("VM deleted: %s", vmName)
-	}()
+	defer cleanupVM(vmName, infoLogger)
 
 	output, err := ExecuteCommand("tart", "clone", "sequoia", vmName)
 	if err == nil && output.ExitCode == 0 {
@@ -98,4 +92,12 @@ func handleVMProcess(infoLogger, errorLogger *log.Logger) error {
 	infoLogger.Printf("Ssh command output: %v", output2)
 
 	return nil
+}
+
+func cleanupVM(vmName string, infoLogger *log.Logger) {
+	ExecuteCommand("tart", "stop", vmName)
+	infoLogger.Printf("VM stopped: %s", vmName)
+
+	ExecuteCommand("tart", "delete", vmName)
+	infoLogger.Printf("VM deleted: %s", vmName)
 }
