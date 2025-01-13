@@ -40,10 +40,11 @@ func RunApp(ctx context.Context, cmd *cli.Command) error {
 
 	for {
 		infoLogger.Printf("Starting VM Runner with key path: %s", keyPath)
-		if err := handleVMProcess(infoLogger, errorLogger); nil != err {
-			return err
+		if err := handleVMProcess(infoLogger, errorLogger); err != nil {
+			errorLogger.Printf("VM Process failed, but continuing: %v", err)
+			sentry.CaptureException(err)
 		}
-		time.Sleep(10 * time.Second)
+
 		time.Sleep(10 * time.Second)
 	}
 }
@@ -51,16 +52,25 @@ func RunApp(ctx context.Context, cmd *cli.Command) error {
 func handleVMProcess(infoLogger, errorLogger *log.Logger) error {
 	vmName := uuid.New().String()
 
+	defer func() {
+		ExecuteCommand("tart", "stop", vmName)
+		infoLogger.Printf("VM stopped: %s", vmName)
+
+		ExecuteCommand("tart", "delete", vmName)
+		infoLogger.Printf("VM deleted: %s", vmName)
+	}()
+
 	output, err := ExecuteCommand("tart", "clone", "sequoia", vmName)
-	if nil != err {
-		sentry.CaptureMessage(fmt.Sprintf("Command execution failed: %v", err))
-		return fmt.Errorf("command execution failed: %v", err)
-	}
-	if output.ExitCode != 0 {
+	if err == nil && output.ExitCode == 0 {
+		infoLogger.Printf("VM cloned: %s", vmName)
+	} else {
+		if err != nil {
+			sentry.CaptureMessage(fmt.Sprintf("Command execution failed: %v", err))
+			return fmt.Errorf("command execution failed: %v", err)
+		}
 		errorLogger.Printf("Command failed with exit code %d\nStderr: %s\n", output.ExitCode, output.Stderr)
 		return fmt.Errorf("command failed with exit code %d", output.ExitCode)
 	}
-	infoLogger.Printf("VM cloned: %s", vmName)
 
 	StartVM(vmName, infoLogger)
 
@@ -80,12 +90,12 @@ func handleVMProcess(infoLogger, errorLogger *log.Logger) error {
 
 	infoLogger.Printf("Connected to VM via SSH")
 
-	output2, execErr := ExecuteSSHCommand(client, "ls", infoLogger)
+	output2, execErr := ExecuteSSHCommand(client, "lsa", infoLogger)
 	if nil != execErr {
 		sentry.CaptureMessage(fmt.Sprintf("Error executing SSH command: %v", execErr))
 		return fmt.Errorf("error executing SSH command: %v", execErr)
 	}
-	infoLogger.Printf("SSH command output: %s", output2)
+	infoLogger.Printf("Ssh command output: %v", output2)
 
 	return nil
 }

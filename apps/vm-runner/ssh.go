@@ -135,17 +135,48 @@ func ConnectSSH(ip string, infoLogger *log.Logger) (*ssh.Client, error) {
 	return nil, fmt.Errorf("failed to connect to VM via SSH after 30 attempts")
 }
 
-func ExecuteSSHCommand(client *ssh.Client, command string, infoLogger *log.Logger) (string, error) {
+type SSHCommandResult struct {
+	Stdout   string
+	Stderr   string
+	ExitCode int
+	Command  string
+}
+
+func ExecuteSSHCommand(client *ssh.Client, command string, infoLogger *log.Logger) (SSHCommandResult, error) {
+	if client == nil {
+		return SSHCommandResult{}, fmt.Errorf("client is nil")
+	}
+
 	session, err := client.NewSession()
 	if err != nil {
-		return "", fmt.Errorf("failed to create session: %v", err)
+		return SSHCommandResult{}, fmt.Errorf("failed to create session: %v", err)
 	}
 	defer session.Close()
 
-	output, err := session.CombinedOutput(command)
-	if err != nil {
-		return "", fmt.Errorf("failed to execute command: %v", err)
+	var stdoutBuf, stderrBuf bytes.Buffer
+	session.Stdout = &stdoutBuf
+	session.Stderr = &stderrBuf
+
+	runErr := session.Run(command)
+	if runErr == nil {
+		return SSHCommandResult{
+			Stdout:   stdoutBuf.String(),
+			Stderr:   stderrBuf.String(),
+			ExitCode: 0,
+			Command:  command,
+		}, nil
 	}
 
-	return string(output), nil
+	exitCode := 0
+	exitErr, ok := runErr.(*ssh.ExitError)
+	if ok {
+		exitCode = exitErr.ExitStatus()
+	}
+
+	return SSHCommandResult{
+		Stdout:   stdoutBuf.String(),
+		Stderr:   stderrBuf.String(),
+		ExitCode: exitCode,
+		Command:  command,
+	}, fmt.Errorf("failed to execute command: %v", runErr)
 }
