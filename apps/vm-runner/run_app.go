@@ -13,9 +13,11 @@ import (
 	"google.golang.org/api/option"
 )
 
-func RunApp(ctx context.Context, cmd *cli.Command, infoLogger, errorLogger *log.Logger) error {
+func RunApp(ctx context.Context, cmd *cli.Command) error {
 	sentryDSN := cmd.String("s")
 	keyPath := cmd.String("f")
+
+	infoLogger, errorLogger := InitializeLoggers()
 
 	if err := InitializeSentry(sentryDSN); nil != err {
 		log.Fatalf("Sentry initialization failed: %s", err)

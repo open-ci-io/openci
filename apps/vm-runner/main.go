@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-	infoLogger, errorLogger := InitializeLoggers()
 
 	(&cli.Command{
 		Name:  "vm-runner for OpenCI",
@@ -31,7 +30,7 @@ func main() {
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			return RunApp(ctx, cmd, infoLogger, errorLogger)
+			return RunApp(ctx, cmd)
 		},
 	}).Run(context.Background(), os.Args)
 }
