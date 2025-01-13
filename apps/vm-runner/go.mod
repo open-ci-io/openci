@@ -7,9 +7,11 @@ require github.com/urfave/cli/v3 v3.0.0-beta1
 require (
 	cloud.google.com/go/firestore v1.18.0
 	firebase.google.com/go v3.13.0+incompatible
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/color v1.18.0
 	github.com/getsentry/sentry-go v0.31.1
+	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/google/uuid v1.6.0
+	golang.org/x/crypto v0.31.0
 	google.golang.org/api v0.216.0
 )
 
@@ -35,7 +37,6 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/s2a-go v0.1.8 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -49,7 +50,6 @@ require (
 	go.opentelemetry.io/otel/sdk v1.31.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.31.0 // indirect
 	go.opentelemetry.io/otel/trace v1.31.0 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/oauth2 v0.25.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
