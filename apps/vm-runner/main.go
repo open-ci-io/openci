@@ -28,6 +28,11 @@ func main() {
 				Usage:    "GitHub App's .pem",
 				Required: true,
 			},
+			&cli.StringFlag{
+				Name:     "b",
+				Usage:    "Firebase Storage Bucket Name",
+				Required: true,
+			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			return RunApp(ctx, cmd)

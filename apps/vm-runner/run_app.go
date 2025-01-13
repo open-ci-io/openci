@@ -16,6 +16,7 @@ import (
 func RunApp(ctx context.Context, cmd *cli.Command) error {
 	sentryDSN := cmd.String("s")
 	keyPath := cmd.String("f")
+	bucketName := cmd.String("b")
 
 	infoLogger, errorLogger := InitializeLoggers()
 
@@ -24,8 +25,12 @@ func RunApp(ctx context.Context, cmd *cli.Command) error {
 	}
 	defer sentry.Flush(2 * time.Second)
 
+	config := &firebase.Config{
+		StorageBucket: bucketName,
+	}
+
 	opt := option.WithCredentialsFile(keyPath)
-	app, err := firebase.NewApp(context.Background(), nil, opt)
+	app, err := firebase.NewApp(context.Background(), config, opt)
 	if nil != err {
 		errorLogger.Printf("error initializing app: %v", err)
 		return fmt.Errorf("error initializing app: %v", err)
@@ -40,7 +45,7 @@ func RunApp(ctx context.Context, cmd *cli.Command) error {
 
 	for {
 		infoLogger.Printf("Starting VM Runner with key path: %s", keyPath)
-		if err := handleVMProcess(infoLogger, errorLogger); err != nil {
+		if err := handleVMProcess(ctx, app, infoLogger, errorLogger); err != nil {
 			errorLogger.Printf("VM Process failed, but continuing: %v", err)
 			sentry.CaptureException(err)
 		}
@@ -49,16 +54,21 @@ func RunApp(ctx context.Context, cmd *cli.Command) error {
 	}
 }
 
-func handleVMProcess(infoLogger, errorLogger *log.Logger) error {
+func handleVMProcess(ctx context.Context, app *firebase.App, infoLogger, errorLogger *log.Logger) error {
 	vmName := uuid.New().String()
+	buildId := uuid.New().String()
+	logId := uuid.New().String()
+	logPath := fmt.Sprintf("logs_v1/%s/%s/openci_log.log", buildId, logId)
 
-	defer cleanupVM(vmName, infoLogger)
+	defer func() {
+		cleanupVM(vmName, infoLogger)
+	}()
 
 	output, err := ExecuteCommand("tart", "clone", "sequoia", vmName)
 	if err == nil && output.ExitCode == 0 {
 		infoLogger.Printf("VM cloned: %s", vmName)
 	} else {
-		if err != nil {
+		if nil != err {
 			sentry.CaptureMessage(fmt.Sprintf("Command execution failed: %v", err))
 			return fmt.Errorf("command execution failed: %v", err)
 		}
@@ -70,28 +80,50 @@ func handleVMProcess(infoLogger, errorLogger *log.Logger) error {
 
 	ip, ipErr := GetVMIp(vmName, infoLogger)
 	if nil != ipErr {
-		sentry.CaptureMessage(fmt.Sprintf("error getting VM IP: %v", ipErr))
+		sentry.CaptureMessage(fmt.Sprintf("Error getting VM IP: %v", ipErr))
 		return fmt.Errorf("error getting VM IP: %v", ipErr)
 	}
+
 	infoLogger.Printf("VM IP: %s", ip)
 
 	client, sshErr := ConnectSSH(ip, infoLogger)
 	if nil != sshErr {
-		sentry.CaptureMessage(fmt.Sprintf("error connecting to VM via SSH: %v", sshErr))
+		sentry.CaptureMessage(fmt.Sprintf("Error connecting to VM via SSH: %v", sshErr))
 		return fmt.Errorf("error connecting to VM via SSH: %v", sshErr)
 	}
 	defer client.Close()
 
 	infoLogger.Printf("Connected to VM via SSH")
 
-	output2, execErr := ExecuteSSHCommand(client, "lsa", infoLogger)
-	if nil != execErr {
-		sentry.CaptureMessage(fmt.Sprintf("Error executing SSH command: %v", execErr))
+	sshOutput, execErr := ExecuteSSHCommand(client, "lsa", infoLogger)
+
+	sshLogContent := fmt.Sprintf(
+		"Date: %s\nCommand: %s\nStdout: %s\nStderr: %s\nExitCode: %d\n",
+		time.Now().Format(time.RFC3339),
+		sshOutput.Command,
+		sshOutput.Stdout,
+		sshOutput.Stderr,
+		sshOutput.ExitCode,
+	)
+
+	if execErr == nil {
+		infoLogger.Printf("SSH command output: %+v", sshOutput)
+
+		uploadErr := UploadLogToFirebaseStorage(ctx, app, logPath, sshLogContent)
+		if nil != uploadErr {
+			errorLogger.Printf("Failed to upload success log to Firebase Storage: %v", uploadErr)
+		}
+		return nil
+	} else {
+		fmt.Printf("Error executing SSH command: %v, %v", execErr, sshLogContent)
+		sentry.CaptureMessage(sshLogContent)
+
+		uploadErr := UploadLogToFirebaseStorage(ctx, app, logPath, sshLogContent)
+		if nil != uploadErr {
+			errorLogger.Printf("Failed to upload error log to Firebase Storage: %v", uploadErr)
+		}
 		return fmt.Errorf("error executing SSH command: %v", execErr)
 	}
-	infoLogger.Printf("Ssh command output: %v", output2)
-
-	return nil
 }
 
 func cleanupVM(vmName string, infoLogger *log.Logger) {
