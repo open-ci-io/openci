@@ -10,7 +10,16 @@ import (
 	firebase "firebase.google.com/go"
 )
 
-func RunFirestoreTransaction(ctx context.Context, firestoreClient *firestore.Client, infoLogger *log.Logger) (*firestore.DocumentSnapshot, error) {
+func GetWorkflow(ctx context.Context, firestoreClient *firestore.Client, workflowId string) (*firestore.DocumentSnapshot, error) {
+	workflowRef := firestoreClient.Collection("workflows").Doc(workflowId)
+	workflowSnap, err := workflowRef.Get(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get workflow: %v", err)
+	}
+	return workflowSnap, nil
+}
+
+func GetBuildJob(ctx context.Context, firestoreClient *firestore.Client, infoLogger *log.Logger) (*firestore.DocumentSnapshot, error) {
 	var resultSnap *firestore.DocumentSnapshot
 
 	err := firestoreClient.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
@@ -25,7 +34,7 @@ func RunFirestoreTransaction(ctx context.Context, firestoreClient *firestore.Cli
 		}
 
 		if len(buildJobDocs) == 0 {
-			return nil
+			return fmt.Errorf("no queued build jobs found")
 		}
 
 		docRef := buildJobDocs[0].Ref
@@ -34,10 +43,14 @@ func RunFirestoreTransaction(ctx context.Context, firestoreClient *firestore.Cli
 			return fmt.Errorf("failed to get document snapshot: %v", err)
 		}
 
-		freshStatus, ok := freshDocSnap.Data()["buildStatus"].(string)
+		if !freshDocSnap.Exists() {
+			return fmt.Errorf("document does not exist")
+		}
+
+		data := freshDocSnap.Data()
+		freshStatus, ok := data["buildStatus"].(string)
 		if !ok {
-			resultSnap = freshDocSnap
-			return nil
+			return fmt.Errorf("invalid buildStatus field")
 		}
 
 		if freshStatus == "queued" {
@@ -56,8 +69,7 @@ func RunFirestoreTransaction(ctx context.Context, firestoreClient *firestore.Cli
 			}
 			infoLogger.Printf("Document %s updated to inProgress.", docRef.ID)
 		} else {
-			resultSnap = nil
-			return nil
+			return fmt.Errorf("build job status is not queued: %s", freshStatus)
 		}
 
 		resultSnap = freshDocSnap
@@ -66,6 +78,10 @@ func RunFirestoreTransaction(ctx context.Context, firestoreClient *firestore.Cli
 
 	if err != nil {
 		return nil, err
+	}
+
+	if resultSnap == nil {
+		return nil, fmt.Errorf("no valid build job found")
 	}
 
 	return resultSnap, nil

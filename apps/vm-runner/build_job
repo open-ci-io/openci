@@ -1,0 +1,33 @@
+// package main
+
+// // OpenCIGitHubChecksStatus には iota を用いて定数を割り当てています。
+// type OpenCIGitHubChecksStatus int
+
+// const (
+// 	OpenCIGitHubChecksStatusQueued OpenCIGitHubChecksStatus = iota
+// 	OpenCIGitHubChecksStatusInProgress
+// 	OpenCIGitHubChecksStatusFailure
+// 	OpenCIGitHubChecksStatusSuccess
+// )
+
+// // BuildJob はビルドの状態やGitHub関連の情報を保持します。
+// type BuildJob struct {
+// 	BuildStatus OpenCIGitHubChecksStatus `json:"buildStatus"`
+// 	GitHub      OpenCIGithub             `json:"github"`
+// 	ID          string                   `json:"id"`
+// 	WorkflowID  string                   `json:"workflowId"`
+// 	CreatedAt   *int                     `json:"createdAt"` // nil の可能性があるのでポインタ
+// }
+
+// // OpenCIGithub はGitHubに関連するリポジトリ情報などを保持します。
+// type OpenCIGithub struct {
+// 	RepositoryUrl  string `json:"repositoryUrl"`
+// 	Owner          string `json:"owner"`
+// 	RepositoryName string `json:"repositoryName"`
+// 	InstallationId int    `json:"installationId"`
+// 	AppId          int    `json:"appId"`
+// 	CheckRunId     int    `json:"checkRunId"`
+// 	IssueNumber    *int   `json:"issueNumber"` // nil の可能性があるのでポインタ
+// 	BaseBranch     string `json:"baseBranch"`
+// 	BuildBranch    string `json:"buildBranch"`
+// }

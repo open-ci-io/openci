@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -11,7 +12,8 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func GetGitHubInstallationToken(pemPath string, installationID int64, appID int64) (string, error) {
+func GetGitHubInstallationToken(pemPath string, installationID int64, appID int64, infoLogger *log.Logger) (string, error) {
+	infoLogger.Printf("Getting GitHub installation token for installation ID: %d, app ID: %d, pemPath: %v\n", installationID, appID, pemPath)
 	pemBytes, err := os.ReadFile(pemPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read pem file: %v", err)
