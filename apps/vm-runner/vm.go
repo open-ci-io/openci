@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 	"log"
 	"strings"
@@ -28,8 +29,23 @@ func GetVMIp(vmName string, infoLogger *log.Logger) (string, error) {
 	}
 }
 
-// メインの処理でVM起動とIP取得を非同期で行う例
-func StartVM(vmName string, infoLogger *log.Logger) {
+func cloneVM(vmName string, infoLogger *log.Logger, errorLogger *log.Logger) error {
+	output, err := ExecuteCommand("tart", "clone", "sequoia", vmName)
+	if err == nil && output.ExitCode == 0 {
+		infoLogger.Printf("VM cloned: %s", vmName)
+		return nil
+	} else {
+		if nil != err {
+			sentry.CaptureMessage(fmt.Sprintf("Command execution failed: %v", err))
+			return fmt.Errorf("command execution failed: %v", err)
+		}
+		errorLogger.Printf("Command failed with exit code %d\nStderr: %s\n", output.ExitCode, output.Stderr)
+		return fmt.Errorf("command failed with exit code %d", output.ExitCode)
+	}
+}
+
+func StartVM(vmName string, infoLogger *log.Logger, errorLogger *log.Logger) {
+	cloneVM(vmName, infoLogger, errorLogger)
 	// VM起動用のgoroutine
 	go func() {
 		output, err := ExecuteCommand("tart", "run", vmName)
@@ -50,4 +66,64 @@ func StartVM(vmName string, infoLogger *log.Logger) {
 	}
 
 	infoLogger.Printf("VM started with IP: %s", ip)
+}
+
+func CleanupVMs(vmName string, infoLogger *log.Logger) {
+	ExecuteCommand("tart", "stop", vmName)
+	infoLogger.Printf("VM stopped: %s", vmName)
+
+	cleanupAllStoppedVMs(infoLogger)
+}
+
+func deleteVM(vmName string, infoLogger *log.Logger) {
+	ExecuteCommand("tart", "delete", vmName)
+	infoLogger.Printf("VM deleted: %s", vmName)
+}
+
+func isValidUUID(uuid string) bool {
+	segments := strings.Split(uuid, "-")
+	if len(segments) != 5 {
+		return false
+	}
+
+	lengths := []int{8, 4, 4, 4, 12}
+	for i, segment := range segments {
+		if len(segment) != lengths[i] {
+			return false
+		}
+		// 16進数のみかチェック
+		if _, err := hex.DecodeString(segment); err != nil {
+			return false
+		}
+	}
+	return true
+}
+
+func cleanupAllStoppedVMs(infoLogger *log.Logger) error {
+	output, err := ExecuteCommand("tart", "list")
+	if err != nil {
+		return fmt.Errorf("failed to list VMs: %v", err)
+	}
+
+	lines := strings.Split(output.Stdout, "\n")
+	for _, line := range lines {
+		if !strings.Contains(line, "stopped") {
+			continue
+		}
+
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
+			continue
+		}
+
+		vmName := fields[1]
+		if !isValidUUID(vmName) {
+			infoLogger.Printf("Skipping non-UUID VM name: %s", vmName)
+			continue
+		}
+
+		deleteVM(vmName, infoLogger)
+	}
+
+	return nil
 }
