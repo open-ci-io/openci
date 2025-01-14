@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -84,32 +85,36 @@ func handleVMProcess(ctx context.Context, infoLogger, errorLogger *log.Logger, f
 	}
 	defer client.Close()
 
-	sshOutput, execErr := ExecuteSSHCommand(client, "ls", infoLogger)
-
-	if execErr == nil {
-		infoLogger.Printf("SSH command output: %+v", sshOutput)
-	} else {
-		sentry.CaptureMessage(fmt.Sprintf("Error executing SSH command: %v, %+v", execErr, sshOutput))
-		return fmt.Errorf("error executing SSH command: %v, %+v", execErr, sshOutput)
+	cmd2 := cloneCommand(buildContext.Job.GitHub.RepoURL, buildContext.Job.GitHub.BuildBranch, buildContext.GitHubInstallationToken)
+	fmt.Printf("cmd2: %s", cmd2)
+	sshOutput, err := ExecuteSSHCommand(client, cmd2, infoLogger)
+	if err != nil {
+		return fmt.Errorf("failed to clone repo: %v, sshOutput: %+v", err, sshOutput)
 	}
 
-	// 	uploadErr := UploadLogToFirebaseStorage(ctx, app, logPath, sshLogContent)
-	// 	if nil != uploadErr {
-	// 		errorLogger.Printf("Failed to upload success log to Firebase Storage: %v", uploadErr)
-	// 	}
-	// 	return nil
-	// } else {
-	// 	fmt.Printf("Error executing SSH command: %v, %v", execErr, sshLogContent)
-	// 	sentry.CaptureMessage(sshLogContent)
+	cmdList := buildContext.Workflow.Steps
+	for _, cmd := range cmdList {
+		newCmd := fmt.Sprintf("source ~/.zshrc && cd %s && %s", buildContext.Workflow.CurrentWorkingDirectory, cmd.Command)
+		res, err := ExecuteSSHCommand(client, newCmd, infoLogger)
+		if err != nil {
+			return fmt.Errorf("failed to execute command: %v, output: %+v", err, res)
+		}
+	}
 
-	// 	uploadErr := UploadLogToFirebaseStorage(ctx, app, logPath, sshLogContent)
-	// 	if nil != uploadErr {
-	// 		errorLogger.Printf("Failed to upload error log to Firebase Storage: %v", uploadErr)
-	// 	}
-	// 	return fmt.Errorf("error executing SSH command: %v", execErr)
-	// }
+	time.Sleep(100 * time.Second)
+
 	return nil
 
+}
+
+func cloneCommand(repoURL, buildBranch, token string) string {
+	fmt.Printf("repoURL: %s, buildBranch: %s, token: %s", repoURL, buildBranch, token)
+	repoWithoutProtocol := strings.TrimPrefix(repoURL, "https://")
+	return fmt.Sprintf("git clone -b %s https://x-access-token:%s@%s",
+		buildBranch,
+		token,
+		repoWithoutProtocol,
+	)
 }
 
 type BuildContext struct {

@@ -14,10 +14,10 @@ import (
 type BuildJob struct {
 	ID     string `json:"id"`
 	GitHub struct {
-		RepoURL        string `json:"repoUrl"`
+		RepoURL        string `json:"repositoryUrl"`
 		InstallationId int    `json:"installationId"`
 		AppId          int    `json:"appId"`
-		Branch         string `json:"branch"`
+		BuildBranch    string `json:"buildBranch"`
 	} `json:"github"`
 	WorkflowId string `json:"workflowId"`
 	Status     string `json:"status"`

@@ -8,9 +8,15 @@ import (
 	"cloud.google.com/go/firestore"
 )
 
+type Step struct {
+	Command string `json:"command"`
+	Name    string `json:"name"`
+}
+
 type Workflow struct {
 	ID                      string `json:"id"`
 	CurrentWorkingDirectory string `json:"currentWorkingDirectory"`
+	Steps                   []Step `json:"steps"`
 }
 
 func GetWorkflow(ctx context.Context, firestoreClient *firestore.Client, workflowId string) (*Workflow, error) {
@@ -25,6 +31,7 @@ func GetWorkflow(ctx context.Context, firestoreClient *firestore.Client, workflo
 		return nil, fmt.Errorf("failed to marshal workflow data: %v", err)
 	}
 	workflow, err := ParseWorkflow(jsonData)
+	fmt.Printf("Successfully parsed Workflow: %v\n", workflow)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse workflow: %v", err)
 	}
