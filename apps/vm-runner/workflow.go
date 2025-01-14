@@ -14,9 +14,10 @@ type Step struct {
 }
 
 type Workflow struct {
-	ID                      string `json:"id"`
-	CurrentWorkingDirectory string `json:"currentWorkingDirectory"`
-	Steps                   []Step `json:"steps"`
+	ID                      string   `json:"id"`
+	CurrentWorkingDirectory string   `json:"currentWorkingDirectory"`
+	Steps                   []Step   `json:"steps"`
+	Owners                  []string `json:"owners"`
 }
 
 func GetWorkflow(ctx context.Context, firestoreClient *firestore.Client, workflowId string) (*Workflow, error) {

@@ -93,11 +93,18 @@ func handleVMProcess(ctx context.Context, infoLogger, errorLogger *log.Logger, f
 	}
 
 	cmdList := buildContext.Workflow.Steps
+
+	secretMap := convertSecretsToMap(buildContext.Secrets)
+
 	for _, cmd := range cmdList {
-		newCmd := fmt.Sprintf("source ~/.zshrc && cd %s && %s", buildContext.Workflow.CurrentWorkingDirectory, cmd.Command)
+		processedCmd := replaceEnvironmentVariables(cmd.Command, secretMap)
+		newCmd := fmt.Sprintf("source ~/.zshrc && cd %s && %s", buildContext.Workflow.CurrentWorkingDirectory, processedCmd)
+		fmt.Printf("newCmd: %s", newCmd)
 		res, err := ExecuteSSHCommand(client, newCmd, infoLogger)
 		if err != nil {
 			return fmt.Errorf("failed to execute command: %v, output: %+v", err, res)
+		} else {
+			fmt.Printf("command executed successfully: %+v", res)
 		}
 	}
 
@@ -121,6 +128,7 @@ type BuildContext struct {
 	Job                     *BuildJob
 	GitHubInstallationToken string
 	Workflow                *Workflow
+	Secrets                 []Secret
 }
 
 func prepareBuildContext(ctx context.Context, client *firestore.Client, cmd *cli.Command, logger *log.Logger) (*BuildContext, error) {
@@ -140,10 +148,16 @@ func prepareBuildContext(ctx context.Context, client *firestore.Client, cmd *cli
 		return nil, fmt.Errorf("failed to get workflow: %v", err)
 	}
 
+	secrets, err := GetSecrets(workflow.Owners, client, ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get secrets: %v", err)
+	}
+
 	return &BuildContext{
 		Job:                     job,
 		GitHubInstallationToken: token,
 		Workflow:                workflow,
+		Secrets:                 secrets,
 	}, nil
 }
 
@@ -153,4 +167,20 @@ func connectSSHOnVM(vmName string, infoLogger *log.Logger) (*ssh.Client, error) 
 		return nil, fmt.Errorf("error getting VM IP: %v", err)
 	}
 	return ConnectSSH(ip, infoLogger)
+}
+
+func convertSecretsToMap(secrets []Secret) map[string]string {
+	secretMap := make(map[string]string)
+	for _, secret := range secrets {
+		secretMap[secret.Key] = secret.Value
+	}
+	return secretMap
+}
+
+func replaceEnvironmentVariables(command string, secrets map[string]string) string {
+	result := command
+	for key, value := range secrets {
+		result = strings.ReplaceAll(result, "$"+key, value)
+	}
+	return result
 }
