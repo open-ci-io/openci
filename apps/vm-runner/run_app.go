@@ -84,7 +84,7 @@ func handleVMProcess(ctx context.Context, infoLogger, errorLogger *log.Logger, f
 	}
 	defer client.Close()
 
-	sshOutput, execErr := ExecuteSSHCommand(client, "lsa", infoLogger)
+	sshOutput, execErr := ExecuteSSHCommand(client, "ls", infoLogger)
 
 	if execErr == nil {
 		infoLogger.Printf("SSH command output: %+v", sshOutput)
