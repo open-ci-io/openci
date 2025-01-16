@@ -48,7 +48,7 @@ func RunApp(ctx context.Context, cmd *cli.Command) error {
 
 	for {
 		infoLogger.Printf("Starting Runner with key path: %s", keyPath)
-		if err := handleVMProcess(ctx, infoLogger, errorLogger, firestoreClient, cmd); err != nil {
+		if err := handleVMProcess(ctx, infoLogger, errorLogger, firestoreClient, cmd, app); err != nil {
 			errorLogger.Printf("Runner failed, but continuing: %v", err)
 			sentry.CaptureException(err)
 		}
@@ -57,7 +57,14 @@ func RunApp(ctx context.Context, cmd *cli.Command) error {
 	}
 }
 
-func handleVMProcess(ctx context.Context, infoLogger, errorLogger *log.Logger, firestoreClient *firestore.Client, cmd *cli.Command) error {
+func handleVMProcess(
+	ctx context.Context,
+	infoLogger,
+	errorLogger *log.Logger,
+	firestoreClient *firestore.Client,
+	cmd *cli.Command,
+	app *firebase.App,
+) error {
 	//
 	// buildId := uuid.New().String()
 	// logId := uuid.New().String()
@@ -88,6 +95,7 @@ func handleVMProcess(ctx context.Context, infoLogger, errorLogger *log.Logger, f
 	cmd2 := cloneCommand(buildContext.Job.GitHub.RepoURL, buildContext.Job.GitHub.BuildBranch, buildContext.GitHubInstallationToken)
 	fmt.Printf("cmd2: %s", cmd2)
 	sshOutput, err := ExecuteSSHCommand(client, cmd2, infoLogger)
+	UploadLogToFirebaseStorage(ctx, app, buildContext.Job.ID, sshOutput)
 	if err != nil {
 		return fmt.Errorf("failed to clone repo: %v, sshOutput: %+v", err, sshOutput)
 	}
@@ -99,19 +107,43 @@ func handleVMProcess(ctx context.Context, infoLogger, errorLogger *log.Logger, f
 	for _, cmd := range cmdList {
 		processedCmd := replaceEnvironmentVariables(cmd.Command, secretMap)
 		newCmd := fmt.Sprintf("source ~/.zshrc && cd %s && %s", buildContext.Workflow.CurrentWorkingDirectory, processedCmd)
-		fmt.Printf("newCmd: %s", newCmd)
+		infoLogger.Printf("Executing command: %s", newCmd)
+
 		res, err := ExecuteSSHCommand(client, newCmd, infoLogger)
+		UploadLogToFirebaseStorage(ctx, app, buildContext.Job.ID, res)
+
 		if err != nil {
+			if err := setBuildStatus(firestoreClient, buildContext.Job.ID, "failure", ctx); err != nil {
+				infoLogger.Printf("Failed to update build status: %v", err)
+			}
 			return fmt.Errorf("failed to execute command: %v, output: %+v", err, res)
-		} else {
-			fmt.Printf("command executed successfully: %+v", res)
 		}
+
+		infoLogger.Printf("Command executed successfully: %+v", res)
 	}
 
-	time.Sleep(100 * time.Second)
+	if err := setBuildStatus(firestoreClient, buildContext.Job.ID, "success", ctx); err != nil {
+		infoLogger.Printf("Failed to update build status: %v", err)
+		return fmt.Errorf("failed to update final build status: %v", err)
+	}
 
 	return nil
+}
 
+func setBuildStatus(firestoreClient *firestore.Client, jobId string, status string, ctx context.Context) error {
+	updates := []firestore.Update{
+		{
+			Path:  "buildStatus",
+			Value: status,
+		},
+	}
+
+	_, err := firestoreClient.Collection("build_jobs_v3").Doc(jobId).Update(ctx, updates)
+	if err != nil {
+		return fmt.Errorf("failed to update build status: %v", err)
+	}
+
+	return nil
 }
 
 func cloneCommand(repoURL, buildBranch, token string) string {
