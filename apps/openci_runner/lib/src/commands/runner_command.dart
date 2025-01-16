@@ -131,10 +131,6 @@ class RunnerCommand extends Command<int> {
           final vmName = generateUUID;
           final logId = generateUUID;
           try {
-            await updateBuildStatus(
-              jobId: buildJob.id,
-            );
-
             final workflow =
                 await getWorkflowModel(firestore, buildJob.workflowId);
             if (workflow == null) {
