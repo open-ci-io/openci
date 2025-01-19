@@ -1,1 +1,9 @@
 run.sh
+*.mobileprovision
+*.cer
+*.p12
+*.pem
+*.key
+*.p8
+*.p12
+*.cer
