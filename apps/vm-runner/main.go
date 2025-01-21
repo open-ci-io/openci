@@ -67,86 +67,87 @@ func main() {
 	}).Run(context.Background(), os.Args)
 }
 
-func RunApp2(ctx context.Context, cmd *cli.Command) error {
+// func RunApp2(ctx context.Context, cmd *cli.Command) error {
 
-	appStoreClient, err := InitAppStoreClient(cmd)
-	if err != nil {
-		return err
-	}
+// 	appStoreClient, err := InitAppStoreClient(cmd)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	_, err = GetProvisioningProfiles(ctx, appStoreClient)
-	if err != nil {
-		return err
-	}
+// 	_, err = GetProvisioningProfiles(ctx, appStoreClient)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	// err = GetCertificateContent(ctx, appStoreClient, client, infoLogger)
-	// if err != nil {
-	// 	return err
-	// }
+// 	// err = GetCertificateContent(ctx, appStoreClient, client, infoLogger)
+// 	// if err != nil {
+// 	// 	return err
+// 	// }
 
-	err = ConvertCertToP12(
-		"/Users/masahiroaoki/Desktop/dist.cer",
-		cmd.String("app-store-key"),
-		"output.p12",
-		"mementomori",
-	)
-	if err != nil {
-		log.Fatalf("Failed to convert certificate: %v", err)
-	}
+// 	// err = ConvertCertToP12(
+// 	// 	"/Users/masahiroaoki/Desktop/dist.cer",
+// 	// 	cmd.String("app-store-key"),
+// 	// 	"/tmp/output.p12",
+// 	// 	"mementomori",
+// 	// )
+// 	// if err != nil {
+// 	// 	log.Fatalf("Failed to convert certificate: %v", err)
+// 	// }
 
-	// k := &Keychain{
-	// 	logger:   &StandardLogger{},
-	// 	executor: &SecurityCommandExecutor{},
-	// }
+// 	// k := &Keychain{
+// 	// 	logger:   &StandardLogger{},
+// 	// 	executor: &SecurityCommandExecutor{},
+// 	// }
 
-	// // キーチェーンの初期化
-	// err2 := k.Initialize(KeychainOptions{
-	// 	Password: "mypassword",
-	// 	Timeout:  nil, // no timeout
-	// })
-	// if err2 != nil {
-	// 	log.Fatal(err2)
-	// }
+// 	// // キーチェーンの初期化
+// 	// err2 := k.Initialize(KeychainOptions{
+// 	// 	Password: "mypassword",
+// 	// 	Timeout:  nil, // no timeout
+// 	// })
+// 	// if err2 != nil {
+// 	// 	log.Fatal(err2)
+// 	// }
 
-	// // 証明書の追加
-	// err = k.AddCertificates(CertificateOptions{
-	// 	CertificatePaths: []string{
-	// 		filepath.Join(os.Getenv("HOME"), "Library/MobileDevice/Certificates/*.p12"),
-	// 	},
-	// 	CertificatePassword: "certpass",
-	// 	AllowedApplications: []string{"codesign", "productsign"},
-	// })
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+// 	// // 証明書の追加
+// 	// err = k.AddCertificates(CertificateOptions{
+// 	// 	CertificatePaths: []string{
+// 	// 		filepath.Join(os.Getenv("HOME"), "Library/MobileDevice/Certificates/*.p12"),
+// 	// 	},
+// 	// 	CertificatePassword: "certpass",
+// 	// 	AllowedApplications: []string{"codesign", "productsign"},
+// 	// })
+// 	// if err != nil {
+// 	// 	log.Fatal(err)
+// 	// }
 
-	return nil
-}
+// 	return nil
+// }
 
 func ConvertCertToP12(certPath string, keyPath string, p12Path string, password string) error {
-	// 証明書の読み込み
 	certBytes, err := os.ReadFile(certPath)
 	if err != nil {
 		return fmt.Errorf("failed to read certificate: %v", err)
 	}
 
-	var cert *x509.Certificate
-	// まずPEMとしてデコードを試みる
-	if block, _ := pem.Decode(certBytes); block != nil {
-		cert, err = x509.ParseCertificate(block.Bytes)
-	} else {
-		// PEMデコードに失敗した場合は、DERとしてパースを試みる
-		cert, err = x509.ParseCertificate(certBytes)
-	}
-
-	if err != nil {
-		return fmt.Errorf("failed to parse certificate: %v", err)
-	}
-
-	// 秘密鍵の読み込み
 	keyBytes, err := os.ReadFile(keyPath)
 	if err != nil {
 		return fmt.Errorf("failed to read private key: %v", err)
+	}
+
+	var cert *x509.Certificate
+	certBlock, _ := pem.Decode(certBytes)
+	if certBlock == nil {
+		// DERとしてパース
+		cert, err = x509.ParseCertificate(certBytes)
+		if err != nil {
+			return fmt.Errorf("failed to parse DER certificate: %v", err)
+		}
+	} else {
+		// PEMとしてパース
+		cert, err = x509.ParseCertificate(certBlock.Bytes)
+		if err != nil {
+			return fmt.Errorf("failed to parse PEM certificate: %v", err)
+		}
 	}
 
 	keyBlock, _ := pem.Decode(keyBytes)
@@ -156,18 +157,18 @@ func ConvertCertToP12(certPath string, keyPath string, p12Path string, password 
 
 	privateKey, err := x509.ParsePKCS8PrivateKey(keyBlock.Bytes)
 	if err != nil {
-		return fmt.Errorf("failed to parse private key: %v", err)
+		privateKey, err = x509.ParsePKCS1PrivateKey(keyBlock.Bytes)
+		if err != nil {
+			return fmt.Errorf("failed to parse private key: %v", err)
+		}
 	}
 
-	// Modern.Encodeを使用してP12を作成
 	pfxData, err := pkcs12.Modern.Encode(privateKey, cert, nil, password)
 	if err != nil {
 		return fmt.Errorf("failed to encode P12: %v", err)
 	}
 
-	// P12ファイルの保存
-	err = os.WriteFile(p12Path, pfxData, 0644)
-	if err != nil {
+	if err = os.WriteFile(p12Path, pfxData, 0644); err != nil {
 		return fmt.Errorf("failed to write P12 file: %v", err)
 	}
 

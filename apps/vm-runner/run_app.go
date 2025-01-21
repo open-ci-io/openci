@@ -1,10 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"encoding/base64"
+	"encoding/pem"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -47,6 +54,12 @@ func RunApp(ctx context.Context, cmd *cli.Command) error {
 	}
 	defer firestoreClient.Close()
 
+	// if err := handleVMProcess(ctx, infoLogger, errorLogger, firestoreClient, cmd, app); err != nil {
+	// 	errorLogger.Printf("Runner failed, but continuing: %v", err)
+	// 	sentry.CaptureException(err)
+	// }
+	// return nil
+
 	for {
 		infoLogger.Printf("Starting Runner with key path: %s", keyPath)
 		if err := handleVMProcess(ctx, infoLogger, errorLogger, firestoreClient, cmd, app); err != nil {
@@ -54,9 +67,67 @@ func RunApp(ctx context.Context, cmd *cli.Command) error {
 			sentry.CaptureException(err)
 		}
 
-		time.Sleep(10 * time.Second)
+		// 	time.Sleep(10 * time.Second)
+		// }
+
+	}
+}
+
+func generateCSR() (string, error) {
+	// CSRの情報を設定
+	template := &x509.CertificateRequest{
+		Subject: pkix.Name{
+			CommonName:         "Your Company Name",
+			Country:            []string{"JP"},
+			Province:           []string{"Tokyo"},
+			Locality:           []string{"Tokyo"},
+			Organization:       []string{"Your Organization"},
+			OrganizationalUnit: []string{"Development"},
+		},
+		EmailAddresses: []string{"your.email@example.com"},
 	}
 
+	// 秘密鍵の生成
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate private key: %v", err)
+	}
+
+	// CSRの生成
+	csrBytes, err := x509.CreateCertificateRequest(rand.Reader, template, privateKey)
+	if err != nil {
+		return "", fmt.Errorf("failed to create CSR: %v", err)
+	}
+
+	// CSRをPEM形式に変換
+	csrPEM := new(bytes.Buffer)
+	err = pem.Encode(csrPEM, &pem.Block{
+		Type:  "CERTIFICATE REQUEST",
+		Bytes: csrBytes,
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to encode CSR to PEM: %v", err)
+	}
+
+	// 秘密鍵をPEM形式でファイルに保存
+	keyFile, err := os.Create("developer_cert.key")
+	if err != nil {
+		return "", fmt.Errorf("failed to create key file: %v", err)
+	}
+	defer keyFile.Close()
+
+	err = pem.Encode(keyFile, &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(privateKey),
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to save private key: %v", err)
+	}
+
+	// Base64エンコード（改行なし）
+	base64CSR := base64.StdEncoding.EncodeToString(csrPEM.Bytes())
+
+	return base64CSR, nil
 }
 
 func handleVMProcess(
@@ -90,13 +161,13 @@ func handleVMProcess(
 	}
 	defer client.Close()
 
-	cmd2 := cloneCommand(buildContext.Job.GitHub.RepoURL, buildContext.Job.GitHub.BuildBranch, buildContext.GitHubInstallationToken)
-	fmt.Printf("cmd2: %s", cmd2)
-	sshOutput, err := ExecuteSSHCommand(client, cmd2, infoLogger)
-	UploadLogToFirebaseStorage(ctx, app, buildContext.Job.ID, sshOutput)
-	if err != nil {
-		return fmt.Errorf("failed to clone repo: %v, sshOutput: %+v", err, sshOutput)
-	}
+	// cmd2 := cloneCommand(buildContext.Job.GitHub.RepoURL, buildContext.Job.GitHub.BuildBranch, buildContext.GitHubInstallationToken)
+	// fmt.Printf("cmd2: %s", cmd2)
+	// sshOutput, err := ExecuteSSHCommand(client, cmd2, infoLogger)
+	// UploadLogToFirebaseStorage(ctx, app, buildContext.Job.ID, sshOutput)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to clone repo: %v, sshOutput: %+v", err, sshOutput)
+	// }
 
 	// cmdList := buildContext.Workflow.Steps
 
@@ -110,6 +181,13 @@ func handleVMProcess(
 	if err != nil {
 		return err
 	}
+
+	p12Path := "/Users/admin/Desktop/certificate.p12"
+
+	// GenCertificateを呼び出す
+	GetCertificateContent(ctx, appStoreClient, client, infoLogger, cmd.String("app-store-key"), p12Path)
+
+	// 証明書の作成
 
 	profiles, err := GetProvisioningProfiles(ctx, appStoreClient)
 	if err != nil {
@@ -143,10 +221,13 @@ func handleVMProcess(
 	}
 	infoLogger.Printf("Successfully saved profile: %v", output)
 
-	err = GetCertificateContent(ctx, appStoreClient, client, infoLogger, cmd.String("app-store-key"))
-	if err != nil {
-		return err
-	}
+	// // 証明書の取得と変換を実行
+	// err = GetCertificateContent(ctx, appStoreClient, client, infoLogger, cmd.String("app-store-key"), p12Path)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to process certificate: %v", err)
+	// }
+
+	setupKeychain(client, infoLogger, errorLogger, p12Path)
 
 	time.Sleep(10 * time.Minute)
 
@@ -173,6 +254,83 @@ func handleVMProcess(
 	// 	return fmt.Errorf("failed to update final build status: %v", err)
 	// }
 
+	return nil
+}
+
+func setupKeychain(client *ssh.Client, infoLogger *log.Logger, errorLogger *log.Logger, p12Path string) error {
+	keychainPath := "/Users/admin/Library/Keychains/build.keychain-db"
+	keychainPassword := "temppass" // 実際の運用では安全なパスワード生成を推奨
+
+	// キーチェーン作成
+	createCmd := fmt.Sprintf("security create-keychain -p %s %s", keychainPassword, keychainPath)
+	output, err := ExecuteSSHCommand(client, createCmd, infoLogger)
+	if err != nil {
+		return fmt.Errorf("failed to create keychain: %v, output: %s", err, output)
+	}
+	infoLogger.Printf("Keychain created successfully: %s", output)
+
+	// キーチェーン設定
+	settingsCmd := fmt.Sprintf("security set-keychain-settings -lut 21600 %s", keychainPath)
+	output, err = ExecuteSSHCommand(client, settingsCmd, infoLogger)
+	if err != nil {
+		return fmt.Errorf("failed to set keychain settings: %v, output: %s", err, output)
+	}
+	infoLogger.Printf("Keychain settings set successfully: %s", output)
+
+	// キーチェーンのロック解除
+	unlockCmd := fmt.Sprintf("security unlock-keychain -p %s %s", keychainPassword, keychainPath)
+	output, err = ExecuteSSHCommand(client, unlockCmd, infoLogger)
+	if err != nil {
+		return fmt.Errorf("failed to unlock keychain: %v, output: %s", err, output)
+	}
+	infoLogger.Printf("Keychain unlocked successfully: %s", output)
+
+	// 証明書のインポート前にファイルの存在確認
+	checkFileCmd := fmt.Sprintf("ls -l %s", p12Path)
+	output, err = ExecuteSSHCommand(client, checkFileCmd, infoLogger)
+	if err != nil {
+		return fmt.Errorf("p12 file not found: %v, output: %s", err, output)
+	}
+	infoLogger.Printf("P12 file exists: %s", output)
+
+	// ファイルのパーミッション変更
+	chmodCmd := fmt.Sprintf("chmod 644 %s", p12Path)
+	output, err = ExecuteSSHCommand(client, chmodCmd, infoLogger)
+	if err != nil {
+		return fmt.Errorf("failed to change p12 file permissions: %v, output: %s", err, output)
+	}
+
+	// 証明書のインポート（修正版）
+	importCmd := fmt.Sprintf("security import %s -P '%s' -A -t cert -f pkcs12 -k %s",
+		p12Path,
+		"mementomori", // P12のパスワード
+		keychainPath,
+	)
+	output, err = ExecuteSSHCommand(client, importCmd, infoLogger)
+	if err != nil {
+		// エラー時により詳細な情報を記録
+		errorLogger.Printf("Certificate import failed. P12 path: %s, Error: %v, Output: %s", p12Path, err, output)
+		return fmt.Errorf("failed to import certificate: %v, output: %s", err, output)
+	}
+	infoLogger.Printf("Certificate imported successfully: %s", output)
+
+	// パーティションリストの設定
+	partitionCmd := fmt.Sprintf("security set-key-partition-list -S apple-tool:,apple: -k %s %s",
+		keychainPassword,
+		keychainPath,
+	)
+	output, err = ExecuteSSHCommand(client, partitionCmd, infoLogger)
+	if err != nil {
+		return fmt.Errorf("failed to set partition list: %v, output: %s", err, output)
+	}
+	infoLogger.Printf("Partition list set successfully: %s", output)
+	// キーチェーンリストの設定
+	listCmd := fmt.Sprintf("security list-keychain -d user -s %s", keychainPath)
+	output, err = ExecuteSSHCommand(client, listCmd, infoLogger)
+	if err != nil {
+		return fmt.Errorf("failed to set keychain list: %v, output: %s", err, output)
+	}
+	infoLogger.Printf("Keychain list set successfully: %s", output)
 	return nil
 }
 
