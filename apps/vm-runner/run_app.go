@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"strings"
@@ -55,6 +56,7 @@ func RunApp(ctx context.Context, cmd *cli.Command) error {
 
 		time.Sleep(10 * time.Second)
 	}
+
 }
 
 func handleVMProcess(
@@ -65,10 +67,6 @@ func handleVMProcess(
 	cmd *cli.Command,
 	app *firebase.App,
 ) error {
-	//
-	// buildId := uuid.New().String()
-	// logId := uuid.New().String()
-	// logPath := fmt.Sprintf("logs_v1/%s/%s/openci_log.log", buildId, logId)
 
 	buildContext, err := prepareBuildContext(ctx, firestoreClient, cmd, infoLogger)
 	if err != nil {
@@ -100,32 +98,80 @@ func handleVMProcess(
 		return fmt.Errorf("failed to clone repo: %v, sshOutput: %+v", err, sshOutput)
 	}
 
-	cmdList := buildContext.Workflow.Steps
+	// cmdList := buildContext.Workflow.Steps
 
-	secretMap := convertSecretsToMap(buildContext.Secrets)
+	// secretMap := convertSecretsToMap(buildContext.Secrets)
 
-	for _, cmd := range cmdList {
-		processedCmd := replaceEnvironmentVariables(cmd.Command, secretMap)
-		newCmd := fmt.Sprintf("source ~/.zshrc && cd %s && %s", buildContext.Workflow.CurrentWorkingDirectory, processedCmd)
-		infoLogger.Printf("Executing command: %s", newCmd)
+	/// TODO: ASCのAPIをたたき、cer-> p12 -> キーチェーンに追加 -> Xcodeを確認 -> flutter build ipa -> TestFlightにアップロード -> ビルド完了 ->
+	///
+	/// TODO: 上の流れをOpenCIに書き込み
 
-		res, err := ExecuteSSHCommand(client, newCmd, infoLogger)
-		UploadLogToFirebaseStorage(ctx, app, buildContext.Job.ID, res)
-
-		if err != nil {
-			if err := setBuildStatus(firestoreClient, buildContext.Job.ID, "failure", ctx); err != nil {
-				infoLogger.Printf("Failed to update build status: %v", err)
-			}
-			return fmt.Errorf("failed to execute command: %v, output: %+v", err, res)
-		}
-
-		infoLogger.Printf("Command executed successfully: %+v", res)
+	appStoreClient, err := InitAppStoreClient(cmd)
+	if err != nil {
+		return err
 	}
 
-	if err := setBuildStatus(firestoreClient, buildContext.Job.ID, "success", ctx); err != nil {
-		infoLogger.Printf("Failed to update build status: %v", err)
-		return fmt.Errorf("failed to update final build status: %v", err)
+	profiles, err := GetProvisioningProfiles(ctx, appStoreClient)
+	if err != nil {
+		return err
 	}
+	profile := profiles.Data[0]
+
+	profileData, err := base64.StdEncoding.DecodeString(*profile.Attributes.ProfileContent)
+	if err != nil {
+		return fmt.Errorf("failed to decode profile content: %v", err)
+	}
+	// Base64エンコードされたデータをSSHコマンドで送信可能な形式に変換
+	encodedProfile := base64.StdEncoding.EncodeToString(profileData)
+	profilePath := fmt.Sprintf("/Users/admin/Library/MobileDevice/Provisioning Profiles/%s.mobileprovision", *profile.Attributes.UUID)
+
+	// プロファイルを保存するためのSSHコマンドを作成
+	mkdirCmd := "mkdir -p '/Users/admin/Library/MobileDevice/Provisioning Profiles/'"
+	output, err := ExecuteSSHCommand(client, mkdirCmd, infoLogger)
+	if err != nil {
+		return fmt.Errorf("failed to create profiles directory: %v", err)
+	}
+	infoLogger.Printf("Successfully created profiles directory: %v", output)
+
+	// Base64デコードしてファイルに保存するコマンド
+	// -n オプションを削除し、入力を一時ファイルに保存してから処理
+	saveCmd := fmt.Sprintf("echo '%s' | base64 -D > '%s'", encodedProfile, profilePath)
+	output, err = ExecuteSSHCommand(client, saveCmd, infoLogger)
+	if err != nil {
+		infoLogger.Printf("Failed to save profile: %v", output)
+		return fmt.Errorf("failed to save profile: %v", err)
+	}
+	infoLogger.Printf("Successfully saved profile: %v", output)
+
+	err = GetCertificateContent(ctx, appStoreClient, client, infoLogger, cmd.String("app-store-key"))
+	if err != nil {
+		return err
+	}
+
+	time.Sleep(10 * time.Minute)
+
+	// for _, cmd := range cmdList {
+	// 	processedCmd := replaceEnvironmentVariables(cmd.Command, secretMap)
+	// 	newCmd := fmt.Sprintf("source ~/.zshrc && cd %s && %s", buildContext.Workflow.CurrentWorkingDirectory, processedCmd)
+	// 	infoLogger.Printf("Executing command: %s", newCmd)
+
+	// 	res, err := ExecuteSSHCommand(client, newCmd, infoLogger)
+	// 	UploadLogToFirebaseStorage(ctx, app, buildContext.Job.ID, res)
+
+	// 	if err != nil {
+	// 		if err := setBuildStatus(firestoreClient, buildContext.Job.ID, "failure", ctx); err != nil {
+	// 			infoLogger.Printf("Failed to update build status: %v", err)
+	// 		}
+	// 		return fmt.Errorf("failed to execute command: %v, output: %+v", err, res)
+	// 	}
+
+	// 	infoLogger.Printf("Command executed successfully: %+v", res)
+	// }
+
+	// if err := setBuildStatus(firestoreClient, buildContext.Job.ID, "success", ctx); err != nil {
+	// 	infoLogger.Printf("Failed to update build status: %v", err)
+	// 	return fmt.Errorf("failed to update final build status: %v", err)
+	// }
 
 	return nil
 }
