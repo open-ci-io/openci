@@ -33,6 +33,7 @@
     "labels": [
         "dependencies"
     ],
+    "rangeStrategy": "bump",
     "prHourlyLimit": 2,
     "prConcurrentLimit": 10
 }
