@@ -9,6 +9,6 @@
             "request": "launch",
             "name": "Open index.html",
             "file": "/Users/masahiroaoki/Developer/open-ci/openci/apps/dashboard/web/index.html"
-        }
+        },
     ]
 }
