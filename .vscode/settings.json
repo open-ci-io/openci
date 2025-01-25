@@ -16,4 +16,5 @@
     "mocktail",
     "openci"
   ],
+  "dart.flutterSdkPath": ".fvm/versions/stable"
 }

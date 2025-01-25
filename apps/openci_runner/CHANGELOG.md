@@ -1,3 +1,7 @@
+## 0.9.12
+
+- refactor
+
 ## 0.9.6
 
 - fix: transaction for firestore
