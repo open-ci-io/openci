@@ -1,0 +1,10 @@
+{
+    "version": 2,
+    "entries": [
+        {
+            "package": "openci",
+            "rootUri": "../",
+            "packageUri": "lib/"
+        }
+    ]
+}
