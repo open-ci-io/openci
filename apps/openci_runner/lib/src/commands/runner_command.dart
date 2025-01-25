@@ -5,9 +5,6 @@ import 'package:args/command_runner.dart';
 import 'package:dart_firebase_admin_plus/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:sentry/sentry.dart';
-import 'package:signals_core/signals_core.dart';
-
 import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/features/get_build_jobs.dart';
 import 'package:openci_runner/src/features/get_workflow.dart';
@@ -23,6 +20,8 @@ import 'package:openci_runner/src/sentry.dart';
 import 'package:openci_runner/src/service/github/clone_command.dart';
 import 'package:openci_runner/src/service/github/get_github_installation_token.dart';
 import 'package:openci_runner/src/service/uuid_service.dart';
+import 'package:sentry/sentry.dart';
+import 'package:signals_core/signals_core.dart';
 
 final firestoreSignal = signal<Firestore?>(null);
 const pollingInterval = Duration(seconds: 5);
