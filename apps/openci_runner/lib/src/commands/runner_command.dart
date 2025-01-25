@@ -5,6 +5,9 @@ import 'package:args/command_runner.dart';
 import 'package:dart_firebase_admin_plus/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
+import 'package:sentry/sentry.dart';
+import 'package:signals_core/signals_core.dart';
+
 import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/features/get_build_jobs.dart';
 import 'package:openci_runner/src/features/get_workflow.dart';
@@ -16,11 +19,10 @@ import 'package:openci_runner/src/features/tart_vm/run_vm.dart';
 import 'package:openci_runner/src/features/tart_vm/stop_vm.dart';
 import 'package:openci_runner/src/features/update_build_status.dart';
 import 'package:openci_runner/src/firebase/firebase_admin.dart';
+import 'package:openci_runner/src/sentry.dart';
 import 'package:openci_runner/src/service/github/clone_command.dart';
 import 'package:openci_runner/src/service/github/get_github_installation_token.dart';
 import 'package:openci_runner/src/service/uuid_service.dart';
-import 'package:sentry/sentry.dart';
-import 'package:signals_core/signals_core.dart';
 
 final firestoreSignal = signal<Firestore?>(null);
 const pollingInterval = Duration(seconds: 5);
@@ -107,10 +109,8 @@ class RunnerCommand extends Command<int> {
     final serviceAccountPath = argResults?['service-account-path'] as String;
     final sentryDsn = argResults?['sentry-dsn'] as String?;
 
-    await Sentry.init(
-      (options) {
-        options.dsn = sentryDsn;
-      },
+    await initSentry(
+      sentryDsn: sentryDsn!,
       appRunner: () async {
         final admin = await initializeFirebaseAdminApp(
           'open-ci-release',
