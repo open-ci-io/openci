@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:dart_firebase_admin_plus/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
-import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/commands/runner_command.dart';
+import 'package:openci_runner/src/env.dart';
 import 'package:openci_runner/src/features/get_build_jobs.dart';
 import 'package:openci_runner/src/features/get_workflow.dart';
 import 'package:openci_runner/src/features/run.dart';
@@ -15,55 +15,13 @@ import 'package:openci_runner/src/features/tart_vm/run_vm.dart';
 import 'package:openci_runner/src/features/tart_vm/stop_vm.dart';
 import 'package:openci_runner/src/features/update_build_status.dart';
 import 'package:openci_runner/src/firebase/firebase_admin.dart';
+import 'package:openci_runner/src/log.dart';
+import 'package:openci_runner/src/secrets.dart';
 import 'package:openci_runner/src/sentry.dart';
 import 'package:openci_runner/src/service/github/clone_command.dart';
 import 'package:openci_runner/src/service/github/get_github_installation_token.dart';
 import 'package:openci_runner/src/service/uuid_service.dart';
 import 'package:sentry/sentry.dart';
-
-void _log(String message, {bool isSuccess = false}) {
-  final logger = Logger();
-  switch (isSuccess) {
-    case true:
-      logger.success('[${DateTime.now().toIso8601String()}]: $message');
-    case false:
-      logger.info('[${DateTime.now().toIso8601String()}]: $message');
-  }
-}
-
-Future<Map<String, String>> _fetchSecrets({
-  required String workflowId,
-  required Firestore firestore,
-  required List<String> owners,
-}) async {
-  final secretsSnapshot = await firestore
-      .collection(secretsCollectionPath)
-      .where('owners', WhereFilter.arrayContainsAny, owners)
-      .get();
-
-  return Map.fromEntries(
-    secretsSnapshot.docs.map(
-      (doc) => MapEntry(
-        doc.data()['key']! as String,
-        doc.data()['value']! as String,
-      ),
-    ),
-  );
-}
-
-String _replaceEnvironmentVariables({
-  required String command,
-  required Map<String, String> secrets,
-}) {
-  var processedCommand = command;
-  for (final entry in secrets.entries) {
-    processedCommand = processedCommand.replaceAll(
-      '\$${entry.key}',
-      entry.value,
-    );
-  }
-  return processedCommand;
-}
 
 Future<void> runApp({
   required String serviceAccountPath,
@@ -83,19 +41,19 @@ Future<void> runApp({
       while (true) {
         final buildJob = await tryGetBuildJob(
           firestore: firestore,
-          log: () => _log(
+          log: () => log(
             'No build jobs found. Waiting ${pollingInterval.inSeconds} seconds before retrying.',
           ),
         );
         if (buildJob == null) continue;
-        _log('Found ${buildJob.toJson()} build jobs');
+        log('Found ${buildJob.toJson()} build jobs');
         final vmName = generateUUID;
         final logId = generateUUID;
         try {
           final workflow =
               await getWorkflowModel(firestore, buildJob.workflowId);
           if (workflow == null) {
-            _log('Workflow not found');
+            log('Workflow not found');
             throw Exception('Workflow not found');
           }
 
@@ -104,7 +62,7 @@ Future<void> runApp({
             appId: buildJob.github.appId,
             privateKey: pem,
           );
-          _log(
+          log(
             'Successfully got GitHub access token: $token',
             isSuccess: true,
           );
@@ -112,8 +70,8 @@ Future<void> runApp({
           await cloneVM(vmName);
           unawaited(runVM(vmName));
           final vmIp = await getVMIp(vmName);
-          _log('VM IP: $vmIp');
-          _log('VM is ready', isSuccess: true);
+          log('VM IP: $vmIp');
+          log('VM is ready', isSuccess: true);
 
           final client = SSHClient(
             await SSHSocket.connect(vmIp, 22),
@@ -136,14 +94,14 @@ Future<void> runApp({
           );
 
           final commandsList = workflow.steps.map((e) => e.command).toList();
-          final secrets = await _fetchSecrets(
+          final secrets = await fetchSecrets(
             workflowId: workflow.id,
             firestore: firestore,
             owners: workflow.owners,
           );
 
           for (final command in commandsList) {
-            final processedCommand = _replaceEnvironmentVariables(
+            final processedCommand = replaceEnvironmentVariables(
               command: command,
               secrets: secrets,
             );
@@ -167,7 +125,7 @@ Future<void> runApp({
             status: OpenCIGitHubChecksStatus.failure,
           );
           await Sentry.captureException(e, stackTrace: stackTrace);
-          _log('Error: $e, Try to run again');
+          log('Error: $e, Try to run again');
         } finally {
           try {
             await stopVM(vmName);
@@ -178,7 +136,7 @@ Future<void> runApp({
               status: OpenCIGitHubChecksStatus.failure,
             );
             await Sentry.captureException(e, stackTrace: stackTrace);
-            _log('Failed to stop or delete VM, $e');
+            log('Failed to stop or delete VM, $e');
           }
         }
         continue;
