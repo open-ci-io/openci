@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_cli/src/command_runner.dart';
+import 'package:openci_cli/src/commands/command_runner.dart';
 import 'package:openci_cli/src/version.dart';
 import 'package:pub_updater/pub_updater.dart';
 
