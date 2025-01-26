@@ -1,6 +1,6 @@
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_models/openci_models.dart';
-import 'package:openci_runner/src/commands/commands.dart';
+import 'package:openci_runner/src/firebase.dart';
 
 Future<void> updateBuildStatus({
   required String jobId,

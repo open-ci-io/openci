@@ -1,12 +1,8 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:dart_firebase_admin_plus/firestore.dart';
 import 'package:openci_runner/src/run_app.dart';
-import 'package:signals_core/signals_core.dart';
 
-final firestoreSignal = signal<Firestore?>(null);
 const pollingInterval = Duration(seconds: 5);
 
 class RunnerCommand extends Command<int> {
