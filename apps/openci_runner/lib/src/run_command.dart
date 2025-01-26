@@ -1,8 +1,8 @@
 import 'package:dart_firebase_admin_plus/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_models/openci_models.dart';
-import 'package:openci_runner/src/commands/runner_command.dart';
 import 'package:openci_runner/src/exceptions/command_execution_exception.dart';
+import 'package:openci_runner/src/firebase.dart';
 import 'package:openci_runner/src/service/dartssh2/dartssh2_service.dart';
 import 'package:openci_runner/src/service/logger_service.dart';
 
