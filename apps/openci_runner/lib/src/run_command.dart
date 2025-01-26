@@ -2,6 +2,7 @@ import 'package:dart_firebase_admin_plus/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/commands/runner_command.dart';
+import 'package:openci_runner/src/exceptions/command_execution_exception.dart';
 import 'package:openci_runner/src/service/dartssh2/dartssh2_service.dart';
 import 'package:openci_runner/src/service/logger_service.dart';
 
@@ -29,45 +30,53 @@ Future<void> runCommand({
     });
   }
 
-  await dartSSH2Service.executeCommand(
-    client: client,
-    command: command,
-    currentWorkingDirectory: currentWorkingDirectory,
-    onDoneError: (result) async {
-      final log = CommandLog(
-        command: command,
-        logStdout: result.stdout,
-        logStderr: result.stderr,
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        exitCode: result.exitCode,
-      );
+  try {
+    await dartSSH2Service.executeCommand(
+      client: client,
+      command: command,
+      currentWorkingDirectory: currentWorkingDirectory,
+      onDoneError: (result) async {
+        final log = CommandLog(
+          command: command,
+          logStdout: result.stdout,
+          logStderr: result.stderr,
+          createdAt: DateTime.now().millisecondsSinceEpoch,
+          exitCode: result.exitCode,
+        );
 
-      await ref.update({
-        'logs': FieldValue.arrayUnion([log.toJson()]),
-      });
+        await ref.update({
+          'logs': FieldValue.arrayUnion([log.toJson()]),
+        });
 
-      logger.err(
-        'Command failed: stdout: ${result.stdout}, stderr: ${result.stderr}',
-      );
-      throw Exception(
-        'Command failed: stdout: ${result.stdout}, stderr: ${result.stderr}',
-      );
-    },
-    onDoneSuccess: (result) async {
-      final log = CommandLog(
-        command: command,
-        logStdout: result.stdout,
-        logStderr: result.stderr,
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        exitCode: result.exitCode,
-      );
+        logger.err(
+          'Command execution failed with exit code ${result.exitCode}: stdout: ${result.stdout}, stderr: ${result.stderr}',
+        );
+        throw CommandExecutionException(
+          command: command,
+          stdout: result.stdout,
+          stderr: result.stderr,
+          exitCode: result.exitCode,
+        );
+      },
+      onDoneSuccess: (result) async {
+        final log = CommandLog(
+          command: command,
+          logStdout: result.stdout,
+          logStderr: result.stderr,
+          createdAt: DateTime.now().millisecondsSinceEpoch,
+          exitCode: result.exitCode,
+        );
 
-      await ref.update({
-        'logs': FieldValue.arrayUnion([log.toJson()]),
-      });
-      logger.info(
-        'Command executed successfully: stdout: ${result.stdout}, stderr: ${result.stderr}',
-      );
-    },
-  );
+        await ref.update({
+          'logs': FieldValue.arrayUnion([log.toJson()]),
+        });
+        logger.info(
+          'Command executed successfully: stdout: ${result.stdout}, stderr: ${result.stderr}',
+        );
+      },
+    );
+  } catch (e) {
+    logger.err('Failed to execute command: $command');
+    rethrow;
+  }
 }
