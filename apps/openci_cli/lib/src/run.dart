@@ -14,10 +14,10 @@ Future<int> runApp({
 
   try {
     // アプリ情報を取得
-    final appInfo = await client.getApp(bundleId: 'com.example.app');
+    // final appInfo = await client.getApp(bundleId: 'com.example.app');
 
-    // ビルド情報を取得
-    final buildInfo = await client.getBuild(buildId: 'build-id');
+    // // ビルド情報を取得
+    // final buildInfo = await client.getBuild(buildId: 'build-id');
 
     // TestFlightに提出
     await client.submitForBetaReview(buildId: 'build-id');
