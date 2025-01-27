@@ -151,6 +151,16 @@ class AppStoreConnectClient {
     }
   }
 
+  Future<Map<String, dynamic>> readCertificate({
+    required String certificateId,
+  }) async {
+    final response = await _request(
+      path: '/certificates/$certificateId',
+      method: 'GET',
+    );
+    return response;
+  }
+
   /// 証明書一覧を取得する
   Future<Map<String, dynamic>> listCertificates({
     String? filterSerialNumber,
