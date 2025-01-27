@@ -4,8 +4,8 @@ import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_cli/src/create_certificate.dart';
 
-class RunCommand extends Command<int> {
-  RunCommand() {
+class CreateCertificateCommand extends Command<int> {
+  CreateCertificateCommand() {
     argParser
       ..addOption(
         'issuer-id',
@@ -22,7 +22,7 @@ class RunCommand extends Command<int> {
   }
 
   @override
-  String get description => 'Run the OpenCI CLI';
+  String get description => 'Create a Apple Developer Certificate';
 
   @override
   String get name => 'create-certificate';

@@ -38,7 +38,8 @@ class OpenciCliCommandRunner extends CompletionCommandRunner<int> {
         help: 'Noisy logging, including all shell commands executed.',
       );
 
-    addCommand(RunCommand());
+    addCommand(CreateCertificateCommand());
+    addCommand(ListCertificatesCommand());
     addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
   }
 
