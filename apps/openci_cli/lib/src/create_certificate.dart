@@ -36,6 +36,7 @@ Future<int> createCertificate({
     );
 
     stdout.write(json.encode(result.toJson()));
+    return ExitCode.success.code;
   } catch (e) {
     final result = SessionResult(
       stdout: '',
@@ -47,5 +48,4 @@ Future<int> createCertificate({
   } finally {
     client.dispose();
   }
-  return ExitCode.success.code;
 }
