@@ -29,8 +29,13 @@ Future<int> createCertificate({
       certificateType: 'IOS_DEVELOPMENT',
     );
 
+    final responseWithKey = {
+      ...response,
+      'key': csr.privateKey,
+    };
+
     final result = SessionResult(
-      stdout: json.encode(response),
+      stdout: json.encode(responseWithKey),
       stderr: '',
       exitCode: 0,
     );
