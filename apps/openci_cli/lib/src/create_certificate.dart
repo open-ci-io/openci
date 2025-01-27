@@ -9,7 +9,7 @@ Future<int> createCertificate({
   required String issuerId,
   required String keyId,
   required String privateKey,
-  String? certificateId,
+  required String certificateType,
 }) async {
   final client = AppStoreConnectClient(
     issuerId: issuerId,
@@ -26,7 +26,7 @@ Future<int> createCertificate({
 
     final response = await client.createCertificate(
       csrContent: csr.csrContent,
-      certificateType: 'IOS_DEVELOPMENT',
+      certificateType: certificateType,
     );
 
     final responseWithKey = {
