@@ -13,3 +13,5 @@ coverage/
 
 # Android studio and IntelliJ
 .idea
+
+run.sh

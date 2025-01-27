@@ -172,8 +172,15 @@ String _createJWT({
     },
   );
 
+  // 秘密鍵がPEM形式でない場合は、PEM形式に変換
+  final pemKey = privateKey.contains('-----BEGIN PRIVATE KEY-----')
+      ? privateKey
+      : '''-----BEGIN PRIVATE KEY-----
+$privateKey
+-----END PRIVATE KEY-----''';
+
   return jwt.sign(
-    RSAPrivateKey(privateKey),
+    ECPrivateKey(pemKey), // RSAPrivateKeyからECPrivateKeyに変更
     algorithm: JWTAlgorithm.ES256,
   );
 }
