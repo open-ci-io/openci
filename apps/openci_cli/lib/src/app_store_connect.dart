@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 
 const _baseUrl = 'https://api.appstoreconnect.apple.com/v1';
 
@@ -122,6 +124,59 @@ class AppStoreConnectClient {
     return response;
   }
 
+  /// 開発用の証明書を作成する
+  Future<Map<String, dynamic>> createCertificate({
+    required String csrContent,
+    required String certificateType,
+  }) async {
+    try {
+      final response = await _request(
+        path: '/certificates',
+        method: 'POST',
+        body: {
+          'data': {
+            'type': 'certificates',
+            'attributes': {
+              'certificateType': certificateType,
+              'csrContent': csrContent,
+            },
+          },
+        },
+      );
+      return response;
+    } catch (e) {
+      throw AppStoreConnectError(
+        'Failed to create certificate: $e',
+      );
+    }
+  }
+
+  /// 証明書一覧を取得する
+  Future<Map<String, dynamic>> listCertificates({
+    String? filterSerialNumber,
+    String? filterType,
+  }) async {
+    var path = '/certificates';
+    final queryParams = <String>[];
+
+    if (filterSerialNumber != null) {
+      queryParams.add('filter[serialNumber]=$filterSerialNumber');
+    }
+    if (filterType != null) {
+      queryParams.add('filter[certificateType]=$filterType');
+    }
+
+    if (queryParams.isNotEmpty) {
+      path += '?${queryParams.join('&')}';
+    }
+
+    final response = await _request(
+      path: path,
+      method: 'GET',
+    );
+    return response;
+  }
+
   /// リソースを解放する
   void dispose() {
     _client.close();
@@ -192,4 +247,64 @@ class AppStoreConnectError implements Exception {
 
   @override
   String toString() => 'AppStoreConnectError: $message';
+}
+
+/// CSRと秘密鍵を生成する
+Future<({String csrContent, String privateKey})> generateCSR({
+  required String commonName,
+  required String countryName,
+  required String organizationName,
+}) async {
+  final tempDir = await Directory.systemTemp.createTemp('csr_');
+  final keyPath = path.join(tempDir.path, 'private.key');
+  final csrPath = path.join(tempDir.path, 'request.csr');
+
+  try {
+    // 秘密鍵の生成
+    final generateKeyResult = await Process.run('openssl', [
+      'genpkey',
+      '-algorithm',
+      'RSA',
+      '-out',
+      keyPath,
+      '-pkeyopt',
+      'rsa_keygen_bits:2048',
+    ]);
+
+    if (generateKeyResult.exitCode != 0) {
+      throw AppStoreConnectError(
+        'Failed to generate private key: ${generateKeyResult.stderr}',
+      );
+    }
+
+    // CSRの生成
+    final generateCsrResult = await Process.run('openssl', [
+      'req',
+      '-new',
+      '-key',
+      keyPath,
+      '-out',
+      csrPath,
+      '-subj',
+      '/CN=$commonName/C=$countryName/O=$organizationName',
+    ]);
+
+    if (generateCsrResult.exitCode != 0) {
+      throw AppStoreConnectError(
+        'Failed to generate CSR: ${generateCsrResult.stderr}',
+      );
+    }
+
+    // CSRの内容を読み込む
+    final csrContent = await File(csrPath).readAsString();
+    final privateKey = await File(keyPath).readAsString();
+
+    return (
+      csrContent: csrContent.trim(),
+      privateKey: privateKey.trim(),
+    );
+  } finally {
+    // 一時ファイルの削除
+    await tempDir.delete(recursive: true);
+  }
 }

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_cli/src/run.dart';
+import 'package:openci_cli/src/create_certificate.dart';
 
 class RunCommand extends Command<int> {
   RunCommand() {
@@ -25,7 +25,7 @@ class RunCommand extends Command<int> {
   String get description => 'Run the OpenCI CLI';
 
   @override
-  String get name => 'run';
+  String get name => 'create-certificate';
 
   @override
   Future<int> run() async {
@@ -38,7 +38,7 @@ class RunCommand extends Command<int> {
     }
     final privateKey = File(pathToPrivateKey).readAsStringSync();
 
-    return runApp(
+    return createCertificate(
       issuerId: issuerId,
       keyId: keyId,
       privateKey: privateKey,
