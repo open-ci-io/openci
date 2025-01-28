@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/apps/dashboard/melos_dashboard.iml" filepath="$PROJECT_DIR$/apps/dashboard/melos_dashboard.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/openci_cli/melos_openci_cli.iml" filepath="$PROJECT_DIR$/apps/openci_cli/melos_openci_cli.iml" />
       <module fileurl="file://$PROJECT_DIR$/packages/openci_models/melos_openci_models.iml" filepath="$PROJECT_DIR$/packages/openci_models/melos_openci_models.iml" />
       <module fileurl="file://$PROJECT_DIR$/apps/openci_runner/melos_openci_runner.iml" filepath="$PROJECT_DIR$/apps/openci_runner/melos_openci_runner.iml" />
       <module fileurl="file://$PROJECT_DIR$/apps/sample_flutter_app/melos_sample_flutter_app.iml" filepath="$PROJECT_DIR$/apps/sample_flutter_app/melos_sample_flutter_app.iml" />
