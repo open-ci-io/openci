@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:openci_cli/src/commands/command_runner.dart';
+import 'package:openci_cli/src/commands/core/command_runner.dart';
 
 Future<void> main(List<String> args) async {
   await _flushThenExit(await OpenciCliCommandRunner().run(args));

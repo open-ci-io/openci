@@ -1,6 +1,6 @@
 import 'package:mason_logger/mason_logger.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:openci_cli/src/commands/command_runner.dart';
+import 'package:openci_cli/src/commands/core/command_runner.dart';
 import 'package:test/test.dart';
 
 class _MockLogger extends Mock implements Logger {}
