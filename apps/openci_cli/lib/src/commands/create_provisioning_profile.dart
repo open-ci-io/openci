@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_cli/src/create_provisioning_profile.dart';
-import 'package:openci_cli/src/profile_type.dart';
+import 'package:openci_cli2/src/create_provisioning_profile.dart';
+import 'package:openci_cli2/src/profile_type.dart';
 
 class CreateProvisioningProfileCommand extends Command<int> {
   CreateProvisioningProfileCommand() {
@@ -39,10 +39,10 @@ class CreateProvisioningProfileCommand extends Command<int> {
   }
 
   @override
-  String get description => 'Read Apple Developer Provisioning Profile';
+  String get description => 'Create Apple Developer Provisioning Profile';
 
   @override
-  String get name => 'read-provisioning-profile';
+  String get name => 'create-provisioning-profile';
 
   @override
   Future<int> run() async {

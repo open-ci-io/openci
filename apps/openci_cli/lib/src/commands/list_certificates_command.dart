@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_cli/src/certificate_type.dart';
-import 'package:openci_cli/src/list_certificates.dart';
+import 'package:openci_cli2/src/certificate_type.dart';
+import 'package:openci_cli2/src/list_certificates.dart';
 
 class ListCertificatesCommand extends Command<int> {
   ListCertificatesCommand() {

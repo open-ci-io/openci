@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_cli/src/read_provisioning_profile.dart';
+import 'package:openci_cli2/src/read_provisioning_profile.dart';
 
 class ReadProvisioningProfileCommand extends Command<int> {
   ReadProvisioningProfileCommand() {

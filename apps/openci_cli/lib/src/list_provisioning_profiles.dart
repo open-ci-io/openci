@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_cli/src/app_store_connect.dart';
-import 'package:openci_cli/src/certificate_type.dart';
+import 'package:openci_cli2/src/app_store_connect.dart';
+import 'package:openci_cli2/src/certificate_type.dart';
 import 'package:openci_models/openci_models.dart';
 
 Future<int> listProvisioningProfiles({

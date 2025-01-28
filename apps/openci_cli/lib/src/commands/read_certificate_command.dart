@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_cli/src/read_certificate.dart';
+import 'package:openci_cli2/src/read_certificate.dart';
 
 class ReadCertificateCommand extends Command<int> {
   ReadCertificateCommand() {

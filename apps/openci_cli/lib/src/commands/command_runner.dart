@@ -2,16 +2,13 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:cli_completion/cli_completion.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_cli/src/commands/commands.dart';
-import 'package:openci_cli/src/commands/create_provisioning_profile.dart';
-import 'package:openci_cli/src/commands/list_procisioning_profile.dart';
-import 'package:openci_cli/src/commands/read_certificate_command.dart';
-import 'package:openci_cli/src/version.dart';
+import 'package:openci_cli2/src/commands/commands.dart';
+import 'package:openci_cli2/src/version.dart';
 import 'package:pub_updater/pub_updater.dart';
 
-const executableName = 'openci_cli';
-const packageName = 'openci_cli';
-const description = 'A Very Good Project created by Very Good CLI.';
+const executableName = 'openci_cli2';
+const packageName = 'openci_cli2';
+const description = 'A CLI tool for OpenCI.';
 
 /// {@template openci_cli_command_runner}
 /// A [CommandRunner] for the CLI.

@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:http/http.dart' as http;
-import 'package:openci_cli/src/certificate_type.dart';
-import 'package:openci_cli/src/profile_type.dart';
+import 'package:openci_cli2/src/certificate_type.dart';
+import 'package:openci_cli2/src/profile_type.dart';
 import 'package:path/path.dart' as path;
 
 const _baseUrl = 'https://api.appstoreconnect.apple.com/v1';

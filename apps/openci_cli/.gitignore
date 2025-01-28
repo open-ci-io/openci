@@ -13,5 +13,3 @@ coverage/
 
 # Android studio and IntelliJ
 .idea
-
-*.sh
