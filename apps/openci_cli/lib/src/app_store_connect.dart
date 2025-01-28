@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:http/http.dart' as http;
 import 'package:openci_cli/src/certificate_type.dart';
+import 'package:openci_cli/src/profile_type.dart';
 import 'package:path/path.dart' as path;
 
 const _baseUrl = 'https://api.appstoreconnect.apple.com/v1';
@@ -155,10 +156,9 @@ class AppStoreConnectClient {
   /// プロビジョニングプロファイルを作成する
   Future<Map<String, dynamic>> createProfile({
     required String name,
-    required String profileType,
+    required ProfileType profileType,
     required String bundleId,
     required String certificateId,
-    required String deviceId,
   }) async {
     try {
       final response = await _request(
@@ -169,7 +169,7 @@ class AppStoreConnectClient {
             'type': 'profiles',
             'attributes': {
               'name': name,
-              'profileType': profileType,
+              'profileType': profileType.name,
             },
             'relationships': {
               'bundleId': {
@@ -183,14 +183,6 @@ class AppStoreConnectClient {
                   {
                     'type': 'certificates',
                     'id': certificateId,
-                  }
-                ],
-              },
-              'devices': {
-                'data': [
-                  {
-                    'type': 'devices',
-                    'id': deviceId,
                   }
                 ],
               },
