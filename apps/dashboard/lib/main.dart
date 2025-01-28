@@ -7,6 +7,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'firebase_options.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -35,6 +37,7 @@ class MyApp extends StatelessWidget {
           ThemeData.dark().textTheme,
         ),
       ),
+      navigatorKey: navigatorKey,
       home: const AuthGate(),
     );
   }

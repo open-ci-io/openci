@@ -1,6 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dashboard/main.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/features/secrets/presentation/secret_page_controller.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -179,7 +186,7 @@ class _StepItem extends HookConsumerWidget {
             ),
             verticalMargin8,
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 controller
                   ..updateStepName(
                     index,
@@ -189,6 +196,152 @@ class _StepItem extends HookConsumerWidget {
                     index,
                     commandTextEditingController.text,
                   );
+
+                final state = navigatorKey.currentState;
+
+                if (commandTextEditingController.text
+                    .contains('flutter build ipa')) {
+                  final isAppStoreConnectApiKeyUploaded =
+                      await _isAppStoreConnectApiKeyUploaded();
+                  if (state == null) {
+                    return;
+                  }
+                  if (isAppStoreConnectApiKeyUploaded) {
+                    return;
+                  }
+
+                  final issuerIdController = TextEditingController();
+                  final keyIdController = TextEditingController();
+                  final keyFileController = TextEditingController();
+
+                  await showAdaptiveDialog<void>(
+                    context: state.context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('AppStore Connect API Key'),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'To run flutter build ipa, you need to upload AppStore Connect API Key',
+                          ),
+                          verticalMargin8,
+                          TextFormField(
+                            controller: issuerIdController,
+                            decoration: const InputDecoration(
+                              labelText: 'issuer-id',
+                            ),
+                          ),
+                          TextFormField(
+                            controller: keyIdController,
+                            decoration: const InputDecoration(
+                              labelText: 'key-id',
+                            ),
+                          ),
+                          TextFormField(
+                            controller: keyFileController,
+                            decoration: InputDecoration(
+                              labelText: '.p8 key file, base64 encoded',
+                              suffixIcon: IconButton(
+                                onPressed: () async {
+                                  final keyFile =
+                                      await FilePicker.platform.pickFiles(
+                                    type: FileType.custom,
+                                    allowedExtensions: ['p8'],
+                                  );
+                                  if (keyFile == null) {
+                                    return;
+                                  }
+
+                                  final path = keyFile.files.first.path;
+                                  if (path == null) {
+                                    return;
+                                  }
+
+                                  final bytes = await File(path).readAsBytes();
+                                  final keyFileContentBase64 =
+                                      base64Encode(bytes);
+                                  keyFileController.text = keyFileContentBase64;
+                                },
+                                icon: const Icon(Icons.folder),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text(
+                            'Cancel',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            try {
+                              await FirebaseFirestore.instance
+                                  .collection(secretsCollectionPath)
+                                  .add({
+                                'key': 'OPENCI_ASC_ISSUER_ID',
+                                'value': issuerIdController.text,
+                                'owners': [
+                                  FirebaseAuth.instance.currentUser!.uid,
+                                ],
+                                'createdAt':
+                                    DateTime.now().millisecondsSinceEpoch,
+                                'updatedAt':
+                                    DateTime.now().millisecondsSinceEpoch,
+                              });
+
+                              await FirebaseFirestore.instance
+                                  .collection(secretsCollectionPath)
+                                  .add({
+                                'key': 'OPENCI_ASC_KEY_ID',
+                                'value': keyIdController.text,
+                                'owners': [
+                                  FirebaseAuth.instance.currentUser!.uid,
+                                ],
+                                'createdAt':
+                                    DateTime.now().millisecondsSinceEpoch,
+                                'updatedAt':
+                                    DateTime.now().millisecondsSinceEpoch,
+                              });
+
+                              await FirebaseFirestore.instance
+                                  .collection(secretsCollectionPath)
+                                  .add({
+                                'key': 'OPENCI_ASC_KEY_BASE64',
+                                'value': keyFileController.text,
+                                'owners': [
+                                  FirebaseAuth.instance.currentUser!.uid,
+                                ],
+                                'createdAt':
+                                    DateTime.now().millisecondsSinceEpoch,
+                                'updatedAt':
+                                    DateTime.now().millisecondsSinceEpoch,
+                              });
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'AppStore Connect API Key uploaded',
+                                  ),
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(e.toString()),
+                                ),
+                              );
+                            }
+                          },
+                          child: const Text('Upload'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
               },
               child: const Text('Save Step'),
             ),
@@ -209,6 +362,14 @@ class _StepItem extends HookConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<bool> _isAppStoreConnectApiKeyUploaded() async {
+    final secrets = await FirebaseFirestore.instance
+        .collection(secretsCollectionPath)
+        .where('key', isEqualTo: 'OPENCI_ASC_ISSUER_ID')
+        .get();
+    return secrets.docs.isNotEmpty;
   }
 }
 
