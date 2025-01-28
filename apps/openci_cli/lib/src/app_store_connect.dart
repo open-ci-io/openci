@@ -264,6 +264,7 @@ Future<({String csrContent, String privateKey})> generateCSR({
   required String commonName,
   required String countryName,
   required String organizationName,
+  String? outputKeyPath,
 }) async {
   final tempDir = await Directory.systemTemp.createTemp('csr_');
   final keyPath = path.join(tempDir.path, 'private.key');
