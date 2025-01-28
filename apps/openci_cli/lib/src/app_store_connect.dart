@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:http/http.dart' as http;
+import 'package:openci_cli/src/certificate_type.dart';
 import 'package:path/path.dart' as path;
 
 const _baseUrl = 'https://api.appstoreconnect.apple.com/v1';
@@ -149,6 +150,98 @@ class AppStoreConnectClient {
         'Failed to create certificate: $e',
       );
     }
+  }
+
+  /// プロビジョニングプロファイルを作成する
+  Future<Map<String, dynamic>> createProfile({
+    required String name,
+    required String profileType,
+    required String bundleId,
+    required String certificateId,
+    required String deviceId,
+  }) async {
+    try {
+      final response = await _request(
+        path: '/profiles',
+        method: 'POST',
+        body: {
+          'data': {
+            'type': 'profiles',
+            'attributes': {
+              'name': name,
+              'profileType': profileType,
+            },
+            'relationships': {
+              'bundleId': {
+                'data': {
+                  'type': 'bundleIds',
+                  'id': bundleId,
+                },
+              },
+              'certificates': {
+                'data': [
+                  {
+                    'type': 'certificates',
+                    'id': certificateId,
+                  }
+                ],
+              },
+              'devices': {
+                'data': [
+                  {
+                    'type': 'devices',
+                    'id': deviceId,
+                  }
+                ],
+              },
+            },
+          },
+        },
+      );
+      return response;
+    } catch (e) {
+      throw AppStoreConnectError('Failed to create profile: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> getProfile({
+    required String profileId,
+  }) async {
+    final response = await _request(
+      path: '/profiles/$profileId',
+      method: 'GET',
+    );
+    return response;
+  }
+
+  /// プロビジョニングプロファイル一覧を取得する
+  Future<Map<String, dynamic>> listProfiles({
+    String? filterName,
+    CertificateType? filterType,
+    String? filterId,
+  }) async {
+    var path = '/profiles';
+    final queryParams = <String>[];
+
+    if (filterName != null) {
+      queryParams.add('filter[name]=$filterName');
+    }
+    if (filterType != null) {
+      queryParams.add('filter[profileType]=${filterType.name}');
+    }
+    if (filterId != null) {
+      queryParams.add('filter[id]=$filterId');
+    }
+
+    if (queryParams.isNotEmpty) {
+      path += '?${queryParams.join('&')}';
+    }
+
+    final response = await _request(
+      path: path,
+      method: 'GET',
+    );
+    return response;
   }
 
   Future<Map<String, dynamic>> readCertificate({

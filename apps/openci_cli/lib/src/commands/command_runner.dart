@@ -3,6 +3,7 @@ import 'package:args/command_runner.dart';
 import 'package:cli_completion/cli_completion.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_cli/src/commands/commands.dart';
+import 'package:openci_cli/src/commands/list_procisioning_profile.dart';
 import 'package:openci_cli/src/commands/read_certificate_command.dart';
 import 'package:openci_cli/src/version.dart';
 import 'package:pub_updater/pub_updater.dart';
@@ -42,6 +43,7 @@ class OpenciCliCommandRunner extends CompletionCommandRunner<int> {
     addCommand(CreateCertificateCommand());
     addCommand(ReadCertificateCommand());
     addCommand(ListCertificatesCommand());
+    addCommand(ListProvisioningProfileCommand());
     addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
   }
 
