@@ -45,7 +45,114 @@ Future<void> handleFlutterBuildIpa(
     await runCommand(
       logId: logId,
       client: client,
-      command: 'flutter build ipa',
+      command: 'openci_cli2 update',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+    final result = await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'openci_cli2 create-certificate --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="/Users/admin/Desktop/AuthKey_$keyId.p8" --certificate-type=DISTRIBUTION',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+
+    final resultJson = jsonDecode(result.stdout);
+    final resultCode = resultJson['statusCode'];
+
+    if (resultCode != 201) {
+      throw Exception('Failed to create certificate');
+    }
+    final keyBase64 = resultJson['key'];
+
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'echo $keyBase64 | base64 -d > /Users/admin/Desktop/certificate.key',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+
+    final csrBase64 =
+        resultJson['body']['data']['attributes']['certificateContent'];
+
+    final certificateId = resultJson['body']['data']['id'];
+
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'echo $csrBase64 | base64 -d > /Users/admin/Desktop/certificate.cer',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+
+    const p12Path = '/Users/admin/Desktop/certificate.p12';
+    const p12Password = '12345678';
+    const keychainPassword = '12345678';
+
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'openssl pkcs12 -export -in /Users/admin/Desktop/certificate.cer -inkey /Users/admin/Desktop/certificate.key -out $p12Path -name "Certificate Name" -passout pass:$p12Password',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+
+    // Save p12 file to Firestore (as a secret)
+
+    const keychainPath =
+        '/Users/admin/Library/Keychains/app-signing.keychain-db';
+
+    await runCommand(
+      logId: logId,
+      client: client,
+      command: 'security create-keychain -p "$keychainPassword" $keychainPath',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+
+    await runCommand(
+      logId: logId,
+      client: client,
+      command: 'security set-keychain-settings -lut 21600 $keychainPath',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+
+    await runCommand(
+      logId: logId,
+      client: client,
+      command: 'security unlock-keychain -p "$keychainPassword" $keychainPath',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'security import $p12Path -P $p12Password -A -t cert -f pkcs12 -k $keychainPath',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'security set-key-partition-list -S apple-tool:,apple: -k $keychainPassword $keychainPath',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+
+    await runCommand(
+      logId: logId,
+      client: client,
+      command: 'security list-keychain -d user -s $keychainPath',
       currentWorkingDirectory: workflow.currentWorkingDirectory,
       jobId: buildJob.id,
     );
@@ -53,228 +160,113 @@ Future<void> handleFlutterBuildIpa(
     // await runCommand(
     //   logId: logId,
     //   client: client,
-    //   command: 'openci_cli2 update',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
-    // final result = await runCommand(
-    //   logId: logId,
-    //   client: client,
     //   command:
-    //       'openci_cli2 create-certificate --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="/Users/admin/Desktop/AuthKey_$keyId.p8" --certificate-type=DISTRIBUTION',
+    //       'openci_cli2 create-provisioning-profile --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="/Users/admin/Desktop/AuthKey_$keyId.p8" --certificate-id=$certificateId --profile-name="OpenCI PP" --profile-type="IOS_APP_STORE" --bundle-id="io.openci.dashboard.ios"',
     //   currentWorkingDirectory: workflow.currentWorkingDirectory,
     //   jobId: buildJob.id,
     // );
 
-    // final resultJson = jsonDecode(result.stdout);
-    // final resultCode = resultJson['statusCode'];
+    final bundleIdRes = await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          r"grep -m1 PRODUCT_BUNDLE_IDENTIFIER ios/Runner.xcodeproj/project.pbxproj | sed -E 's/.*= ([^;]+);.*/\1/'",
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+    print('bundleIdRes: $bundleIdRes');
 
-    // if (resultCode != 201) {
-    //   throw Exception('Failed to create certificate');
-    // }
-    // final keyBase64 = resultJson['key'];
+    final bundleId = bundleIdRes.stdout.trim();
 
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command:
-    //       'echo $keyBase64 | base64 -d > /Users/admin/Desktop/certificate.key',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
+    final bundleIdsRes = await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'openci_cli2 list-bundle-ids --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="/Users/admin/Desktop/AuthKey_$keyId.p8" --filter-identifier="$bundleId"',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+    print('bundleIdsRes: $bundleIdsRes');
 
-    // final csrBase64 =
-    //     resultJson['body']['data']['attributes']['certificateContent'];
+    final bundleIdsJson = jsonDecode(bundleIdsRes.stdout);
+    final ascBundleId = bundleIdsJson['body']['data'][0]['id'];
+    final teamId =
+        bundleIdsJson['body']['data'][0]['attributes']['seedId'] as String;
 
-    // final certificateId = resultJson['body']['data']['id'];
+    const ppName = 'OpenCI PP';
 
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command:
-    //       'echo $csrBase64 | base64 -d > /Users/admin/Desktop/certificate.cer',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
+    final ppRes = await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'openci_cli2 create-provisioning-profile --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="/Users/admin/Desktop/AuthKey_$keyId.p8" --certificate-id=$certificateId --profile-name="$ppName" --profile-type="IOS_APP_STORE" --bundle-id=$ascBundleId',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
 
-    // const p12Path = '/Users/admin/Desktop/certificate.p12';
-    // const p12Password = '12345678';
-    // const keychainPassword = '12345678';
+    print('ppRes: $ppRes');
+    final ppJson = jsonDecode(ppRes.stdout);
+    final ppBase64 = ppJson['body']['data']['attributes']['profileContent'];
+    final ppUuid = ppJson['body']['data']['attributes']['uuid'];
 
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command:
-    //       'openssl pkcs12 -export -in /Users/admin/Desktop/certificate.cer -inkey /Users/admin/Desktop/certificate.key -out $p12Path -name "Certificate Name" -passout pass:$p12Password',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
-
-    // // Save p12 file to Firestore (as a secret)
-
-    // const keychainPath =
-    //     '/Users/admin/Library/Keychains/app-signing.keychain-db';
-
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command: 'security create-keychain -p "$keychainPassword" $keychainPath',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
-
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command: 'security set-keychain-settings -lut 21600 $keychainPath',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
-
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command: 'security unlock-keychain -p "$keychainPassword" $keychainPath',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          r'mkdir -p /Users/admin/Library/MobileDevice/Provisioning\ Profiles',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
 
     // await runCommand(
     //   logId: logId,
     //   client: client,
     //   command:
-    //       'security import $p12Path -P $p12Password -A -t cert -f pkcs12 -k $keychainPath',
+    //       r'mkdir -p /Users/admin/Library/Developer/Xcode/UserData/Provisioning\ Profiles',
     //   currentWorkingDirectory: workflow.currentWorkingDirectory,
     //   jobId: buildJob.id,
     // );
 
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command:
-    //       'security set-key-partition-list -S apple-tool:,apple: -k $keychainPassword $keychainPath',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
+    await runCommand(
+      logId: logId,
+      client: client,
+      command: 'pwd',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
 
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command: 'security list-keychain -d user -s $keychainPath',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'echo $ppBase64 | base64 -d > "/Users/admin/Library/MobileDevice/Provisioning Profiles/$ppUuid.mobileprovision"',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
 
-    // // await runCommand(
-    // //   logId: logId,
-    // //   client: client,
-    // //   command:
-    // //       'openci_cli2 create-provisioning-profile --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="/Users/admin/Desktop/AuthKey_$keyId.p8" --certificate-id=$certificateId --profile-name="OpenCI PP" --profile-type="IOS_APP_STORE" --bundle-id="io.openci.dashboard.ios"',
-    // //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    // //   jobId: buildJob.id,
-    // // );
+    final exportOptionsPlistBase64 = createPlistXmlAsBase64(
+      teamId: teamId,
+      bundleId: bundleId,
+      profileName: ppName,
+    );
 
-    // final bundleIdRes = await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command:
-    //       r"grep -m1 PRODUCT_BUNDLE_IDENTIFIER ios/Runner.xcodeproj/project.pbxproj | sed -E 's/.*= ([^;]+);.*/\1/'",
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
-    // print('bundleIdRes: $bundleIdRes');
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'echo $exportOptionsPlistBase64 | base64 -d > "/Users/admin/${workflow.currentWorkingDirectory}/ios/ExportOptions.plist"',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
 
-    // final bundleId = bundleIdRes.stdout.trim();
-
-    // final bundleIdsRes = await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command:
-    //       'openci_cli2 list-bundle-ids --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="/Users/admin/Desktop/AuthKey_$keyId.p8" --filter-identifier="$bundleId"',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
-    // print('bundleIdsRes: $bundleIdsRes');
-
-    // final bundleIdsJson = jsonDecode(bundleIdsRes.stdout);
-    // final ascBundleId = bundleIdsJson['body']['data'][0]['id'];
-    // final teamId =
-    //     bundleIdsJson['body']['data'][0]['attributes']['seedId'] as String;
-
-    // const ppName = 'OpenCI PP';
-
-    // final ppRes = await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command:
-    //       'openci_cli2 create-provisioning-profile --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="/Users/admin/Desktop/AuthKey_$keyId.p8" --certificate-id=$certificateId --profile-name="$ppName" --profile-type="IOS_APP_STORE" --bundle-id=$ascBundleId',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
-
-    // print('ppRes: $ppRes');
-    // final ppJson = jsonDecode(ppRes.stdout);
-    // final ppBase64 = ppJson['body']['data']['attributes']['profileContent'];
-    // final ppUuid = ppJson['body']['data']['attributes']['uuid'];
-
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command:
-    //       r'mkdir -p /Users/admin/Library/MobileDevice/Provisioning\ Profiles',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
-
-    // // await runCommand(
-    // //   logId: logId,
-    // //   client: client,
-    // //   command:
-    // //       r'mkdir -p /Users/admin/Library/Developer/Xcode/UserData/Provisioning\ Profiles',
-    // //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    // //   jobId: buildJob.id,
-    // // );
-
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command: 'pwd',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
-
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command:
-    //       'echo $ppBase64 | base64 -d > "/Users/admin/Library/MobileDevice/Provisioning Profiles/$ppUuid.mobileprovision"',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
-
-    // final exportOptionsPlistBase64 = createPlistXmlAsBase64(
-    //   teamId: teamId,
-    //   bundleId: bundleId,
-    //   profileName: ppName,
-    // );
-
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command:
-    //       'echo $exportOptionsPlistBase64 | base64 -d > "/Users/admin/${workflow.currentWorkingDirectory}/ios/ExportOptions.plist"',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
-
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command:
-    //       'flutter build ipa --export-options-plist="/Users/admin/${workflow.currentWorkingDirectory}/ios/ExportOptions.plist"',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'flutter build ipa --export-options-plist="/Users/admin/${workflow.currentWorkingDirectory}/ios/ExportOptions.plist"',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
 
     await Future.delayed(const Duration(hours: 10));
   }
