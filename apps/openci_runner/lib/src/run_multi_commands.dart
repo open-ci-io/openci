@@ -6,6 +6,7 @@ import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/env.dart';
 import 'package:openci_runner/src/features/get_workflow.dart';
 import 'package:openci_runner/src/features/update_build_status.dart';
+import 'package:openci_runner/src/handle_flutter_builld_ipa.dart';
 import 'package:openci_runner/src/log.dart';
 import 'package:openci_runner/src/run_command.dart';
 import 'package:openci_runner/src/secrets.dart';
@@ -35,6 +36,16 @@ Future<void> runMultiCommands(
       command: command,
       secrets: secrets,
     );
+
+    if (processedCommand.contains('flutter build ipa')) {
+      await handleFlutterBuildIpa(
+        logId,
+        client,
+        workflow,
+        buildJob,
+        firestore,
+      );
+    }
 
     await runCommand(
       logId: logId,

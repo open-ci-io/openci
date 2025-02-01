@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_cli2/src/app_store_connect.dart';
-import 'package:openci_models/openci_models.dart';
 
 Future<int> createCertificate({
   required String issuerId,
@@ -17,6 +16,8 @@ Future<int> createCertificate({
     privateKey: privateKey,
   );
 
+  Map<String, dynamic> response;
+
   try {
     final csr = await generateCSR(
       commonName: 'OpenCI',
@@ -24,31 +25,27 @@ Future<int> createCertificate({
       organizationName: 'OpenCI',
     );
 
-    final response = await client.createCertificate(
+    response = await client.createCertificate(
       csrContent: csr.csrContent,
       certificateType: certificateType,
     );
 
-    final responseWithKey = {
-      ...response,
-      'key': csr.privateKey,
-    };
+    if (response['statusCode'] == 201 || response['statusCode'] == 200) {
+      final base64Key = base64Encode(utf8.encode(csr.privateKey));
+      response = {
+        ...response,
+        'key': base64Key,
+      };
+    }
 
-    final result = SessionResult(
-      stdout: json.encode(responseWithKey),
-      stderr: '',
-      exitCode: 0,
-    );
-
-    stdout.write(json.encode(result.toJson()));
+    stdout.write(jsonEncode(response));
     return ExitCode.success.code;
   } catch (e) {
-    final result = SessionResult(
-      stdout: '',
-      stderr: e.toString(),
-      exitCode: 1,
-    );
-    stdout.write(json.encode(result.toJson()));
+    final result = {
+      'stderr': e.toString(),
+      'exitCode': 1,
+    };
+    stdout.write(jsonEncode(result));
     return 1;
   } finally {
     client.dispose();

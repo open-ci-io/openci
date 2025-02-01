@@ -43,6 +43,7 @@ class OpenciCliCommandRunner extends CompletionCommandRunner<int> {
     addCommand(ReadCertificateCommand());
     addCommand(ListCertificatesCommand());
     addCommand(ListProvisioningProfileCommand());
+    addCommand(ListBundleIdsCommand());
     addCommand(ReadProvisioningProfileCommand());
     addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
   }

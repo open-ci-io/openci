@@ -29,21 +29,14 @@ Future<int> createProvisioningProfile({
       certificateId: certificateId,
     );
 
-    final result = SessionResult(
-      stdout: json.encode(response),
-      stderr: '',
-      exitCode: 0,
-    );
-
-    stdout.write(json.encode(result.toJson()));
+    stdout.write(jsonEncode(response));
     return ExitCode.success.code;
   } catch (e) {
-    final result = SessionResult(
-      stdout: '',
-      stderr: e.toString(),
-      exitCode: 1,
-    );
-    stdout.write(json.encode(result.toJson()));
+    final result = {
+      'stderr': e.toString(),
+      'exitCode': 1,
+    };
+    stdout.write(jsonEncode(result));
     return 1;
   } finally {
     client.dispose();

@@ -6,7 +6,7 @@ import 'package:openci_runner/src/firebase.dart';
 import 'package:openci_runner/src/service/dartssh2/dartssh2_service.dart';
 import 'package:openci_runner/src/service/logger_service.dart';
 
-Future<void> runCommand({
+Future<SessionResult> runCommand({
   required SSHClient client,
   required String command,
   required String? currentWorkingDirectory,
@@ -31,7 +31,7 @@ Future<void> runCommand({
   }
 
   try {
-    await dartSSH2Service.executeCommand(
+    return await dartSSH2Service.executeCommand(
       client: client,
       command: command,
       currentWorkingDirectory: currentWorkingDirectory,
