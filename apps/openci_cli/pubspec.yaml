@@ -1,6 +1,6 @@
 name: openci_cli2
 description: OpenCI CLI
-version: 0.1.7
+version: 0.1.8
 repository: https://github.com/open-ci-io/openci/tree/develop/apps/openci_cli
 homepage: https://open-ci.io
 

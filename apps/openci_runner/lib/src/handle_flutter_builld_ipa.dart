@@ -5,6 +5,7 @@ import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/firebase.dart';
 import 'package:openci_runner/src/run_command.dart';
+import 'package:uuid/uuid.dart';
 
 Future<void> handleFlutterBuildIpa(
   String logId,
@@ -192,7 +193,7 @@ Future<void> handleFlutterBuildIpa(
     final teamId =
         bundleIdsJson['body']['data'][0]['attributes']['seedId'] as String;
 
-    final ppName = 'OpenCI_PP_${bundleId}_${DateTime.now().toIso8601String()}';
+    final ppName = 'OpenCI_PP_${const Uuid().v4()}';
 
     final ppRes = await runCommand(
       logId: logId,

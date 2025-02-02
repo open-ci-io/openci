@@ -1,3 +1,8 @@
+
+## 0.1.8
+
+- Minor bug fix
+
 ## 0.1.7
 
 - Add `delete-provisioning-profile` command

@@ -20,15 +20,10 @@ Future<int> deleteProvisioningProfile({
     final response = await client.deleteProfile(
       profileId: profileId,
     );
-
     stdout.write(jsonEncode(response));
     return ExitCode.success.code;
   } catch (e) {
-    final result = {
-      'stderr': e.toString(),
-      'exitCode': 1,
-    };
-    stdout.write(jsonEncode(result));
+    stdout.write(jsonEncode(e));
     return 1;
   } finally {
     client.dispose();

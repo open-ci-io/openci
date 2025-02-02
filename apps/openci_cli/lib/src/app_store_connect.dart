@@ -67,6 +67,13 @@ class AppStoreConnectClient {
         throw AppStoreConnectError('Unsupported HTTP method: $method');
     }
 
+    if (response.statusCode == 204) {
+      return {
+        'statusCode': response.statusCode,
+        'body': '',
+      };
+    }
+
     final responseBody = jsonDecode(response.body) as Map<String, dynamic>;
 
     return {
@@ -187,6 +194,7 @@ class AppStoreConnectClient {
       path: '/profiles/$profileId',
       method: 'DELETE',
     );
+    print('response: $response');
     return response;
   }
 
