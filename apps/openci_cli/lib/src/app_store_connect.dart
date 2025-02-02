@@ -180,6 +180,16 @@ class AppStoreConnectClient {
     }
   }
 
+  Future<Map<String, dynamic>> deleteProfile({
+    required String profileId,
+  }) async {
+    final response = await _request(
+      path: '/profiles/$profileId',
+      method: 'DELETE',
+    );
+    return response;
+  }
+
   Future<Map<String, dynamic>> getProfile({
     required String profileId,
   }) async {
