@@ -309,8 +309,6 @@ Future<void> handleFlutterBuildIpa(
         jobId: buildJob.id,
       );
     }
-
-    await Future<void>.delayed(const Duration(hours: 10));
   }
 }
 
