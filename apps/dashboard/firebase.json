@@ -13,7 +13,7 @@
         "lib/firebase_options.dart": {
           "projectId": "open-ci-release",
           "configurations": {
-            "android": "1:226435817638:android:6848f67578b6d77ac1d467"
+            "ios": "1:226435817638:ios:aecb8b1ecfed8e9dc1d467"
           }
         }
       },
@@ -22,6 +22,14 @@
           "projectId": "open-ci-release",
           "appId": "1:226435817638:android:6848f67578b6d77ac1d467",
           "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "open-ci-release",
+          "appId": "1:226435817638:ios:aecb8b1ecfed8e9dc1d467",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
         }
       }
     }
