@@ -302,7 +302,8 @@ Future<void> handleFlutterBuildIpa(
       await runCommand(
         logId: logId,
         client: client,
-        command: 'openci_cli2 delete-provisioning-profile --profile-id=$ppId',
+        command:
+            'openci_cli2 delete-provisioning-profile --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="${authKeyPath(cwd: workflow.currentWorkingDirectory, keyId: keyId)}" --profile-id=$ppId',
         currentWorkingDirectory: workflow.currentWorkingDirectory,
         jobId: buildJob.id,
       );
