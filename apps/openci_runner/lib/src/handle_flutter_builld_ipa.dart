@@ -49,11 +49,12 @@ Future<void> handleFlutterBuildIpa(
       currentWorkingDirectory: workflow.currentWorkingDirectory,
       jobId: buildJob.id,
     );
+
     final result = await runCommand(
       logId: logId,
       client: client,
       command:
-          'openci_cli2 create-certificate --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="/Users/admin/Desktop/AuthKey_$keyId.p8" --certificate-type=DISTRIBUTION',
+          'openci_cli2 create-certificate --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="${authKeyPath(cwd: workflow.currentWorkingDirectory, keyId: keyId)}" --certificate-type=DISTRIBUTION',
       currentWorkingDirectory: workflow.currentWorkingDirectory,
       jobId: buildJob.id,
     );
@@ -182,7 +183,7 @@ Future<void> handleFlutterBuildIpa(
       logId: logId,
       client: client,
       command:
-          'openci_cli2 list-bundle-ids --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="/Users/admin/Desktop/AuthKey_$keyId.p8" --filter-identifier="$bundleId"',
+          'openci_cli2 list-bundle-ids --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="${authKeyPath(cwd: workflow.currentWorkingDirectory, keyId: keyId)}" --filter-identifier="$bundleId"',
       currentWorkingDirectory: workflow.currentWorkingDirectory,
       jobId: buildJob.id,
     );
@@ -199,7 +200,7 @@ Future<void> handleFlutterBuildIpa(
       logId: logId,
       client: client,
       command:
-          'openci_cli2 create-provisioning-profile --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="/Users/admin/Desktop/AuthKey_$keyId.p8" --certificate-id=$certificateId --profile-name="$ppName" --profile-type="IOS_APP_STORE" --bundle-id=$ascBundleId',
+          'openci_cli2 create-provisioning-profile --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="${authKeyPath(cwd: workflow.currentWorkingDirectory, keyId: keyId)}" --certificate-id=$certificateId --profile-name="$ppName" --profile-type="IOS_APP_STORE" --bundle-id=$ascBundleId',
       currentWorkingDirectory: workflow.currentWorkingDirectory,
       jobId: buildJob.id,
     );
@@ -217,15 +218,6 @@ Future<void> handleFlutterBuildIpa(
       currentWorkingDirectory: workflow.currentWorkingDirectory,
       jobId: buildJob.id,
     );
-
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command:
-    //       r'mkdir -p /Users/admin/Library/Developer/Xcode/UserData/Provisioning\ Profiles',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
 
     await runCommand(
       logId: logId,
@@ -259,6 +251,37 @@ Future<void> handleFlutterBuildIpa(
       jobId: buildJob.id,
     );
 
+    final rubyScriptBase64 = generateXcodeprojRubyScriptBase64(
+      teamId: teamId,
+      profileName: ppName,
+    );
+    const rubyScriptName = 'xcode_proj.rb';
+
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'echo $rubyScriptBase64 | base64 -d > "/Users/admin/${workflow.currentWorkingDirectory}/$rubyScriptName"',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+
+    await runCommand(
+      logId: logId,
+      client: client,
+      command: 'ruby $rubyScriptName',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+
+    await runCommand(
+      logId: logId,
+      client: client,
+      command: '',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+
     await runCommand(
       logId: logId,
       client: client,
@@ -268,10 +291,17 @@ Future<void> handleFlutterBuildIpa(
       jobId: buildJob.id,
     );
 
-    await Future.delayed(const Duration(hours: 10));
-  }
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey $keyId --apiIssuer $issuerId',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
 
-  // 1. ビルド
+    await Future<void>.delayed(const Duration(hours: 10));
+  }
 }
 
 String decodeBase64ToOriginalString(String base64String) {
@@ -320,6 +350,13 @@ Future<String> _getP8Base64(Firestore firestore) async {
   return keyBase64;
 }
 
+String authKeyPath({
+  required String cwd,
+  required String keyId,
+}) {
+  return '/Users/admin/$cwd/private_keys/AuthKey_$keyId.p8';
+}
+
 Future<void> _uploadP8File(
   SSHClient client,
   String p8Base64,
@@ -334,10 +371,18 @@ Future<void> _uploadP8File(
   // PPをDL
   // PPをVMに配置
   await runCommand(
+    client: client,
+    command: 'mkdir -p /Users/admin/$currentWorkingDirectory/private_keys',
+    currentWorkingDirectory: currentWorkingDirectory,
+    jobId: buildJobId,
+    logId: logId,
+  );
+
+  await runCommand(
     logId: logId,
     client: client,
     command:
-        'echo $p8Base64 | base64 -d > /Users/admin/Desktop/AuthKey_$keyId.p8',
+        'echo $p8Base64 | base64 -d > ${authKeyPath(cwd: currentWorkingDirectory, keyId: keyId)}',
     currentWorkingDirectory: currentWorkingDirectory,
     jobId: buildJobId,
   );
@@ -436,4 +481,35 @@ String createPlistXmlAsBase64({
   final bytes = utf8.encode(xmlContent);
   final base64String = base64Encode(bytes);
   return base64String;
+}
+
+/// Returns a base64 encoded string of the Ruby script.
+/// This Ruby script modifies the Xcode project build settings.
+String generateXcodeprojRubyScriptBase64({
+  required String teamId,
+  required String profileName,
+}) {
+  final rubyScript = '''
+require 'xcodeproj'
+
+# Project path (using ios/Runner.xcodeproj)
+project_path = 'ios/Runner.xcodeproj'
+project = Xcodeproj::Project.open(project_path)
+
+# Modify build settings of each target in the project
+project.targets.each do |target|
+  target.build_configurations.each do |config|
+    config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
+    config.build_settings['DEVELOPMENT_TEAM'] = '$teamId'
+    config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = '$profileName'
+    config.build_settings["PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]"] = '$profileName'
+  end
+end
+
+project.save
+''';
+
+  if (rubyScript.trim().isEmpty) return '';
+
+  return base64Encode(utf8.encode(rubyScript));
 }

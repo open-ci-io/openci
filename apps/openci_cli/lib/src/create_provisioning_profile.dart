@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_cli2/src/app_store_connect.dart';
 import 'package:openci_cli2/src/profile_type.dart';
-import 'package:openci_models/openci_models.dart';
 
 Future<int> createProvisioningProfile({
   required String issuerId,
