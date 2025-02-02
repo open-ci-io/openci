@@ -175,7 +175,6 @@ Future<void> handleFlutterBuildIpa(
       currentWorkingDirectory: workflow.currentWorkingDirectory,
       jobId: buildJob.id,
     );
-    print('bundleIdRes: $bundleIdRes');
 
     final bundleId = bundleIdRes.stdout.trim();
 
@@ -187,14 +186,13 @@ Future<void> handleFlutterBuildIpa(
       currentWorkingDirectory: workflow.currentWorkingDirectory,
       jobId: buildJob.id,
     );
-    print('bundleIdsRes: $bundleIdsRes');
 
     final bundleIdsJson = jsonDecode(bundleIdsRes.stdout);
     final ascBundleId = bundleIdsJson['body']['data'][0]['id'];
     final teamId =
         bundleIdsJson['body']['data'][0]['attributes']['seedId'] as String;
 
-    const ppName = 'OpenCI PP';
+    final ppName = 'OpenCI_PP_${bundleId}_${DateTime.now().toIso8601String()}';
 
     final ppRes = await runCommand(
       logId: logId,
@@ -205,10 +203,10 @@ Future<void> handleFlutterBuildIpa(
       jobId: buildJob.id,
     );
 
-    print('ppRes: $ppRes');
     final ppJson = jsonDecode(ppRes.stdout);
     final ppBase64 = ppJson['body']['data']['attributes']['profileContent'];
     final ppUuid = ppJson['body']['data']['attributes']['uuid'];
+    final ppId = ppJson['body']['data']['id'];
 
     await runCommand(
       logId: logId,
@@ -282,23 +280,33 @@ Future<void> handleFlutterBuildIpa(
       jobId: buildJob.id,
     );
 
-    await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'flutter build ipa --export-options-plist="/Users/admin/${workflow.currentWorkingDirectory}/ios/ExportOptions.plist"',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
+    try {
+      await runCommand(
+        logId: logId,
+        client: client,
+        command:
+            'flutter build ipa --export-options-plist="/Users/admin/${workflow.currentWorkingDirectory}/ios/ExportOptions.plist"',
+        currentWorkingDirectory: workflow.currentWorkingDirectory,
+        jobId: buildJob.id,
+      );
 
-    await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey $keyId --apiIssuer $issuerId',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
+      await runCommand(
+        logId: logId,
+        client: client,
+        command:
+            'xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey $keyId --apiIssuer $issuerId',
+        currentWorkingDirectory: workflow.currentWorkingDirectory,
+        jobId: buildJob.id,
+      );
+    } finally {
+      await runCommand(
+        logId: logId,
+        client: client,
+        command: 'openci_cli2 delete-provisioning-profile --profile-id=$ppId',
+        currentWorkingDirectory: workflow.currentWorkingDirectory,
+        jobId: buildJob.id,
+      );
+    }
 
     await Future<void>.delayed(const Duration(hours: 10));
   }
