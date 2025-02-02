@@ -503,6 +503,7 @@ project.targets.each do |target|
     config.build_settings['DEVELOPMENT_TEAM'] = '$teamId'
     config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = '$profileName'
     config.build_settings["PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]"] = '$profileName'
+    config.build_settings['CODE_SIGN_IDENTITY'] = 'Apple Distribution'
   end
 end
 
