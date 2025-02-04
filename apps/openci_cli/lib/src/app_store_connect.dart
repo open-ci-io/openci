@@ -46,42 +46,40 @@ class AppStoreConnectClient {
     final uri = Uri.parse('$_baseUrl$path');
     late http.Response response;
 
-    try {
-      switch (method) {
-        case 'GET':
-          response = await _client.get(uri, headers: headers);
-        case 'POST':
-          response = await _client.post(
-            uri,
-            headers: headers,
-            body: json.encode(body),
-          );
-        case 'PATCH':
-          response = await _client.patch(
-            uri,
-            headers: headers,
-            body: json.encode(body),
-          );
-        case 'DELETE':
-          response = await _client.delete(uri, headers: headers);
-        default:
-          throw AppStoreConnectError('Unsupported HTTP method: $method');
-      }
-
-      if (response.statusCode >= 400) {
-        throw AppStoreConnectError(
-          'API request failed: ${response.statusCode} - ${response.body}',
+    switch (method) {
+      case 'GET':
+        response = await _client.get(uri, headers: headers);
+      case 'POST':
+        response = await _client.post(
+          uri,
+          headers: headers,
+          body: json.encode(body),
         );
-      }
-
-      if (response.body.isEmpty) {
-        return {};
-      }
-
-      return json.decode(response.body) as Map<String, dynamic>;
-    } catch (e) {
-      throw AppStoreConnectError('Request failed: $e');
+      case 'PATCH':
+        response = await _client.patch(
+          uri,
+          headers: headers,
+          body: json.encode(body),
+        );
+      case 'DELETE':
+        response = await _client.delete(uri, headers: headers);
+      default:
+        throw AppStoreConnectError('Unsupported HTTP method: $method');
     }
+
+    if (response.statusCode == 204) {
+      return {
+        'statusCode': response.statusCode,
+        'body': '',
+      };
+    }
+
+    final responseBody = jsonDecode(response.body) as Map<String, dynamic>;
+
+    return {
+      'statusCode': response.statusCode,
+      'body': responseBody,
+    };
   }
 
   /// アプリ情報を取得する
@@ -131,26 +129,19 @@ class AppStoreConnectClient {
     required String csrContent,
     required String certificateType,
   }) async {
-    try {
-      final response = await _request(
-        path: '/certificates',
-        method: 'POST',
-        body: {
-          'data': {
-            'type': 'certificates',
-            'attributes': {
-              'certificateType': certificateType,
-              'csrContent': csrContent,
-            },
+    return _request(
+      path: '/certificates',
+      method: 'POST',
+      body: {
+        'data': {
+          'type': 'certificates',
+          'attributes': {
+            'certificateType': certificateType,
+            'csrContent': csrContent,
           },
         },
-      );
-      return response;
-    } catch (e) {
-      throw AppStoreConnectError(
-        'Failed to create certificate: $e',
-      );
-    }
+      },
+    );
   }
 
   /// プロビジョニングプロファイルを作成する
@@ -194,6 +185,17 @@ class AppStoreConnectClient {
     } catch (e) {
       throw AppStoreConnectError('Failed to create profile: $e');
     }
+  }
+
+  Future<Map<String, dynamic>> deleteProfile({
+    required String profileId,
+  }) async {
+    final response = await _request(
+      path: '/profiles/$profileId',
+      method: 'DELETE',
+    );
+    print('response: $response');
+    return response;
   }
 
   Future<Map<String, dynamic>> getProfile({
@@ -259,6 +261,28 @@ class AppStoreConnectClient {
     }
     if (filterType != null) {
       queryParams.add('filter[certificateType]=$filterType');
+    }
+
+    if (queryParams.isNotEmpty) {
+      path += '?${queryParams.join('&')}';
+    }
+
+    final response = await _request(
+      path: path,
+      method: 'GET',
+    );
+    return response;
+  }
+
+  /// バンドルID一覧を取得する
+  Future<Map<String, dynamic>> listBundleIds({
+    String? filterIdentifier,
+  }) async {
+    var path = '/bundleIds';
+    final queryParams = <String>[];
+
+    if (filterIdentifier != null && filterIdentifier.isNotEmpty) {
+      queryParams.add('filter[identifier]=$filterIdentifier');
     }
 
     if (queryParams.isNotEmpty) {

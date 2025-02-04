@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:mason_logger/mason_logger.dart';
@@ -22,7 +21,7 @@ Future<int> readCertificate({
       certificateId: certificateId,
     );
 
-    stdout.write(json.encode(response));
+    stdout.write(response);
     return ExitCode.success.code;
   } catch (e) {
     final result = SessionResult(
@@ -30,7 +29,7 @@ Future<int> readCertificate({
       stderr: e.toString(),
       exitCode: 1,
     );
-    stdout.write(json.encode(result.toJson()));
+    stdout.write(result.toJson());
     return 1;
   } finally {
     client.dispose();

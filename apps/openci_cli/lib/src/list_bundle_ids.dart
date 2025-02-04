@@ -3,16 +3,12 @@ import 'dart:io';
 
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_cli2/src/app_store_connect.dart';
-import 'package:openci_cli2/src/profile_type.dart';
 
-Future<int> createProvisioningProfile({
+Future<int> listBundleIds({
   required String issuerId,
   required String keyId,
   required String privateKey,
-  required String profileName,
-  required ProfileType profileType,
-  required String bundleId,
-  required String certificateId,
+  String? filterIdentifier,
 }) async {
   final client = AppStoreConnectClient(
     issuerId: issuerId,
@@ -21,21 +17,14 @@ Future<int> createProvisioningProfile({
   );
 
   try {
-    final response = await client.createProfile(
-      name: profileName,
-      profileType: profileType,
-      bundleId: bundleId,
-      certificateId: certificateId,
+    final response = await client.listBundleIds(
+      filterIdentifier: filterIdentifier,
     );
 
     stdout.write(jsonEncode(response));
     return ExitCode.success.code;
   } catch (e) {
-    final result = {
-      'stderr': e.toString(),
-      'exitCode': 1,
-    };
-    stdout.write(jsonEncode(result));
+    stdout.write(e.toString());
     return 1;
   } finally {
     client.dispose();

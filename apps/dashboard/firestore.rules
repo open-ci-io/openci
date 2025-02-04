@@ -12,6 +12,7 @@ service cloud.firestore {
     }
     match /secrets_v1/{secretId} {
       allow create: if request.auth.uid != null;
+      allow list: if request.auth.uid != null;
       allow read, update, delete: if request.auth.uid != null 
         && resource.data.owners.hasAny([request.auth.uid]);
     }

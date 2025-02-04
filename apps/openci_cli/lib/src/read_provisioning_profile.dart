@@ -23,12 +23,12 @@ Future<int> readProvisioningProfile({
     );
 
     final result = SessionResult(
-      stdout: json.encode(response),
+      stdout: jsonEncode(response),
       stderr: '',
       exitCode: 0,
     );
 
-    stdout.write(json.encode(result.toJson()));
+    stdout.write(result.toJson());
     return ExitCode.success.code;
   } catch (e) {
     final result = SessionResult(
@@ -36,7 +36,7 @@ Future<int> readProvisioningProfile({
       stderr: e.toString(),
       exitCode: 1,
     );
-    stdout.write(json.encode(result.toJson()));
+    stdout.write(result.toJson());
     return 1;
   } finally {
     client.dispose();

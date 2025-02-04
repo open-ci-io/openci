@@ -1,16 +1,16 @@
 name: dashboard
 description: "A Dashboard for OpenCI"
 publish_to: 'none'
-version: 1.1.0+1
+version: 1.1.0+11
 environment:
   sdk: ^3.6.0
   
 dependencies:
-  cloud_firestore: ^5.6.0
+  cloud_firestore: ^5.6.2
   cupertino_icons: ^1.0.8
   file_picker: ^8.1.7
   firebase_auth: ^5.3.1
-  firebase_core: ^3.6.0
+  firebase_core: ^3.10.1
   flutter:
     sdk: flutter
   flutter_adaptive_scaffold: ^0.3.1
@@ -22,9 +22,10 @@ dependencies:
   openci_models:
     path: ../../packages/openci_models
   riverpod_annotation: ^2.5.3
+  sentry_flutter: ^8.13.0-beta.3
   signals: ^6.0.2
   uuid: ^4.5.1
-  
+
 dev_dependencies:
   build_runner: ^2.4.14
   custom_lint: ^0.7.0
