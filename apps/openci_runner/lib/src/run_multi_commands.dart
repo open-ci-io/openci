@@ -45,15 +45,15 @@ Future<void> runMultiCommands(
         buildJob,
         firestore,
       );
+    } else {
+      await runCommand(
+        logId: logId,
+        client: client,
+        command: processedCommand,
+        currentWorkingDirectory: workflow.currentWorkingDirectory,
+        jobId: buildJob.id,
+      );
     }
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command: processedCommand,
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
   }
 
   await updateBuildStatus(
