@@ -7,6 +7,10 @@ import 'package:openci_runner/src/firebase.dart';
 import 'package:openci_runner/src/run_command.dart';
 import 'package:uuid/uuid.dart';
 
+const _p12Path = '/Users/admin/Desktop/certificate.p12';
+const _p12Password = '12345678';
+const _keychainPassword = '12345678';
+
 Future<void> handleFlutterBuildIpa(
   String logId,
   SSHClient client,
@@ -14,302 +18,461 @@ Future<void> handleFlutterBuildIpa(
   BuildJob buildJob,
   Firestore firestore,
 ) async {
-  // 0. Secretsの存在を確認
   final areASCSecretsUploaded = await _areASCSecretsUploaded();
   if (!areASCSecretsUploaded) {
     throw Exception('ASC secrets are not uploaded');
   }
 
+  final p8Base64 = await _getP8Base64(firestore);
+  final issuerId = await _getIssuerId(firestore);
+  final keyId = await _getKeyId(firestore);
+  await _uploadP8File(
+    client,
+    p8Base64,
+    logId,
+    workflow.id,
+    buildJob.id,
+    workflow.currentWorkingDirectory,
+    keyId,
+  );
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command: 'openci_cli2 update',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  String? certificateId;
+
   final isValidP12FileUploaded = await _wasP12FileUploadedWithinOneYear();
-  if (isValidP12FileUploaded) {
+  final isP12CertificateIdUploaded =
+      await _isP12CertificateIdUploaded(firestore);
+
+  if (isValidP12FileUploaded && isP12CertificateIdUploaded) {
     print('P12 file is uploaded within one year');
-    // base64を取得し、リモートに書き込む
-    // keychainにimport
-    // PPをDL
-    // PPをVMに配置
-  } else {
-    print('P12 file is not uploaded within one year');
-    // p12ファイルを作成
-    final p8Base64 = await _getP8Base64(firestore);
-    final issuerId = await _getIssuerId(firestore);
-    final keyId = await _getKeyId(firestore);
-    await _uploadP8File(
+
+    final p12Base64 = await _fetchP12File(firestore);
+    certificateId = await _fetchP12CertificateId(firestore);
+
+    final isP12RegisteredInASC = await _isP12RegisteredInASC(
+      certificateId,
       client,
-      p8Base64,
       logId,
       workflow.id,
       buildJob.id,
       workflow.currentWorkingDirectory,
+      issuerId,
       keyId,
     );
 
-    await runCommand(
-      logId: logId,
-      client: client,
-      command: 'openci_cli2 update',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
+    if (!isP12RegisteredInASC) {
+      await _deleteP12File(firestore);
+      await _deleteP12CertificateId(firestore);
 
-    final result = await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'openci_cli2 create-certificate --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="${authKeyPath(cwd: workflow.currentWorkingDirectory, keyId: keyId)}" --certificate-type=DISTRIBUTION',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    final resultJson = jsonDecode(result.stdout);
-    final resultCode = resultJson['statusCode'];
-
-    if (resultCode != 201) {
-      throw Exception('Failed to create certificate');
-    }
-    final keyBase64 = resultJson['key'];
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'echo $keyBase64 | base64 -d > /Users/admin/Desktop/certificate.key',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    final csrBase64 =
-        resultJson['body']['data']['attributes']['certificateContent'];
-
-    final certificateId = resultJson['body']['data']['id'];
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'echo $csrBase64 | base64 -d > /Users/admin/Desktop/certificate.cer',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    const p12Path = '/Users/admin/Desktop/certificate.p12';
-    const p12Password = '12345678';
-    const keychainPassword = '12345678';
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'openssl pkcs12 -export -in /Users/admin/Desktop/certificate.cer -inkey /Users/admin/Desktop/certificate.key -out $p12Path -name "Certificate Name" -passout pass:$p12Password',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    // Save p12 file to Firestore (as a secret)
-
-    const keychainPath =
-        '/Users/admin/Library/Keychains/app-signing.keychain-db';
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command: 'security create-keychain -p "$keychainPassword" $keychainPath',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command: 'security set-keychain-settings -lut 21600 $keychainPath',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command: 'security unlock-keychain -p "$keychainPassword" $keychainPath',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'security import $p12Path -P $p12Password -A -t cert -f pkcs12 -k $keychainPath',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'security set-key-partition-list -S apple-tool:,apple: -k $keychainPassword $keychainPath',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command: 'security list-keychain -d user -s $keychainPath',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    // await runCommand(
-    //   logId: logId,
-    //   client: client,
-    //   command:
-    //       'openci_cli2 create-provisioning-profile --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="/Users/admin/Desktop/AuthKey_$keyId.p8" --certificate-id=$certificateId --profile-name="OpenCI PP" --profile-type="IOS_APP_STORE" --bundle-id="io.openci.dashboard.ios"',
-    //   currentWorkingDirectory: workflow.currentWorkingDirectory,
-    //   jobId: buildJob.id,
-    // );
-
-    final bundleIdRes = await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          r"grep -m1 PRODUCT_BUNDLE_IDENTIFIER ios/Runner.xcodeproj/project.pbxproj | sed -E 's/.*= ([^;]+);.*/\1/'",
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    final bundleId = bundleIdRes.stdout.trim();
-
-    final bundleIdsRes = await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'openci_cli2 list-bundle-ids --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="${authKeyPath(cwd: workflow.currentWorkingDirectory, keyId: keyId)}" --filter-identifier="$bundleId"',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    final bundleIdsJson = jsonDecode(bundleIdsRes.stdout);
-    final ascBundleId = bundleIdsJson['body']['data'][0]['id'];
-    final teamId =
-        bundleIdsJson['body']['data'][0]['attributes']['seedId'] as String;
-
-    final ppName = 'OpenCI_PP_${const Uuid().v4()}';
-
-    final ppRes = await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'openci_cli2 create-provisioning-profile --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="${authKeyPath(cwd: workflow.currentWorkingDirectory, keyId: keyId)}" --certificate-id=$certificateId --profile-name="$ppName" --profile-type="IOS_APP_STORE" --bundle-id=$ascBundleId',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    final ppJson = jsonDecode(ppRes.stdout);
-    final ppBase64 = ppJson['body']['data']['attributes']['profileContent'];
-    final ppUuid = ppJson['body']['data']['attributes']['uuid'];
-    final ppId = ppJson['body']['data']['id'];
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          r'mkdir -p /Users/admin/Library/MobileDevice/Provisioning\ Profiles',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command: 'pwd',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'echo $ppBase64 | base64 -d > "/Users/admin/Library/MobileDevice/Provisioning Profiles/$ppUuid.mobileprovision"',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    final exportOptionsPlistBase64 = createPlistXmlAsBase64(
-      teamId: teamId,
-      bundleId: bundleId,
-      profileName: ppName,
-    );
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'echo $exportOptionsPlistBase64 | base64 -d > "/Users/admin/${workflow.currentWorkingDirectory}/ios/ExportOptions.plist"',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    final rubyScriptBase64 = generateXcodeprojRubyScriptBase64(
-      teamId: teamId,
-      profileName: ppName,
-    );
-    const rubyScriptName = 'xcode_proj.rb';
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'echo $rubyScriptBase64 | base64 -d > "/Users/admin/${workflow.currentWorkingDirectory}/$rubyScriptName"',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command: 'ruby $rubyScriptName',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command: '',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
-
-    try {
-      await runCommand(
+      certificateId = await _createP12File(
         logId: logId,
         client: client,
-        command:
-            'flutter build ipa --export-options-plist="/Users/admin/${workflow.currentWorkingDirectory}/ios/ExportOptions.plist"',
-        currentWorkingDirectory: workflow.currentWorkingDirectory,
-        jobId: buildJob.id,
+        workflow: workflow,
+        buildJob: buildJob,
+        firestore: firestore,
+        issuerId: issuerId,
+        keyId: keyId,
       );
 
-      await runCommand(
-        logId: logId,
-        client: client,
-        command:
-            'xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey $keyId --apiIssuer $issuerId',
-        currentWorkingDirectory: workflow.currentWorkingDirectory,
-        jobId: buildJob.id,
+      await _uploadP12File(
+        client,
+        logId,
+        workflow.id,
+        buildJob.id,
+        workflow.currentWorkingDirectory,
+        _p12Path,
+        firestore,
       );
-    } finally {
+
+      await _uploadP12CertificateId(certificateId, firestore);
+    } else {
       await runCommand(
         logId: logId,
         client: client,
-        command:
-            'openci_cli2 delete-provisioning-profile --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="${authKeyPath(cwd: workflow.currentWorkingDirectory, keyId: keyId)}" --profile-id=$ppId',
+        command: 'echo $p12Base64 | base64 -d > $_p12Path',
         currentWorkingDirectory: workflow.currentWorkingDirectory,
         jobId: buildJob.id,
       );
     }
+  } else if (!isValidP12FileUploaded && !isP12CertificateIdUploaded) {
+    print('P12 file is not uploaded within one year');
+    certificateId = await _createP12File(
+      logId: logId,
+      client: client,
+      workflow: workflow,
+      buildJob: buildJob,
+      firestore: firestore,
+      issuerId: issuerId,
+      keyId: keyId,
+    );
+
+    await _uploadP12File(
+      client,
+      logId,
+      workflow.id,
+      buildJob.id,
+      workflow.currentWorkingDirectory,
+      _p12Path,
+      firestore,
+    );
+
+    await _uploadP12CertificateId(certificateId, firestore);
+  } else {
+    throw Exception(
+      'P12 file is not uploaded within one year or P12 certificate id is not uploaded, isValidP12FileUploaded:$isValidP12FileUploaded, isP12CertificateIdUploaded:$isP12CertificateIdUploaded',
+    );
   }
+
+  const keychainPath = '/Users/admin/Library/Keychains/app-signing.keychain-db';
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command: 'security create-keychain -p "$_keychainPassword" $keychainPath',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command: 'security set-keychain-settings -lut 21600 $keychainPath',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command: 'security unlock-keychain -p "$_keychainPassword" $keychainPath',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        'security import $_p12Path -P $_p12Password -A -t cert -f pkcs12 -k $keychainPath',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        'security set-key-partition-list -S apple-tool:,apple: -k $_keychainPassword $keychainPath',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command: 'security list-keychain -d user -s $keychainPath',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  final bundleIdRes = await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        r"grep -m1 PRODUCT_BUNDLE_IDENTIFIER ios/Runner.xcodeproj/project.pbxproj | sed -E 's/.*= ([^;]+);.*/\1/'",
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  final bundleId = bundleIdRes.stdout.trim();
+
+  final bundleIdsRes = await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        'openci_cli2 list-bundle-ids --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="${authKeyPath(cwd: workflow.currentWorkingDirectory, keyId: keyId)}" --filter-identifier="$bundleId"',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  final bundleIdsJson = jsonDecode(bundleIdsRes.stdout);
+  final ascBundleId = bundleIdsJson['body']['data'][0]['id'];
+  final teamId =
+      bundleIdsJson['body']['data'][0]['attributes']['seedId'] as String;
+
+  final ppName = 'OpenCI_PP_${const Uuid().v4()}';
+
+  final ppRes = await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        'openci_cli2 create-provisioning-profile --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="${authKeyPath(cwd: workflow.currentWorkingDirectory, keyId: keyId)}" --certificate-id=$certificateId --profile-name="$ppName" --profile-type="IOS_APP_STORE" --bundle-id=$ascBundleId',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  final ppJson = jsonDecode(ppRes.stdout);
+  final ppBase64 = ppJson['body']['data']['attributes']['profileContent'];
+  final ppUuid = ppJson['body']['data']['attributes']['uuid'];
+  final ppId = ppJson['body']['data']['id'];
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        r'mkdir -p /Users/admin/Library/MobileDevice/Provisioning\ Profiles',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command: 'pwd',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        'echo $ppBase64 | base64 -d > "/Users/admin/Library/MobileDevice/Provisioning Profiles/$ppUuid.mobileprovision"',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  final exportOptionsPlistBase64 = createPlistXmlAsBase64(
+    teamId: teamId,
+    bundleId: bundleId,
+    profileName: ppName,
+  );
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        'echo $exportOptionsPlistBase64 | base64 -d > "/Users/admin/${workflow.currentWorkingDirectory}/ios/ExportOptions.plist"',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  final rubyScriptBase64 = generateXcodeprojRubyScriptBase64(
+    teamId: teamId,
+    profileName: ppName,
+  );
+  const rubyScriptName = 'xcode_proj.rb';
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        'echo $rubyScriptBase64 | base64 -d > "/Users/admin/${workflow.currentWorkingDirectory}/$rubyScriptName"',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command: 'ruby $rubyScriptName',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command: '',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  try {
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'flutter build ipa --export-options-plist="/Users/admin/${workflow.currentWorkingDirectory}/ios/ExportOptions.plist"',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey $keyId --apiIssuer $issuerId',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+  } finally {
+    await runCommand(
+      logId: logId,
+      client: client,
+      command:
+          'openci_cli2 delete-provisioning-profile --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="${authKeyPath(cwd: workflow.currentWorkingDirectory, keyId: keyId)}" --profile-id=$ppId',
+      currentWorkingDirectory: workflow.currentWorkingDirectory,
+      jobId: buildJob.id,
+    );
+  }
+}
+
+Future<void> _deleteP12File(Firestore firestore) async {
+  final qs = firestore
+      .collection(secretsCollectionPath)
+      .where('key', WhereFilter.equal, 'OPENCI_ASC_P12_FILE');
+  final docs = await qs.get();
+  if (docs.docs.isNotEmpty) {
+    await docs.docs.first.ref.delete();
+  }
+}
+
+Future<void> _deleteP12CertificateId(Firestore firestore) async {
+  final qs = firestore
+      .collection(secretsCollectionPath)
+      .where('key', WhereFilter.equal, 'OPENCI_ASC_P12_CERTIFICATE_ID');
+  final docs = await qs.get();
+  if (docs.docs.isNotEmpty) {
+    await docs.docs.first.ref.delete();
+  }
+}
+
+Future<String> _fetchP12File(Firestore firestore) async {
+  final qs = firestore
+      .collection(secretsCollectionPath)
+      .where('key', WhereFilter.equal, 'OPENCI_ASC_P12_FILE');
+  final docs = await qs.get();
+  final data = docs.docs.first.data();
+  final p12Base64 = data['value'] as String?;
+  if (p12Base64 == null) {
+    throw Exception('OPENCI_ASC_P12_FILE is not found');
+  }
+
+  return p12Base64;
+}
+
+Future<String> _fetchP12CertificateId(Firestore firestore) async {
+  final qs = firestore
+      .collection(secretsCollectionPath)
+      .where('key', WhereFilter.equal, 'OPENCI_ASC_P12_CERTIFICATE_ID');
+  final docs = await qs.get();
+  final data = docs.docs.first.data();
+  final certificateId = data['value'] as String?;
+  if (certificateId == null) {
+    throw Exception('OPENCI_ASC_P12_CERTIFICATE_ID is not found');
+  }
+  return certificateId;
+}
+
+Future<String> _createP12File({
+  required String logId,
+  required SSHClient client,
+  required WorkflowModel workflow,
+  required BuildJob buildJob,
+  required Firestore firestore,
+  required String issuerId,
+  required String keyId,
+}) async {
+  final result = await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        'openci_cli2 create-certificate --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="${authKeyPath(cwd: workflow.currentWorkingDirectory, keyId: keyId)}" --certificate-type=DISTRIBUTION',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  final resultJson = jsonDecode(result.stdout);
+  final resultCode = resultJson['statusCode'];
+
+  if (resultCode != 201) {
+    throw Exception('Failed to create certificate');
+  }
+  final keyBase64 = resultJson['key'];
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        'echo $keyBase64 | base64 -d > /Users/admin/Desktop/certificate.key',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  final csrBase64 =
+      resultJson['body']['data']['attributes']['certificateContent'];
+
+  final certificateId = resultJson['body']['data']['id'] as String;
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        'echo $csrBase64 | base64 -d > /Users/admin/Desktop/certificate.cer',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+
+  await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        'openssl pkcs12 -export -in /Users/admin/Desktop/certificate.cer -inkey /Users/admin/Desktop/certificate.key -out $_p12Path -name "Certificate Name" -passout pass:$_p12Password',
+    currentWorkingDirectory: workflow.currentWorkingDirectory,
+    jobId: buildJob.id,
+  );
+  return certificateId;
+}
+
+Future<void> _uploadP12File(
+  SSHClient client,
+  String logId,
+  String workflowId,
+  String buildJobId,
+  String currentWorkingDirectory,
+  String p12Path,
+  Firestore firestore,
+) async {
+  final p12Base64Result = await runCommand(
+    logId: logId,
+    client: client,
+    command: 'base64 -i $p12Path',
+    currentWorkingDirectory: currentWorkingDirectory,
+    jobId: buildJobId,
+  );
+
+  if (p12Base64Result.exitCode != 0) {
+    throw Exception('Failed to encode p12 file to base64');
+  }
+
+  final p12Base64 = p12Base64Result.stdout.trim();
+
+  await firestore.collection(secretsCollectionPath).add({
+    'key': 'OPENCI_ASC_P12_FILE',
+    'value': p12Base64,
+    'updatedAt': DateTime.now().millisecondsSinceEpoch ~/ 1000,
+  });
+  print('Successfully uploaded p12 file');
+}
+
+Future<void> _uploadP12CertificateId(
+  String certificateId,
+  Firestore firestore,
+) async {
+  await firestore.collection(secretsCollectionPath).add({
+    'key': 'OPENCI_ASC_P12_CERTIFICATE_ID',
+    'value': certificateId,
+    'updatedAt': DateTime.now().millisecondsSinceEpoch ~/ 1000,
+  });
+  print('Successfully uploaded p12 certificate id');
 }
 
 String decodeBase64ToOriginalString(String base64String) {
@@ -420,6 +583,38 @@ Future<bool> _wasP12FileUploadedWithinOneYear() async {
   }
 
   return true;
+}
+
+Future<bool> _isP12CertificateIdUploaded(Firestore firestore) async {
+  final qs = firestore
+      .collection(secretsCollectionPath)
+      .where('key', WhereFilter.equal, 'OPENCI_ASC_P12_CERTIFICATE_ID');
+  final docs = await qs.get();
+  return docs.docs.isNotEmpty;
+}
+
+Future<bool> _isP12RegisteredInASC(
+  String certificateId,
+  SSHClient client,
+  String logId,
+  String workflowId,
+  String buildJobId,
+  String currentWorkingDirectory,
+  String issuerId,
+  String keyId,
+) async {
+  final result = await runCommand(
+    logId: logId,
+    client: client,
+    command:
+        'openci_cli2 read-certificate --issuer-id=$issuerId --key-id=$keyId --path-to-private-key="${authKeyPath(cwd: currentWorkingDirectory, keyId: keyId)}" --certificate-id=$certificateId',
+    currentWorkingDirectory: currentWorkingDirectory,
+    jobId: buildJobId,
+  );
+  final stdout = result.stdout;
+  return stdout.contains('200') ||
+      stdout.contains('201') ||
+      stdout.contains('202');
 }
 
 Future<bool> _areASCSecretsUploaded() async {
