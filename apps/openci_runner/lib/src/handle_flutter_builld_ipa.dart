@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dart_firebase_admin_plus/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_models/openci_models.dart';
+import 'package:openci_runner/src/env.dart';
 import 'package:openci_runner/src/firebase.dart';
 import 'package:openci_runner/src/run_command.dart';
 import 'package:uuid/uuid.dart';
@@ -17,6 +18,7 @@ Future<void> handleFlutterBuildIpa(
   WorkflowModel workflow,
   BuildJob buildJob,
   Firestore firestore,
+  ReplacementResult replacementResult,
 ) async {
   final areASCSecretsUploaded = await _areASCSecretsUploaded();
   if (!areASCSecretsUploaded) {
@@ -300,7 +302,7 @@ Future<void> handleFlutterBuildIpa(
       logId: logId,
       client: client,
       command:
-          'flutter build ipa --export-options-plist="/Users/admin/${workflow.currentWorkingDirectory}/ios/ExportOptions.plist"',
+          '${replacementResult.replacedCommand} --export-options-plist="/Users/admin/${workflow.currentWorkingDirectory}/ios/ExportOptions.plist"',
       currentWorkingDirectory: workflow.currentWorkingDirectory,
       jobId: buildJob.id,
     );
@@ -322,7 +324,47 @@ Future<void> handleFlutterBuildIpa(
       currentWorkingDirectory: workflow.currentWorkingDirectory,
       jobId: buildJob.id,
     );
+
+    if (_doesCommandContainBuildNumber(replacementResult.replacedCommand)) {
+      final secretKey = _findSecretKey(replacementResult.replacements);
+      if (secretKey != null) {
+        await _incrementBuildNumber(secretKey);
+      }
+    }
   }
+}
+
+String? _findSecretKey(Map<String, String> replacements) {
+  for (final entry in replacements.entries) {
+    if (entry.value.contains('--build-number')) {
+      return entry.key;
+    }
+  }
+  return null;
+}
+
+Future<void> _incrementBuildNumber(String secretKey) async {
+  final firestore = firestoreSignal.value!;
+  final qs = firestore
+      .collection(secretsCollectionPath)
+      .where('key', WhereFilter.equal, secretKey);
+  final docs = await qs.get();
+  final data = docs.docs.first.data();
+  final buildNumber = data['value'] as String?;
+  if (buildNumber == null) {
+    throw Exception('BUILD_NUMBER is not found');
+  }
+  final incrementedBuildNumber = int.parse(buildNumber) + 1;
+  await firestore
+      .collection(secretsCollectionPath)
+      .doc(docs.docs.first.id)
+      .update({
+    'value': incrementedBuildNumber.toString(),
+  });
+}
+
+bool _doesCommandContainBuildNumber(String command) {
+  return command.contains('--build-number');
 }
 
 Future<void> _deleteP12File(Firestore firestore) async {
