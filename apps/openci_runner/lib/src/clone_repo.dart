@@ -17,7 +17,7 @@ Future<void> cloneRepo(
     appId: buildJob.github.appId,
     privateKey: pem,
   );
-  log('Successfully got GitHub access token: $token', isSuccess: true);
+  openciLog('Successfully got GitHub access token: $token', isSuccess: true);
   await runCommand(
     logId: logId,
     client: client,

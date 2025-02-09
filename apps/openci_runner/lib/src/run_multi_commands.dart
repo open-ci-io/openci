@@ -20,7 +20,7 @@ Future<void> runMultiCommands(
 ) async {
   final workflow = await getWorkflowModel(firestore, buildJob.workflowId);
   if (workflow == null) {
-    log('Workflow not found');
+    openciLog('Workflow not found');
     throw Exception('Workflow not found');
   }
 

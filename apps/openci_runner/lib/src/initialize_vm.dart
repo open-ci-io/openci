@@ -17,8 +17,8 @@ Future<SSHClient> initializeVM(
   await cloneVM(vmName);
   unawaited(runVM(vmName));
   final vmIp = await getVMIp(vmName);
-  log('VM IP: $vmIp');
-  log('VM is ready', isSuccess: true);
+  openciLog('VM IP: $vmIp');
+  openciLog('VM is ready', isSuccess: true);
 
   final client = SSHClient(
     await SSHSocket.connect(vmIp, 22),
