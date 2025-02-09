@@ -1,6 +1,6 @@
 name: openci_runner
 description: OpenCI CLI
-version: 0.9.13
+version: 0.9.14
 repository: https://github.com/open-ci-io/openci/tree/develop/apps/openci_runner
 homepage: https://open-ci.io
 environment:

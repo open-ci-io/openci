@@ -6,6 +6,7 @@ import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/env.dart';
 import 'package:openci_runner/src/firebase.dart';
 import 'package:openci_runner/src/run_command.dart';
+import 'package:openci_runner/src/service/logger_service.dart';
 import 'package:uuid/uuid.dart';
 
 const _p12Path = '/Users/admin/Desktop/certificate.p12';
@@ -326,7 +327,10 @@ Future<void> handleFlutterBuildIpa(
     );
 
     if (_doesCommandContainBuildNumber(replacementResult.replacedCommand)) {
-      final secretKey = _findSecretKey(replacementResult.replacements);
+      final log = loggerSignal.value;
+      final secretKey =
+          _findSecretKeyWhichContainsExactBuildNumber(replacementResult);
+      log.info('secretKey: $secretKey');
       if (secretKey != null) {
         await _incrementBuildNumber(secretKey);
       }
@@ -334,12 +338,32 @@ Future<void> handleFlutterBuildIpa(
   }
 }
 
-String? _findSecretKey(Map<String, String> replacements) {
-  for (final entry in replacements.entries) {
-    if (entry.value.contains('--build-number')) {
-      return entry.key;
-    }
+/// 指定した command 内に `--build-number 123` のような指定があるかを確認し、
+/// その数字が secret の値 (entry.value) に含まれているかどうかを判定する。
+/// 含まれている場合、その secret の key を返す。
+String? _findSecretKeyWhichContainsExactBuildNumber(
+  ReplacementResult replacementResult,
+) {
+  final command = replacementResult.replacedCommand;
+  final buildNumberRegex = RegExp(r'--build-number\s+(\d+)');
+  final match = buildNumberRegex.firstMatch(command);
+  if (match == null) {
+    return null;
   }
+
+  final buildNumber = match.group(1);
+  if (buildNumber == null) {
+    return null;
+  }
+
+  for (final entry in replacementResult.replacements.entries) {
+    final secretValue = entry.value;
+    if (!secretValue.contains(buildNumber)) {
+      continue;
+    }
+    return entry.key;
+  }
+
   return null;
 }
 

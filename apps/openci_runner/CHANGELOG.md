@@ -1,3 +1,7 @@
+## 0.9.14
+
+- add: secret key for build number
+
 ## 0.9.13
 
 - fix: increment build number
