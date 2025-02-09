@@ -32,24 +32,25 @@ Future<void> runMultiCommands(
   );
 
   for (final command in commandsList) {
-    final processedCommand = replaceEnvironmentVariables(
+    final replacementResult = replaceEnvironmentVariables(
       command: command,
       secrets: secrets,
     );
 
-    if (processedCommand.contains('flutter build ipa')) {
+    if (replacementResult.replacedCommand.contains('flutter build ipa')) {
       await handleFlutterBuildIpa(
         logId,
         client,
         workflow,
         buildJob,
         firestore,
+        replacementResult,
       );
     } else {
       await runCommand(
         logId: logId,
         client: client,
-        command: processedCommand,
+        command: replacementResult.replacedCommand,
         currentWorkingDirectory: workflow.currentWorkingDirectory,
         jobId: buildJob.id,
       );
