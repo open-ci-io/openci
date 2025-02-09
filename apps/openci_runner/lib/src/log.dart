@@ -1,6 +1,6 @@
 import 'package:mason_logger/mason_logger.dart';
 
-void log(String message, {bool isSuccess = false}) {
+void openciLog(String message, {bool isSuccess = false}) {
   final logger = Logger();
   switch (isSuccess) {
     case true:

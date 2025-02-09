@@ -14,7 +14,7 @@ Future<void> mainLoop(Firestore firestore, String pem) async {
   while (true) {
     final buildJob = await tryGetBuildJob(
       firestore: firestore,
-      log: () => log(
+      log: () => openciLog(
         'No build jobs found. Waiting ${pollingInterval.inSeconds} seconds before retrying.',
       ),
     );
@@ -45,7 +45,7 @@ Future<void> _handleBuildError(
     status: OpenCIGitHubChecksStatus.failure,
   );
   await Sentry.captureException(error, stackTrace: stackTrace);
-  log('Error: $error, Try to run again');
+  openciLog('Error: $error, Try to run again');
 }
 
 Future<void> _cleanupVmAndBuildState(String jobId, String vmName) async {
@@ -58,6 +58,6 @@ Future<void> _cleanupVmAndBuildState(String jobId, String vmName) async {
       status: OpenCIGitHubChecksStatus.failure,
     );
     await Sentry.captureException(e, stackTrace: stackTrace);
-    log('Failed to stop or delete VM, $e');
+    openciLog('Failed to stop or delete VM, $e');
   }
 }
