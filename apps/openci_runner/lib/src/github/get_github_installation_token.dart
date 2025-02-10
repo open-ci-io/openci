@@ -8,18 +8,21 @@ Future<String> getGitHubInstallationToken({
   required int installationId,
   required int appId,
   required String privateKey,
+  http.Client? client,
 }) async {
   if (privateKey.isEmpty || installationId <= 0) {
     throw ArgumentError('Required parameters are missing');
   }
 
+  final httpClient = client ?? http.Client();
+
   try {
-    final jwt = _createJWT(
+    final jwt = createJWT(
       appId: appId,
       privateKey: privateKey,
     );
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(
         'https://api.github.com/app/installations/$installationId/access_tokens',
       ),
@@ -37,11 +40,14 @@ Future<String> getGitHubInstallationToken({
     throw GitHubError(response.statusCode, response.body);
   } catch (e) {
     throw GitHubError(-1, 'Failed to create installation token: $e');
+  } finally {
+    if (client == null) {
+      httpClient.close();
+    }
   }
 }
 
-/// JWTトークンを生成する
-String _createJWT({
+String createJWT({
   required int appId,
   required String privateKey,
 }) {
@@ -60,7 +66,6 @@ String _createJWT({
   );
 }
 
-/// GitHubのエラーを表現するクラス
 class GitHubError implements Exception {
   GitHubError(this.statusCode, this.message);
   final int statusCode;
