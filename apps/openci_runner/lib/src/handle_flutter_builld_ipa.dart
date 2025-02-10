@@ -6,7 +6,6 @@ import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/env.dart';
 import 'package:openci_runner/src/firebase.dart';
 import 'package:openci_runner/src/run_command.dart';
-import 'package:openci_runner/src/service/logger_service.dart';
 import 'package:uuid/uuid.dart';
 
 const _p12Path = '/Users/admin/Desktop/certificate.p12';
@@ -325,70 +324,7 @@ Future<void> handleFlutterBuildIpa(
       currentWorkingDirectory: workflow.currentWorkingDirectory,
       jobId: buildJob.id,
     );
-
-    if (_doesCommandContainBuildNumber(replacementResult.replacedCommand)) {
-      final log = loggerSignal.value;
-      final secretKey =
-          _findSecretKeyWhichContainsExactBuildNumber(replacementResult);
-      log.info('secretKey: $secretKey');
-      if (secretKey != null) {
-        await _incrementBuildNumber(secretKey);
-      }
-    }
   }
-}
-
-/// 指定した command 内に `--build-number 123` のような指定があるかを確認し、
-/// その数字が secret の値 (entry.value) に含まれているかどうかを判定する。
-/// 含まれている場合、その secret の key を返す。
-String? _findSecretKeyWhichContainsExactBuildNumber(
-  ReplacementResult replacementResult,
-) {
-  final command = replacementResult.replacedCommand;
-  final buildNumberRegex = RegExp(r'--build-number\s+(\d+)');
-  final match = buildNumberRegex.firstMatch(command);
-  if (match == null) {
-    return null;
-  }
-
-  final buildNumber = match.group(1);
-  if (buildNumber == null) {
-    return null;
-  }
-
-  for (final entry in replacementResult.replacements.entries) {
-    final secretValue = entry.value;
-    if (!secretValue.contains(buildNumber)) {
-      continue;
-    }
-    return entry.key;
-  }
-
-  return null;
-}
-
-Future<void> _incrementBuildNumber(String secretKey) async {
-  final firestore = firestoreSignal.value!;
-  final qs = firestore
-      .collection(secretsCollectionPath)
-      .where('key', WhereFilter.equal, secretKey);
-  final docs = await qs.get();
-  final data = docs.docs.first.data();
-  final buildNumber = data['value'] as String?;
-  if (buildNumber == null) {
-    throw Exception('BUILD_NUMBER is not found');
-  }
-  final incrementedBuildNumber = int.parse(buildNumber) + 1;
-  await firestore
-      .collection(secretsCollectionPath)
-      .doc(docs.docs.first.id)
-      .update({
-    'value': incrementedBuildNumber.toString(),
-  });
-}
-
-bool _doesCommandContainBuildNumber(String command) {
-  return command.contains('--build-number');
 }
 
 Future<void> _deleteP12File(Firestore firestore) async {

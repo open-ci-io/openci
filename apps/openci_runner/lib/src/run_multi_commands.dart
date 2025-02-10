@@ -6,10 +6,42 @@ import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/env.dart';
 import 'package:openci_runner/src/features/get_workflow.dart';
 import 'package:openci_runner/src/features/update_build_status.dart';
+import 'package:openci_runner/src/firebase.dart';
 import 'package:openci_runner/src/handle_flutter_builld_ipa.dart';
 import 'package:openci_runner/src/log.dart';
 import 'package:openci_runner/src/run_command.dart';
 import 'package:openci_runner/src/secrets.dart';
+
+bool doesSecretContainIOSBuildNumber(Map<String, dynamic> secrets) {
+  if (secrets.keys.any((key) => key.contains('IOS_BUILD_NUMBER')) == true) {
+    return true;
+  }
+  return false;
+}
+
+Future<void> incrementBuildNumber(String secretKey) async {
+  final firestore = firestoreSignal.value!;
+  final qs = firestore
+      .collection(secretsCollectionPath)
+      .where('key', WhereFilter.equal, secretKey);
+  final docs = await qs.get();
+  final data = docs.docs.first.data();
+  final buildNumber = data['value'] as String?;
+  if (buildNumber == null) {
+    throw Exception('BUILD_NUMBER is not found');
+  }
+  final incrementedBuildNumber = int.parse(buildNumber) + 1;
+  await firestore
+      .collection(secretsCollectionPath)
+      .doc(docs.docs.first.id)
+      .update({
+    'value': incrementedBuildNumber.toString(),
+  });
+}
+
+bool _doesCommandContainBuildNumber(String command) {
+  return command.contains('--build-number');
+}
 
 Future<void> runMultiCommands(
   Firestore firestore,
@@ -38,6 +70,11 @@ Future<void> runMultiCommands(
     );
 
     if (replacementResult.replacedCommand.contains('flutter build ipa')) {
+      if (doesSecretContainIOSBuildNumber(secrets) &&
+          _doesCommandContainBuildNumber(replacementResult.replacedCommand)) {
+        await incrementBuildNumber('IOS_BUILD_NUMBER');
+      }
+
       await handleFlutterBuildIpa(
         logId,
         client,
