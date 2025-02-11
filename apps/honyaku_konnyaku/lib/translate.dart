@@ -2,6 +2,16 @@ import 'dart:io';
 
 import 'package:google_generative_ai/google_generative_ai.dart';
 
+// Helper function to strip code block delimiters if present.
+String _stripCodeBlockDelimiters(String text) {
+  final trimmed = text.trim();
+  if (trimmed.startsWith("```") && trimmed.endsWith("```")) {
+    final withoutDelimiters = trimmed.substring(3, trimmed.length - 3);
+    return withoutDelimiters.trim();
+  }
+  return trimmed;
+}
+
 Future<void> translate(
   String pathToInput,
   String pathToOutput,
@@ -13,7 +23,6 @@ Future<void> translate(
     throw Exception('Input file does not exist');
   }
   final content = await inputFile.readAsString();
-  print('Content: $content');
   final model = GenerativeModel(
     model: 'gemini-2.0-flash',
     apiKey: apiKey,
@@ -26,6 +35,9 @@ Future<void> translate(
     throw Exception('Failed to translate text');
   }
 
+  // Remove code block delimiters if present.
+  final cleanedTranslation = _stripCodeBlockDelimiters(translated);
+
   final outputFile = File(pathToOutput);
-  await outputFile.writeAsString(translated);
+  await outputFile.writeAsString(cleanedTranslation);
 }
