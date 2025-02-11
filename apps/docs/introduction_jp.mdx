@@ -103,7 +103,71 @@ OpenCI CLIのリポジトリをクローンします。
 
 </CodeGroup>
 
-その後、firebase_functionsディレクトリに移動し、以下のコマンドを実行してFirebase Functionsをデプロイします。
+## GitHub アプリの設定
+
+OpenCIでは、GitHubアプリを使用して、ビルドジョブを取得します。
+
+### GitHubアプリの作成
+
+[GitHubアプリの作成](https://github.com/settings/apps/new) へアクセスし、GitHubアプリを作成します。
+
+## Secretの設定
+
+Firebase Functionsで使用するGitHubアプリのシークレットをGoogle CloudのSecret Managerに登録します。
+
+`/apps/firebase_functions/functions/`に移動し、
+
+#### GITHUB_APP_ID
+
+<CodeGroup>
+
+  ```bash macOS
+  firebase functions:secrets:set APP_ID
+  ```
+
+</CodeGroup>
+
+#### GITHUB_WEBHOOK_SECRET
+
+GitHubから送られてくるWebhookの正当性を検証するための“秘密のランダム文字列”です。
+
+以下のように文字列を生成し、
+
+<CodeGroup>
+
+  ```bash macOS
+  openssl rand -hex 32
+  ```
+
+</CodeGroup>
+
+生成した文字列をFirebase Functionsの`GITHUB_WEBHOOK_SECRET`に設定します。
+
+<CodeGroup>
+
+  ```bash macOS
+  firebase functions:secrets:set GITHUB_WEBHOOK_SECRET
+  ```
+
+</CodeGroup>
+
+そして、この文字列をGitHubアプリのWebhookのSecretに設定します。
+
+以下のようになれば、Webhookの設定は完了です。
+
+![GitHubアプリのWebhookの設定](./images/webhook_setup.png)
+
+#### GITHUB_PRIVATE_KEY
+
+<CodeGroup>
+
+  ```bash macOS
+  firebase functions:secrets:set PRIVATE_KEY
+  ```
+
+</CodeGroup>
+
+すべてのSecretを設定したら、Firebase Functionsをデプロイします。
 
 <CodeGroup>
 
@@ -114,49 +178,7 @@ OpenCI CLIのリポジトリをクローンします。
 
 </CodeGroup>
 
-## GitHub アプリの設定
-
-OpenCIでは、GitHubアプリを使用して、ビルドジョブを取得します。
-
-### GitHubアプリの作成
-
-[GitHubアプリの作成](https://github.com/settings/apps/new) へアクセスし、GitHubアプリを作成します。
-
-その後、GitHubアプリのwebhook URLに、Firebase FunctionsのgitHubAppFunctionを指定します。
-
-### Secretの設定
-
-Firebase Functionsで使用するシークレットを登録します。
-
-#### APP_ID
-
-<CodeGroup>
-
-  ```bash macOS
-  firebase functions:config:set APP_ID
-  ```
-
-</CodeGroup>
-
-#### GITHUB_WEBHOOK_SECRET
-
-<CodeGroup>
-
-  ```bash macOS
-  firebase functions:config:set GITHUB_WEBHOOK_SECRET
-  ```
-
-</CodeGroup>
-
-#### PRIVATE_KEY
-
-<CodeGroup>
-
-  ```bash macOS
-  firebase functions:config:set PRIVATE_KEY
-  ```
-
-</CodeGroup>
+最後に、GitHubアプリのwebhook URLに、Firebase Functionsの`gitHubAppFunction`のURLを指定します。
 
 ### Firebaseサービスアカウントの作成
 
