@@ -3,7 +3,7 @@ import 'package:hk/parse_arg.dart';
 import 'package:hk/print_usage.dart';
 import 'package:hk/translate.dart';
 
-const String version = '0.0.1';
+const String version = '0.1.1';
 
 Future<void> main(List<String> arguments) async {
   final parser = buildParser();
