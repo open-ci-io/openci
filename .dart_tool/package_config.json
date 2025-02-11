@@ -230,10 +230,10 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-01-28T06:58:47.575840Z",
+  "generated": "2025-02-11T05:06:53.830050Z",
   "generator": "pub",
-  "generatorVersion": "3.6.1",
+  "generatorVersion": "3.6.2",
   "flutterRoot": "file:///Users/masahiroaoki/fvm/versions/stable",
-  "flutterVersion": "3.27.3",
+  "flutterVersion": "3.27.4",
   "pubCache": "file:///Users/masahiroaoki/.pub-cache"
 }
