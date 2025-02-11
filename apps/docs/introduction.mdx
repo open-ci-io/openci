@@ -56,7 +56,7 @@ OpenCI Runner is a CLI for running OpenCI. Dart is required for installation.
 
 ### Download Base Image
 
-OpenCI uses macOS 15.0 as its base image. This will take a very long time.
+OpenCI uses macOS 15.0 as a base image. This will take a very long time.
 
 <CodeGroup>
 
@@ -76,13 +76,13 @@ Access the [Firebase site](https://console.firebase.google.com/) with any Google
 
 ### Firestore Configuration
 
-Firestore is used to register build jobs. Therefore, access Firestore and provision it.
+Firestore is used for registering build jobs. Therefore, access Firestore and perform provisioning.
 
 ### Firebase Functions Configuration
 
-OpenCI uses Firebase Functions. The Blaze plan (paid) is required to use Firebase Functions. The cost is about a few yen per month.
+OpenCI uses Firebase Functions. Using Firebase Functions requires registration for the Blaze plan (paid). The cost is a few yen per month.
 
-### Initialize Firebase
+### Firebase Initialization
 
 After creating a Firebase project, specify the project to use.
 
@@ -94,25 +94,14 @@ After creating a Firebase project, specify the project to use.
 
 </CodeGroup>
 
+
 ### Deploy Firebase Functions
 
 Clone the OpenCI CLI repository.
-
 <CodeGroup>
 
   ```bash macOS
   gh repo clone open-ci-io/openci
-  ```
-
-</CodeGroup>
-
-Then, navigate to the firebase_functions directory and execute the following command to deploy Firebase Functions.
-
-<CodeGroup>
-
-  ```bash macOS
-  cd apps/firebase_functions/functions
-  firebase deploy --only functions
   ```
 
 </CodeGroup>
@@ -125,44 +114,77 @@ OpenCI uses a GitHub app to retrieve build jobs.
 
 Access [GitHub app creation](https://github.com/settings/apps/new) and create a GitHub app.
 
-Then, set the webhook URL of the GitHub app to the gitHubAppFunction of Firebase Functions.
+## Secret Configuration
 
-### Configure Secrets
+Register the GitHub app secrets used by Firebase Functions in Google Cloud's Secret Manager.
 
-Register the secrets used by Firebase Functions.
+Navigate to `/apps/firebase_functions/functions/`,
 
-#### APP_ID
+#### GITHUB_APP_ID
 
 <CodeGroup>
 
   ```bash macOS
-  firebase functions:config:set APP_ID
+  firebase functions:secrets:set APP_ID
   ```
 
 </CodeGroup>
 
 #### GITHUB_WEBHOOK_SECRET
 
-<CodeGroup>
+This is a "secret random string" used to verify the authenticity of Webhooks sent from GitHub.
 
-  ```bash macOS
-  firebase functions:config:set GITHUB_WEBHOOK_SECRET
-  ```
-
-</CodeGroup>
-
-#### PRIVATE_KEY
+Generate a string as follows,
 
 <CodeGroup>
 
   ```bash macOS
-  firebase functions:config:set PRIVATE_KEY
+  openssl rand -hex 32
   ```
 
 </CodeGroup>
 
-### Create Firebase Service Account
+Set the generated string to `GITHUB_WEBHOOK_SECRET` in Firebase Functions.
+
+<CodeGroup>
+
+  ```bash macOS
+  firebase functions:secrets:set GITHUB_WEBHOOK_SECRET
+  ```
+
+</CodeGroup>
+
+Then, set this string as the Webhook Secret for the GitHub app.
+
+The Webhook configuration is complete when it looks like the following.
+
+![GitHub App Webhook Configuration](./images/webhook_setup.png)
+
+#### GITHUB_PRIVATE_KEY
+
+<CodeGroup>
+
+  ```bash macOS
+  firebase functions:secrets:set PRIVATE_KEY
+  ```
+
+</CodeGroup>
+
+After setting all the Secrets, deploy the Firebase Functions.
+
+<CodeGroup>
+
+  ```bash macOS
+  cd apps/firebase_functions/functions
+  firebase deploy --only functions
+  ```
+
+</CodeGroup>
+
+Finally, specify the URL of the Firebase Functions' `gitHubAppFunction` as the webhook URL for the GitHub app.
+
+### Create a Firebase Service Account
 
 Create a Firebase service account and place it as apps/openci_runner/firebase_service_account.json.
 
-Now the preparation for self-hosting OpenCI is complete. Congratulations!
+This completes the preparation for self-hosting OpenCI. Congratulations!
