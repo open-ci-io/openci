@@ -1,3 +1,8 @@
+
+## 0.9.15
+
+- add: firebase project id arg
+
 ## 0.9.14
 
 - add: secret key for build number

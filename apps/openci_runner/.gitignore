@@ -14,9 +14,11 @@ coverage/
 # Android studio and IntelliJ
 .idea
 
-# Firebase
-service_account.json
 github_apps.pem
+github_apps_dev.pem
+
+service_account.json
+service_account_dev.json
 
 # Prod URLs
 lib/src/constants/prod_urls.dart
