@@ -2,10 +2,13 @@
 
 A CLI tool to translate files to any language.
 
+HK stands for "Honyaku Konnyaku", which is a tool to translate text to any
+language in Doraemon.
+
 ## Usage
 
 ```bash
-hk.dart -i input.mdx -o output.mdx -p "translate to english" -k <your-api-key>
+hk -i input.mdx -o output.mdx -p "translate to english" -k <your-api-key>
 ```
 
 ## Installation
