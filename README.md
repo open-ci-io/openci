@@ -1,10 +1,14 @@
 # Get started
 
-Go to [OpenCI Docs](https://open-ci.io/docs) to get started.
+Go to [OpenCI Docs](https://docs.open-ci.io) to get started.
 
 ## Contribute to OpenCI Docs
 
 If you want to contribute to our docs, please fork apps/docs and make a PR.
+
+## Discord Channel
+
+Join our [Discord channel](https://discord.gg/gwbnwWtefk) to get help from the community.
 
 # Goals of OpenCI
 
