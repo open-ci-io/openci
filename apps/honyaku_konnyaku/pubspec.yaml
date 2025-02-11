@@ -1,12 +1,11 @@
 name: hk
-description: A CLI app to translate text using ChatGPT.
+description: A CLI app to translate text using Gemini.
 version: 0.0.1
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/open-ci-io/openci/tree/develop/apps/honyaku_konnyaku
 
 environment:
   sdk: ^3.5.4
 
-# Add regular dependencies here.
 dependencies:
   args: ^2.4.2
   google_generative_ai: ^0.4.6
