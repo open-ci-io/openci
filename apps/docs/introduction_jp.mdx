@@ -78,7 +78,20 @@ OpenCIはバックエンド等にFirebaseを使用しています。そのため
 ビルドジョブの登録にはFirestoreを使用しています。そのため、Firestoreへアクセスし、プロビジョニングを行なってください。
 
 ### Firebase Functionsの設定
-OpenCIはFirebase Functionsを使用しています。Firebase Functionsの利用はBlazeプラン(有料)の登録が必要です。料金は月数百円程度です。
+OpenCIはFirebase Functionsを使用しています。Firebase Functionsの利用はBlazeプラン(有料)の登録が必要です。料金は月数円程度です。
+
+### Firebaseの初期化
+
+Firebaseのプロジェクトを作成したら、使用するプロジェクトを指定します。
+
+<CodeGroup>
+
+  ```bash macOS
+  firebase use project-id
+  ```
+
+</CodeGroup>
+
 
 ### Firebase Functionsのデプロイ
 OpenCI CLIのリポジトリをクローンします。

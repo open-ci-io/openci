@@ -1,14 +1,15 @@
+```
 ---
 title: Introduction
-description: 'Welcome to OpenCI Documentation'
+description: 'Welcome to the OpenCI documentation'
 ---
 
 ## Prerequisites
 
 To self-host OpenCI, you need to meet the following prerequisites:
 
-- Mac with M1 chip or higher
-- macOS 14.0 or higher
+- Mac with M1 or later
+- macOS 14.0 or later
 
 ## Initial Setup
 
@@ -28,7 +29,7 @@ Tart is a tool for managing macOS VMs.
 
 ### Firebase CLI
 
-OpenCI uses Firebase, so Firebase CLI installation is required.
+OpenCI uses Firebase, so you need to install the Firebase CLI.
 
 <CodeGroup>
 
@@ -40,7 +41,7 @@ OpenCI uses Firebase, so Firebase CLI installation is required.
 
 ### OpenCI Runner
 
-OpenCI Runner is a CLI to run OpenCI. Dart is required for installation.
+OpenCI Runner is a CLI for running OpenCI. It requires Dart for installation.
 
 <CodeGroup>
 
@@ -54,9 +55,9 @@ OpenCI Runner is a CLI to run OpenCI. Dart is required for installation.
 
 </CodeGroup>
 
-### Download Base Image
+### Download the Base Image
 
-OpenCI uses macOS 15.0 as the base image. This process takes considerable time.
+OpenCI uses macOS 15.0 as its base image. This will take a very long time.
 
 <CodeGroup>
 
@@ -67,20 +68,35 @@ tart pull ghcr.io/open-ci-io/sequoia:0.0.4
 </CodeGroup>
 
 ## Firebase Configuration
-OpenCI uses Firebase for backend services. Therefore, Firebase configuration is necessary.
 
-### Create Firebase Project
+OpenCI uses Firebase for its backend and other features. Therefore, Firebase needs to be configured.
 
-Access the [Firebase Console](https://console.firebase.google.com/) with any Google account and create a project.
+### Create a Firebase Project
 
-### Firestore Setup
+Access the [Firebase site](https://console.firebase.google.com/) with any Google account and create a project.
 
-Firestore is used for build job registration. Please access Firestore and complete the provisioning.
+### Firestore Configuration
 
-### Firebase Functions Setup
-OpenCI uses Firebase Functions. Firebase Functions requires Blaze plan (paid) registration. The cost is around a few dollars per month.
+Firestore is used for registering build jobs. Access Firestore and perform provisioning.
+
+### Firebase Functions Configuration
+
+OpenCI uses Firebase Functions. Using Firebase Functions requires registering for the Blaze plan (paid). The cost is a few yen per month.
+
+### Firebase Initialization
+
+After creating a Firebase project, specify the project to use.
+
+<CodeGroup>
+
+  ```bash macOS
+  firebase use project-id
+  ```
+
+</CodeGroup>
 
 ### Deploy Firebase Functions
+
 Clone the OpenCI CLI repository.
 <CodeGroup>
 
@@ -90,7 +106,7 @@ Clone the OpenCI CLI repository.
 
 </CodeGroup>
 
-Then, navigate to the firebase_functions directory and run the following command to deploy Firebase Functions.
+Then, navigate to the firebase_functions directory and execute the following command to deploy Firebase Functions.
 
 <CodeGroup>
 
@@ -103,17 +119,17 @@ Then, navigate to the firebase_functions directory and run the following command
 
 ## GitHub App Configuration
 
-OpenCI uses GitHub App to fetch build jobs.
+OpenCI uses a GitHub app to retrieve build jobs.
 
-### Create GitHub App
+### Create a GitHub App
 
-Access [Create GitHub App](https://github.com/settings/apps/new) and create a GitHub App.
+Access [Create a GitHub App](https://github.com/settings/apps/new) and create a GitHub app.
 
-Then, specify the gitHubAppFunction of Firebase Functions as the webhook URL for the GitHub App.
+Then, set the webhook URL of the GitHub app to the gitHubAppFunction of Firebase Functions.
 
-### Secret Configuration
+### Configure Secrets
 
-Register the secrets used in Firebase Functions.
+Register the secrets used by Firebase Functions.
 
 #### APP_ID
 
@@ -145,8 +161,9 @@ Register the secrets used in Firebase Functions.
 
 </CodeGroup>
 
-### Create Firebase Service Account
+### Create a Firebase Service Account
 
 Create a Firebase service account and place it as apps/openci_runner/firebase_service_account.json.
 
-Now the self-hosting setup for OpenCI is complete. Great job!
+With this, the preparation for self-hosting OpenCI is complete. Congratulations!
+```
