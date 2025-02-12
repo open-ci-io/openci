@@ -18,8 +18,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const _defaultProjectId = 'openci-release(default)';
 
-class SignUpPage extends HookConsumerWidget {
-  const SignUpPage({super.key});
+class WelcomePage extends HookConsumerWidget {
+  const WelcomePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

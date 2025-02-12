@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/features/secrets/presentation/secret_page.dart';
-import 'package:dashboard/src/features/sign_up/presentation/sign_up_page.dart';
+import 'package:dashboard/src/features/welcome_page/presentation/welcome_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -48,7 +48,7 @@ class _NavigationPageState extends State<NavigationPage> {
             await FirebaseAuth.instance.signOut();
             await Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute<void>(
-                builder: (context) => const SignUpPage(),
+                builder: (context) => const WelcomePage(),
               ),
               (route) => false,
             );
@@ -72,7 +72,7 @@ class _NavigationPageState extends State<NavigationPage> {
           await auth.signOut();
           await prefs.remove('googleServiceInfoPlist');
           await Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute<void>(builder: (context) => const SignUpPage()),
+            MaterialPageRoute<void>(builder: (context) => const WelcomePage()),
             (route) => false,
           );
           return;

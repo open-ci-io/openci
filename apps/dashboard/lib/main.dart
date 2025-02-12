@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
-import 'package:dashboard/src/features/sign_up/presentation/sign_up_page.dart';
+import 'package:dashboard/src/features/welcome_page/presentation/welcome_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +69,7 @@ class AuthGate extends StatelessWidget {
         if (snapshot.hasData) {
           return const NavigationPage();
         }
-        return const SignUpPage();
+        return const WelcomePage();
       },
     );
   }
