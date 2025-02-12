@@ -3,7 +3,7 @@ description: "A Dashboard for OpenCI"
 publish_to: 'none'
 version: 1.1.0+11
 environment:
-  sdk: 3.6.0
+  sdk: ">=3.6.0 <4.0.0"
   
 dependencies:
   cloud_firestore: ^5.6.2
@@ -21,8 +21,10 @@ dependencies:
   json_annotation: ^4.9.0
   openci_models:
     path: ../../packages/openci_models
+  propertylistserialization: ^1.4.1
   riverpod_annotation: ^2.5.3
   sentry_flutter: ^8.13.0-beta.3
+  shared_preferences: ^2.5.2
   signals: ^6.0.2
   uuid: ^4.5.1
 

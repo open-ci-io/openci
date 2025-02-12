@@ -6,17 +6,5 @@
             "request": "launch",
             "type": "dart"
         },
-        {
-            "name": "dashboard (profile mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "dashboard (release mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
-        }
     ]
 }
