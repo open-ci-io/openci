@@ -1,3 +1,8 @@
+
+## 1.3.0
+
+- add: OpenCIFirebaseOptions model
+
 ## 1.2.14
 
 - update: CommandLog model

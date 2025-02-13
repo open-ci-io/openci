@@ -1,0 +1,4 @@
+# melos_managed_dependency_overrides: openci_models
+dependency_overrides:
+  openci_models:
+    path: ../../packages/openci_models
