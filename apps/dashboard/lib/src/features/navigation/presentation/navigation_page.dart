@@ -1,11 +1,9 @@
-import 'dart:convert';
-
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/features/secrets/presentation/secret_page.dart';
 import 'package:dashboard/src/features/welcome_page/presentation/welcome_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page.dart';
+import 'package:dashboard/src/services/firebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,32 +41,7 @@ class _NavigationPageState extends State<NavigationPage> {
         const logoutIndex = 2;
         if (value == logoutIndex) {
           final prefs = await SharedPreferences.getInstance();
-          final plist = prefs.getString('googleServiceInfoPlist');
-          if (plist == null) {
-            await FirebaseAuth.instance.signOut();
-            await Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute<void>(
-                builder: (context) => const WelcomePage(),
-              ),
-              (route) => false,
-            );
-
-            return;
-          }
-          final plistMap = jsonDecode(plist) as Map<String, dynamic>;
-
-          final apps = await Firebase.initializeApp(
-            name: plistMap['PROJECT_ID'] as String,
-            options: FirebaseOptions(
-              apiKey: plistMap['API_KEY'] as String,
-              appId: plistMap['GOOGLE_APP_ID'] as String,
-              messagingSenderId: plistMap['GCM_SENDER_ID'] as String,
-              projectId: plistMap['PROJECT_ID'] as String,
-            ),
-          );
-          final auth = FirebaseAuth.instanceFor(
-            app: apps,
-          );
+          final auth = await getFirebaseAuth();
           await auth.signOut();
           await prefs.remove('googleServiceInfoPlist');
           await Navigator.of(context).pushAndRemoveUntil(

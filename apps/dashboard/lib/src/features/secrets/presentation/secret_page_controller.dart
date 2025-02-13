@@ -15,6 +15,8 @@ class SecretPageController extends _$SecretPageController {
 
 @riverpod
 Stream<QuerySnapshot> secretStream(Ref ref) {
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  print('uid: $uid');
   return FirebaseFirestore.instance
       .collection(secretsCollectionPath)
       .where(
