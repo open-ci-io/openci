@@ -1,24 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dashboard/src/services/firebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'workflow_page_controller.g.dart';
-
-@riverpod
-Stream<QuerySnapshot> workflowStream(Ref ref) {
-  return FirebaseFirestore.instance
-      .collection('workflows')
-      .where('owners', arrayContains: FirebaseAuth.instance.currentUser!.uid)
-      .orderBy('name')
-      .snapshots();
-}
 
 @riverpod
 class WorkflowPageController extends _$WorkflowPageController {
   @override
   void build() {
     return;
+  }
+
+  Future<List<WorkflowModel>> workflows() async {
+    final firestore = await getFirebaseFirestore();
+    final auth = await getFirebaseAuth();
+    final uid = auth.currentUser!.uid;
+    final workflows = await firestore
+        .collection(workflowsCollectionPath)
+        .where('owners', arrayContains: uid)
+        .get();
+    return workflows.docs
+        .map(
+          (e) => WorkflowModel.fromJson(e.data()),
+        )
+        .toList();
   }
 
   Future<void> addWorkflow() async {

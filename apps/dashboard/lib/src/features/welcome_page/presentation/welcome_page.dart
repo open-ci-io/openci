@@ -153,29 +153,6 @@ class _LoginButton extends StatelessWidget {
       onPressed: () async {
         if (formKey.currentState!.validate()) {
           formKey.currentState!.save();
-          if (projectId == _defaultProjectId) {
-            try {
-              await FirebaseAuth.instance.signInWithEmailAndPassword(
-                email: emailTextController.text,
-                password: passwordTextController.text,
-              );
-              await Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute<void>(
-                  builder: (context) => const NavigationPage(),
-                ),
-                (route) => false,
-              );
-            } on FirebaseAuthException catch (e) {
-              await showErrorDialog(
-                context,
-                e.message ?? 'An error occurred',
-              );
-            } on Exception catch (e) {
-              await showErrorDialog(context, e.toString());
-            }
-            return;
-          }
-
           final auth = await getFirebaseAuth();
           try {
             await auth.signInWithEmailAndPassword(

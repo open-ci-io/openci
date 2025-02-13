@@ -11,44 +11,36 @@ class WorkflowPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(workflowPageControllerProvider.notifier);
-    final stream = ref.watch(workflowStreamProvider);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         heroTag: 'add',
         onPressed: controller.addWorkflow,
         child: const Icon(Icons.add),
       ),
-      body: stream.when(
-        data: (data) {
-          final workflows = data.docs
-              .map(
-                (e) =>
-                    WorkflowModel.fromJson(e.data()! as Map<String, dynamic>),
-              )
-              .toList();
-          return Padding(
-            padding: const EdgeInsets.all(24),
-            child: ListView.separated(
-              itemCount: workflows.length,
-              separatorBuilder: (context, index) => const Divider(
-                color: Color(0xFF2C2C2E),
-                height: 1,
+      body: FutureBuilder(
+        future: controller.workflows(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final workflows = snapshot.data!;
+            return Padding(
+              padding: const EdgeInsets.all(24),
+              child: ListView.separated(
+                itemCount: workflows.length,
+                separatorBuilder: (context, index) => const Divider(
+                  color: Color(0xFF2C2C2E),
+                  height: 1,
+                ),
+                itemBuilder: (context, index) {
+                  final workflow = workflows[index];
+                  return _WorkflowListItem(
+                    workflowModel: workflow,
+                  );
+                },
               ),
-              itemBuilder: (context, index) {
-                final workflow = workflows[index];
-                return _WorkflowListItem(
-                  workflowModel: workflow,
-                );
-              },
-            ),
-          );
+            );
+          }
+          return const Center(child: CircularProgressIndicator());
         },
-        error: (error, stackTrace) {
-          return Center(
-            child: SelectableText('An error occurred: $error'),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );
   }

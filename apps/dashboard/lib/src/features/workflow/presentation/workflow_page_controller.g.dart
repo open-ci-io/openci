@@ -6,26 +6,8 @@ part of 'workflow_page_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$workflowStreamHash() => r'31c3f45295682badb585a2149bd4087eba68f1a7';
-
-/// See also [workflowStream].
-@ProviderFor(workflowStream)
-final workflowStreamProvider =
-    AutoDisposeStreamProvider<QuerySnapshot>.internal(
-  workflowStream,
-  name: r'workflowStreamProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$workflowStreamHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef WorkflowStreamRef = AutoDisposeStreamProviderRef<QuerySnapshot>;
 String _$workflowPageControllerHash() =>
-    r'9d1f2b1b855cda75206a2f74cc04bdd070824bad';
+    r'a2cde141731f0be0ee52465519cd1ff6891259e9';
 
 /// See also [WorkflowPageController].
 @ProviderFor(WorkflowPageController)
