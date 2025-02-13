@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/main.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
+import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/secrets/presentation/secrets.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
 import 'package:file_picker/file_picker.dart';
@@ -15,15 +16,19 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 
 class StepsSection extends ConsumerWidget {
-  const StepsSection(this.workflowModel, {super.key});
+  const StepsSection(this.workflowModel, this.firebaseSuite, {super.key});
 
   final WorkflowModel workflowModel;
+  final OpenCIFirebaseSuite firebaseSuite;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controller =
-        ref.watch(workflowEditorControllerProvider(workflowModel).notifier);
-    final state = ref.watch(workflowEditorControllerProvider(workflowModel));
+    final controller = ref.watch(
+      workflowEditorControllerProvider(workflowModel, firebaseSuite).notifier,
+    );
+    final state = ref.watch(
+      workflowEditorControllerProvider(workflowModel, firebaseSuite),
+    );
     final steps = state.steps;
 
     return Card(
@@ -58,6 +63,7 @@ class StepsSection extends ConsumerWidget {
                   step: steps[index],
                   index: index,
                   workflowModel: workflowModel,
+                  firebaseSuite: firebaseSuite,
                 );
               },
             ),
@@ -74,16 +80,19 @@ class _StepItem extends HookConsumerWidget {
     required this.step,
     required this.index,
     required this.workflowModel,
+    required this.firebaseSuite,
   });
 
   final WorkflowModelStep step;
   final int index;
   final WorkflowModel workflowModel;
+  final OpenCIFirebaseSuite firebaseSuite;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controller =
-        ref.watch(workflowEditorControllerProvider(workflowModel).notifier);
+    final controller = ref.watch(
+      workflowEditorControllerProvider(workflowModel, firebaseSuite).notifier,
+    );
     final stepNameTextEditingController =
         useTextEditingController(text: step.name);
     final commandTextEditingController =
@@ -115,8 +124,8 @@ class _StepItem extends HookConsumerWidget {
                   builder: (context) => Consumer(
                     builder: (context, ref, child) {
                       return Dialog(
-                        child: FutureBuilder(
-                          future: secrets(),
+                        child: StreamBuilder(
+                          stream: secrets(firebaseSuite),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               final data = snapshot.data!;

@@ -113,6 +113,12 @@ class RegisterButton extends StatelessWidget {
               'userId': userId,
               'createdAt': Timestamp.now().microsecondsSinceEpoch,
             });
+            await Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute<void>(
+                builder: (context) => const NavigationPage(),
+              ),
+              (route) => false,
+            );
           } on FirebaseAuthException catch (e) {
             await showErrorDialog(
               context,

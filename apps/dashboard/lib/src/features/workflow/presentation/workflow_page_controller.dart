@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dashboard/src/services/firebase.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'workflow_page_controller.g.dart';
@@ -8,34 +6,36 @@ part 'workflow_page_controller.g.dart';
 @riverpod
 class WorkflowPageController extends _$WorkflowPageController {
   @override
-  void build() {
+  void build(OpenCIFirebaseSuite firebaseSuite) {
     return;
   }
 
-  Future<List<WorkflowModel>> workflows() async {
-    final firestore = await getFirebaseFirestore();
-    final auth = await getFirebaseAuth();
+  Stream<List<WorkflowModel>> workflows() {
+    final firestore = firebaseSuite.firestore;
+    final auth = firebaseSuite.auth;
     final uid = auth.currentUser!.uid;
-    final workflows = await firestore
+    return firestore
         .collection(workflowsCollectionPath)
         .where('owners', arrayContains: uid)
-        .get();
-    return workflows.docs
+        .snapshots()
         .map(
-          (e) => WorkflowModel.fromJson(e.data()),
-        )
-        .toList();
+          (snapshot) => snapshot.docs
+              .map((e) => WorkflowModel.fromJson(e.data()))
+              .toList(),
+        );
   }
 
   Future<void> addWorkflow() async {
-    final ref = FirebaseFirestore.instance.collection('workflows').doc();
-    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final ref = firebaseSuite.firestore.collection('workflows').doc();
+    final uid = firebaseSuite.auth.currentUser!.uid;
     final workflow = WorkflowModel.empty(ref.id, uid);
     await ref.set(workflow.toJson());
   }
 
-  Future<void> duplicateWorkflow(WorkflowModel workflow) async {
-    final ref = FirebaseFirestore.instance.collection('workflows').doc();
+  Future<void> duplicateWorkflow(
+    WorkflowModel workflow,
+  ) async {
+    final ref = firebaseSuite.firestore.collection('workflows').doc();
     final newWorkflow = workflow.copyWith(
       id: ref.id,
       name: '${workflow.name} (Copy)',
@@ -43,10 +43,9 @@ class WorkflowPageController extends _$WorkflowPageController {
     await ref.set(newWorkflow.toJson());
   }
 
-  Future<void> deleteWorkflow(String docId) async {
-    await FirebaseFirestore.instance
-        .collection('workflows')
-        .doc(docId)
-        .delete();
+  Future<void> deleteWorkflow(
+    String docId,
+  ) async {
+    await firebaseSuite.firestore.collection('workflows').doc(docId).delete();
   }
 }

@@ -1,17 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dashboard/src/services/firebase.dart';
+import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:openci_models/openci_models.dart';
 
-Future<List<DocumentSnapshot>> secrets() async {
-  final firestore = await getFirebaseFirestore();
-  final auth = await getFirebaseAuth();
+Stream<List<DocumentSnapshot>> secrets(OpenCIFirebaseSuite firebaseSuite) {
+  final firestore = firebaseSuite.firestore;
+  final auth = firebaseSuite.auth;
   final uid = auth.currentUser!.uid;
-  final doc = await firestore
+  return firestore
       .collection(secretsCollectionPath)
       .where(
         'owners',
         arrayContains: uid,
       )
-      .get();
-  return doc.docs;
+      .snapshots()
+      .map((snapshot) => snapshot.docs);
 }

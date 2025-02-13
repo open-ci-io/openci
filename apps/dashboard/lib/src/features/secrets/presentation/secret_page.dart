@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/common_widgets/dialogs.dart';
+import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/secrets/presentation/secrets.dart';
 import 'package:dashboard/src/services/firebase.dart';
 import 'package:file_picker/file_picker.dart';
@@ -11,7 +11,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 
 class SecretPage extends ConsumerWidget {
-  const SecretPage({super.key});
+  const SecretPage({super.key, required this.firebaseSuite});
+
+  final OpenCIFirebaseSuite firebaseSuite;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,15 +22,17 @@ class SecretPage extends ConsumerWidget {
         onPressed: () {
           showDialog<void>(
             context: context,
-            builder: (context) => const _DialogBody(),
+            builder: (context) => _DialogBody(
+              firebaseSuite: firebaseSuite,
+            ),
           );
         },
         child: const Icon(Icons.add),
       ),
-      body: FutureBuilder(
-        future: secrets(),
+      body: StreamBuilder(
+        stream: secrets(firebaseSuite),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
               child: Text('No Secrets found'),
             );
@@ -67,6 +71,7 @@ class SecretPage extends ConsumerWidget {
                             showDialog<void>(
                               context: context,
                               builder: (context) => _DialogBody(
+                                firebaseSuite: firebaseSuite,
                                 secretKey: secret.key,
                                 secretValue: secret.value,
                                 documentId: data[index].id,
@@ -82,7 +87,7 @@ class SecretPage extends ConsumerWidget {
                               title: 'Delete Secret',
                               context: context,
                               onDelete: () {
-                                FirebaseFirestore.instance
+                                firebaseSuite.firestore
                                     .collection(secretsCollectionPath)
                                     .doc(data[index].id)
                                     .delete();
@@ -110,13 +115,14 @@ class _DialogBody extends HookConsumerWidget {
     this.secretValue,
     this.isEditing = false,
     this.documentId,
+    required this.firebaseSuite,
   });
 
   final String? secretKey;
   final String? secretValue;
   final bool isEditing;
   final String? documentId;
-
+  final OpenCIFirebaseSuite firebaseSuite;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final keyController = useTextEditingController(text: secretKey ?? '');
@@ -177,13 +183,12 @@ class _DialogBody extends HookConsumerWidget {
                     elevation: 0,
                   ),
                   onPressed: () async {
-                    final firestore = await getFirebaseFirestore();
                     if (keyController.text.isEmpty ||
                         valueController.text.isEmpty) {
                       return;
                     }
                     if (isEditing) {
-                      await firestore
+                      await firebaseSuite.firestore
                           .collection(secretsCollectionPath)
                           .doc(documentId)
                           .update({
@@ -194,7 +199,9 @@ class _DialogBody extends HookConsumerWidget {
                     } else {
                       final auth = await getFirebaseAuth();
                       final uid = auth.currentUser!.uid;
-                      await firestore.collection(secretsCollectionPath).add({
+                      await firebaseSuite.firestore
+                          .collection(secretsCollectionPath)
+                          .add({
                         'key': keyController.text,
                         'value': valueController.text,
                         'owners': [uid],

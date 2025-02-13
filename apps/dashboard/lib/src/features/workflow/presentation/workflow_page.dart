@@ -1,4 +1,5 @@
 import 'package:dashboard/src/common_widgets/dialogs.dart';
+import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page_controller.dart';
 import 'package:flutter/material.dart';
@@ -6,28 +7,36 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 
 class WorkflowPage extends ConsumerWidget {
-  const WorkflowPage({super.key});
+  const WorkflowPage({super.key, required this.firebaseSuite});
+
+  final OpenCIFirebaseSuite firebaseSuite;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controller = ref.watch(workflowPageControllerProvider.notifier);
+    final controller =
+        ref.watch(workflowPageControllerProvider(firebaseSuite).notifier);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         heroTag: 'add',
         onPressed: controller.addWorkflow,
         child: const Icon(Icons.add),
       ),
-      body: FutureBuilder(
-        future: controller.workflows(),
+      body: StreamBuilder(
+        stream: controller.workflows(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
-          if (!snapshot.hasData) {
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
               child: Text('No workflow found'),
+            );
+          }
+          if (snapshot.hasError) {
+            return const Center(
+              child: Text('An error occurred'),
             );
           }
           final workflows = snapshot.data!;
@@ -43,6 +52,7 @@ class WorkflowPage extends ConsumerWidget {
                 final workflow = workflows[index];
                 return _WorkflowListItem(
                   workflowModel: workflow,
+                  firebaseSuite: firebaseSuite,
                 );
               },
             ),
@@ -56,13 +66,16 @@ class WorkflowPage extends ConsumerWidget {
 class _WorkflowListItem extends ConsumerWidget {
   const _WorkflowListItem({
     required this.workflowModel,
+    required this.firebaseSuite,
   });
 
   final WorkflowModel workflowModel;
+  final OpenCIFirebaseSuite firebaseSuite;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controller = ref.watch(workflowPageControllerProvider.notifier);
+    final controller =
+        ref.watch(workflowPageControllerProvider(firebaseSuite).notifier);
     final screenWidth = MediaQuery.of(context).size.width;
     final iconWidth = screenWidth * 0.05;
     return ListTile(
@@ -104,7 +117,10 @@ class _WorkflowListItem extends ConsumerWidget {
                         context,
                         MaterialPageRoute<void>(
                           fullscreenDialog: true,
-                          builder: (context) => WorkflowEditor(workflowModel),
+                          builder: (context) => WorkflowEditor(
+                            workflowModel,
+                            firebaseSuite,
+                          ),
                         ),
                       );
                     },
@@ -163,8 +179,10 @@ class _WorkflowListItem extends ConsumerWidget {
                               context,
                               MaterialPageRoute<void>(
                                 fullscreenDialog: true,
-                                builder: (context) =>
-                                    WorkflowEditor(workflowModel),
+                                builder: (context) => WorkflowEditor(
+                                  workflowModel,
+                                  firebaseSuite,
+                                ),
                               ),
                             );
                           },

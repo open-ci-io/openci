@@ -1,4 +1,5 @@
 import 'package:dashboard/src/common_widgets/margins.dart';
+import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -6,17 +7,22 @@ import 'package:openci_models/openci_models.dart';
 
 class OwnersSection extends ConsumerWidget {
   const OwnersSection(
-    this.workflowModel, {
+    this.workflowModel,
+    this.firebaseSuite, {
     super.key,
   });
 
   final WorkflowModel workflowModel;
+  final OpenCIFirebaseSuite firebaseSuite;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controller =
-        ref.watch(workflowEditorControllerProvider(workflowModel).notifier);
-    final state = ref.watch(workflowEditorControllerProvider(workflowModel));
+    final controller = ref.watch(
+      workflowEditorControllerProvider(workflowModel, firebaseSuite).notifier,
+    );
+    final state = ref.watch(
+      workflowEditorControllerProvider(workflowModel, firebaseSuite),
+    );
     final owners = state.owners;
     return Card(
       elevation: 0,
