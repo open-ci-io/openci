@@ -69,12 +69,7 @@ class _NavigationPageState extends State<NavigationPage> {
               final prefs = await SharedPreferences.getInstance();
               await prefs.remove('googleServiceInfoPlist');
               await data.auth.signOut();
-              await Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute<void>(
-                  builder: (context) => const WelcomePage(),
-                ),
-                (route) => false,
-              );
+              await pushAndRemoveUntil(context, const WelcomePage());
               return;
             }
             setState(() {
@@ -97,12 +92,7 @@ class _NavigationPageState extends State<NavigationPage> {
                   await data.auth.signOut();
                   final prefs = await SharedPreferences.getInstance();
                   await prefs.remove('googleServiceInfoPlist');
-                  await Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute<void>(
-                      builder: (context) => const WelcomePage(),
-                    ),
-                    (route) => false,
-                  );
+                  await pushAndRemoveUntil(context, const WelcomePage());
                 },
                 icon: const Icon(Icons.logout),
               ),

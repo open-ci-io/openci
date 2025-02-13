@@ -113,12 +113,7 @@ class RegisterButton extends StatelessWidget {
               'userId': userId,
               'createdAt': Timestamp.now().microsecondsSinceEpoch,
             });
-            await Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute<void>(
-                builder: (context) => const NavigationPage(),
-              ),
-              (route) => false,
-            );
+            await pushAndRemoveUntil(context, const NavigationPage());
           } on FirebaseAuthException catch (e) {
             await showErrorDialog(
               context,
@@ -132,6 +127,19 @@ class RegisterButton extends StatelessWidget {
       child: const Text('Register'),
     );
   }
+}
+
+Future<void> pushAndRemoveUntil(BuildContext context, Widget page) async {
+  await Navigator.of(context).pushAndRemoveUntil(
+    PageRouteBuilder<void>(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionDuration: Duration.zero,
+      reverseTransitionDuration: Duration.zero,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+          child,
+    ),
+    (route) => false,
+  );
 }
 
 class _LoginButton extends StatelessWidget {
@@ -165,12 +173,7 @@ class _LoginButton extends StatelessWidget {
               email: emailTextController.text,
               password: passwordTextController.text,
             );
-            await Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute<void>(
-                builder: (context) => const NavigationPage(),
-              ),
-              (route) => false,
-            );
+            await pushAndRemoveUntil(context, const NavigationPage());
           } on FirebaseAuthException catch (e) {
             await showErrorDialog(
               context,

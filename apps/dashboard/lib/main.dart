@@ -1,15 +1,13 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/welcome_page/presentation/welcome_page.dart';
+import 'package:dashboard/src/services/firebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
 
@@ -75,27 +73,7 @@ class AuthGate extends StatelessWidget {
   }
 
   Future<User?> future() async {
-    final prefs = await SharedPreferences.getInstance();
-    final plist = prefs.getString('googleServiceInfoPlist');
-
-    if (plist == null) {
-      return FirebaseAuth.instance.currentUser;
-    }
-    final plistMap = jsonDecode(plist) as Map<String, dynamic>;
-
-    final apps = await Firebase.initializeApp(
-      name: plistMap['PROJECT_ID'] as String,
-      options: FirebaseOptions(
-        apiKey: plistMap['API_KEY'] as String,
-        appId: plistMap['GOOGLE_APP_ID'] as String,
-        messagingSenderId: plistMap['GCM_SENDER_ID'] as String,
-        projectId: plistMap['PROJECT_ID'] as String,
-      ),
-    );
-    final auth = FirebaseAuth.instanceFor(
-      app: apps,
-    );
-    final user = auth.currentUser;
-    return user;
+    final auth = await getFirebaseAuth();
+    return auth.currentUser;
   }
 }
