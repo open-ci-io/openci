@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/main.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
-import 'package:dashboard/src/features/secrets/presentation/secret_page_controller.dart';
+import 'package:dashboard/src/features/secrets/presentation/secrets.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -114,67 +114,67 @@ class _StepItem extends HookConsumerWidget {
                   context: context,
                   builder: (context) => Consumer(
                     builder: (context, ref, child) {
-                      final stream = ref.watch(secretStreamProvider);
                       return Dialog(
-                        child: stream.when(
-                          data: (data) {
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                verticalMargin8,
-                                const Text(
-                                  'Secrets',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                        child: FutureBuilder(
+                          future: secrets(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              final data = snapshot.data!;
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  verticalMargin8,
+                                  const Text(
+                                    'Secrets',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                verticalMargin8,
-                                ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: data.docs.length,
-                                  itemBuilder: (context, index) {
-                                    final secret = data.docs[index].data()!
-                                        as Map<String, dynamic>;
-                                    return Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          secret['key'].toString(),
-                                        ),
-                                        IconButton(
-                                          onPressed: () async {
-                                            await Clipboard.setData(
-                                              ClipboardData(
-                                                text: '\$${secret['key']}',
-                                              ),
-                                            );
-                                            Navigator.of(context).pop();
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                  'Secret copied to clipboard',
+                                  verticalMargin8,
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: data.length,
+                                    itemBuilder: (context, index) {
+                                      final secret = data[index].data()!
+                                          as Map<String, dynamic>;
+                                      return Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            secret['key'].toString(),
+                                          ),
+                                          IconButton(
+                                            onPressed: () async {
+                                              await Clipboard.setData(
+                                                ClipboardData(
+                                                  text: '\$${secret['key']}',
                                                 ),
-                                              ),
-                                            );
-                                          },
-                                          icon: const Icon(Icons.copy),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ],
+                                              );
+                                              Navigator.of(context).pop();
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'Secret copied to clipboard',
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            icon: const Icon(Icons.copy),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ],
+                              );
+                            }
+                            return const Center(
+                              child: CircularProgressIndicator(),
                             );
-                          },
-                          error: (error, stackTrace) {
-                            return const Text('Error');
-                          },
-                          loading: () {
-                            return const Text('Loading');
                           },
                         ),
                       );

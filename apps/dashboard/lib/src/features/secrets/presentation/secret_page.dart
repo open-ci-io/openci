@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/common_widgets/dialogs.dart';
-import 'package:dashboard/src/features/secrets/presentation/secret_page_controller.dart';
+import 'package:dashboard/src/features/secrets/presentation/secrets.dart';
+import 'package:dashboard/src/services/firebase.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,6 @@ class SecretPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stream = ref.watch(secretStreamProvider);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -26,81 +26,72 @@ class SecretPage extends ConsumerWidget {
         },
         child: const Icon(Icons.add),
       ),
-      body: stream.when(
-        data: (data) {
-          if (data.docs.isEmpty) {
-            return const Center(
-              child: Text('No secrets found'),
+      body: FutureBuilder(
+        future: secrets(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final data = snapshot.data!;
+            return Padding(
+              padding: const EdgeInsets.all(24),
+              child: ListView.builder(
+                itemCount: data.length,
+                itemBuilder: (context, index) {
+                  final secret = OpenCISecret.fromJson(
+                    data[index].data()! as Map<String, dynamic>,
+                  );
+                  return Card(
+                    elevation: 0,
+                    child: ListTile(
+                      title: Text(secret.key),
+                      subtitle: Text(
+                        secret.value.length > 16
+                            ? secret.value
+                                .substring(0, 16)
+                                .replaceAll(RegExp(r'.'), '*')
+                            : secret.value.replaceAll(RegExp(r'.'), '*'),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              showDialog<void>(
+                                context: context,
+                                builder: (context) => _DialogBody(
+                                  secretKey: secret.key,
+                                  secretValue: secret.value,
+                                  documentId: data[index].id,
+                                  isEditing: true,
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.edit),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              showDeleteDialog(
+                                title: 'Delete Secret',
+                                context: context,
+                                onDelete: () {
+                                  FirebaseFirestore.instance
+                                      .collection(secretsCollectionPath)
+                                      .doc(data[index].id)
+                                      .delete();
+                                },
+                              );
+                            },
+                            icon: const Icon(Icons.delete),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             );
           }
-
-          return Padding(
-            padding: const EdgeInsets.all(24),
-            child: ListView.builder(
-              itemCount: data.docs.length,
-              itemBuilder: (context, index) {
-                final secret = OpenCISecret.fromJson(
-                  data.docs[index].data()! as Map<String, dynamic>,
-                );
-                return Card(
-                  elevation: 0,
-                  child: ListTile(
-                    title: Text(secret.key),
-                    subtitle: Text(
-                      secret.value.length > 16
-                          ? secret.value
-                              .substring(0, 16)
-                              .replaceAll(RegExp(r'.'), '*')
-                          : secret.value.replaceAll(RegExp(r'.'), '*'),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            showDialog<void>(
-                              context: context,
-                              builder: (context) => _DialogBody(
-                                secretKey: secret.key,
-                                secretValue: secret.value,
-                                documentId: data.docs[index].id,
-                                isEditing: true,
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.edit),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            showDeleteDialog(
-                              title: 'Delete Secret',
-                              context: context,
-                              onDelete: () {
-                                FirebaseFirestore.instance
-                                    .collection(secretsCollectionPath)
-                                    .doc(data.docs[index].id)
-                                    .delete();
-                              },
-                            );
-                          },
-                          icon: const Icon(Icons.delete),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
+          return const Center(child: CircularProgressIndicator());
         },
-        error: (error, stackTrace) {
-          return Center(
-            child: Text('Error: $error'),
-          );
-        },
-        loading: () => const Center(
-          child: Text('Loading'),
-        ),
       ),
     );
   }
@@ -179,12 +170,13 @@ class _DialogBody extends HookConsumerWidget {
                     elevation: 0,
                   ),
                   onPressed: () async {
+                    final firestore = await getFirebaseFirestore();
                     if (keyController.text.isEmpty ||
                         valueController.text.isEmpty) {
                       return;
                     }
                     if (isEditing) {
-                      await FirebaseFirestore.instance
+                      await firestore
                           .collection(secretsCollectionPath)
                           .doc(documentId)
                           .update({
@@ -193,9 +185,7 @@ class _DialogBody extends HookConsumerWidget {
                         'updatedAt': DateTime.now().millisecondsSinceEpoch,
                       });
                     } else {
-                      await FirebaseFirestore.instance
-                          .collection(secretsCollectionPath)
-                          .add({
+                      await firestore.collection(secretsCollectionPath).add({
                         'key': keyController.text,
                         'value': valueController.text,
                         'owners': [FirebaseAuth.instance.currentUser!.uid],
