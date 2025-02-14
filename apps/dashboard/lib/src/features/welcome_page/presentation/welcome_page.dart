@@ -271,11 +271,8 @@ class _PasswordField extends StatelessWidget {
       controller: passwordTextController,
       decoration: const InputDecoration(
         labelText: 'Password',
-        hintStyle: TextStyle(
-          color: Colors.white,
-        ),
+        hintStyle: TextStyle(),
       ),
-      style: const TextStyle(color: Colors.white),
       obscureText: true,
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -299,7 +296,6 @@ class _EmailField extends StatelessWidget {
     return TextFormField(
       controller: emailTextController,
       decoration: const InputDecoration(labelText: 'Email'),
-      style: const TextStyle(color: Colors.white),
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Enter your email';
@@ -323,7 +319,6 @@ class _Title extends StatelessWidget {
       'Welcome to Open CI',
       style: TextStyle(
         fontSize: 26,
-        color: Colors.white,
       ),
     );
   }

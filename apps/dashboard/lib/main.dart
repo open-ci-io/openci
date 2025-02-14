@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dashboard/colors.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/welcome_page/presentation/welcome_page.dart';
 import 'package:dashboard/src/services/firebase.dart';
@@ -33,8 +34,6 @@ void main() async {
   );
 }
 
-const Color primaryColor = Color(0xff03dac6);
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -43,11 +42,32 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         colorScheme: const ColorScheme.dark(
-          primary: primaryColor,
+          primary: OpenCIColors.primary,
+          secondary: OpenCIColors.primary,
+          surface: OpenCIColors.surface,
         ),
         useMaterial3: true,
         textTheme: GoogleFonts.interTextTheme(
           ThemeData.dark().textTheme,
+        ).apply(
+          bodyColor: OpenCIColors.onPrimary,
+          displayColor: OpenCIColors.onPrimary,
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          labelStyle: TextStyle(color: OpenCIColors.onPrimary),
+          hintStyle: TextStyle(color: OpenCIColors.onPrimary),
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: OpenCIColors.onPrimary),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: OpenCIColors.onPrimary),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: OpenCIColors.primaryDark,
+            foregroundColor: Colors.black,
+          ),
         ),
       ),
       navigatorKey: navigatorKey,
