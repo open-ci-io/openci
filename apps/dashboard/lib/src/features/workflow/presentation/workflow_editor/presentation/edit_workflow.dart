@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 
-class WorkflowEditor extends ConsumerWidget {
-  const WorkflowEditor(this.workflowModel, this.firebaseSuite, {super.key});
+class EditWorkflow extends ConsumerWidget {
+  const EditWorkflow(this.workflowModel, this.firebaseSuite, {super.key});
   final WorkflowModel workflowModel;
   final OpenCIFirebaseSuite firebaseSuite;
 

@@ -1,6 +1,6 @@
 import 'package:dashboard/colors.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
-import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/edit_workflow.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -120,7 +120,7 @@ class _WorkflowListItem extends ConsumerWidget {
           context,
           MaterialPageRoute<void>(
             fullscreenDialog: true,
-            builder: (context) => WorkflowEditor(workflowModel, firebaseSuite),
+            builder: (context) => EditWorkflow(workflowModel, firebaseSuite),
           ),
         );
       },
@@ -190,7 +190,7 @@ class _WorkflowListItemMenu extends StatelessWidget {
               MaterialPageRoute<void>(
                 fullscreenDialog: true,
                 builder: (context) =>
-                    WorkflowEditor(workflowModel, firebaseSuite),
+                    EditWorkflow(workflowModel, firebaseSuite),
               ),
             );
           },
