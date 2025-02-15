@@ -1,7 +1,9 @@
+import 'package:dashboard/colors.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 
@@ -38,20 +40,57 @@ class WorkflowListPage extends ConsumerWidget {
               child: Text('An error occurred'),
             );
           }
-          final workflows = snapshot.data!;
+          final workflows = snapshot.data!
+            ..sort(
+              (a, b) => a.currentWorkingDirectory
+                  .compareTo(b.currentWorkingDirectory),
+            );
+
           return Padding(
             padding: const EdgeInsets.all(24),
             child: ListView.separated(
               itemCount: workflows.length,
-              separatorBuilder: (context, index) => const Divider(
-                color: Color(0xFF2C2C2E),
-                height: 1,
-              ),
+              separatorBuilder: (context, index) {
+                final workflow = workflows[index];
+                final nextWorkflow =
+                    index < workflows.length - 1 ? workflows[index + 1] : null;
+                final shouldShowSeparator = nextWorkflow != null &&
+                    workflow.currentWorkingDirectory ==
+                        nextWorkflow.currentWorkingDirectory;
+
+                return shouldShowSeparator
+                    ? const Divider(
+                        color: Color(0xFF2C2C2E),
+                        height: 1,
+                      )
+                    : const SizedBox.shrink();
+              },
               itemBuilder: (_, index) {
                 final workflow = workflows[index];
-                return _WorkflowListItem(
-                  workflowModel: workflow,
-                  firebaseSuite: firebaseSuite,
+                final previousWorkflow =
+                    index > 0 ? workflows[index - 1] : null;
+                final shouldShowWorkingDirectory = previousWorkflow == null ||
+                    workflow.currentWorkingDirectory !=
+                        previousWorkflow.currentWorkingDirectory;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (shouldShowWorkingDirectory)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 30, bottom: 20),
+                        child: Text(
+                          workflow.currentWorkingDirectory,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                          ),
+                        ),
+                      ),
+                    _WorkflowListItem(
+                      workflowModel: workflow,
+                      firebaseSuite: firebaseSuite,
+                    ),
+                  ],
                 );
               },
             ),
@@ -85,30 +124,37 @@ class _WorkflowListItem extends ConsumerWidget {
           ),
         );
       },
-      title: Text(
-        workflowModel.name,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 16,
+      title: Padding(
+        padding: const EdgeInsets.only(left: 16),
+        child: Text(
+          workflowModel.name,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+          ),
         ),
       ),
-      subtitle: Wrap(
-        children: [
-          Text(
-            workflowModel.github.triggerType.name,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            workflowModel.github.baseBranch,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            workflowModel.currentWorkingDirectory,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-        ],
+      subtitle: Padding(
+        padding: const EdgeInsets.only(left: 16),
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(
+              workflowModel.github.triggerType == GitHubTriggerType.push
+                  ? FontAwesomeIcons.arrowRight
+                  : FontAwesomeIcons.codePullRequest,
+              size: 10,
+              color: workflowModel.github.triggerType == GitHubTriggerType.push
+                  ? OpenCIColors.primary
+                  : OpenCIColors.primaryGreenDark,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              workflowModel.github.baseBranch,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
       ),
       contentPadding: EdgeInsets.zero,
       trailing: _WorkflowListItemMenu(

@@ -6,4 +6,6 @@ class OpenCIColors {
   static const Color surface = Color(0xFF222222);
   static const Color onPrimary = Color(0xFFF4F4F4);
   static const Color error = Color(0xFFD15C66);
+  static const Color primaryGreen = Color(0xff7BFAA8);
+  static const Color primaryGreenDark = Color.fromARGB(255, 96, 233, 144);
 }
