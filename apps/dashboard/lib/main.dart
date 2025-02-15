@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
             borderSide: BorderSide(color: OpenCIColors.onPrimary),
           ),
           focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: OpenCIColors.onPrimary),
+            borderSide: BorderSide(color: OpenCIColors.primary),
           ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
