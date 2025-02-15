@@ -1,6 +1,6 @@
-import 'package:dashboard/colors.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -16,13 +16,6 @@ class BasicInfoSection extends HookConsumerWidget {
 
   final WorkflowModel workflowModel;
   final OpenCIFirebaseSuite firebaseSuite;
-
-  TextStyle labelStyle({
-    required bool hasFocus,
-  }) =>
-      hasFocus
-          ? const TextStyle(color: OpenCIColors.primary)
-          : const TextStyle(color: OpenCIColors.onPrimary);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -1,3 +1,4 @@
+import 'package:dashboard/colors.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/basic_information/presentation/basic_information_section.dart';
@@ -17,8 +18,8 @@ class WorkflowEditor extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(
-        workflowEditorControllerProvider(workflowModel, firebaseSuite)
-            .notifier);
+      workflowEditorControllerProvider(workflowModel, firebaseSuite).notifier,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -52,3 +53,10 @@ class WorkflowEditor extends ConsumerWidget {
     );
   }
 }
+
+TextStyle labelStyle({
+  required bool hasFocus,
+}) =>
+    hasFocus
+        ? const TextStyle(color: OpenCIColors.primary)
+        : const TextStyle(color: OpenCIColors.onPrimary);

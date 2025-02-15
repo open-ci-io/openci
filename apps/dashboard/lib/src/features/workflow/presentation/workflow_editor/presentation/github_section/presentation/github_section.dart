@@ -1,11 +1,13 @@
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 
-class GitHubSection extends ConsumerWidget {
+class GitHubSection extends HookConsumerWidget {
   const GitHubSection(
     this.workflowModel,
     this.firebaseSuite, {
@@ -20,23 +22,32 @@ class GitHubSection extends ConsumerWidget {
     final controller = ref.watch(
       workflowEditorControllerProvider(workflowModel, firebaseSuite).notifier,
     );
-    return Card(
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'GitHub Configuration',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            verticalMargin16,
-            TextFormField(
+    final repoUrlFocusNode = useFocusNode();
+    final triggerTypeFocusNode = useFocusNode();
+    final baseBranchFocusNode = useFocusNode();
+
+    useListenable(repoUrlFocusNode);
+    useListenable(triggerTypeFocusNode);
+    useListenable(baseBranchFocusNode);
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'GitHub Configuration',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          verticalMargin16,
+          Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: TextFormField(
+              focusNode: repoUrlFocusNode,
               initialValue: workflowModel.github.repositoryUrl,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Repository URL',
-                border: OutlineInputBorder(),
+                labelStyle: labelStyle(hasFocus: repoUrlFocusNode.hasFocus),
               ),
               validator: (value) {
                 if (value?.isEmpty ?? true) {
@@ -46,12 +57,16 @@ class GitHubSection extends ConsumerWidget {
               },
               onChanged: controller.updateGitHubRepoUrl,
             ),
-            verticalMargin16,
-            DropdownButtonFormField<GitHubTriggerType>(
+          ),
+          verticalMargin16,
+          Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: DropdownButtonFormField<GitHubTriggerType>(
+              focusNode: triggerTypeFocusNode,
               value: workflowModel.github.triggerType,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Trigger Type',
-                border: OutlineInputBorder(),
+                labelStyle: labelStyle(hasFocus: triggerTypeFocusNode.hasFocus),
               ),
               items: GitHubTriggerType.values.map((type) {
                 return DropdownMenuItem(
@@ -64,12 +79,16 @@ class GitHubSection extends ConsumerWidget {
                     .updateGitHubTriggerType(value ?? GitHubTriggerType.push);
               },
             ),
-            verticalMargin16,
-            TextFormField(
+          ),
+          verticalMargin16,
+          Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: TextFormField(
+              focusNode: baseBranchFocusNode,
               initialValue: workflowModel.github.baseBranch,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Base Branch',
-                border: OutlineInputBorder(),
+                labelStyle: labelStyle(hasFocus: baseBranchFocusNode.hasFocus),
               ),
               validator: (value) {
                 if (value?.isEmpty ?? true) {
@@ -79,8 +98,8 @@ class GitHubSection extends ConsumerWidget {
               },
               onChanged: controller.updateGitHubBaseBranch,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
