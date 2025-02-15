@@ -45,6 +45,7 @@ class MyApp extends StatelessWidget {
           primary: OpenCIColors.primary,
           secondary: OpenCIColors.primary,
           surface: OpenCIColors.surface,
+          error: OpenCIColors.error,
         ),
         useMaterial3: true,
         textTheme: GoogleFonts.interTextTheme(
