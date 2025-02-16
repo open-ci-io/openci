@@ -46,6 +46,7 @@ class StepsSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ExpansionTile(
+          initiallyExpanded: true,
           title: Text(
             'Steps',
             style: textTheme.titleMedium,
