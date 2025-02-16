@@ -19,6 +19,7 @@ class GitHubSection extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final textTheme = Theme.of(context).textTheme;
     final controller = ref.watch(
       workflowEditorControllerProvider(workflowModel, firebaseSuite).notifier,
     );
@@ -30,77 +31,79 @@ class GitHubSection extends HookConsumerWidget {
     useListenable(triggerTypeFocusNode);
     useListenable(baseBranchFocusNode);
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ExpansionTile(
+          title: Text(
             'GitHub Configuration',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: textTheme.titleMedium,
           ),
-          verticalMargin16,
-          Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: TextFormField(
-              focusNode: repoUrlFocusNode,
-              initialValue: workflowModel.github.repositoryUrl,
-              decoration: InputDecoration(
-                labelText: 'Repository URL',
-                labelStyle: labelStyle(hasFocus: repoUrlFocusNode.hasFocus),
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: TextFormField(
+                focusNode: repoUrlFocusNode,
+                initialValue: workflowModel.github.repositoryUrl,
+                decoration: InputDecoration(
+                  labelText: 'Repository URL',
+                  labelStyle: labelStyle(hasFocus: repoUrlFocusNode.hasFocus),
+                ),
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return 'Please enter repository URL';
+                  }
+                  return null;
+                },
+                onChanged: controller.updateGitHubRepoUrl,
               ),
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter repository URL';
-                }
-                return null;
-              },
-              onChanged: controller.updateGitHubRepoUrl,
             ),
-          ),
-          verticalMargin16,
-          Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: DropdownButtonFormField<GitHubTriggerType>(
-              focusNode: triggerTypeFocusNode,
-              value: workflowModel.github.triggerType,
-              decoration: InputDecoration(
-                labelText: 'Trigger Type',
-                labelStyle: labelStyle(hasFocus: triggerTypeFocusNode.hasFocus),
+            verticalMargin16,
+            Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: DropdownButtonFormField<GitHubTriggerType>(
+                focusNode: triggerTypeFocusNode,
+                value: workflowModel.github.triggerType,
+                decoration: InputDecoration(
+                  labelText: 'Trigger Type',
+                  labelStyle:
+                      labelStyle(hasFocus: triggerTypeFocusNode.hasFocus),
+                ),
+                items: GitHubTriggerType.values.map((type) {
+                  return DropdownMenuItem(
+                    value: type,
+                    child: Text(type.name),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  controller
+                      .updateGitHubTriggerType(value ?? GitHubTriggerType.push);
+                },
               ),
-              items: GitHubTriggerType.values.map((type) {
-                return DropdownMenuItem(
-                  value: type,
-                  child: Text(type.name),
-                );
-              }).toList(),
-              onChanged: (value) {
-                controller
-                    .updateGitHubTriggerType(value ?? GitHubTriggerType.push);
-              },
             ),
-          ),
-          verticalMargin16,
-          Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: TextFormField(
-              focusNode: baseBranchFocusNode,
-              initialValue: workflowModel.github.baseBranch,
-              decoration: InputDecoration(
-                labelText: 'Base Branch',
-                labelStyle: labelStyle(hasFocus: baseBranchFocusNode.hasFocus),
+            verticalMargin16,
+            Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: TextFormField(
+                focusNode: baseBranchFocusNode,
+                initialValue: workflowModel.github.baseBranch,
+                decoration: InputDecoration(
+                  labelText: 'Base Branch',
+                  labelStyle:
+                      labelStyle(hasFocus: baseBranchFocusNode.hasFocus),
+                ),
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return 'Please enter base branch';
+                  }
+                  return null;
+                },
+                onChanged: controller.updateGitHubBaseBranch,
               ),
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter base branch';
-                }
-                return null;
-              },
-              onChanged: controller.updateGitHubBaseBranch,
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 }

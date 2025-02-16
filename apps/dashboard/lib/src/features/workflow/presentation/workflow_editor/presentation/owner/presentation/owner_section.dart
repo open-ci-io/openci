@@ -23,6 +23,7 @@ class OwnersSection extends ConsumerWidget {
     final state = ref.watch(
       workflowEditorControllerProvider(workflowModel, firebaseSuite),
     );
+    final textTheme = Theme.of(context).textTheme;
     final owners = state.owners;
     return Card(
       elevation: 0,
@@ -34,9 +35,9 @@ class OwnersSection extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Owners',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: textTheme.titleMedium,
                 ),
                 IconButton(
                   icon: const Icon(Icons.add),

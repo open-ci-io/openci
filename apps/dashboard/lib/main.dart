@@ -70,6 +70,9 @@ class MyApp extends StatelessWidget {
             foregroundColor: Colors.black,
           ),
         ),
+        expansionTileTheme: const ExpansionTileThemeData(
+          shape: LinearBorder.none,
+        ),
       ),
       navigatorKey: navigatorKey,
       home: const AuthGate(),

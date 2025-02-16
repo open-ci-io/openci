@@ -26,6 +26,7 @@ dependencies:
   sentry_flutter: ^8.13.0-beta.3
   shared_preferences: ^2.5.2
   signals: ^6.0.2
+  timelines_plus: ^1.0.6
   uuid: ^4.5.1
 
 dev_dependencies:

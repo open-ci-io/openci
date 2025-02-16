@@ -22,6 +22,7 @@ class BasicInfoSection extends HookConsumerWidget {
     final controller = ref.watch(
       workflowEditorControllerProvider(workflowModel, firebaseSuite).notifier,
     );
+    final textTheme = Theme.of(context).textTheme;
 
     final workflowNameFocus = useFocusNode();
     final currentWorkingDirectoryFocus = useFocusNode();
@@ -30,80 +31,81 @@ class BasicInfoSection extends HookConsumerWidget {
     useListenable(currentWorkingDirectoryFocus);
     useListenable(flutterVersionFocus);
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ExpansionTile(
+          title: Text(
             'Basic Information',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: textTheme.titleMedium,
           ),
-          verticalMargin16,
-          Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: TextFormField(
-              focusNode: workflowNameFocus,
-              initialValue: workflowModel.name,
-              decoration: InputDecoration(
-                labelText: 'Workflow Name',
-                labelStyle: labelStyle(hasFocus: workflowNameFocus.hasFocus),
-              ),
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter a workflow name';
-                }
-                return null;
-              },
-              onChanged: controller.updateWorkflowName,
-            ),
-          ),
-          verticalMargin16,
-          Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: DropdownButtonFormField<String>(
-              focusNode: flutterVersionFocus,
-              value: workflowModel.flutter.version,
-              decoration: InputDecoration(
-                labelText: 'Flutter Version',
-                labelStyle: labelStyle(hasFocus: flutterVersionFocus.hasFocus),
-              ),
-              items: flutterVersionList.map((value) {
-                return DropdownMenuItem(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (value) {
-                controller.updateFlutterVersion(
-                  value ?? flutterVersionList[0],
-                );
-              },
-            ),
-          ),
-          verticalMargin16,
-          Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: TextFormField(
-              focusNode: currentWorkingDirectoryFocus,
-              initialValue: workflowModel.currentWorkingDirectory,
-              decoration: InputDecoration(
-                labelText: 'Current Working Directory',
-                labelStyle: labelStyle(
-                  hasFocus: currentWorkingDirectoryFocus.hasFocus,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: TextFormField(
+                focusNode: workflowNameFocus,
+                initialValue: workflowModel.name,
+                decoration: InputDecoration(
+                  labelText: 'Workflow Name',
+                  labelStyle: labelStyle(hasFocus: workflowNameFocus.hasFocus),
                 ),
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return 'Please enter a workflow name';
+                  }
+                  return null;
+                },
+                onChanged: controller.updateWorkflowName,
               ),
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter current working directory';
-                }
-                return null;
-              },
-              onChanged: controller.updateCurrentWorkingDirectory,
             ),
-          ),
-        ],
-      ),
+            verticalMargin16,
+            Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: DropdownButtonFormField<String>(
+                focusNode: flutterVersionFocus,
+                value: workflowModel.flutter.version,
+                decoration: InputDecoration(
+                  labelText: 'Flutter Version',
+                  labelStyle:
+                      labelStyle(hasFocus: flutterVersionFocus.hasFocus),
+                ),
+                items: flutterVersionList.map((value) {
+                  return DropdownMenuItem(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  controller.updateFlutterVersion(
+                    value ?? flutterVersionList[0],
+                  );
+                },
+              ),
+            ),
+            verticalMargin16,
+            Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: TextFormField(
+                focusNode: currentWorkingDirectoryFocus,
+                initialValue: workflowModel.currentWorkingDirectory,
+                decoration: InputDecoration(
+                  labelText: 'Current Working Directory',
+                  labelStyle: labelStyle(
+                    hasFocus: currentWorkingDirectoryFocus.hasFocus,
+                  ),
+                ),
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return 'Please enter current working directory';
+                  }
+                  return null;
+                },
+                onChanged: controller.updateCurrentWorkingDirectory,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
