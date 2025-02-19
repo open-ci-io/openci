@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dashboard/colors.dart';
 import 'package:dashboard/main.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
@@ -15,7 +15,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
-import 'package:timelines_plus/timelines_plus.dart';
 
 class StepsSection extends ConsumerWidget {
   const StepsSection(this.workflowModel, this.firebaseSuite, {super.key});
@@ -33,14 +32,76 @@ class StepsSection extends ConsumerWidget {
     );
     final steps = state.steps;
 
-    const stepList = [
-      'Flutter Pub Get',
-      'Run Flutter Test',
-      'Flutter Build IPA',
-      'Upload to App Store',
-      'Notify Slack',
-    ];
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final cards = <Card>[
+      for (int index = 0; index < steps.length; index += 1)
+        Card(
+          color: colorScheme.surfaceBright,
+          key: Key('$index'),
+          child: SizedBox(
+            height: 80,
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 30,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    steps[index].name,
+                    style: textTheme.titleMedium,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  verticalMargin8,
+                  Text(
+                    steps[index].command,
+                    style: textTheme.labelSmall!.copyWith(
+                      fontWeight: FontWeight.w100,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+    ];
+
+    Widget proxyDecorator(
+      Widget child,
+      int index,
+      Animation<double> animation,
+    ) {
+      return AnimatedBuilder(
+        animation: animation,
+        builder: (BuildContext context, Widget? child) {
+          final animValue = Curves.easeInOut.transform(animation.value);
+          final elevation = lerpDouble(1, 6, animValue)!;
+          final scale = lerpDouble(1, 1.02, animValue)!;
+          return Transform.scale(
+            scale: scale,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(
+                  width: 0.6,
+                  color: colorScheme.primary,
+                ),
+              ),
+              elevation: elevation,
+              color: cards[index].color,
+              child: cards[index].child,
+            ),
+          );
+        },
+        child: child,
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,78 +113,24 @@ class StepsSection extends ConsumerWidget {
             style: textTheme.titleMedium,
           ),
           children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 16),
-              child: Timeline.tileBuilder(
-                physics: const NeverScrollableScrollPhysics(),
+            Container(
+              padding: const EdgeInsets.only(left: 16, top: 8, right: 16),
+              height: 500,
+              child: ReorderableListView(
                 shrinkWrap: true,
-                builder: TimelineTileBuilder.connected(
-                  nodePositionBuilder: (context, index) => 0,
-                  firstConnectorBuilder: (context) => Container(),
-                  connectorBuilder: (context, index, connectorType) {
-                    return const SolidLineConnector(
-                      thickness: 1,
-                      color: OpenCIColors.onPrimary,
-                    );
-                  },
-                  indicatorBuilder: (context, index) {
-                    return const DotIndicator(
-                      color: OpenCIColors.primary,
-                      size: 8,
-                    );
-                  },
-                  contentsBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(stepList[index]),
-                    );
-                  },
-                  itemCount: stepList.length,
-                ),
+                proxyDecorator: proxyDecorator,
+                onReorder: (int oldIndex, int newIndex) {
+                  if (newIndex > oldIndex) {
+                    newIndex -= 1;
+                  }
+                  controller.reorderStep(oldIndex, newIndex);
+                },
+                children: cards,
               ),
             ),
           ],
         ),
       ],
-    );
-
-    return const Padding(
-      padding: EdgeInsets.all(16),
-
-      // child: Column(
-      //   crossAxisAlignment: CrossAxisAlignment.start,
-      //   children: [
-      //     Row(
-      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //       children: [
-      //         const Text(
-      //           'Steps',
-      //           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      //         ),
-      //         IconButton(
-      //           icon: const Icon(Icons.add),
-      //           onPressed: () => controller.addStepByIndex(steps.length),
-      //         ),
-      //       ],
-      //     ),
-      //     verticalMargin16,
-      //     ReorderableListView.builder(
-      //       shrinkWrap: true,
-      //       physics: const NeverScrollableScrollPhysics(),
-      //       itemCount: steps.length,
-      //       onReorder: controller.reorderStep,
-      //       itemBuilder: (_, index) {
-      //         return _StepItem(
-      //           key: UniqueKey(),
-      //           step: steps[index],
-      //           index: index,
-      //           workflowModel: workflowModel,
-      //           firebaseSuite: firebaseSuite,
-      //         );
-      //       },
-      //     ),
-      //   ],
-      // ),
     );
   }
 }
