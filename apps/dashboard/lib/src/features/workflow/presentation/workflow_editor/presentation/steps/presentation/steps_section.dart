@@ -45,6 +45,8 @@ class StepsSection extends HookConsumerWidget {
                 builder: (context) => _DialoBody(
                   stepTitleEditingController: stepTitleEditingController,
                   stepCommandEditingController: stepCommandEditingController,
+                  controller: controller,
+                  stepIndex: index,
                 ),
               );
             },
@@ -155,17 +157,21 @@ class StepsSection extends HookConsumerWidget {
   }
 }
 
-class _DialoBody extends StatelessWidget {
+class _DialoBody extends ConsumerWidget {
   const _DialoBody({
     required this.stepTitleEditingController,
     required this.stepCommandEditingController,
+    required this.controller,
+    required this.stepIndex,
   });
 
   final TextEditingController stepTitleEditingController;
   final TextEditingController stepCommandEditingController;
+  final WorkflowEditorController controller;
+  final int stepIndex;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final screenWidth = MediaQuery.of(context).size.width;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
@@ -250,7 +256,19 @@ class _DialoBody extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // controller.removeStep(stepIndex);
+                      // Navigator.of(context).pop();
+                      showDialog<void>(
+                        context: context,
+                        builder: (context) {
+                          return _DeleteStepConfirmationDialog(
+                            controller: controller,
+                            stepIndex: stepIndex,
+                          );
+                        },
+                      );
+                    },
                     child: Text(
                       'Delete',
                       style: textTheme.bodyMedium!.copyWith(
@@ -261,7 +279,7 @@ class _DialoBody extends StatelessWidget {
                   ),
                   horizontalMargin16,
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () => Navigator.of(context).pop(),
                     child: Text(
                       'Cancel',
                       style: textTheme.bodyMedium!.copyWith(
@@ -272,7 +290,18 @@ class _DialoBody extends StatelessWidget {
                   ),
                   horizontalMargin16,
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      controller
+                        ..updateCommand(
+                          stepIndex,
+                          stepCommandEditingController.text,
+                        )
+                        ..updateStepName(
+                          stepIndex,
+                          stepTitleEditingController.text,
+                        );
+                      Navigator.of(context).pop();
+                    },
                     child: Text(
                       'Save',
                       style: textTheme.bodyMedium!.copyWith(
@@ -287,6 +316,54 @@ class _DialoBody extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DeleteStepConfirmationDialog extends StatelessWidget {
+  const _DeleteStepConfirmationDialog({
+    required this.controller,
+    required this.stepIndex,
+  });
+
+  final WorkflowEditorController controller;
+  final int stepIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    return AlertDialog(
+      title: const Text('Delete Step'),
+      content: const Text(
+        'Are you sure you want to delete this step?',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(
+            'Cancel',
+            style: textTheme.bodyMedium!.copyWith(
+              fontWeight: FontWeight.w300,
+              color: colorScheme.primary,
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            controller.removeStep(stepIndex);
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            'Delete',
+            style: textTheme.bodyMedium!.copyWith(
+              fontWeight: FontWeight.w300,
+              color: colorScheme.error,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
