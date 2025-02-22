@@ -138,12 +138,13 @@ class StepsSection extends HookConsumerWidget {
                 children: cards,
               ),
             ),
+            verticalMargin10,
             IconButton(
               onPressed: () {
                 controller.addStepByIndex(steps.length);
               },
               icon: Icon(
-                Icons.add,
+                Icons.add_sharp,
                 color: colorScheme.primary,
               ),
             ),
