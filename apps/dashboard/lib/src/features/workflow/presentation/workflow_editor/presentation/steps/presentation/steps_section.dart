@@ -26,10 +26,8 @@ class StepsSection extends HookConsumerWidget {
 
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final screenWidth = MediaQuery.of(context).size.width;
     final stepTitleEditingController = useTextEditingController();
     final stepCommandEditingController = useTextEditingController();
-    const textFieldWidth = 0.6;
 
     final cards = <Card>[
       for (int index = 0; index < steps.length; index += 1)
@@ -44,122 +42,9 @@ class StepsSection extends HookConsumerWidget {
               showAdaptiveDialog<void>(
                 barrierDismissible: true,
                 context: context,
-                builder: (context) => Dialog(
-                  child: SizedBox(
-                    width: screenWidth * 0.6,
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Edit Step',
-                                style: textTheme.titleLarge,
-                              ),
-                              IconButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                icon: const Icon(Icons.close),
-                              ),
-                            ],
-                          ),
-                          verticalMargin24,
-                          TextField(
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w300,
-                            ),
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.all(18),
-                              labelText: 'Title',
-                              border: const OutlineInputBorder(),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  width: textFieldWidth,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  width: textFieldWidth,
-                                  color: colorScheme.primary,
-                                ),
-                              ),
-                            ),
-                            controller: stepTitleEditingController,
-                          ),
-                          verticalMargin16,
-                          TextField(
-                            minLines: 10,
-                            maxLines: null,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w300,
-                            ),
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.all(18),
-                              labelText: 'Command',
-                              border: const OutlineInputBorder(),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  width: textFieldWidth,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  width: textFieldWidth,
-                                  color: colorScheme.primary,
-                                ),
-                              ),
-                            ),
-                            controller: stepCommandEditingController,
-                          ),
-                          verticalMargin24,
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              TextButton(
-                                onPressed: () {},
-                                child: Text(
-                                  'Delete',
-                                  style: textTheme.bodyMedium!.copyWith(
-                                    color: colorScheme.error,
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                ),
-                              ),
-                              horizontalMargin16,
-                              TextButton(
-                                onPressed: () {},
-                                child: Text(
-                                  'Cancel',
-                                  style: textTheme.bodyMedium!.copyWith(
-                                    color: colorScheme.primary,
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                ),
-                              ),
-                              horizontalMargin16,
-                              TextButton(
-                                onPressed: () {},
-                                child: Text(
-                                  'Save',
-                                  style: textTheme.bodyMedium!.copyWith(
-                                    color: colorScheme.primary,
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                builder: (context) => _DialoBody(
+                  stepTitleEditingController: stepTitleEditingController,
+                  stepCommandEditingController: stepCommandEditingController,
                 ),
               );
             },
@@ -265,6 +150,142 @@ class StepsSection extends HookConsumerWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _DialoBody extends StatelessWidget {
+  const _DialoBody({
+    required this.stepTitleEditingController,
+    required this.stepCommandEditingController,
+  });
+
+  final TextEditingController stepTitleEditingController;
+  final TextEditingController stepCommandEditingController;
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    const textFieldWidth = 0.6;
+
+    return Dialog(
+      child: SizedBox(
+        width: screenWidth * 0.6,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Edit Step',
+                    style: textTheme.titleLarge,
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              verticalMargin24,
+              TextField(
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w300,
+                ),
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.all(18),
+                  labelText: 'Title',
+                  border: const OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: textFieldWidth,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: textFieldWidth,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ),
+                controller: stepTitleEditingController,
+              ),
+              verticalMargin16,
+              TextField(
+                minLines: 10,
+                maxLines: null,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w300,
+                ),
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.all(18),
+                  labelText: 'Command',
+                  border: const OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: textFieldWidth,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: textFieldWidth,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ),
+                controller: stepCommandEditingController,
+              ),
+              verticalMargin24,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      'Delete',
+                      style: textTheme.bodyMedium!.copyWith(
+                        color: colorScheme.error,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ),
+                  horizontalMargin16,
+                  TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      'Cancel',
+                      style: textTheme.bodyMedium!.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ),
+                  horizontalMargin16,
+                  TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      'Save',
+                      style: textTheme.bodyMedium!.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
