@@ -52,6 +52,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.robotoTextTheme(
           ThemeData.dark().textTheme,
         ).apply(
+          fontFamily: 'roboto',
           bodyColor: OpenCIColors.onPrimary,
           displayColor: OpenCIColors.onPrimary,
         ),
