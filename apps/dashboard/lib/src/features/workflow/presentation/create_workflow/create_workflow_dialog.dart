@@ -47,11 +47,6 @@ Future<bool> ascKeysUploaded(Ref ref) async {
   return true;
 }
 
-// TODO: CWDをDropDownから選択できるように
-// TODO: basebranchも選択できるように
-// TODO: また、CWDを更新できるように (Firestoreに保存しておくため)
-// TODO:
-
 @riverpod
 Future<bool> saveWorkflow(
   Ref ref, {
@@ -104,7 +99,7 @@ class _DialogBodyState extends ConsumerState<CreateWorkflowDialog>
   late final _currentPage = createSignal(_Page.chooseTemplate);
   late final _workflowName = createSignal('New Workflow');
   late final _flutterBuildIpaCommand = createSignal('flutter build ipa');
-  late final _cwd = createSignal('/');
+  late final _cwd = createSignal('');
   late final _baseBranch = createSignal('main');
   late final _githubTriggerType = createSignal(GitHubTriggerType.push);
 
@@ -218,6 +213,7 @@ class _FlutterBuildIpa extends HookWidget {
     final textTheme = Theme.of(context).textTheme;
     const textFieldBorderWidth = 0.6;
     final colorScheme = Theme.of(context).colorScheme;
+
     final workflowNameEditingController =
         useTextEditingController(text: workflowName.value);
     final flutterBuildCommandEditingController =
@@ -389,6 +385,7 @@ class _FlutterBuildIpa extends HookWidget {
                 flutterBuildIpaCommand.value =
                     flutterBuildCommandEditingController.text;
                 cwd.value = cwdEditingController.text;
+                baseBranch.value = baseBranchEditingController.text;
               },
               child: const Text(
                 'Save',
