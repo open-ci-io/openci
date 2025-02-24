@@ -1,5 +1,6 @@
 import 'package:dashboard/colors.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
+import 'package:dashboard/src/features/workflow/presentation/create_workflow/create_workflow_dialog.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/edit_workflow.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page_controller.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,12 @@ class WorkflowListPage extends ConsumerWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         heroTag: 'add',
-        onPressed: controller.addWorkflow,
+        onPressed: () {
+          showDialog<void>(
+            context: context,
+            builder: (context) => const CreateWorkflowDialog(),
+          );
+        },
         child: const Icon(Icons.add),
       ),
       body: StreamBuilder(
