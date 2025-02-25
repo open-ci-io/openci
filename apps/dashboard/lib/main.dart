@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const inputDecorationBorderWidth = 0.6;
     return MaterialApp(
       theme: ThemeData(
         colorScheme: const ColorScheme.dark(
@@ -57,13 +58,21 @@ class MyApp extends StatelessWidget {
           displayColor: OpenCIColors.onPrimary,
         ),
         inputDecorationTheme: const InputDecorationTheme(
+          contentPadding: EdgeInsets.all(18),
+          border: OutlineInputBorder(),
           labelStyle: TextStyle(color: OpenCIColors.onPrimary),
           hintStyle: TextStyle(color: OpenCIColors.onPrimary),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: OpenCIColors.onPrimary),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              width: inputDecorationBorderWidth,
+              color: OpenCIColors.onPrimary,
+            ),
           ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: OpenCIColors.primary),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              width: inputDecorationBorderWidth,
+              color: OpenCIColors.primary,
+            ),
           ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(

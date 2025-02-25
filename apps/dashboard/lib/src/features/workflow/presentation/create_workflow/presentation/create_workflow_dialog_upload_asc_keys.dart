@@ -16,8 +16,6 @@ class UploadASCKeys extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const textFieldBorderWidth = 0.6;
-    final colorScheme = Theme.of(context).colorScheme;
     final stepTitleEditingController = useTextEditingController();
     return OpenCIDialog(
       title: const Text(
@@ -33,22 +31,8 @@ class UploadASCKeys extends HookConsumerWidget {
                   fontSize: 14,
                   fontWeight: FontWeight.w300,
                 ),
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.all(18),
+                decoration: const InputDecoration(
                   labelText: 'Issuer Id',
-                  border: const OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: textFieldBorderWidth,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: textFieldBorderWidth,
-                      color: colorScheme.primary,
-                    ),
-                  ),
                 ),
                 controller: stepTitleEditingController,
               ),
@@ -60,22 +44,8 @@ class UploadASCKeys extends HookConsumerWidget {
                   fontSize: 14,
                   fontWeight: FontWeight.w300,
                 ),
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.all(18),
+                decoration: const InputDecoration(
                   labelText: 'Key Id',
-                  border: const OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: textFieldBorderWidth,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: textFieldBorderWidth,
-                      color: colorScheme.primary,
-                    ),
-                  ),
                 ),
                 controller: stepTitleEditingController,
               ),
@@ -94,21 +64,7 @@ class UploadASCKeys extends HookConsumerWidget {
               onPressed: () {},
               icon: const Icon(Icons.folder_open),
             ),
-            contentPadding: const EdgeInsets.all(18),
             labelText: '.p8 key file (select file)',
-            border: const OutlineInputBorder(),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                width: textFieldBorderWidth,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                width: textFieldBorderWidth,
-                color: colorScheme.primary,
-              ),
-            ),
           ),
           controller: stepTitleEditingController,
         ),

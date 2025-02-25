@@ -172,8 +172,6 @@ class FlutterBuildIpa extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    const textFieldBorderWidth = 0.6;
-    final colorScheme = Theme.of(context).colorScheme;
 
     final workflowNameEditingController =
         useTextEditingController(text: workflowName.value);
@@ -193,22 +191,9 @@ class FlutterBuildIpa extends HookWidget {
             fontSize: 14,
             fontWeight: FontWeight.w300,
           ),
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.all(18),
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.all(18),
             labelText: 'Workflow Name',
-            border: const OutlineInputBorder(),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                width: textFieldBorderWidth,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                width: textFieldBorderWidth,
-                color: colorScheme.primary,
-              ),
-            ),
           ),
           controller: workflowNameEditingController,
         ),
@@ -218,22 +203,9 @@ class FlutterBuildIpa extends HookWidget {
             fontSize: 14,
             fontWeight: FontWeight.w300,
           ),
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.all(18),
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.all(18),
             labelText: 'flutter build command',
-            border: const OutlineInputBorder(),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                width: textFieldBorderWidth,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                width: textFieldBorderWidth,
-                color: colorScheme.primary,
-              ),
-            ),
           ),
           controller: flutterBuildCommandEditingController,
         ),
@@ -243,22 +215,9 @@ class FlutterBuildIpa extends HookWidget {
             fontSize: 14,
             fontWeight: FontWeight.w300,
           ),
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.all(18),
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.all(18),
             labelText: 'current working directory',
-            border: const OutlineInputBorder(),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                width: textFieldBorderWidth,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                width: textFieldBorderWidth,
-                color: colorScheme.primary,
-              ),
-            ),
           ),
           controller: cwdEditingController,
         ),
@@ -269,21 +228,8 @@ class FlutterBuildIpa extends HookWidget {
               child: DropdownButtonFormField<GitHubTriggerType>(
                 value: GitHubTriggerType.push,
                 style: const TextStyle(fontWeight: FontWeight.w300),
-                decoration: InputDecoration(
-                  border: const OutlineInputBorder(),
+                decoration: const InputDecoration(
                   labelText: 'Trigger Type',
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: textFieldBorderWidth,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: textFieldBorderWidth,
-                      color: colorScheme.primary,
-                    ),
-                  ),
                 ),
                 items: GitHubTriggerType.values.map((type) {
                   return DropdownMenuItem(
@@ -303,22 +249,9 @@ class FlutterBuildIpa extends HookWidget {
                   fontSize: 14,
                   fontWeight: FontWeight.w300,
                 ),
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.all(18),
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.all(18),
                   labelText: 'base branch',
-                  border: const OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: textFieldBorderWidth,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: textFieldBorderWidth,
-                      color: colorScheme.primary,
-                    ),
-                  ),
                 ),
                 controller: baseBranchEditingController,
               ),
