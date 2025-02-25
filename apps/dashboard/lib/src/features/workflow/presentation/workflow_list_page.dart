@@ -215,9 +215,7 @@ class _WorkflowListItemMenu extends StatelessWidget {
           ),
         ),
         MenuItemButton(
-          onPressed: () {
-            controller.deleteWorkflow(workflowModel.id);
-          },
+          onPressed: () => controller.deleteWorkflow(workflowModel.id),
           child: Text(
             'Delete',
             style: TextStyle(color: theme.error),

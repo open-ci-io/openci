@@ -11,3 +11,4 @@ export 'src/secret/openci_secret.dart';
 export 'src/firebase/firebase_options.dart';
 export 'src/flutter/flutter_version.dart';
 export 'src/workflow/user/openci_user.dart';
+export 'src/ditribution.dart';

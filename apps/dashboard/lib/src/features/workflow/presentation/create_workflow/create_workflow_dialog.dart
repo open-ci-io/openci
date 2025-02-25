@@ -17,8 +17,11 @@ enum _Page {
   checkASCKeyUpload,
   uploadASCKeys,
   flutterBuildIpa,
+  distribution,
   result,
 }
+
+// TODO(maffreud): move this to openci_models
 
 @riverpod
 Future<bool> ascKeysUploaded(Ref ref) async {
@@ -55,6 +58,7 @@ Future<bool> saveWorkflow(
   required GitHubTriggerType githubTriggerType,
   required String githubBaseBranch,
   required String flutterBuildIpaCommand,
+  required OpenCIAppDistributionTarget appDistributionTarget,
 }) async {
   final firestore = await getFirebaseFirestore();
   final firebaseAuth = await getFirebaseAuth();
@@ -81,9 +85,18 @@ Future<bool> saveWorkflow(
         name: 'Run Flutter Build IPA',
         command: flutterBuildIpaCommand,
       ),
+      if (appDistributionTarget == OpenCIAppDistributionTarget.testflight)
+        const WorkflowModelStep(
+          name: 'Upload to Testflight',
+          command:
+              'xcrun notarytool submit path/to/your.ipa --key-id API_KEY_ID --key /path/to/AuthKey_API_KEY_ID.p8 --issuer ISSUER_ID',
+        ),
     ],
   );
-  await firestore.collection(workflowsCollectionPath).add(workflow.toJson());
+  await firestore
+      .collection(workflowsCollectionPath)
+      .doc(workflow.id)
+      .set(workflow.toJson());
   return true;
 }
 
@@ -102,6 +115,8 @@ class _DialogBodyState extends ConsumerState<CreateWorkflowDialog>
   late final _cwd = createSignal('');
   late final _baseBranch = createSignal('main');
   late final _githubTriggerType = createSignal(GitHubTriggerType.push);
+  late final _appDistributionTarget =
+      createSignal(OpenCIAppDistributionTarget.none);
 
   @override
   Widget build(BuildContext context) {
@@ -123,14 +138,94 @@ class _DialogBodyState extends ConsumerState<CreateWorkflowDialog>
           baseBranch: _baseBranch,
           githubTriggerType: _githubTriggerType,
         ),
+      _Page.distribution => _Distribution(
+          appDistributionTarget: _appDistributionTarget,
+          currentPage: _currentPage,
+        ),
       _Page.result => _Result(
           currentWorkingDirectory: _cwd.value,
           workflowName: _workflowName.value,
           githubTriggerType: _githubTriggerType.value,
           githubBaseBranch: _baseBranch.value,
           flutterBuildIpaCommand: _flutterBuildIpaCommand.value,
+          appDistributionTarget: _appDistributionTarget.value,
         ),
     };
+  }
+}
+
+class _Distribution extends StatelessWidget {
+  const _Distribution({
+    required this.appDistributionTarget,
+    required this.currentPage,
+  });
+
+  final Signal<OpenCIAppDistributionTarget> appDistributionTarget;
+  final Signal<_Page> currentPage;
+
+  @override
+  Widget build(BuildContext context) {
+    return OpenCIDialog(
+      title: const Text('Distribution'),
+      children: [
+        // TODO(maffreud): add firebase app distribution support
+        // RadioListTile<OpenCIAppDistributionTarget>(
+        //   title: const Text('Firebase App Distribution'),
+        //   value: OpenCIAppDistributionTarget.firebaseAppDistribution,
+        //   groupValue: appDistributionTarget.value,
+        //   onChanged: (OpenCIAppDistributionTarget? value) {
+        //     if (value != null) {
+        //       appDistributionTarget.value = value;
+        //     }
+        //   },
+        // ),
+        RadioListTile<OpenCIAppDistributionTarget>(
+          title: Text(OpenCIAppDistributionTarget.testflight.name),
+          value: OpenCIAppDistributionTarget.testflight,
+          groupValue: appDistributionTarget.value,
+          onChanged: (OpenCIAppDistributionTarget? value) {
+            if (value != null) {
+              appDistributionTarget.value = value;
+            }
+          },
+        ),
+        RadioListTile<OpenCIAppDistributionTarget>(
+          title: Text(OpenCIAppDistributionTarget.none.name),
+          value: OpenCIAppDistributionTarget.none,
+          groupValue: appDistributionTarget.value,
+          onChanged: (OpenCIAppDistributionTarget? value) {
+            if (value != null) {
+              appDistributionTarget.value = value;
+            }
+          },
+        ),
+        verticalMargin16,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+              onPressed: () {
+                currentPage.value = _Page.flutterBuildIpa;
+              },
+              child: const Text(
+                'Back',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ),
+            horizontalMargin8,
+            TextButton(
+              onPressed: () async {
+                currentPage.value = _Page.result;
+              },
+              child: const Text(
+                'Save',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
 
@@ -380,12 +475,12 @@ class _FlutterBuildIpa extends HookWidget {
             horizontalMargin8,
             TextButton(
               onPressed: () async {
-                currentPage.value = _Page.result;
                 workflowName.value = workflowNameEditingController.text;
                 flutterBuildIpaCommand.value =
                     flutterBuildCommandEditingController.text;
                 cwd.value = cwdEditingController.text;
                 baseBranch.value = baseBranchEditingController.text;
+                currentPage.value = _Page.distribution;
               },
               child: const Text(
                 'Save',
@@ -406,6 +501,7 @@ class _Result extends ConsumerWidget {
     required this.githubTriggerType,
     required this.githubBaseBranch,
     required this.flutterBuildIpaCommand,
+    required this.appDistributionTarget,
   });
 
   final String currentWorkingDirectory;
@@ -413,7 +509,7 @@ class _Result extends ConsumerWidget {
   final GitHubTriggerType githubTriggerType;
   final String githubBaseBranch;
   final String flutterBuildIpaCommand;
-
+  final OpenCIAppDistributionTarget appDistributionTarget;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final future = ref.watch(
@@ -423,6 +519,7 @@ class _Result extends ConsumerWidget {
         githubTriggerType: githubTriggerType,
         githubBaseBranch: githubBaseBranch,
         flutterBuildIpaCommand: flutterBuildIpaCommand,
+        appDistributionTarget: appDistributionTarget,
       ),
     );
     final textTheme = Theme.of(context).textTheme;

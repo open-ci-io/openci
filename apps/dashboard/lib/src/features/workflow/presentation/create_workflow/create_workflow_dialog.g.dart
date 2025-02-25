@@ -23,7 +23,7 @@ final ascKeysUploadedProvider = AutoDisposeFutureProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AscKeysUploadedRef = AutoDisposeFutureProviderRef<bool>;
-String _$saveWorkflowHash() => r'38599b0d41253383baaacdf10bd59c3882a5270a';
+String _$saveWorkflowHash() => r'74e1a75784227d514e12dbe72f84cab26613e3c2';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -62,6 +62,7 @@ class SaveWorkflowFamily extends Family<AsyncValue<bool>> {
     required GitHubTriggerType githubTriggerType,
     required String githubBaseBranch,
     required String flutterBuildIpaCommand,
+    required OpenCIAppDistributionTarget appDistributionTarget,
   }) {
     return SaveWorkflowProvider(
       currentWorkingDirectory: currentWorkingDirectory,
@@ -69,6 +70,7 @@ class SaveWorkflowFamily extends Family<AsyncValue<bool>> {
       githubTriggerType: githubTriggerType,
       githubBaseBranch: githubBaseBranch,
       flutterBuildIpaCommand: flutterBuildIpaCommand,
+      appDistributionTarget: appDistributionTarget,
     );
   }
 
@@ -82,6 +84,7 @@ class SaveWorkflowFamily extends Family<AsyncValue<bool>> {
       githubTriggerType: provider.githubTriggerType,
       githubBaseBranch: provider.githubBaseBranch,
       flutterBuildIpaCommand: provider.flutterBuildIpaCommand,
+      appDistributionTarget: provider.appDistributionTarget,
     );
   }
 
@@ -109,6 +112,7 @@ class SaveWorkflowProvider extends AutoDisposeFutureProvider<bool> {
     required GitHubTriggerType githubTriggerType,
     required String githubBaseBranch,
     required String flutterBuildIpaCommand,
+    required OpenCIAppDistributionTarget appDistributionTarget,
   }) : this._internal(
           (ref) => saveWorkflow(
             ref as SaveWorkflowRef,
@@ -117,6 +121,7 @@ class SaveWorkflowProvider extends AutoDisposeFutureProvider<bool> {
             githubTriggerType: githubTriggerType,
             githubBaseBranch: githubBaseBranch,
             flutterBuildIpaCommand: flutterBuildIpaCommand,
+            appDistributionTarget: appDistributionTarget,
           ),
           from: saveWorkflowProvider,
           name: r'saveWorkflowProvider',
@@ -132,6 +137,7 @@ class SaveWorkflowProvider extends AutoDisposeFutureProvider<bool> {
           githubTriggerType: githubTriggerType,
           githubBaseBranch: githubBaseBranch,
           flutterBuildIpaCommand: flutterBuildIpaCommand,
+          appDistributionTarget: appDistributionTarget,
         );
 
   SaveWorkflowProvider._internal(
@@ -146,6 +152,7 @@ class SaveWorkflowProvider extends AutoDisposeFutureProvider<bool> {
     required this.githubTriggerType,
     required this.githubBaseBranch,
     required this.flutterBuildIpaCommand,
+    required this.appDistributionTarget,
   }) : super.internal();
 
   final String currentWorkingDirectory;
@@ -153,6 +160,7 @@ class SaveWorkflowProvider extends AutoDisposeFutureProvider<bool> {
   final GitHubTriggerType githubTriggerType;
   final String githubBaseBranch;
   final String flutterBuildIpaCommand;
+  final OpenCIAppDistributionTarget appDistributionTarget;
 
   @override
   Override overrideWith(
@@ -172,6 +180,7 @@ class SaveWorkflowProvider extends AutoDisposeFutureProvider<bool> {
         githubTriggerType: githubTriggerType,
         githubBaseBranch: githubBaseBranch,
         flutterBuildIpaCommand: flutterBuildIpaCommand,
+        appDistributionTarget: appDistributionTarget,
       ),
     );
   }
@@ -188,7 +197,8 @@ class SaveWorkflowProvider extends AutoDisposeFutureProvider<bool> {
         other.workflowName == workflowName &&
         other.githubTriggerType == githubTriggerType &&
         other.githubBaseBranch == githubBaseBranch &&
-        other.flutterBuildIpaCommand == flutterBuildIpaCommand;
+        other.flutterBuildIpaCommand == flutterBuildIpaCommand &&
+        other.appDistributionTarget == appDistributionTarget;
   }
 
   @override
@@ -199,6 +209,7 @@ class SaveWorkflowProvider extends AutoDisposeFutureProvider<bool> {
     hash = _SystemHash.combine(hash, githubTriggerType.hashCode);
     hash = _SystemHash.combine(hash, githubBaseBranch.hashCode);
     hash = _SystemHash.combine(hash, flutterBuildIpaCommand.hashCode);
+    hash = _SystemHash.combine(hash, appDistributionTarget.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -221,6 +232,9 @@ mixin SaveWorkflowRef on AutoDisposeFutureProviderRef<bool> {
 
   /// The parameter `flutterBuildIpaCommand` of this provider.
   String get flutterBuildIpaCommand;
+
+  /// The parameter `appDistributionTarget` of this provider.
+  OpenCIAppDistributionTarget get appDistributionTarget;
 }
 
 class _SaveWorkflowProviderElement
@@ -241,6 +255,9 @@ class _SaveWorkflowProviderElement
   @override
   String get flutterBuildIpaCommand =>
       (origin as SaveWorkflowProvider).flutterBuildIpaCommand;
+  @override
+  OpenCIAppDistributionTarget get appDistributionTarget =>
+      (origin as SaveWorkflowProvider).appDistributionTarget;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
