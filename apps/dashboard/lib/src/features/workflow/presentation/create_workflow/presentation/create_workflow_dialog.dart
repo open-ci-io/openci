@@ -1,6 +1,10 @@
-import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/create_workflow_dialog_choose_template.dart';
-import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/create_workflow_dialog_upload_asc_keys.dart';
-import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages.dart';
+import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/check_asc_key_upload.dart';
+import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/choose_template.dart';
+import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/distribution.dart';
+import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/enum.dart';
+import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/flutter_build_ipa.dart';
+import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/result.dart';
+import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/upload_asc_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
