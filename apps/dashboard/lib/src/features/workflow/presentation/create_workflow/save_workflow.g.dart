@@ -1,29 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'create_workflow_dialog.dart';
+part of 'save_workflow.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$ascKeysUploadedHash() => r'0917bbc6df12566b11e64a4e9cc31122c672df77';
-
-/// See also [ascKeysUploaded].
-@ProviderFor(ascKeysUploaded)
-final ascKeysUploadedProvider = AutoDisposeFutureProvider<bool>.internal(
-  ascKeysUploaded,
-  name: r'ascKeysUploadedProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$ascKeysUploadedHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef AscKeysUploadedRef = AutoDisposeFutureProviderRef<bool>;
-String _$saveWorkflowHash() => r'74e1a75784227d514e12dbe72f84cab26613e3c2';
+String _$saveWorkflowHash() => r'b4642d2648f6695468cba702bb2bdb4ae0e3d486';
 
 /// Copied from Dart SDK
 class _SystemHash {
