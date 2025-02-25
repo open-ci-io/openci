@@ -2,8 +2,15 @@ import 'package:dashboard/src/services/firebase.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+part 'create_workflow_dialog_controller.g.dart';
 
-part 'are_app_store_connect_keys_uploaded.g.dart';
+@riverpod
+class CreateWorkflowDialogController extends _$CreateWorkflowDialogController {
+  @override
+  void build() {
+    return;
+  }
+}
 
 @riverpod
 Future<bool> areAppStoreConnectKeysUploaded(Ref ref) async {

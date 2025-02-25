@@ -1,4 +1,4 @@
-import 'package:dashboard/src/features/workflow/presentation/create_workflow/pages.dart';
+import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
