@@ -1,5 +1,5 @@
 class OpenCIPredefinedSecretKeys {
-  static const String ascIssuerId = 'OPENCI_ASC_ISSUER_ID';
-  static const String ascKeyId = 'OPENCI_ASC_KEY_ID';
-  static const String ascKeyBase64 = 'OPENCI_ASC_KEY_BASE64';
+  static const ascIssuerId = 'OPENCI_ASC_ISSUER_ID';
+  static const ascKeyId = 'OPENCI_ASC_KEY_ID';
+  static const ascKeyBase64 = 'OPENCI_ASC_KEY_BASE64';
 }
