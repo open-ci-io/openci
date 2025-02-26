@@ -4,6 +4,7 @@ import 'package:dashboard/src/features/workflow/presentation/create_workflow/pre
 import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/enum.dart';
 import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/flutter_build_ipa.dart';
 import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/result.dart';
+import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/select_asc_keys.dart';
 import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/upload_asc_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -27,6 +28,9 @@ class _DialogBodyState extends ConsumerState<CreateWorkflowDialog>
   late final _githubTriggerType = createSignal(GitHubTriggerType.push);
   late final _appDistributionTarget =
       createSignal(OpenCIAppDistributionTarget.none);
+  late final _issuerId = createSignal('');
+  late final _keyId = createSignal('');
+  late final _keyBase64 = createSignal('');
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +41,16 @@ class _DialogBodyState extends ConsumerState<CreateWorkflowDialog>
       PageEnum.checkASCKeyUpload => CheckASCKeyUpload(
           currentPage: _currentPage,
         ),
+      PageEnum.selectASCKeys => SelectASCKeys(
+          issuerId: _issuerId,
+          keyId: _keyId,
+          keyBase64: _keyBase64,
+          currentPage: _currentPage,
+        ),
       PageEnum.uploadASCKeys => UploadASCKeys(
+          issuerId: _issuerId.value,
+          keyId: _keyId.value,
+          keyBase64: _keyBase64.value,
           currentPage: _currentPage,
         ),
       PageEnum.flutterBuildIpa => FlutterBuildIpa(

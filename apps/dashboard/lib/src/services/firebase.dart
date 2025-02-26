@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 Future<FirebaseOptions?> getFirebaseOptions({SharedPreferences? prefs}) async {
   final plist = await readPlist(prefs: prefs);
@@ -48,3 +49,5 @@ Future<FirebaseFirestore> getFirebaseFirestore() async {
 
   return FirebaseFirestore.instanceFor(app: apps);
 }
+
+String getDocumentId() => const Uuid().v4();

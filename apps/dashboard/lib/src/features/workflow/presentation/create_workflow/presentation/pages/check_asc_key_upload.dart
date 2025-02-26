@@ -50,7 +50,7 @@ class CheckASCKeyUpload extends ConsumerWidget {
                 verticalMargin16,
                 TextButton(
                   onPressed: () {
-                    currentPage.value = PageEnum.uploadASCKeys;
+                    currentPage.value = PageEnum.selectASCKeys;
                   },
                   child: const Text('Upload ASC keys'),
                 ),
