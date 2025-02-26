@@ -3,12 +3,20 @@ title: Running OpenCI
 description: 'How to run OpenCI'
 ---
 
-To run OpenCI, execute the following command.
+To run OpenCI, execute the following command:
+
+The necessary files are the GitHub Apps Private Key `.pem` file and the Firebase service account `.json` file, which you created on the previous page.
+
+You will also need your Firebase project ID.
 
 <CodeGroup>
 
   ```bash macOS
-  dart run openci_runner runner --pem-path path-to-pem-file --service-account-path path-to-service-account-json-file
+  openci_runner runner --pem-path path-to-pem-file \
+    --service-account-path path-to-service-account-json-file \
+    --project-id project-id
   ```
 
 </CodeGroup>
+
+Running this command will start the OpenCI Runner.
