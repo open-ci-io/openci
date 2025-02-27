@@ -167,13 +167,9 @@ GitHubアプリのPrivate Keyを作成します。次のステップでも使用
   <img src="/images/github_private_key.png" />
 </Frame>
 
-<CodeGroup>
+このPrivate KeyをFirebase Functionsの`PRIVATE_KEY`に設定します。
 
-  ```bash macOS
-  firebase functions:secrets:set PRIVATE_KEY
-  ```
-
-</CodeGroup>
+本来は、firebase CLIでSecretを登録すべきですが、現在のCLIは`.pem`の読み込み時にクラッシュするため、GCPのSecret ManagerからGUIで登録してください。
 
 すべてのSecretを設定したら、Firebase Functionsをデプロイします。
 

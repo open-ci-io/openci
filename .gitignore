@@ -4,3 +4,4 @@ melos.yaml
 .fvm/
 
 gen_dmg.sh
+scripts/
