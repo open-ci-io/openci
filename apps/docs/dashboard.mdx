@@ -1,0 +1,30 @@
+---
+title: OpenCI Dashboard
+description: 'How to use the OpenCI Dashboard'
+---
+
+The OpenCI Dashboard allows you to perform various OpenCI operations. Currently, it only supports macOS.
+
+## GoogleService-Info.plist Configuration
+
+The OpenCI Dashboard uses GoogleService-Info.plist for Firebase authentication.
+
+Add a macOS app to your Firebase project. The bundle ID is `io.openci.dashboard.ios`.
+
+After adding the macOS app, download the GoogleService-Info.plist file.
+
+## Launching the Dashboard
+
+Download the Dashboard.dmg file from https://github.com/open-ci-io/openci.
+
+Open the downloaded Dashboard.dmg file to launch the OpenCI Dashboard.
+
+## Configuring the Dashboard
+
+After launching the OpenCI Dashboard, configure the GoogleService-Info.plist.
+
+## Firebase Configuration
+
+OpenCI uses Firestore and Firebase Auth. Provision Firestore and enable email address sign-in in Firebase Auth.
+
+After that, you will be able to create an account.
