@@ -1,4 +1,5 @@
 import 'package:dart_firebase_admin_plus/firestore.dart';
+import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/commands/runner_command.dart';
 import 'package:openci_runner/src/features/get_build_jobs.dart';
@@ -11,16 +12,19 @@ import 'package:openci_runner/src/service/uuid_service.dart';
 import 'package:sentry/sentry.dart';
 
 Future<void> mainLoop(Firestore firestore, String pem) async {
+  final logger = Logger();
+  final progress = logger.progress(
+    'No build jobs found. Waiting ${pollingInterval.inSeconds} seconds before retrying.',
+  );
   while (true) {
     final buildJob = await tryGetBuildJob(
       firestore: firestore,
-      log: () => openciLog(
-        'No build jobs found. Waiting ${pollingInterval.inSeconds} seconds before retrying.',
-      ),
     );
     if (buildJob == null) {
       continue;
     }
+
+    progress.update('Successfully got a build job');
 
     final vmName = generateUUID;
     final logId = generateUUID;
@@ -28,8 +32,10 @@ Future<void> mainLoop(Firestore firestore, String pem) async {
     try {
       await processBuildJob(buildJob, firestore, pem, vmName, logId);
     } catch (e, stackTrace) {
+      progress.update('Failed to process build job');
       await _handleBuildError(buildJob.id, e, stackTrace);
     } finally {
+      progress.update('Cleaning up VM and build state');
       await _cleanupVmAndBuildState(buildJob.id, vmName);
     }
   }

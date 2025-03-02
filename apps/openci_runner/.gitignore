@@ -14,11 +14,7 @@ coverage/
 # Android studio and IntelliJ
 .idea
 
-github_apps.pem
-github_apps_dev.pem
-
-service_account.json
-service_account_dev.json
+secrets/
 
 # Prod URLs
 lib/src/constants/prod_urls.dart

@@ -50,11 +50,9 @@ Future<BuildJob?> getBuildJob(
 
 Future<BuildJob?> tryGetBuildJob({
   required Firestore firestore,
-  required void Function() log,
 }) async {
   final buildJob = await getBuildJob(firestore);
   if (buildJob == null) {
-    log();
     await Future<void>.delayed(pollingInterval);
   }
   return buildJob;
