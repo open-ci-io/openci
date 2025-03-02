@@ -9,7 +9,7 @@ dependencies:
   args: ^2.5.0
   cli_completion: ^0.5.1
   dart_firebase_admin_plus: ^0.5.0
-  dart_jsonwebtoken: ^2.14.2
+  dart_jsonwebtoken: ^3.1.1
   dartssh2: ^2.10.0
   github: ^9.24.0
   http: ^1.2.2
