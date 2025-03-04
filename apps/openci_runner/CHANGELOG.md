@@ -1,3 +1,6 @@
+## 0.10.0-dev-2
+
+- fix: main loop log
 
 ## 0.10.0-dev.1
 
