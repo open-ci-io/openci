@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/features/secrets/presentation/secret_page.dart';
 import 'package:dashboard/src/features/welcome_page/presentation/welcome_page.dart';
-import 'package:dashboard/src/features/workflow/presentation/workflow_list_page.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/workflow_list_page.dart';
 import 'package:dashboard/src/services/firebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

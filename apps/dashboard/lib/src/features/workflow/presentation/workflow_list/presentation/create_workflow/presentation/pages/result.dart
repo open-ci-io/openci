@@ -1,6 +1,6 @@
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/common_widgets/openci_dialog.dart';
-import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/save_workflow.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow/presentation/save_workflow.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';

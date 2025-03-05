@@ -1,11 +1,13 @@
 import 'dart:ui';
 
 import 'package:dashboard/src/common_widgets/margins.dart';
+import 'package:dashboard/src/common_widgets/openci_dialog.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/steps/presentation/edit_step_dialog.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 
@@ -144,7 +146,11 @@ class StepsSection extends HookConsumerWidget {
             verticalMargin10,
             IconButton(
               onPressed: () {
-                controller.addStepByIndex(steps.length);
+                // controller.addStepByIndex(steps.length);
+                showDialog(
+                  context: context,
+                  builder: (context) => const ChooseStepTemplate(),
+                );
               },
               icon: Icon(
                 Icons.add_sharp,
@@ -153,6 +159,39 @@ class StepsSection extends HookConsumerWidget {
             ),
           ],
         ),
+      ],
+    );
+  }
+}
+
+class ChooseStepTemplate extends StatelessWidget {
+  const ChooseStepTemplate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return OpenCIDialog(
+      title: Text(
+        'Choose a template',
+        style: textTheme.titleLarge,
+      ),
+      children: [
+        TextButton(
+          onPressed: () {},
+          child: const ListTile(
+            title: Text('Convert Base64 to File'),
+            leading: Icon(FontAwesomeIcons.bolt),
+          ),
+        ),
+        verticalMargin8,
+        TextButton(
+          onPressed: () {},
+          child: const ListTile(
+            title: Text('From scratch'),
+            leading: Icon(FontAwesomeIcons.pen),
+          ),
+        ),
+        verticalMargin16,
       ],
     );
   }

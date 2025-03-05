@@ -1,12 +1,13 @@
 import 'package:dashboard/colors.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
-import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/create_workflow_dialog.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/edit_workflow.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/create_workflow_dialog.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
+import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 class WorkflowListPage extends ConsumerWidget {
   const WorkflowListPage({super.key, required this.firebaseSuite});
@@ -17,17 +18,31 @@ class WorkflowListPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final controller =
         ref.watch(workflowPageControllerProvider(firebaseSuite).notifier);
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         heroTag: 'add',
         onPressed: () {
-          showDialog<void>(
+          WoltModalSheet.show<void>(
             context: context,
-            builder: (context) => const CreateWorkflowDialog(),
+            pageListBuilder: (modalSheetContext) {
+              final textTheme = Theme.of(context).textTheme;
+              return [
+                chooseWorkflowTemplate(
+                  modalSheetContext,
+                  textTheme,
+                ),
+              ];
+            },
+            modalTypeBuilder: (context) => const WoltDialogType(),
+            onModalDismissedWithBarrierTap: () {
+              Navigator.of(context).pop();
+            },
           );
         },
         child: const Icon(Icons.add),
       ),
+      // TODO(someone): Use riverpod (StreamProvider)
       body: StreamBuilder(
         stream: controller.workflows(),
         builder: (context, snapshot) {

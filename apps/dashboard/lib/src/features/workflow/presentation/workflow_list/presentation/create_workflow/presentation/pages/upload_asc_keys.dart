@@ -1,7 +1,7 @@
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/common_widgets/openci_dialog.dart';
-import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/enum.dart';
-import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/save_asc_keys.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow/presentation/pages/enum.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow/presentation/save_asc_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:signals/signals_flutter.dart';

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/common_widgets/openci_dialog.dart';
-import 'package:dashboard/src/features/workflow/presentation/create_workflow/presentation/pages/enum.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow/presentation/pages/enum.dart';
 import 'package:dashboard/src/services/app_store_connect.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
