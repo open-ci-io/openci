@@ -6,7 +6,7 @@ part of 'secrets_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$secretsRepositoryHash() => r'31347e87714d66c5911d1aa1cd3a09a464d809f9';
+String _$secretsRepositoryHash() => r'cc2aca7a272bd485220117da30471d245015c942';
 
 /// See also [SecretsRepository].
 @ProviderFor(SecretsRepository)

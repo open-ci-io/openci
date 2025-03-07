@@ -147,7 +147,7 @@ class StepsSection extends HookConsumerWidget {
             IconButton(
               onPressed: () {
                 // controller.addStepByIndex(steps.length);
-                showDialog(
+                showDialog<void>(
                   context: context,
                   builder: (context) => const ChooseStepTemplate(),
                 );

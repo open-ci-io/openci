@@ -60,8 +60,10 @@ class MyApp extends StatelessWidget {
         inputDecorationTheme: const InputDecorationTheme(
           contentPadding: EdgeInsets.all(18),
           border: OutlineInputBorder(),
-          labelStyle: TextStyle(color: OpenCIColors.onPrimary),
-          hintStyle: TextStyle(color: OpenCIColors.onPrimary),
+          labelStyle: TextStyle(
+            color: Color.fromARGB(255, 234, 233, 233),
+            fontWeight: FontWeight.w200,
+          ),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
               width: inputDecorationBorderWidth,
@@ -72,6 +74,12 @@ class MyApp extends StatelessWidget {
             borderSide: BorderSide(
               width: inputDecorationBorderWidth,
               color: OpenCIColors.primary,
+            ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              width: inputDecorationBorderWidth,
+              color: OpenCIColors.error,
             ),
           ),
         ),

@@ -14,11 +14,6 @@ class SecretsRepository extends _$SecretsRepository {
     return;
   }
 
-  Future<OpenCIFirebaseSuite> getOpenCIFirebaseSuite() async {
-    final suite = await getOpenCIFirebaseSuite();
-    return suite;
-  }
-
   Future<FirebaseFirestore> getFirestore() async {
     final suite = await getOpenCIFirebaseSuite();
     return suite.firestore;
@@ -77,10 +72,8 @@ class SecretsRepository extends _$SecretsRepository {
         keyBase64,
       );
       return true;
-    } on FirebaseAuthException catch (_) {
-      return false;
-    } on Exception catch (_) {
-      return false;
+    } catch (e) {
+      throw Exception(e);
     }
   }
 }

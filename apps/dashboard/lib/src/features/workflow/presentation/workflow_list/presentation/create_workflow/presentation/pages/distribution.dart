@@ -20,7 +20,7 @@ class Distribution extends StatelessWidget {
     return OpenCIDialog(
       title: const Text('Distribution'),
       children: [
-        // TODO(maffreud): add firebase app distribution support
+        // TODO(mafreud): add firebase app distribution support
         // RadioListTile<OpenCIAppDistributionTarget>(
         //   title: const Text('Firebase App Distribution'),
         //   value: OpenCIAppDistributionTarget.firebaseAppDistribution,

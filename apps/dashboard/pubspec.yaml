@@ -21,6 +21,8 @@ dependencies:
   google_fonts: ^6.2.1
   hooks_riverpod: ^2.5.4
   json_annotation: ^4.9.0
+  loading_overlay: ^0.4.2
+  modal_progress_hud_nsn: ^0.5.1
   openci_models:
     path: ../../packages/openci_models
   propertylistserialization: ^1.4.1
