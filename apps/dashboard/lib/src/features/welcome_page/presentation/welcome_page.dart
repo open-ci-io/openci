@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dashboard/src/common_widgets/dialogs.dart';
+import 'package:dashboard/src/common_widgets/dialogs/error_dialog.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/extensions/build_context_extension.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
