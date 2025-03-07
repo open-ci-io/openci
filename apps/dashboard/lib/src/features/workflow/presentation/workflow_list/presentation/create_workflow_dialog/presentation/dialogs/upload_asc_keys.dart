@@ -10,7 +10,7 @@ WoltModalSheetPage uploadASCKeys(
 ) {
   var isSuccess = false;
   return baseDialog(
-    onBack: (ref) {},
+    onBack: (ref) => WoltModalSheet.of(modalSheetContext).popPage(),
     onNext: (ref, formKey) {},
     child: (ref) => const SizedBox(),
     modalSheetContext: modalSheetContext,

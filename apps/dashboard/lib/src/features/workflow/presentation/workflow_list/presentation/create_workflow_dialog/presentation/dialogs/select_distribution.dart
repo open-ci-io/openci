@@ -9,7 +9,7 @@ WoltModalSheetPage selectDistribution(
   TextTheme textTheme,
 ) {
   return baseDialog(
-    onBack: (ref) {},
+    onBack: (ref) => WoltModalSheet.of(modalSheetContext).popPage(),
     onNext: (ref, formKey) {},
     child: (ref) {
       final state = ref.watch(createWorkflowDialogControllerProvider);

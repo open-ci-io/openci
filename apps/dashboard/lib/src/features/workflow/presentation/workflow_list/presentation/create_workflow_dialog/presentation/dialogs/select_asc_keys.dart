@@ -20,7 +20,7 @@ WoltModalSheetPage selectASCKeys(
   final keyFileBase64EditingController = TextEditingController();
 
   return baseDialog(
-    onBack: (ref) {},
+    onBack: (ref) => WoltModalSheet.of(modalSheetContext).popPage(),
     onNext: (ref, formKey) {},
     child: (ref) => const SizedBox(),
     modalSheetContext: modalSheetContext,
