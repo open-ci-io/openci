@@ -13,12 +13,13 @@ WoltModalSheetPage selectDistribution(
     onNext: (ref, formKey) {},
     child: (ref) {
       final state = ref.watch(createWorkflowDialogControllerProvider);
+      final value = state.appDistributionTarget;
       return Column(
         children: [
           RadioListTile<OpenCIAppDistributionTarget>(
             title: Text(OpenCIAppDistributionTarget.testflight.name),
             value: OpenCIAppDistributionTarget.testflight,
-            groupValue: state.appDistributionTarget,
+            groupValue: value,
             onChanged: (OpenCIAppDistributionTarget? value) {
               if (value != null) {
                 ref
@@ -30,7 +31,7 @@ WoltModalSheetPage selectDistribution(
           RadioListTile<OpenCIAppDistributionTarget>(
             title: Text(OpenCIAppDistributionTarget.none.name),
             value: OpenCIAppDistributionTarget.none,
-            groupValue: state.appDistributionTarget,
+            groupValue: value,
             onChanged: (OpenCIAppDistributionTarget? value) {
               if (value != null) {
                 ref
@@ -53,36 +54,5 @@ WoltModalSheetPage selectDistribution(
       onPressed: () => WoltModalSheet.of(modalSheetContext).popPage(),
       child: const Text('Finish'),
     ),
-    builder: (context, ref, child) {
-      final state = ref.watch(createWorkflowDialogControllerProvider);
-      return Column(
-        children: [
-          RadioListTile<OpenCIAppDistributionTarget>(
-            title: Text(OpenCIAppDistributionTarget.testflight.name),
-            value: OpenCIAppDistributionTarget.testflight,
-            groupValue: state.appDistributionTarget,
-            onChanged: (OpenCIAppDistributionTarget? value) {
-              if (value != null) {
-                ref
-                    .read(createWorkflowDialogControllerProvider.notifier)
-                    .setAppDistributionTarget(value);
-              }
-            },
-          ),
-          RadioListTile<OpenCIAppDistributionTarget>(
-            title: Text(OpenCIAppDistributionTarget.none.name),
-            value: OpenCIAppDistributionTarget.none,
-            groupValue: state.appDistributionTarget,
-            onChanged: (OpenCIAppDistributionTarget? value) {
-              if (value != null) {
-                ref
-                    .read(createWorkflowDialogControllerProvider.notifier)
-                    .setAppDistributionTarget(value);
-              }
-            },
-          ),
-        ],
-      );
-    },
   );
 }

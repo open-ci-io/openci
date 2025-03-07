@@ -151,8 +151,5 @@ WoltModalSheetPage selectFlutterBuildIpaData(
       },
       child: const Text('Next'),
     ),
-    builder: (context, ref, child) {
-      return const SizedBox.shrink();
-    },
   );
 }

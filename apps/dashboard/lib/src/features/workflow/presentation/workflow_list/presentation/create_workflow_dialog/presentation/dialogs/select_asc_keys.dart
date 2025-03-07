@@ -22,7 +22,60 @@ WoltModalSheetPage selectASCKeys(
   return baseDialog(
     onBack: (ref) => WoltModalSheet.of(modalSheetContext).popPage(),
     onNext: (ref, formKey) {},
-    child: (ref) => const SizedBox(),
+    child: (ref) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          TextField(
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w300,
+            ),
+            decoration: const InputDecoration(
+              labelText: 'Issuer Id',
+              helperText: '* required',
+            ),
+            controller: issuerIdEditingController,
+          ),
+          verticalMargin16,
+          TextField(
+            readOnly: true,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w300,
+            ),
+            decoration: InputDecoration(
+              helperText: '* required',
+              suffixIcon: IconButton(
+                onPressed: () async {
+                  final result = await FilePicker.platform.pickFiles(
+                    type: FileType.custom,
+                    allowedExtensions: ['p8'],
+                    withData: true,
+                  );
+                  if (result != null) {
+                    final file = result.files.first;
+                    final fileName = file.name;
+                    final bytes = file.bytes;
+                    if (bytes != null) {
+                      final base64 = base64Encode(bytes);
+                      keyFileBase64EditingController.text = base64;
+                    }
+                    final keyId = getASCKeyId(fileName);
+                    if (keyId != null) {
+                      keyIdEditingController.text = keyId;
+                    }
+                  }
+                },
+                icon: const Icon(Icons.folder_open),
+              ),
+              labelText: '.p8',
+            ),
+            controller: keyFileBase64EditingController,
+          ),
+        ],
+      ),
+    ),
     modalSheetContext: modalSheetContext,
     textTheme: textTheme,
     title: 'Upload ASC Keys',
@@ -70,61 +123,5 @@ WoltModalSheetPage selectASCKeys(
         );
       },
     ),
-    builder: (context, ref, child) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          children: [
-            TextField(
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-              ),
-              decoration: const InputDecoration(
-                labelText: 'Issuer Id',
-                helperText: '* required',
-              ),
-              controller: issuerIdEditingController,
-            ),
-            verticalMargin16,
-            TextField(
-              readOnly: true,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-              ),
-              decoration: InputDecoration(
-                helperText: '* required',
-                suffixIcon: IconButton(
-                  onPressed: () async {
-                    final result = await FilePicker.platform.pickFiles(
-                      type: FileType.custom,
-                      allowedExtensions: ['p8'],
-                      withData: true,
-                    );
-                    if (result != null) {
-                      final file = result.files.first;
-                      final fileName = file.name;
-                      final bytes = file.bytes;
-                      if (bytes != null) {
-                        final base64 = base64Encode(bytes);
-                        keyFileBase64EditingController.text = base64;
-                      }
-                      final keyId = getASCKeyId(fileName);
-                      if (keyId != null) {
-                        keyIdEditingController.text = keyId;
-                      }
-                    }
-                  },
-                  icon: const Icon(Icons.folder_open),
-                ),
-                labelText: '.p8',
-              ),
-              controller: keyFileBase64EditingController,
-            ),
-          ],
-        ),
-      );
-    },
   );
 }

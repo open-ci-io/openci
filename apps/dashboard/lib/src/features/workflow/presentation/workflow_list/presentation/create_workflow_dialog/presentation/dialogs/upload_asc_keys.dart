@@ -12,7 +12,23 @@ WoltModalSheetPage uploadASCKeys(
   return baseDialog(
     onBack: (ref) => WoltModalSheet.of(modalSheetContext).popPage(),
     onNext: (ref, formKey) {},
-    child: (ref) => const SizedBox(),
+    child: (ref) {
+      final ascKey = ref.watch(createWorkflowDialogControllerProvider).ascKey;
+      final future = ref.watch(saveASCKeysProvider(ascKey: ascKey));
+      return future.when(
+        data: (data) {
+          isSuccess = true;
+          return const Text('✅ Successfully uploaded ASC Keys');
+        },
+        error: (error, stack) {
+          isSuccess = false;
+          return Text('❌ Error, please try again: $error');
+        },
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    },
     modalSheetContext: modalSheetContext,
     textTheme: textTheme,
     rightButtonTextButton: Visibility(
@@ -27,21 +43,5 @@ WoltModalSheetPage uploadASCKeys(
       child: const Text('Back'),
     ),
     title: 'Upload ASC Keys',
-    builder: (context, ref, child) {
-      final ascKey = ref.watch(createWorkflowDialogControllerProvider).ascKey;
-      final future = ref.watch(saveASCKeysProvider(ascKey: ascKey));
-      return future.when(
-        data: (data) {
-          isSuccess = true;
-          return const Text('✅ Successfully uploaded ASC Keys');
-        },
-        error: (error, stack) {
-          return Text('❌ Error, please try again: $error');
-        },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    },
   );
 }

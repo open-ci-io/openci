@@ -9,7 +9,6 @@ WoltModalSheetPage baseDialog({
   required String title,
   required Widget leftButtonTextButton,
   required Widget rightButtonTextButton,
-  required Widget Function(BuildContext, WidgetRef, Widget?) builder,
   required Widget Function(WidgetRef) child,
   required void Function(WidgetRef) onBack,
   required void Function(WidgetRef, GlobalKey<FormState>) onNext,

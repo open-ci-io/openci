@@ -26,7 +26,6 @@ WoltModalSheetPage checkASCKeys(
       };
       return Text(text, style: const TextStyle(fontWeight: FontWeight.w300));
     },
-    builder: (context, ref, child) => const SizedBox(),
     child: (ref) {
       final controller =
           ref.watch(createWorkflowDialogControllerProvider.notifier);

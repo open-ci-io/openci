@@ -60,12 +60,5 @@ WoltModalSheetPage chooseWorkflowTemplate(
         ],
       );
     },
-    builder: (context, ref, child) {
-      return const Column(
-        children: [
-          Text('Choose Workflow Template'),
-        ],
-      );
-    },
   );
 }
