@@ -30,10 +30,6 @@ WoltModalSheetPage chooseWorkflowTemplate(
     modalSheetContext: modalSheetContext,
     textTheme: textTheme,
     title: 'Choose Workflow Template',
-    leftButtonTextButton:
-        TextButton(onPressed: () {}, child: const Text('Back')),
-    rightButtonTextButton:
-        TextButton(onPressed: () {}, child: const Text('Next')),
     child: (ref) {
       final state = ref.watch(createWorkflowDialogControllerProvider);
       final controller =

@@ -125,31 +125,5 @@ WoltModalSheetPage selectFlutterBuildIpaData(
     modalSheetContext: modalSheetContext,
     textTheme: textTheme,
     title: 'Select Flutter Build .ipa Data',
-    leftButtonTextButton:
-        TextButton(onPressed: () {}, child: const Text('Back')),
-    rightButtonTextButton: TextButton(
-      onPressed: () {
-        // final provider = ProviderContainer();
-        // if (formKey.currentState!.validate()) {
-        //   formKey.currentState!.save();
-        //   provider
-        //       .read(createWorkflowDialogControllerProvider.notifier)
-        //       .setFlutterBuildIpaData(
-        //         FlutterBuildIpaData(
-        //           workflowName: workflowNameEditingController.text,
-        //           flutterBuildCommand:
-        //               flutterBuildCommandEditingController.text,
-        //           cwd: cwdEditingController.text,
-        //           baseBranch: baseBranchEditingController.text,
-        //         ),
-        //       );
-
-        //   WoltModalSheet.of(modalSheetContext).pushPage(
-        //     selectDistribution(modalSheetContext, textTheme),
-        //   );
-        // }
-      },
-      child: const Text('Next'),
-    ),
   );
 }

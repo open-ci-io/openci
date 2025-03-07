@@ -31,17 +31,6 @@ WoltModalSheetPage uploadASCKeys(
     },
     modalSheetContext: modalSheetContext,
     textTheme: textTheme,
-    rightButtonTextButton: Visibility(
-      visible: isSuccess,
-      child: TextButton(
-        onPressed: () {},
-        child: const Text('Next'),
-      ),
-    ),
-    leftButtonTextButton: TextButton(
-      onPressed: () => WoltModalSheet.of(modalSheetContext).popPage(),
-      child: const Text('Back'),
-    ),
     title: 'Upload ASC Keys',
   );
 }

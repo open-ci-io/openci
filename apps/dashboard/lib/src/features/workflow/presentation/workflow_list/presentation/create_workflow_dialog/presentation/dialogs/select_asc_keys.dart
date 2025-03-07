@@ -2,13 +2,9 @@ import 'dart:convert';
 
 import 'package:dashboard/src/common_widgets/dialogs/custom_wolt_modal_dialog.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
-import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/domain/create_workflow_domain.dart';
-import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/create_workflow_dialog_controller.dart';
-import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/dialogs/upload_asc_keys.dart';
 import 'package:dashboard/src/services/app_store_connect.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage selectASCKeys(
@@ -79,49 +75,5 @@ WoltModalSheetPage selectASCKeys(
     modalSheetContext: modalSheetContext,
     textTheme: textTheme,
     title: 'Upload ASC Keys',
-    leftButtonTextButton: TextButton(
-      style: TextButton.styleFrom(
-        minimumSize: const Size(80, 36),
-      ),
-      onPressed: () => WoltModalSheet.of(modalSheetContext).popPage(),
-      child: const Text(
-        'Back',
-        style: TextStyle(
-          fontWeight: FontWeight.w300,
-        ),
-      ),
-    ),
-    rightButtonTextButton: Consumer(
-      builder: (context, ref, child) {
-        final controller =
-            ref.watch(createWorkflowDialogControllerProvider.notifier);
-
-        return TextButton(
-          onPressed: () async {
-            if (issuerIdEditingController.text.isEmpty ||
-                keyIdEditingController.text.isEmpty ||
-                keyFileBase64EditingController.text.isEmpty) {
-              return;
-            }
-            controller.setASCKey(
-              AppStoreConnectKey(
-                issuerId: issuerIdEditingController.text,
-                keyId: keyIdEditingController.text,
-                key: keyFileBase64EditingController.text,
-              ),
-            );
-            WoltModalSheet.of(modalSheetContext).pushPage(
-              uploadASCKeys(modalSheetContext, textTheme),
-            );
-          },
-          child: const Text(
-            'Upload',
-            style: TextStyle(
-              fontWeight: FontWeight.w300,
-            ),
-          ),
-        );
-      },
-    ),
   );
 }

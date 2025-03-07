@@ -1,6 +1,5 @@
 import 'package:dashboard/src/common_widgets/dialogs/custom_wolt_modal_dialog.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/create_workflow_dialog_controller.dart';
-import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/dialogs/select_asc_keys.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/dialogs/select_flutter_build_ipa_data.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -53,55 +52,5 @@ WoltModalSheetPage checkASCKeys(
     modalSheetContext: modalSheetContext,
     textTheme: textTheme,
     title: 'Check ASC Keys',
-    leftButtonTextButton: TextButton(
-      style: TextButton.styleFrom(
-        minimumSize: const Size(80, 36),
-      ),
-      onPressed: () => WoltModalSheet.of(modalSheetContext).popPage(),
-      child: const Text(
-        'Back',
-        style: TextStyle(
-          fontWeight: FontWeight.w300,
-        ),
-      ),
-    ),
-    rightButtonTextButton: Consumer(
-      builder: (context, ref, child) {
-        final state = ref.watch(createWorkflowDialogControllerProvider);
-        final text = switch (state.isASCKeyUploaded) {
-          true => 'Next',
-          false => 'Upload ASC Keys',
-          null => 'Loading...',
-        };
-        return TextButton(
-          style: TextButton.styleFrom(
-            minimumSize: const Size(80, 36),
-          ),
-          onPressed: () {
-            switch (state.isASCKeyUploaded) {
-              case true:
-                WoltModalSheet.of(modalSheetContext).pushPage(
-                  selectFlutterBuildIpaData(
-                    modalSheetContext,
-                    textTheme,
-                  ),
-                );
-              case false:
-                WoltModalSheet.of(modalSheetContext)
-                    .pushPage(selectASCKeys(modalSheetContext, textTheme));
-              case null:
-                // TODO: Handle this case.
-                throw UnimplementedError();
-            }
-          },
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontWeight: FontWeight.w300,
-            ),
-          ),
-        );
-      },
-    ),
   );
 }

@@ -46,13 +46,5 @@ WoltModalSheetPage selectDistribution(
     modalSheetContext: modalSheetContext,
     textTheme: textTheme,
     title: 'Select Distribution',
-    leftButtonTextButton: TextButton(
-      onPressed: () => WoltModalSheet.of(modalSheetContext).popPage(),
-      child: const Text('Back'),
-    ),
-    rightButtonTextButton: TextButton(
-      onPressed: () => WoltModalSheet.of(modalSheetContext).popPage(),
-      child: const Text('Finish'),
-    ),
   );
 }
