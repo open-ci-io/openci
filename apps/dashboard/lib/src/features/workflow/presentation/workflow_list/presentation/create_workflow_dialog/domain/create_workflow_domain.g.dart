@@ -18,7 +18,7 @@ _$CreateWorkflowDomainImpl _$$CreateWorkflowDomainImplFromJson(
           ? const AppStoreConnectKey()
           : AppStoreConnectKey.fromJson(json['ascKey'] as Map<String, dynamic>),
       flutterBuildIpaData: json['flutterBuildIpaData'] == null
-          ? null
+          ? const FlutterBuildIpaData()
           : FlutterBuildIpaData.fromJson(
               json['flutterBuildIpaData'] as Map<String, dynamic>),
       appDistributionTarget: $enumDecodeNullable(
@@ -34,7 +34,7 @@ Map<String, dynamic> _$$CreateWorkflowDomainImplToJson(
       'isASCKeyUploaded': instance.isASCKeyUploaded,
       'isLoading': instance.isLoading,
       'ascKey': instance.ascKey.toJson(),
-      'flutterBuildIpaData': instance.flutterBuildIpaData?.toJson(),
+      'flutterBuildIpaData': instance.flutterBuildIpaData.toJson(),
       'appDistributionTarget':
           _$OpenCIAppDistributionTargetEnumMap[instance.appDistributionTarget]!,
     };
@@ -70,10 +70,14 @@ Map<String, dynamic> _$$AppStoreConnectKeyImplToJson(
 _$FlutterBuildIpaDataImpl _$$FlutterBuildIpaDataImplFromJson(
         Map<String, dynamic> json) =>
     _$FlutterBuildIpaDataImpl(
-      workflowName: json['workflowName'] as String,
-      flutterBuildCommand: json['flutterBuildCommand'] as String,
+      workflowName: json['workflowName'] as String? ?? 'Release iOS build',
+      flutterBuildCommand:
+          json['flutterBuildCommand'] as String? ?? 'flutter build ipa',
       cwd: json['cwd'] as String? ?? '',
-      baseBranch: json['baseBranch'] as String,
+      baseBranch: json['baseBranch'] as String? ?? 'main',
+      triggerType: $enumDecodeNullable(
+              _$GitHubTriggerTypeEnumMap, json['triggerType']) ??
+          GitHubTriggerType.push,
     );
 
 Map<String, dynamic> _$$FlutterBuildIpaDataImplToJson(
@@ -83,4 +87,10 @@ Map<String, dynamic> _$$FlutterBuildIpaDataImplToJson(
       'flutterBuildCommand': instance.flutterBuildCommand,
       'cwd': instance.cwd,
       'baseBranch': instance.baseBranch,
+      'triggerType': _$GitHubTriggerTypeEnumMap[instance.triggerType]!,
     };
+
+const _$GitHubTriggerTypeEnumMap = {
+  GitHubTriggerType.push: 'push',
+  GitHubTriggerType.pullRequest: 'pullRequest',
+};

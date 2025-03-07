@@ -19,7 +19,7 @@ class CreateWorkflowDomain with _$CreateWorkflowDomain {
     @Default(null) bool? isASCKeyUploaded,
     @Default(false) bool isLoading,
     @Default(AppStoreConnectKey()) AppStoreConnectKey ascKey,
-    @Default(null) FlutterBuildIpaData? flutterBuildIpaData,
+    @Default(FlutterBuildIpaData()) FlutterBuildIpaData flutterBuildIpaData,
     @Default(OpenCIAppDistributionTarget.none)
     OpenCIAppDistributionTarget appDistributionTarget,
   }) = _CreateWorkflowDomain;
@@ -41,10 +41,11 @@ class AppStoreConnectKey with _$AppStoreConnectKey {
 @freezed
 class FlutterBuildIpaData with _$FlutterBuildIpaData {
   const factory FlutterBuildIpaData({
-    required String workflowName,
-    required String flutterBuildCommand,
+    @Default('Release iOS build') String workflowName,
+    @Default('flutter build ipa') String flutterBuildCommand,
     @Default('') String cwd,
-    required String baseBranch,
+    @Default('main') String baseBranch,
+    @Default(GitHubTriggerType.push) GitHubTriggerType triggerType,
   }) = _FlutterBuildIpaData;
   factory FlutterBuildIpaData.fromJson(Map<String, Object?> json) =>
       _$FlutterBuildIpaDataFromJson(json);

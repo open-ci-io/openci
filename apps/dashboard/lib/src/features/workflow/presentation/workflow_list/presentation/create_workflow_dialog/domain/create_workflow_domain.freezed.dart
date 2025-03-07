@@ -24,7 +24,7 @@ mixin _$CreateWorkflowDomain {
   bool? get isASCKeyUploaded => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
   AppStoreConnectKey get ascKey => throw _privateConstructorUsedError;
-  FlutterBuildIpaData? get flutterBuildIpaData =>
+  FlutterBuildIpaData get flutterBuildIpaData =>
       throw _privateConstructorUsedError;
   OpenCIAppDistributionTarget get appDistributionTarget =>
       throw _privateConstructorUsedError;
@@ -50,11 +50,11 @@ abstract class $CreateWorkflowDomainCopyWith<$Res> {
       bool? isASCKeyUploaded,
       bool isLoading,
       AppStoreConnectKey ascKey,
-      FlutterBuildIpaData? flutterBuildIpaData,
+      FlutterBuildIpaData flutterBuildIpaData,
       OpenCIAppDistributionTarget appDistributionTarget});
 
   $AppStoreConnectKeyCopyWith<$Res> get ascKey;
-  $FlutterBuildIpaDataCopyWith<$Res>? get flutterBuildIpaData;
+  $FlutterBuildIpaDataCopyWith<$Res> get flutterBuildIpaData;
 }
 
 /// @nodoc
@@ -77,7 +77,7 @@ class _$CreateWorkflowDomainCopyWithImpl<$Res,
     Object? isASCKeyUploaded = freezed,
     Object? isLoading = null,
     Object? ascKey = null,
-    Object? flutterBuildIpaData = freezed,
+    Object? flutterBuildIpaData = null,
     Object? appDistributionTarget = null,
   }) {
     return _then(_value.copyWith(
@@ -97,10 +97,10 @@ class _$CreateWorkflowDomainCopyWithImpl<$Res,
           ? _value.ascKey
           : ascKey // ignore: cast_nullable_to_non_nullable
               as AppStoreConnectKey,
-      flutterBuildIpaData: freezed == flutterBuildIpaData
+      flutterBuildIpaData: null == flutterBuildIpaData
           ? _value.flutterBuildIpaData
           : flutterBuildIpaData // ignore: cast_nullable_to_non_nullable
-              as FlutterBuildIpaData?,
+              as FlutterBuildIpaData,
       appDistributionTarget: null == appDistributionTarget
           ? _value.appDistributionTarget
           : appDistributionTarget // ignore: cast_nullable_to_non_nullable
@@ -122,12 +122,8 @@ class _$CreateWorkflowDomainCopyWithImpl<$Res,
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $FlutterBuildIpaDataCopyWith<$Res>? get flutterBuildIpaData {
-    if (_value.flutterBuildIpaData == null) {
-      return null;
-    }
-
-    return $FlutterBuildIpaDataCopyWith<$Res>(_value.flutterBuildIpaData!,
+  $FlutterBuildIpaDataCopyWith<$Res> get flutterBuildIpaData {
+    return $FlutterBuildIpaDataCopyWith<$Res>(_value.flutterBuildIpaData,
         (value) {
       return _then(_value.copyWith(flutterBuildIpaData: value) as $Val);
     });
@@ -147,13 +143,13 @@ abstract class _$$CreateWorkflowDomainImplCopyWith<$Res>
       bool? isASCKeyUploaded,
       bool isLoading,
       AppStoreConnectKey ascKey,
-      FlutterBuildIpaData? flutterBuildIpaData,
+      FlutterBuildIpaData flutterBuildIpaData,
       OpenCIAppDistributionTarget appDistributionTarget});
 
   @override
   $AppStoreConnectKeyCopyWith<$Res> get ascKey;
   @override
-  $FlutterBuildIpaDataCopyWith<$Res>? get flutterBuildIpaData;
+  $FlutterBuildIpaDataCopyWith<$Res> get flutterBuildIpaData;
 }
 
 /// @nodoc
@@ -173,7 +169,7 @@ class __$$CreateWorkflowDomainImplCopyWithImpl<$Res>
     Object? isASCKeyUploaded = freezed,
     Object? isLoading = null,
     Object? ascKey = null,
-    Object? flutterBuildIpaData = freezed,
+    Object? flutterBuildIpaData = null,
     Object? appDistributionTarget = null,
   }) {
     return _then(_$CreateWorkflowDomainImpl(
@@ -193,10 +189,10 @@ class __$$CreateWorkflowDomainImplCopyWithImpl<$Res>
           ? _value.ascKey
           : ascKey // ignore: cast_nullable_to_non_nullable
               as AppStoreConnectKey,
-      flutterBuildIpaData: freezed == flutterBuildIpaData
+      flutterBuildIpaData: null == flutterBuildIpaData
           ? _value.flutterBuildIpaData
           : flutterBuildIpaData // ignore: cast_nullable_to_non_nullable
-              as FlutterBuildIpaData?,
+              as FlutterBuildIpaData,
       appDistributionTarget: null == appDistributionTarget
           ? _value.appDistributionTarget
           : appDistributionTarget // ignore: cast_nullable_to_non_nullable
@@ -213,7 +209,7 @@ class _$CreateWorkflowDomainImpl implements _CreateWorkflowDomain {
       this.isASCKeyUploaded = null,
       this.isLoading = false,
       this.ascKey = const AppStoreConnectKey(),
-      this.flutterBuildIpaData = null,
+      this.flutterBuildIpaData = const FlutterBuildIpaData(),
       this.appDistributionTarget = OpenCIAppDistributionTarget.none});
 
   factory _$CreateWorkflowDomainImpl.fromJson(Map<String, dynamic> json) =>
@@ -233,7 +229,7 @@ class _$CreateWorkflowDomainImpl implements _CreateWorkflowDomain {
   final AppStoreConnectKey ascKey;
   @override
   @JsonKey()
-  final FlutterBuildIpaData? flutterBuildIpaData;
+  final FlutterBuildIpaData flutterBuildIpaData;
   @override
   @JsonKey()
   final OpenCIAppDistributionTarget appDistributionTarget;
@@ -290,7 +286,7 @@ abstract class _CreateWorkflowDomain implements CreateWorkflowDomain {
           final bool? isASCKeyUploaded,
           final bool isLoading,
           final AppStoreConnectKey ascKey,
-          final FlutterBuildIpaData? flutterBuildIpaData,
+          final FlutterBuildIpaData flutterBuildIpaData,
           final OpenCIAppDistributionTarget appDistributionTarget}) =
       _$CreateWorkflowDomainImpl;
 
@@ -306,7 +302,7 @@ abstract class _CreateWorkflowDomain implements CreateWorkflowDomain {
   @override
   AppStoreConnectKey get ascKey;
   @override
-  FlutterBuildIpaData? get flutterBuildIpaData;
+  FlutterBuildIpaData get flutterBuildIpaData;
   @override
   OpenCIAppDistributionTarget get appDistributionTarget;
 
@@ -518,6 +514,7 @@ mixin _$FlutterBuildIpaData {
   String get flutterBuildCommand => throw _privateConstructorUsedError;
   String get cwd => throw _privateConstructorUsedError;
   String get baseBranch => throw _privateConstructorUsedError;
+  GitHubTriggerType get triggerType => throw _privateConstructorUsedError;
 
   /// Serializes this FlutterBuildIpaData to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -539,7 +536,8 @@ abstract class $FlutterBuildIpaDataCopyWith<$Res> {
       {String workflowName,
       String flutterBuildCommand,
       String cwd,
-      String baseBranch});
+      String baseBranch,
+      GitHubTriggerType triggerType});
 }
 
 /// @nodoc
@@ -561,6 +559,7 @@ class _$FlutterBuildIpaDataCopyWithImpl<$Res, $Val extends FlutterBuildIpaData>
     Object? flutterBuildCommand = null,
     Object? cwd = null,
     Object? baseBranch = null,
+    Object? triggerType = null,
   }) {
     return _then(_value.copyWith(
       workflowName: null == workflowName
@@ -579,6 +578,10 @@ class _$FlutterBuildIpaDataCopyWithImpl<$Res, $Val extends FlutterBuildIpaData>
           ? _value.baseBranch
           : baseBranch // ignore: cast_nullable_to_non_nullable
               as String,
+      triggerType: null == triggerType
+          ? _value.triggerType
+          : triggerType // ignore: cast_nullable_to_non_nullable
+              as GitHubTriggerType,
     ) as $Val);
   }
 }
@@ -595,7 +598,8 @@ abstract class _$$FlutterBuildIpaDataImplCopyWith<$Res>
       {String workflowName,
       String flutterBuildCommand,
       String cwd,
-      String baseBranch});
+      String baseBranch,
+      GitHubTriggerType triggerType});
 }
 
 /// @nodoc
@@ -615,6 +619,7 @@ class __$$FlutterBuildIpaDataImplCopyWithImpl<$Res>
     Object? flutterBuildCommand = null,
     Object? cwd = null,
     Object? baseBranch = null,
+    Object? triggerType = null,
   }) {
     return _then(_$FlutterBuildIpaDataImpl(
       workflowName: null == workflowName
@@ -633,6 +638,10 @@ class __$$FlutterBuildIpaDataImplCopyWithImpl<$Res>
           ? _value.baseBranch
           : baseBranch // ignore: cast_nullable_to_non_nullable
               as String,
+      triggerType: null == triggerType
+          ? _value.triggerType
+          : triggerType // ignore: cast_nullable_to_non_nullable
+              as GitHubTriggerType,
     ));
   }
 }
@@ -641,27 +650,34 @@ class __$$FlutterBuildIpaDataImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$FlutterBuildIpaDataImpl implements _FlutterBuildIpaData {
   const _$FlutterBuildIpaDataImpl(
-      {required this.workflowName,
-      required this.flutterBuildCommand,
+      {this.workflowName = 'Release iOS build',
+      this.flutterBuildCommand = 'flutter build ipa',
       this.cwd = '',
-      required this.baseBranch});
+      this.baseBranch = 'main',
+      this.triggerType = GitHubTriggerType.push});
 
   factory _$FlutterBuildIpaDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$FlutterBuildIpaDataImplFromJson(json);
 
   @override
+  @JsonKey()
   final String workflowName;
   @override
+  @JsonKey()
   final String flutterBuildCommand;
   @override
   @JsonKey()
   final String cwd;
   @override
+  @JsonKey()
   final String baseBranch;
+  @override
+  @JsonKey()
+  final GitHubTriggerType triggerType;
 
   @override
   String toString() {
-    return 'FlutterBuildIpaData(workflowName: $workflowName, flutterBuildCommand: $flutterBuildCommand, cwd: $cwd, baseBranch: $baseBranch)';
+    return 'FlutterBuildIpaData(workflowName: $workflowName, flutterBuildCommand: $flutterBuildCommand, cwd: $cwd, baseBranch: $baseBranch, triggerType: $triggerType)';
   }
 
   @override
@@ -675,13 +691,15 @@ class _$FlutterBuildIpaDataImpl implements _FlutterBuildIpaData {
                 other.flutterBuildCommand == flutterBuildCommand) &&
             (identical(other.cwd, cwd) || other.cwd == cwd) &&
             (identical(other.baseBranch, baseBranch) ||
-                other.baseBranch == baseBranch));
+                other.baseBranch == baseBranch) &&
+            (identical(other.triggerType, triggerType) ||
+                other.triggerType == triggerType));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, workflowName, flutterBuildCommand, cwd, baseBranch);
+  int get hashCode => Object.hash(runtimeType, workflowName,
+      flutterBuildCommand, cwd, baseBranch, triggerType);
 
   /// Create a copy of FlutterBuildIpaData
   /// with the given fields replaced by the non-null parameter values.
@@ -702,10 +720,11 @@ class _$FlutterBuildIpaDataImpl implements _FlutterBuildIpaData {
 
 abstract class _FlutterBuildIpaData implements FlutterBuildIpaData {
   const factory _FlutterBuildIpaData(
-      {required final String workflowName,
-      required final String flutterBuildCommand,
+      {final String workflowName,
+      final String flutterBuildCommand,
       final String cwd,
-      required final String baseBranch}) = _$FlutterBuildIpaDataImpl;
+      final String baseBranch,
+      final GitHubTriggerType triggerType}) = _$FlutterBuildIpaDataImpl;
 
   factory _FlutterBuildIpaData.fromJson(Map<String, dynamic> json) =
       _$FlutterBuildIpaDataImpl.fromJson;
@@ -718,6 +737,8 @@ abstract class _FlutterBuildIpaData implements FlutterBuildIpaData {
   String get cwd;
   @override
   String get baseBranch;
+  @override
+  GitHubTriggerType get triggerType;
 
   /// Create a copy of FlutterBuildIpaData
   /// with the given fields replaced by the non-null parameter values.
