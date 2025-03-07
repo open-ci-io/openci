@@ -1,6 +1,5 @@
 import 'package:dashboard/src/common_widgets/dialogs/custom_wolt_modal_dialog.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
-import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/domain/create_workflow_domain.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/create_workflow_dialog_controller.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/dialogs/select_distribution.dart';
 import 'package:flutter/material.dart';
@@ -17,41 +16,33 @@ WoltModalSheetPage selectFlutterBuildIpaData(
   final flutterBuildCommandEditingController = TextEditingController();
   final cwdEditingController = TextEditingController();
   final baseBranchEditingController = TextEditingController();
-  final triggerTypeEditingController = TextEditingController();
+
+  void updateState(WidgetRef ref) {
+    ref.read(createWorkflowDialogControllerProvider.notifier)
+      ..setFlutterBuildIpaWorkflowName(
+        workflowNameEditingController.text,
+      )
+      ..setFlutterBuildIpaFlutterBuildCommand(
+        flutterBuildCommandEditingController.text,
+      )
+      ..setFlutterBuildIpaCwd(
+        cwdEditingController.text,
+      )
+      ..setFlutterBuildIpaBaseBranch(
+        baseBranchEditingController.text,
+      );
+  }
 
   return baseDialog(
     onBack: (ref) {
-      ref
-          .read(createWorkflowDialogControllerProvider.notifier)
-          .setFlutterBuildIpaData(
-            FlutterBuildIpaData(
-              workflowName: workflowNameEditingController.text,
-              flutterBuildCommand: flutterBuildCommandEditingController.text,
-              cwd: cwdEditingController.text,
-              baseBranch: baseBranchEditingController.text,
-              triggerType: GitHubTriggerType.values.byName(
-                triggerTypeEditingController.text,
-              ),
-            ),
-          );
+      updateState(ref);
       WoltModalSheet.of(modalSheetContext).popPage();
     },
     onNext: (ref, formKey) {
       if (formKey.currentState!.validate()) {
         formKey.currentState!.save();
-        ref
-            .read(createWorkflowDialogControllerProvider.notifier)
-            .setFlutterBuildIpaData(
-              FlutterBuildIpaData(
-                workflowName: workflowNameEditingController.text,
-                flutterBuildCommand: flutterBuildCommandEditingController.text,
-                cwd: cwdEditingController.text,
-                baseBranch: baseBranchEditingController.text,
-                triggerType: GitHubTriggerType.values.byName(
-                  triggerTypeEditingController.text,
-                ),
-              ),
-            );
+        updateState(ref);
+
         WoltModalSheet.of(modalSheetContext).pushPage(
           selectDistribution(modalSheetContext, textTheme),
         );
@@ -64,7 +55,6 @@ WoltModalSheetPage selectFlutterBuildIpaData(
             flutterBuildCommandEditingController,
         cwdEditingController: cwdEditingController,
         baseBranchEditingController: baseBranchEditingController,
-        triggerTypeEditingController: triggerTypeEditingController,
       );
     },
     modalSheetContext: modalSheetContext,
@@ -79,14 +69,12 @@ class _Body extends StatefulHookConsumerWidget {
     required this.flutterBuildCommandEditingController,
     required this.cwdEditingController,
     required this.baseBranchEditingController,
-    required this.triggerTypeEditingController,
   });
 
   final TextEditingController workflowNameEditingController;
   final TextEditingController flutterBuildCommandEditingController;
   final TextEditingController cwdEditingController;
   final TextEditingController baseBranchEditingController;
-  final TextEditingController triggerTypeEditingController;
 
   @override
   ConsumerState<_Body> createState() => _BodyState();
@@ -105,7 +93,6 @@ class _BodyState extends ConsumerState<_Body> {
               state.flutterBuildCommand;
           widget.cwdEditingController.text = state.cwd;
           widget.baseBranchEditingController.text = state.baseBranch;
-          widget.triggerTypeEditingController.text = state.triggerType.name;
         });
 
         return null;
@@ -180,7 +167,9 @@ class _BodyState extends ConsumerState<_Body> {
                 }).toList(),
                 onChanged: (value) {
                   if (value != null) {
-                    widget.triggerTypeEditingController.text = value.name;
+                    ref
+                        .read(createWorkflowDialogControllerProvider.notifier)
+                        .setFlutterBuildIpaTriggerType(value);
                   }
                 },
               ),

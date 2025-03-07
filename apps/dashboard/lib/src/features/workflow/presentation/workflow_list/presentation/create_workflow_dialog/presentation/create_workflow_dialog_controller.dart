@@ -36,10 +36,35 @@ class CreateWorkflowDialogController extends _$CreateWorkflowDialogController {
     state = state.copyWith(ascKey: ascKey);
   }
 
-  void setFlutterBuildIpaData(
-    FlutterBuildIpaData flutterBuildIpaData,
+  void setFlutterBuildIpaWorkflowName(
+    String workflowName,
   ) {
-    state = state.copyWith(flutterBuildIpaData: flutterBuildIpaData);
+    state = state.copyWith.flutterBuildIpaData(workflowName: workflowName);
+  }
+
+  void setFlutterBuildIpaFlutterBuildCommand(
+    String flutterBuildCommand,
+  ) {
+    state = state.copyWith
+        .flutterBuildIpaData(flutterBuildCommand: flutterBuildCommand);
+  }
+
+  void setFlutterBuildIpaCwd(
+    String cwd,
+  ) {
+    state = state.copyWith.flutterBuildIpaData(cwd: cwd);
+  }
+
+  void setFlutterBuildIpaBaseBranch(
+    String baseBranch,
+  ) {
+    state = state.copyWith.flutterBuildIpaData(baseBranch: baseBranch);
+  }
+
+  void setFlutterBuildIpaTriggerType(
+    GitHubTriggerType triggerType,
+  ) {
+    state = state.copyWith.flutterBuildIpaData(triggerType: triggerType);
   }
 
   void setAppDistributionTarget(
