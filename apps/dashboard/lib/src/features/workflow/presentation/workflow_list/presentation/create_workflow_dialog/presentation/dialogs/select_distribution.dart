@@ -10,7 +10,11 @@ WoltModalSheetPage selectDistribution(
 ) {
   return baseDialog(
     onBack: (ref) => WoltModalSheet.of(modalSheetContext).popPage(),
-    onNext: (ref, formKey) {},
+    onNext: (ref, formKey) {
+      print(ref
+          .read(createWorkflowDialogControllerProvider)
+          .appDistributionTarget);
+    },
     child: (ref) {
       final state = ref.watch(createWorkflowDialogControllerProvider);
       final value = state.appDistributionTarget;
