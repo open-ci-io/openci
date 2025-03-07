@@ -1,4 +1,4 @@
-import 'package:dashboard/src/common_widgets/dialogs.dart';
+import 'package:dashboard/src/common_widgets/dialogs/custom_wolt_modal_dialog.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/dialogs/check_asc_keys.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/dialogs/enum.dart';
 import 'package:flutter/material.dart';

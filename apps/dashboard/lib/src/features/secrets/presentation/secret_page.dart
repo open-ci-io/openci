@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:dashboard/src/common_widgets/delete_dialog.dart';
+import 'package:dashboard/src/common_widgets/dialogs/delete_dialog.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/secrets/presentation/secrets.dart';
 import 'package:dashboard/src/services/firebase.dart';
