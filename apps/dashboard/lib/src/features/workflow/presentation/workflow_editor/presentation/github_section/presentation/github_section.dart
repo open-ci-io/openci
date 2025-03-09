@@ -1,5 +1,4 @@
 import 'package:dashboard/src/common_widgets/margins.dart';
-import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/edit_workflow.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
 import 'package:flutter/material.dart';
@@ -9,19 +8,17 @@ import 'package:openci_models/openci_models.dart';
 
 class GitHubSection extends HookConsumerWidget {
   const GitHubSection(
-    this.workflowModel,
-    this.firebaseSuite, {
+    this.workflowModel, {
     super.key,
   });
 
   final WorkflowModel workflowModel;
-  final OpenCIFirebaseSuite firebaseSuite;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
     final controller = ref.watch(
-      workflowEditorControllerProvider(workflowModel, firebaseSuite).notifier,
+      workflowEditorControllerProvider(workflowModel).notifier,
     );
     final repoUrlFocusNode = useFocusNode();
     final triggerTypeFocusNode = useFocusNode();

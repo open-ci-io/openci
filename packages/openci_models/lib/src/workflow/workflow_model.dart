@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:openci_models/openci_models.dart';
 
 part 'workflow_model.freezed.dart';
 part 'workflow_model.g.dart';
@@ -26,7 +27,7 @@ class WorkflowModel with _$WorkflowModel {
         currentWorkingDirectory: '',
         name: 'New Workflow',
         id: docId,
-        flutter: WorkflowModelFlutter(version: '3.24.4'),
+        flutter: WorkflowModelFlutter(version: FlutterVersion.getDefault()),
         github: WorkflowModelGitHub(
           repositoryUrl: 'https://github.com/example/repo',
           triggerType: GitHubTriggerType.push,
@@ -39,9 +40,10 @@ class WorkflowModel with _$WorkflowModel {
 
 @freezed
 class WorkflowModelFlutter with _$WorkflowModelFlutter {
-  const factory WorkflowModelFlutter({
-    required String version,
+  factory WorkflowModelFlutter({
+    @FlutterVersionConverter() required FlutterVersion version,
   }) = _WorkflowModelFlutter;
+
   factory WorkflowModelFlutter.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelFlutterFromJson(json);
 }

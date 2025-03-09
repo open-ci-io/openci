@@ -176,6 +176,24 @@ final areAppStoreConnectKeysUploadedProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AreAppStoreConnectKeysUploadedRef = AutoDisposeFutureProviderRef<bool>;
+String _$createWorkflowHash() => r'435392c640770651952717133b8424ef909aa1aa';
+
+/// See also [createWorkflow].
+@ProviderFor(createWorkflow)
+final createWorkflowProvider =
+    AutoDisposeFutureProvider<WorkflowModel>.internal(
+  createWorkflow,
+  name: r'createWorkflowProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$createWorkflowHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CreateWorkflowRef = AutoDisposeFutureProviderRef<WorkflowModel>;
 String _$createWorkflowDialogControllerHash() =>
     r'80a4adb7a2378ccc95929649999cb50ca04af417';
 

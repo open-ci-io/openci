@@ -7,7 +7,7 @@ part of 'workflow_editor_controller.dart';
 // **************************************************************************
 
 String _$workflowEditorControllerHash() =>
-    r'8325c34a733454b733ad2c60329bcaa85e1f65c3';
+    r'4888a303167ded4587173f650fa00100731a168f';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -33,11 +33,9 @@ class _SystemHash {
 abstract class _$WorkflowEditorController
     extends BuildlessAutoDisposeNotifier<WorkflowModel> {
   late final WorkflowModel workflowModel;
-  late final OpenCIFirebaseSuite firebaseSuite;
 
   WorkflowModel build(
     WorkflowModel workflowModel,
-    OpenCIFirebaseSuite firebaseSuite,
   );
 }
 
@@ -53,11 +51,9 @@ class WorkflowEditorControllerFamily extends Family<WorkflowModel> {
   /// See also [WorkflowEditorController].
   WorkflowEditorControllerProvider call(
     WorkflowModel workflowModel,
-    OpenCIFirebaseSuite firebaseSuite,
   ) {
     return WorkflowEditorControllerProvider(
       workflowModel,
-      firebaseSuite,
     );
   }
 
@@ -67,7 +63,6 @@ class WorkflowEditorControllerFamily extends Family<WorkflowModel> {
   ) {
     return call(
       provider.workflowModel,
-      provider.firebaseSuite,
     );
   }
 
@@ -92,11 +87,8 @@ class WorkflowEditorControllerProvider extends AutoDisposeNotifierProviderImpl<
   /// See also [WorkflowEditorController].
   WorkflowEditorControllerProvider(
     WorkflowModel workflowModel,
-    OpenCIFirebaseSuite firebaseSuite,
   ) : this._internal(
-          () => WorkflowEditorController()
-            ..workflowModel = workflowModel
-            ..firebaseSuite = firebaseSuite,
+          () => WorkflowEditorController()..workflowModel = workflowModel,
           from: workflowEditorControllerProvider,
           name: r'workflowEditorControllerProvider',
           debugGetCreateSourceHash:
@@ -107,7 +99,6 @@ class WorkflowEditorControllerProvider extends AutoDisposeNotifierProviderImpl<
           allTransitiveDependencies:
               WorkflowEditorControllerFamily._allTransitiveDependencies,
           workflowModel: workflowModel,
-          firebaseSuite: firebaseSuite,
         );
 
   WorkflowEditorControllerProvider._internal(
@@ -118,11 +109,9 @@ class WorkflowEditorControllerProvider extends AutoDisposeNotifierProviderImpl<
     required super.debugGetCreateSourceHash,
     required super.from,
     required this.workflowModel,
-    required this.firebaseSuite,
   }) : super.internal();
 
   final WorkflowModel workflowModel;
-  final OpenCIFirebaseSuite firebaseSuite;
 
   @override
   WorkflowModel runNotifierBuild(
@@ -130,7 +119,6 @@ class WorkflowEditorControllerProvider extends AutoDisposeNotifierProviderImpl<
   ) {
     return notifier.build(
       workflowModel,
-      firebaseSuite,
     );
   }
 
@@ -139,16 +127,13 @@ class WorkflowEditorControllerProvider extends AutoDisposeNotifierProviderImpl<
     return ProviderOverride(
       origin: this,
       override: WorkflowEditorControllerProvider._internal(
-        () => create()
-          ..workflowModel = workflowModel
-          ..firebaseSuite = firebaseSuite,
+        () => create()..workflowModel = workflowModel,
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
         workflowModel: workflowModel,
-        firebaseSuite: firebaseSuite,
       ),
     );
   }
@@ -162,15 +147,13 @@ class WorkflowEditorControllerProvider extends AutoDisposeNotifierProviderImpl<
   @override
   bool operator ==(Object other) {
     return other is WorkflowEditorControllerProvider &&
-        other.workflowModel == workflowModel &&
-        other.firebaseSuite == firebaseSuite;
+        other.workflowModel == workflowModel;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, workflowModel.hashCode);
-    hash = _SystemHash.combine(hash, firebaseSuite.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -182,9 +165,6 @@ mixin WorkflowEditorControllerRef
     on AutoDisposeNotifierProviderRef<WorkflowModel> {
   /// The parameter `workflowModel` of this provider.
   WorkflowModel get workflowModel;
-
-  /// The parameter `firebaseSuite` of this provider.
-  OpenCIFirebaseSuite get firebaseSuite;
 }
 
 class _WorkflowEditorControllerProviderElement
@@ -195,9 +175,6 @@ class _WorkflowEditorControllerProviderElement
   @override
   WorkflowModel get workflowModel =>
       (origin as WorkflowEditorControllerProvider).workflowModel;
-  @override
-  OpenCIFirebaseSuite get firebaseSuite =>
-      (origin as WorkflowEditorControllerProvider).firebaseSuite;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

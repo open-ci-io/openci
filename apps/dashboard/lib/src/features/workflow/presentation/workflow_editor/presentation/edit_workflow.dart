@@ -1,6 +1,5 @@
 import 'package:dashboard/colors.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
-import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/basic_information/presentation/basic_information_section.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/github_section/presentation/github_section.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/steps/presentation/steps_section.dart';
@@ -10,14 +9,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 
 class EditWorkflow extends ConsumerWidget {
-  const EditWorkflow(this.workflowModel, this.firebaseSuite, {super.key});
+  const EditWorkflow(this.workflowModel, {super.key});
   final WorkflowModel workflowModel;
-  final OpenCIFirebaseSuite firebaseSuite;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(
-      workflowEditorControllerProvider(workflowModel, firebaseSuite).notifier,
+      workflowEditorControllerProvider(workflowModel).notifier,
     );
 
     return Scaffold(
@@ -40,13 +38,13 @@ class EditWorkflow extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          BasicInfoSection(workflowModel, firebaseSuite),
+          BasicInfoSection(workflowModel),
           verticalMargin24,
-          GitHubSection(workflowModel, firebaseSuite),
+          GitHubSection(workflowModel),
           // verticalMargin24,
           // OwnersSection(workflowModel, firebaseSuite),
           verticalMargin24,
-          StepsSection(workflowModel, firebaseSuite),
+          StepsSection(workflowModel),
         ],
       ),
     );

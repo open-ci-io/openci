@@ -36,7 +36,7 @@ WoltModalSheetPage chooseWorkflowTemplate(
             modalSheetContext,
             MaterialPageRoute<void>(
               fullscreenDialog: true,
-              builder: (context) => EditWorkflow(workflowModel, firebaseSuite),
+              builder: (context) => EditWorkflow(workflowModel),
             ),
           );
       }

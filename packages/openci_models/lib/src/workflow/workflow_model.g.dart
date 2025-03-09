@@ -36,13 +36,14 @@ Map<String, dynamic> _$$WorkflowModelImplToJson(_$WorkflowModelImpl instance) =>
 _$WorkflowModelFlutterImpl _$$WorkflowModelFlutterImplFromJson(
         Map<String, dynamic> json) =>
     _$WorkflowModelFlutterImpl(
-      version: json['version'] as String,
+      version:
+          const FlutterVersionConverter().fromJson(json['version'] as String),
     );
 
 Map<String, dynamic> _$$WorkflowModelFlutterImplToJson(
         _$WorkflowModelFlutterImpl instance) =>
     <String, dynamic>{
-      'version': instance.version,
+      'version': const FlutterVersionConverter().toJson(instance.version),
     };
 
 _$WorkflowModelGitHubImpl _$$WorkflowModelGitHubImplFromJson(

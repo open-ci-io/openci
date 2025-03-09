@@ -1,5 +1,4 @@
 import 'package:dashboard/src/common_widgets/margins.dart';
-import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/edit_workflow.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
 import 'package:flutter/material.dart';
@@ -9,18 +8,16 @@ import 'package:openci_models/openci_models.dart';
 
 class BasicInfoSection extends HookConsumerWidget {
   const BasicInfoSection(
-    this.workflowModel,
-    this.firebaseSuite, {
+    this.workflowModel, {
     super.key,
   });
 
   final WorkflowModel workflowModel;
-  final OpenCIFirebaseSuite firebaseSuite;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(
-      workflowEditorControllerProvider(workflowModel, firebaseSuite).notifier,
+      workflowEditorControllerProvider(workflowModel).notifier,
     );
     final textTheme = Theme.of(context).textTheme;
 
@@ -63,21 +60,24 @@ class BasicInfoSection extends HookConsumerWidget {
               padding: const EdgeInsets.only(left: 16),
               child: DropdownButtonFormField<String>(
                 focusNode: flutterVersionFocus,
-                value: workflowModel.flutter.version,
+                value: workflowModel.flutter.version.stringValue,
                 decoration: InputDecoration(
                   labelText: 'Flutter Version',
                   labelStyle:
                       labelStyle(hasFocus: flutterVersionFocus.hasFocus),
                 ),
-                items: flutterVersionList.map((value) {
+                items: FlutterVersion.values.map((value) {
                   return DropdownMenuItem(
-                    value: value,
-                    child: Text(value),
+                    value: value.stringValue,
+                    child: Text(value.stringValue),
                   );
                 }).toList(),
                 onChanged: (value) {
+                  if (value == null) {
+                    return;
+                  }
                   controller.updateFlutterVersion(
-                    value ?? flutterVersionList[0],
+                    FlutterVersion.fromString(value),
                   );
                 },
               ),

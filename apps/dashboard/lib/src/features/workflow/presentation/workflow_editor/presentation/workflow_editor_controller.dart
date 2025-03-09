@@ -1,6 +1,7 @@
-import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
+import 'package:dashboard/src/services/firebase.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 part 'workflow_editor_controller.g.dart';
 
 @riverpod
@@ -8,12 +9,10 @@ class WorkflowEditorController extends _$WorkflowEditorController {
   @override
   WorkflowModel build(
     WorkflowModel workflowModel,
-    OpenCIFirebaseSuite firebaseSuite,
-  ) {
-    return workflowModel;
-  }
+  ) =>
+      workflowModel;
 
-  void updateFlutterVersion(String version) {
+  void updateFlutterVersion(FlutterVersion version) {
     state = state.copyWith.flutter(version: version);
   }
 
@@ -83,9 +82,7 @@ class WorkflowEditorController extends _$WorkflowEditorController {
   }
 
   Future<void> save() async {
-    await firebaseSuite.firestore
-        .collection('workflows')
-        .doc(state.id)
-        .set(state.toJson());
+    final firestore = await getFirebaseFirestore();
+    await firestore.collection('workflows').doc(state.id).set(state.toJson());
   }
 }

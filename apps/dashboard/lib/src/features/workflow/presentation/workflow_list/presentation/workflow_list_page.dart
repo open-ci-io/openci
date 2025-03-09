@@ -129,7 +129,7 @@ class _WorkflowListItem extends ConsumerWidget {
           context,
           MaterialPageRoute<void>(
             fullscreenDialog: true,
-            builder: (context) => EditWorkflow(workflowModel, firebaseSuite),
+            builder: (context) => EditWorkflow(workflowModel),
           ),
         );
       },
@@ -198,8 +198,7 @@ class _WorkflowListItemMenu extends StatelessWidget {
               context,
               MaterialPageRoute<void>(
                 fullscreenDialog: true,
-                builder: (context) =>
-                    EditWorkflow(workflowModel, firebaseSuite),
+                builder: (context) => EditWorkflow(workflowModel),
               ),
             );
           },
