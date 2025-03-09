@@ -1,6 +1,7 @@
 import 'package:dashboard/colors.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/edit_workflow.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/create_workflow_dialog_controller.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/dialogs/choose_workflow_template.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page_controller.dart';
 import 'package:flutter/material.dart';
@@ -19,10 +20,15 @@ class WorkflowListPage extends ConsumerWidget {
     final controller =
         ref.watch(workflowPageControllerProvider(firebaseSuite).notifier);
 
+    void invalidateCreateWorkflowDialogController() {
+      ref.invalidate(createWorkflowDialogControllerProvider);
+    }
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         heroTag: 'add',
         onPressed: () {
+          invalidateCreateWorkflowDialogController();
           WoltModalSheet.show<void>(
             context: context,
             pageListBuilder: (modalSheetContext) {
