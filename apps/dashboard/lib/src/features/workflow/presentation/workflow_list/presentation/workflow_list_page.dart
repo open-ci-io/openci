@@ -37,11 +37,12 @@ class WorkflowListPage extends ConsumerWidget {
                 chooseWorkflowTemplate(
                   modalSheetContext,
                   textTheme,
+                  firebaseSuite,
                 ),
               ];
             },
             modalTypeBuilder: (context) => const WoltDialogType(),
-            onModalDismissedWithBarrierTap: () {
+            onModalDismissedWithBarrierTap: () async {
               Navigator.of(context).pop();
             },
           );

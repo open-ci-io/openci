@@ -7,16 +7,17 @@ import 'package:dashboard/src/services/firebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class NavigationPage extends StatefulWidget {
+class NavigationPage extends ConsumerStatefulWidget {
   const NavigationPage({super.key});
 
   @override
-  State<NavigationPage> createState() => _NavigationPageState();
+  ConsumerState<NavigationPage> createState() => _NavigationPageState();
 }
 
-class _NavigationPageState extends State<NavigationPage> {
+class _NavigationPageState extends ConsumerState<NavigationPage> {
   int index = 0;
   @override
   Widget build(BuildContext context) {
@@ -35,31 +36,10 @@ class _NavigationPageState extends State<NavigationPage> {
       ),
     ];
 
-    return FutureBuilder(
-      future: getOpenCIFirebaseSuite(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const Scaffold(
-            body: Center(
-              child: Text('An error occurred'),
-            ),
-          );
-        }
-        final data = snapshot.data;
-        if (data == null) {
-          return const Scaffold(
-            body: Center(
-              child: Text('No data found'),
-            ),
-          );
-        }
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
+    final future = ref.watch(openciFirebaseSuiteProvider);
+
+    return future.when(
+      data: (data) {
         return AdaptiveScaffold(
           transitionDuration: Duration.zero,
           selectedIndex: index,
@@ -102,6 +82,16 @@ class _NavigationPageState extends State<NavigationPage> {
           body: (_) => _pages(data)[index],
         );
       },
+      error: (error, stack) => const Scaffold(
+        body: Center(
+          child: Text('An error occurred'),
+        ),
+      ),
+      loading: () => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator.adaptive(),
+        ),
+      ),
     );
   }
 }
