@@ -27,11 +27,12 @@ class WorkflowPageController extends _$WorkflowPageController {
         );
   }
 
-  Future<void> addWorkflow() async {
+  Future<WorkflowModel> addWorkflow() async {
     final ref = firebaseSuite.firestore.collection('workflows').doc();
     final uid = firebaseSuite.auth.currentUser!.uid;
     final workflow = WorkflowModel.empty(ref.id, uid);
     await ref.set(workflow.toJson());
+    return workflow;
   }
 
   Future<void> duplicateWorkflow(

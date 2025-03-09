@@ -1,5 +1,6 @@
 import 'package:dashboard/src/common_widgets/dialogs/custom_wolt_modal_dialog.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/edit_workflow.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/dialogs/check_asc_keys.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/dialogs/enum.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page_controller.dart'
@@ -28,9 +29,16 @@ WoltModalSheetPage chooseWorkflowTemplate(
           );
         case OpenCIWorkflowTemplate.blank:
           Navigator.pop(modalSheetContext);
-          await ref
+          final workflowModel = await ref
               .read(workflowPageControllerProvider(firebaseSuite).notifier)
               .addWorkflow();
+          await Navigator.push(
+            modalSheetContext,
+            MaterialPageRoute<void>(
+              fullscreenDialog: true,
+              builder: (context) => EditWorkflow(workflowModel, firebaseSuite),
+            ),
+          );
       }
     },
     modalSheetContext: modalSheetContext,

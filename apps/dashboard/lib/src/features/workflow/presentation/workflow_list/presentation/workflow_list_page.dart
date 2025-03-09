@@ -41,9 +41,7 @@ class WorkflowListPage extends ConsumerWidget {
               ];
             },
             modalTypeBuilder: (context) => const WoltDialogType(),
-            onModalDismissedWithBarrierTap: () async {
-              Navigator.of(context).pop();
-            },
+            onModalDismissedWithBarrierTap: Navigator.of(context).pop,
           );
         },
         child: const Icon(Icons.add),

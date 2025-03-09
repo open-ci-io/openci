@@ -162,7 +162,7 @@ class _WorkflowStreamProviderElement
 }
 
 String _$workflowPageControllerHash() =>
-    r'bec1d9ead49bb64a5ff8249f5d5d2cb1c6367f95';
+    r'b4fd067070fdd29e206efa7de26660dc489eec19';
 
 abstract class _$WorkflowPageController
     extends BuildlessAutoDisposeNotifier<void> {
