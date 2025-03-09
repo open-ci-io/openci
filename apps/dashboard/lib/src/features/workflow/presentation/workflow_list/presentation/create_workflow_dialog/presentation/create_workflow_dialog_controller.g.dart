@@ -6,7 +6,7 @@ part of 'create_workflow_dialog_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$saveASCKeysHash() => r'c9930a1e317a011439f51cd36de0f97d07a685af';
+String _$saveASCKeysHash() => r'57fba506ea19b5c7033a3c2caf9bb93d9f90e748';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -177,11 +177,11 @@ final areAppStoreConnectKeysUploadedProvider =
 // ignore: unused_element
 typedef AreAppStoreConnectKeysUploadedRef = AutoDisposeFutureProviderRef<bool>;
 String _$createWorkflowDialogControllerHash() =>
-    r'a81d235d45321e5e3e8e6f63c796a2b45c591732';
+    r'80a4adb7a2378ccc95929649999cb50ca04af417';
 
 /// See also [CreateWorkflowDialogController].
 @ProviderFor(CreateWorkflowDialogController)
-final createWorkflowDialogControllerProvider = AutoDisposeNotifierProvider<
+final createWorkflowDialogControllerProvider = NotifierProvider<
     CreateWorkflowDialogController, CreateWorkflowDomain>.internal(
   CreateWorkflowDialogController.new,
   name: r'createWorkflowDialogControllerProvider',
@@ -192,7 +192,6 @@ final createWorkflowDialogControllerProvider = AutoDisposeNotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$CreateWorkflowDialogController
-    = AutoDisposeNotifier<CreateWorkflowDomain>;
+typedef _$CreateWorkflowDialogController = Notifier<CreateWorkflowDomain>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

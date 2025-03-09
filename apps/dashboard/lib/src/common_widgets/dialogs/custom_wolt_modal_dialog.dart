@@ -11,7 +11,7 @@ WoltModalSheetPage baseDialog({
   required void Function(WidgetRef) onBack,
   required void Function(WidgetRef, GlobalKey<FormState>) onNext,
   Text? Function(WidgetRef)? backButtonText,
-  Text? Function(WidgetRef)? nextButtonText,
+  Widget? Function(WidgetRef)? nextButtonText,
 }) {
   return WoltModalSheetPage(
     topBarTitle: Text(title, style: textTheme.titleMedium),
@@ -44,7 +44,7 @@ class _Body extends ConsumerWidget {
   final void Function(WidgetRef) onBack;
   final void Function(WidgetRef, GlobalKey<FormState>) onNext;
   final Text? Function(WidgetRef)? backButtonText;
-  final Text? Function(WidgetRef)? nextButtonText;
+  final Widget? Function(WidgetRef)? nextButtonText;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -89,7 +89,7 @@ class _BottomButtons extends ConsumerWidget {
   final void Function(WidgetRef, GlobalKey<FormState>) onNext;
 
   final Text? Function(WidgetRef)? backButtonText;
-  final Text? Function(WidgetRef)? nextButtonText;
+  final Widget? Function(WidgetRef)? nextButtonText;
 
   final GlobalKey<FormState> formKey;
 

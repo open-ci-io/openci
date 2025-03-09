@@ -322,7 +322,7 @@ AppStoreConnectKey _$AppStoreConnectKeyFromJson(Map<String, dynamic> json) {
 mixin _$AppStoreConnectKey {
   String? get issuerId => throw _privateConstructorUsedError;
   String? get keyId => throw _privateConstructorUsedError;
-  String? get key => throw _privateConstructorUsedError;
+  String? get keyFileBase64 => throw _privateConstructorUsedError;
 
   /// Serializes this AppStoreConnectKey to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -340,7 +340,7 @@ abstract class $AppStoreConnectKeyCopyWith<$Res> {
           AppStoreConnectKey value, $Res Function(AppStoreConnectKey) then) =
       _$AppStoreConnectKeyCopyWithImpl<$Res, AppStoreConnectKey>;
   @useResult
-  $Res call({String? issuerId, String? keyId, String? key});
+  $Res call({String? issuerId, String? keyId, String? keyFileBase64});
 }
 
 /// @nodoc
@@ -360,7 +360,7 @@ class _$AppStoreConnectKeyCopyWithImpl<$Res, $Val extends AppStoreConnectKey>
   $Res call({
     Object? issuerId = freezed,
     Object? keyId = freezed,
-    Object? key = freezed,
+    Object? keyFileBase64 = freezed,
   }) {
     return _then(_value.copyWith(
       issuerId: freezed == issuerId
@@ -371,9 +371,9 @@ class _$AppStoreConnectKeyCopyWithImpl<$Res, $Val extends AppStoreConnectKey>
           ? _value.keyId
           : keyId // ignore: cast_nullable_to_non_nullable
               as String?,
-      key: freezed == key
-          ? _value.key
-          : key // ignore: cast_nullable_to_non_nullable
+      keyFileBase64: freezed == keyFileBase64
+          ? _value.keyFileBase64
+          : keyFileBase64 // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
   }
@@ -387,7 +387,7 @@ abstract class _$$AppStoreConnectKeyImplCopyWith<$Res>
       __$$AppStoreConnectKeyImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? issuerId, String? keyId, String? key});
+  $Res call({String? issuerId, String? keyId, String? keyFileBase64});
 }
 
 /// @nodoc
@@ -405,7 +405,7 @@ class __$$AppStoreConnectKeyImplCopyWithImpl<$Res>
   $Res call({
     Object? issuerId = freezed,
     Object? keyId = freezed,
-    Object? key = freezed,
+    Object? keyFileBase64 = freezed,
   }) {
     return _then(_$AppStoreConnectKeyImpl(
       issuerId: freezed == issuerId
@@ -416,9 +416,9 @@ class __$$AppStoreConnectKeyImplCopyWithImpl<$Res>
           ? _value.keyId
           : keyId // ignore: cast_nullable_to_non_nullable
               as String?,
-      key: freezed == key
-          ? _value.key
-          : key // ignore: cast_nullable_to_non_nullable
+      keyFileBase64: freezed == keyFileBase64
+          ? _value.keyFileBase64
+          : keyFileBase64 // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
@@ -428,7 +428,7 @@ class __$$AppStoreConnectKeyImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$AppStoreConnectKeyImpl implements _AppStoreConnectKey {
   const _$AppStoreConnectKeyImpl(
-      {this.issuerId = null, this.keyId = null, this.key = null});
+      {this.issuerId = null, this.keyId = null, this.keyFileBase64 = null});
 
   factory _$AppStoreConnectKeyImpl.fromJson(Map<String, dynamic> json) =>
       _$$AppStoreConnectKeyImplFromJson(json);
@@ -441,11 +441,11 @@ class _$AppStoreConnectKeyImpl implements _AppStoreConnectKey {
   final String? keyId;
   @override
   @JsonKey()
-  final String? key;
+  final String? keyFileBase64;
 
   @override
   String toString() {
-    return 'AppStoreConnectKey(issuerId: $issuerId, keyId: $keyId, key: $key)';
+    return 'AppStoreConnectKey(issuerId: $issuerId, keyId: $keyId, keyFileBase64: $keyFileBase64)';
   }
 
   @override
@@ -456,12 +456,13 @@ class _$AppStoreConnectKeyImpl implements _AppStoreConnectKey {
             (identical(other.issuerId, issuerId) ||
                 other.issuerId == issuerId) &&
             (identical(other.keyId, keyId) || other.keyId == keyId) &&
-            (identical(other.key, key) || other.key == key));
+            (identical(other.keyFileBase64, keyFileBase64) ||
+                other.keyFileBase64 == keyFileBase64));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, issuerId, keyId, key);
+  int get hashCode => Object.hash(runtimeType, issuerId, keyId, keyFileBase64);
 
   /// Create a copy of AppStoreConnectKey
   /// with the given fields replaced by the non-null parameter values.
@@ -484,7 +485,7 @@ abstract class _AppStoreConnectKey implements AppStoreConnectKey {
   const factory _AppStoreConnectKey(
       {final String? issuerId,
       final String? keyId,
-      final String? key}) = _$AppStoreConnectKeyImpl;
+      final String? keyFileBase64}) = _$AppStoreConnectKeyImpl;
 
   factory _AppStoreConnectKey.fromJson(Map<String, dynamic> json) =
       _$AppStoreConnectKeyImpl.fromJson;
@@ -494,7 +495,7 @@ abstract class _AppStoreConnectKey implements AppStoreConnectKey {
   @override
   String? get keyId;
   @override
-  String? get key;
+  String? get keyFileBase64;
 
   /// Create a copy of AppStoreConnectKey
   /// with the given fields replaced by the non-null parameter values.

@@ -7,7 +7,7 @@ import 'package:openci_models/openci_models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'create_workflow_dialog_controller.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class CreateWorkflowDialogController extends _$CreateWorkflowDialogController {
   @override
   CreateWorkflowDomain build() {
@@ -99,10 +99,17 @@ Future<void> saveASCKeys(
   final secretsRepository = ref.read(secretsRepositoryProvider.notifier);
   final issuerId = ascKey.issuerId;
   final keyId = ascKey.keyId;
-  final key = ascKey.key;
-  if (issuerId == null || keyId == null || key == null) {
-    throw Exception('ASC Key is not valid');
+  final key = ascKey.keyFileBase64;
+  if (issuerId == null) {
+    throw Exception('Issuer ID is not valid');
   }
+  if (keyId == null) {
+    throw Exception('Key ID is not valid');
+  }
+  if (key == null) {
+    throw Exception('Key is not valid');
+  }
+
   await secretsRepository.saveASCKeys(
     issuerId,
     keyId,

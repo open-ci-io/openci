@@ -32,7 +32,7 @@ class AppStoreConnectKey with _$AppStoreConnectKey {
   const factory AppStoreConnectKey({
     @Default(null) String? issuerId,
     @Default(null) String? keyId,
-    @Default(null) String? key,
+    @Default(null) String? keyFileBase64,
   }) = _AppStoreConnectKey;
   factory AppStoreConnectKey.fromJson(Map<String, Object?> json) =>
       _$AppStoreConnectKeyFromJson(json);

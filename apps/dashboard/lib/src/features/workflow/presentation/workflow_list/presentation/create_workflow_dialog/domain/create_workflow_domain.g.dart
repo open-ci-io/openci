@@ -56,7 +56,7 @@ _$AppStoreConnectKeyImpl _$$AppStoreConnectKeyImplFromJson(
     _$AppStoreConnectKeyImpl(
       issuerId: json['issuerId'] as String? ?? null,
       keyId: json['keyId'] as String? ?? null,
-      key: json['key'] as String? ?? null,
+      keyFileBase64: json['keyFileBase64'] as String? ?? null,
     );
 
 Map<String, dynamic> _$$AppStoreConnectKeyImplToJson(
@@ -64,7 +64,7 @@ Map<String, dynamic> _$$AppStoreConnectKeyImplToJson(
     <String, dynamic>{
       'issuerId': instance.issuerId,
       'keyId': instance.keyId,
-      'key': instance.key,
+      'keyFileBase64': instance.keyFileBase64,
     };
 
 _$FlutterBuildIpaDataImpl _$$FlutterBuildIpaDataImplFromJson(
