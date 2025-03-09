@@ -48,8 +48,6 @@ class WorkflowListPage extends ConsumerWidget {
         },
         child: const Icon(Icons.add),
       ),
-      // TODO(someone): Use riverpod (StreamProvider)
-
       body: workflows.when(
         data: (data) {
           final workflows = data;
