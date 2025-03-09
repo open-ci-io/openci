@@ -224,7 +224,10 @@ class _WorkflowListItemMenu extends StatelessWidget {
           },
           child: Text(
             'Edit',
-            style: TextStyle(color: theme.primary),
+            style: TextStyle(
+              color: theme.primary,
+              fontWeight: FontWeight.w200,
+            ),
           ),
         ),
         MenuItemButton(
@@ -233,14 +236,20 @@ class _WorkflowListItemMenu extends StatelessWidget {
           },
           child: Text(
             'Duplicate',
-            style: TextStyle(color: theme.primary),
+            style: TextStyle(
+              color: theme.primary,
+              fontWeight: FontWeight.w200,
+            ),
           ),
         ),
         MenuItemButton(
           onPressed: () => controller.deleteWorkflow(workflowModel.id),
           child: Text(
             'Delete',
-            style: TextStyle(color: theme.error),
+            style: TextStyle(
+              color: theme.error,
+              fontWeight: FontWeight.w200,
+            ),
           ),
         ),
       ],
