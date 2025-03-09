@@ -17,12 +17,11 @@ class WorkflowListPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controller =
-        ref.watch(workflowPageControllerProvider(firebaseSuite).notifier);
-
     void invalidateCreateWorkflowDialogController() {
       ref.invalidate(createWorkflowDialogControllerProvider);
     }
+
+    final workflows = ref.watch(workflowStreamProvider(firebaseSuite));
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
@@ -50,30 +49,10 @@ class WorkflowListPage extends ConsumerWidget {
         child: const Icon(Icons.add),
       ),
       // TODO(someone): Use riverpod (StreamProvider)
-      body: StreamBuilder(
-        stream: controller.workflows(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('No workflow found'),
-            );
-          }
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text('An error occurred'),
-            );
-          }
-          final workflows = snapshot.data!
-            ..sort(
-              (a, b) => a.currentWorkingDirectory
-                  .compareTo(b.currentWorkingDirectory),
-            );
 
+      body: workflows.when(
+        data: (data) {
+          final workflows = data;
           return Padding(
             padding: const EdgeInsets.all(24),
             child: ListView.separated(
@@ -124,6 +103,12 @@ class WorkflowListPage extends ConsumerWidget {
             ),
           );
         },
+        error: (error, stack) => const Center(
+          child: Text('Error'),
+        ),
+        loading: () => const Center(
+          child: CircularProgressIndicator.adaptive(),
+        ),
       ),
     );
   }

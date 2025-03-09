@@ -1,6 +1,8 @@
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 part 'workflow_page_controller.g.dart';
 
 @riverpod
@@ -48,4 +50,14 @@ class WorkflowPageController extends _$WorkflowPageController {
   ) async {
     await firebaseSuite.firestore.collection('workflows').doc(docId).delete();
   }
+}
+
+@riverpod
+Stream<List<WorkflowModel>> workflowStream(
+  Ref ref,
+  OpenCIFirebaseSuite firebaseSuite,
+) {
+  final controller =
+      ref.watch(workflowPageControllerProvider(firebaseSuite).notifier);
+  return controller.workflows();
 }

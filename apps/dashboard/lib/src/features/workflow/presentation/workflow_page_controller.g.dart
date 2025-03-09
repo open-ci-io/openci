@@ -6,8 +6,7 @@ part of 'workflow_page_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$workflowPageControllerHash() =>
-    r'bec1d9ead49bb64a5ff8249f5d5d2cb1c6367f95';
+String _$workflowStreamHash() => r'59d6331bb493f28fa2a17743f5df6ca43015b70c';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,6 +28,141 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
+
+/// See also [workflowStream].
+@ProviderFor(workflowStream)
+const workflowStreamProvider = WorkflowStreamFamily();
+
+/// See also [workflowStream].
+class WorkflowStreamFamily extends Family<AsyncValue<List<WorkflowModel>>> {
+  /// See also [workflowStream].
+  const WorkflowStreamFamily();
+
+  /// See also [workflowStream].
+  WorkflowStreamProvider call(
+    OpenCIFirebaseSuite firebaseSuite,
+  ) {
+    return WorkflowStreamProvider(
+      firebaseSuite,
+    );
+  }
+
+  @override
+  WorkflowStreamProvider getProviderOverride(
+    covariant WorkflowStreamProvider provider,
+  ) {
+    return call(
+      provider.firebaseSuite,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'workflowStreamProvider';
+}
+
+/// See also [workflowStream].
+class WorkflowStreamProvider
+    extends AutoDisposeStreamProvider<List<WorkflowModel>> {
+  /// See also [workflowStream].
+  WorkflowStreamProvider(
+    OpenCIFirebaseSuite firebaseSuite,
+  ) : this._internal(
+          (ref) => workflowStream(
+            ref as WorkflowStreamRef,
+            firebaseSuite,
+          ),
+          from: workflowStreamProvider,
+          name: r'workflowStreamProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$workflowStreamHash,
+          dependencies: WorkflowStreamFamily._dependencies,
+          allTransitiveDependencies:
+              WorkflowStreamFamily._allTransitiveDependencies,
+          firebaseSuite: firebaseSuite,
+        );
+
+  WorkflowStreamProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.firebaseSuite,
+  }) : super.internal();
+
+  final OpenCIFirebaseSuite firebaseSuite;
+
+  @override
+  Override overrideWith(
+    Stream<List<WorkflowModel>> Function(WorkflowStreamRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: WorkflowStreamProvider._internal(
+        (ref) => create(ref as WorkflowStreamRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        firebaseSuite: firebaseSuite,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<List<WorkflowModel>> createElement() {
+    return _WorkflowStreamProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is WorkflowStreamProvider &&
+        other.firebaseSuite == firebaseSuite;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, firebaseSuite.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin WorkflowStreamRef on AutoDisposeStreamProviderRef<List<WorkflowModel>> {
+  /// The parameter `firebaseSuite` of this provider.
+  OpenCIFirebaseSuite get firebaseSuite;
+}
+
+class _WorkflowStreamProviderElement
+    extends AutoDisposeStreamProviderElement<List<WorkflowModel>>
+    with WorkflowStreamRef {
+  _WorkflowStreamProviderElement(super.provider);
+
+  @override
+  OpenCIFirebaseSuite get firebaseSuite =>
+      (origin as WorkflowStreamProvider).firebaseSuite;
+}
+
+String _$workflowPageControllerHash() =>
+    r'bec1d9ead49bb64a5ff8249f5d5d2cb1c6367f95';
 
 abstract class _$WorkflowPageController
     extends BuildlessAutoDisposeNotifier<void> {
