@@ -76,23 +76,6 @@ class CreateWorkflowDialogController extends _$CreateWorkflowDialogController {
   }
 }
 
-enum ASCKey {
-  keyId,
-  issuerId,
-  keyBase64;
-
-  String get key {
-    switch (this) {
-      case ASCKey.keyId:
-        return 'OPENCI_ASC_KEY_ID';
-      case ASCKey.issuerId:
-        return 'OPENCI_ASC_ISSUER_ID';
-      case ASCKey.keyBase64:
-        return 'OPENCI_ASC_KEY_BASE64';
-    }
-  }
-}
-
 @riverpod
 Future<void> saveASCKeys(
   Ref ref, {
@@ -124,21 +107,21 @@ Future<bool> areAppStoreConnectKeysUploaded(Ref ref) async {
   final firestore = await getFirebaseFirestore();
   var qs = await firestore
       .collection(secretsCollectionPath)
-      .where('key', isEqualTo: ASCKey.keyId.key)
+      .where('key', isEqualTo: AppStoreConnectAPIKey.keyId.key)
       .get();
   if (qs.docs.isEmpty) {
     return false;
   }
   qs = await firestore
       .collection(secretsCollectionPath)
-      .where('key', isEqualTo: ASCKey.issuerId.key)
+      .where('key', isEqualTo: AppStoreConnectAPIKey.issuerId.key)
       .get();
   if (qs.docs.isEmpty) {
     return false;
   }
   qs = await firestore
       .collection(secretsCollectionPath)
-      .where('key', isEqualTo: ASCKey.keyBase64.key)
+      .where('key', isEqualTo: AppStoreConnectAPIKey.keyBase64.key)
       .get();
   if (qs.docs.isEmpty) {
     return false;
