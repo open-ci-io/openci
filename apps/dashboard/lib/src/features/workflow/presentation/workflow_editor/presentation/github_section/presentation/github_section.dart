@@ -38,7 +38,7 @@ class GitHubSection extends HookConsumerWidget {
           ),
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 16),
+              padding: const EdgeInsets.only(left: 16, top: 16),
               child: TextFormField(
                 focusNode: repoUrlFocusNode,
                 initialValue: workflowModel.github.repositoryUrl,
