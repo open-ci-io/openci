@@ -7,19 +7,19 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
-WoltModalSheetPage selectStepTemplate(BuildContext context) {
+WoltModalSheetPage selectStepTemplate(BuildContext context, String cwd) {
   void onTemplateChanged(StepTemplate? template, WidgetRef ref) {
     if (template == null) {
       return;
     }
-    ref.read(selectStepControllerProvider.notifier).setTemplate(template);
+    ref.read(selectStepControllerProvider(cwd).notifier).setTemplate(template);
   }
 
   return baseDialog(
     modalSheetContext: context,
     title: 'Choose Step Template',
     child: (ref) {
-      final state = ref.watch(selectStepControllerProvider).template;
+      final state = ref.watch(selectStepControllerProvider(cwd)).template;
       return Column(
         children: [
           RadioListTile(
@@ -39,11 +39,12 @@ WoltModalSheetPage selectStepTemplate(BuildContext context) {
     },
     onBack: (ref) => Navigator.pop(context),
     onNext: (ref, formKey) {
-      final selectedTemplate = ref.read(selectStepControllerProvider).template;
+      final selectedTemplate =
+          ref.read(selectStepControllerProvider(cwd)).template;
       switch (selectedTemplate) {
         case StepTemplate.base64ToFile:
           WoltModalSheet.of(context).pushPage(
-            selectBase64AndLocation(context),
+            selectBase64AndLocation(context, cwd),
           );
         case StepTemplate.blank:
           Navigator.pop(context);

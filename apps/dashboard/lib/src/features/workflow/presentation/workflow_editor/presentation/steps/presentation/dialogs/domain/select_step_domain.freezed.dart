@@ -143,7 +143,7 @@ class _$SelectStepDomainImpl implements _SelectStepDomain {
   const _$SelectStepDomainImpl(
       {this.title = 'Base64 to File',
       this.base64 = '',
-      this.location = '',
+      required this.location,
       this.template = StepTemplate.blank});
 
   factory _$SelectStepDomainImpl.fromJson(Map<String, dynamic> json) =>
@@ -156,7 +156,6 @@ class _$SelectStepDomainImpl implements _SelectStepDomain {
   @JsonKey()
   final String base64;
   @override
-  @JsonKey()
   final String location;
   @override
   @JsonKey()
@@ -206,7 +205,7 @@ abstract class _SelectStepDomain implements SelectStepDomain {
   const factory _SelectStepDomain(
       {final String title,
       final String base64,
-      final String location,
+      required final String location,
       final StepTemplate template}) = _$SelectStepDomainImpl;
 
   factory _SelectStepDomain.fromJson(Map<String, dynamic> json) =

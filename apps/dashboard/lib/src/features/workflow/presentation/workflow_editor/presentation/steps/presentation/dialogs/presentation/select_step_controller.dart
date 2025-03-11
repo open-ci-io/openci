@@ -5,11 +5,23 @@ part 'select_step_controller.g.dart';
 @Riverpod(keepAlive: true)
 class SelectStepController extends _$SelectStepController {
   @override
-  SelectStepDomain build() {
-    return const SelectStepDomain();
+  SelectStepDomain build(String cwd) {
+    return SelectStepDomain(location: cwd);
   }
 
   void setTemplate(StepTemplate template) {
     state = state.copyWith(template: template);
+  }
+
+  void setLocation(String location) {
+    state = state.copyWith(location: location);
+  }
+
+  void setTitle(String title) {
+    state = state.copyWith(title: title);
+  }
+
+  void setBase64(String base64) {
+    state = state.copyWith(base64: base64);
   }
 }

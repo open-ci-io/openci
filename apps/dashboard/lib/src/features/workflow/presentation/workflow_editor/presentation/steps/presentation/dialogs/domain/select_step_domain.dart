@@ -8,7 +8,7 @@ class SelectStepDomain with _$SelectStepDomain {
   const factory SelectStepDomain({
     @Default('Base64 to File') String title,
     @Default('') String base64,
-    @Default('') String location,
+    required String location,
     @Default(StepTemplate.blank) StepTemplate template,
   }) = _SelectStepDomain;
   factory SelectStepDomain.fromJson(Map<String, Object?> json) =>

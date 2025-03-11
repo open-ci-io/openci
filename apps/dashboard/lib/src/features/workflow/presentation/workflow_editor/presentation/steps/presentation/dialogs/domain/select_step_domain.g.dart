@@ -11,7 +11,7 @@ _$SelectStepDomainImpl _$$SelectStepDomainImplFromJson(
     _$SelectStepDomainImpl(
       title: json['title'] as String? ?? 'Base64 to File',
       base64: json['base64'] as String? ?? '',
-      location: json['location'] as String? ?? '',
+      location: json['location'] as String,
       template: $enumDecodeNullable(_$StepTemplateEnumMap, json['template']) ??
           StepTemplate.blank,
     );
