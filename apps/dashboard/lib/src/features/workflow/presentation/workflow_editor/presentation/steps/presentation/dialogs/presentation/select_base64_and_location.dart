@@ -11,7 +11,6 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage selectBase64AndLocation(
   BuildContext context,
-  String cwd,
   WorkflowEditorController workflowEditorController,
 ) {
   final titleController = TextEditingController();
@@ -19,7 +18,7 @@ WoltModalSheetPage selectBase64AndLocation(
   final locationController = TextEditingController();
 
   void updateState(WidgetRef ref) {
-    ref.read(selectStepControllerProvider(cwd).notifier)
+    ref.read(selectStepControllerProvider.notifier)
       ..setTitle(titleController.text)
       ..setLocation(locationController.text)
       ..setBase64(base64Controller.text);
@@ -36,14 +35,12 @@ WoltModalSheetPage selectBase64AndLocation(
           verticalMargin8,
           _Title(
             titleController: titleController,
-            cwd: cwd,
           ),
           verticalMargin16,
           const Text('Base64'),
           verticalMargin8,
           _Base64(
             base64Controller: base64Controller,
-            cwd: cwd,
           ),
           verticalMargin8,
           Row(
@@ -53,7 +50,7 @@ WoltModalSheetPage selectBase64AndLocation(
                 onPressed: () {
                   updateState(ref);
                   WoltModalSheet.of(context).pushPage(
-                    importSecrets(context, cwd),
+                    importSecrets(context),
                   );
                 },
                 child: const Text('Import from Secrets'),
@@ -75,7 +72,6 @@ WoltModalSheetPage selectBase64AndLocation(
           verticalMargin8,
           _Location(
             locationController: locationController,
-            cwd: cwd,
           ),
         ],
       );
@@ -93,10 +89,10 @@ WoltModalSheetPage selectBase64AndLocation(
         return;
       }
       updateState(ref);
-      final state = ref.read(selectStepControllerProvider(cwd));
+      final state = ref.read(selectStepControllerProvider);
       workflowEditorController.addStep(
         name: state.title,
-        command: 'echo ${state.base64} > ${state.location}',
+        command: 'echo ${state.base64} | base64 -d > ${state.location}',
       );
       Navigator.pop(context);
     },
@@ -106,15 +102,13 @@ WoltModalSheetPage selectBase64AndLocation(
 class _Base64 extends HookConsumerWidget {
   const _Base64({
     required this.base64Controller,
-    required this.cwd,
   });
 
   final TextEditingController base64Controller;
-  final String cwd;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(selectStepControllerProvider(cwd));
+    final state = ref.watch(selectStepControllerProvider);
     useEffect(
       () {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -143,15 +137,13 @@ class _Base64 extends HookConsumerWidget {
 class _Location extends HookConsumerWidget {
   const _Location({
     required this.locationController,
-    required this.cwd,
   });
 
   final TextEditingController locationController;
-  final String cwd;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(selectStepControllerProvider(cwd));
+    final state = ref.watch(selectStepControllerProvider);
     useEffect(
       () {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -167,12 +159,6 @@ class _Location extends HookConsumerWidget {
       decoration: const InputDecoration(
         labelText: '/path/to/file',
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Path to file is required';
-        }
-        return null;
-      },
     );
   }
 }
@@ -180,14 +166,12 @@ class _Location extends HookConsumerWidget {
 class _Title extends HookConsumerWidget {
   const _Title({
     required this.titleController,
-    required this.cwd,
   });
 
   final TextEditingController titleController;
-  final String cwd;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(selectStepControllerProvider(cwd));
+    final state = ref.watch(selectStepControllerProvider);
     useEffect(
       () {
         WidgetsBinding.instance.addPostFrameCallback((_) {

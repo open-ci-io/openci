@@ -8,7 +8,7 @@ class SelectStepDomain with _$SelectStepDomain {
   const factory SelectStepDomain({
     @Default('Base64 to File') String title,
     @Default('') String base64,
-    required String location,
+    @Default('') String location,
     @Default(StepTemplate.blank) StepTemplate template,
     String? selectedKey,
   }) = _SelectStepDomain;

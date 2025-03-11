@@ -5,8 +5,8 @@ part 'select_step_controller.g.dart';
 @Riverpod(keepAlive: true)
 class SelectStepController extends _$SelectStepController {
   @override
-  SelectStepDomain build(String cwd) {
-    return SelectStepDomain(location: cwd);
+  SelectStepDomain build() {
+    return SelectStepDomain();
   }
 
   void setTemplate(StepTemplate template) {

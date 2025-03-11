@@ -10,21 +10,20 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage selectStepTemplate(
   BuildContext context,
-  String cwd,
   WorkflowEditorController workflowEditorController,
 ) {
   void onTemplateChanged(StepTemplate? template, WidgetRef ref) {
     if (template == null) {
       return;
     }
-    ref.read(selectStepControllerProvider(cwd).notifier).setTemplate(template);
+    ref.read(selectStepControllerProvider.notifier).setTemplate(template);
   }
 
   return baseDialog(
     modalSheetContext: context,
     title: 'Choose Step Template',
     child: (ref) {
-      final state = ref.watch(selectStepControllerProvider(cwd)).template;
+      final state = ref.watch(selectStepControllerProvider).template;
       return Column(
         children: [
           RadioListTile(
@@ -44,15 +43,18 @@ WoltModalSheetPage selectStepTemplate(
     },
     onBack: (ref) => Navigator.pop(context),
     onNext: (ref, formKey) {
-      final selectedTemplate =
-          ref.read(selectStepControllerProvider(cwd)).template;
+      final selectedTemplate = ref.read(selectStepControllerProvider).template;
       switch (selectedTemplate) {
         case StepTemplate.base64ToFile:
           WoltModalSheet.of(context).pushPage(
-            selectBase64AndLocation(context, cwd, workflowEditorController),
+            selectBase64AndLocation(context, workflowEditorController),
           );
         case StepTemplate.blank:
           Navigator.pop(context);
+          workflowEditorController.addStep(
+            name: 'New Step',
+            command: 'echo "New Step"',
+          );
       }
     },
   );

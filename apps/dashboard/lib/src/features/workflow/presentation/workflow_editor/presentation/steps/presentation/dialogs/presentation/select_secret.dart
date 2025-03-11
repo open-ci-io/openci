@@ -7,7 +7,6 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage importSecrets(
   BuildContext context,
-  String cwd,
 ) {
   return baseDialog(
     modalSheetContext: context,
@@ -20,7 +19,6 @@ WoltModalSheetPage importSecrets(
           return _Body(
             selectedOption: selectedOption,
             secrets: data,
-            cwd: cwd,
           );
         },
         error: (error, stack) {
@@ -40,16 +38,14 @@ class _Body extends ConsumerWidget {
   const _Body({
     required this.selectedOption,
     required this.secrets,
-    required this.cwd,
   });
 
   final String? selectedOption;
   final List<String> secrets;
-  final String cwd;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(selectStepControllerProvider(cwd));
-    final controller = ref.watch(selectStepControllerProvider(cwd).notifier);
+    final state = ref.watch(selectStepControllerProvider);
+    final controller = ref.watch(selectStepControllerProvider.notifier);
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 300),
       // TODO(someone): 2 scrollbar shows
