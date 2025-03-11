@@ -1,8 +1,8 @@
 import 'package:dashboard/src/common_widgets/dialogs/delete_dialog.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
-import 'package:dashboard/src/features/secrets/presentation/secrets.dart';
 import 'package:dashboard/src/services/firebase.dart';
 import 'package:dashboard/src/services/firestore/file_picker.dart';
+import 'package:dashboard/src/services/firestore/secrets_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -15,6 +15,7 @@ class SecretPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final secrets = ref.watch(secretsStreamProvider(firebaseSuite));
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -27,22 +28,8 @@ class SecretPage extends ConsumerWidget {
         },
         child: const Icon(Icons.add),
       ),
-      // TODO(mafreud): use riverpod instead of streambuilder
-      body: StreamBuilder(
-        stream: secrets(firebaseSuite),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('No Secrets found'),
-            );
-          }
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          final data = snapshot.data!;
+      body: secrets.when(
+        data: (data) {
           return Padding(
             padding: const EdgeInsets.all(24),
             child: ListView.builder(
@@ -103,6 +90,9 @@ class SecretPage extends ConsumerWidget {
             ),
           );
         },
+        error: (error, stack) => const Text('Error'),
+        loading: () =>
+            const Center(child: CircularProgressIndicator.adaptive()),
       ),
     );
   }

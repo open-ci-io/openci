@@ -90,3 +90,21 @@ Future<List<String>> secrets(Ref ref) async {
   final secretsRepository = ref.watch(secretsRepositoryProvider.notifier);
   return secretsRepository.getSecrets();
 }
+
+@riverpod
+Stream<List<DocumentSnapshot>> secretsStream(
+  Ref ref,
+  OpenCIFirebaseSuite firebaseSuite,
+) {
+  final firestore = firebaseSuite.firestore;
+  final auth = firebaseSuite.auth;
+  final uid = auth.currentUser!.uid;
+  return firestore
+      .collection(secretsCollectionPath)
+      .where(
+        'owners',
+        arrayContains: uid,
+      )
+      .snapshots()
+      .map((snapshot) => snapshot.docs);
+}
