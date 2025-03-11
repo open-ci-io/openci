@@ -8,7 +8,6 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage checkASCKeys(
   BuildContext modalSheetContext,
-  TextTheme textTheme,
 ) {
   return baseDialog(
     onBack: (ref) => WoltModalSheet.of(modalSheetContext).popPage(),
@@ -18,11 +17,11 @@ WoltModalSheetPage checkASCKeys(
       switch (state.isASCKeyUploaded) {
         case true:
           WoltModalSheet.of(modalSheetContext).pushPage(
-            selectFlutterBuildIpaData(modalSheetContext, textTheme),
+            selectFlutterBuildIpaData(modalSheetContext),
           );
         case false:
           WoltModalSheet.of(modalSheetContext).pushPage(
-            selectASCKeys(modalSheetContext, textTheme),
+            selectASCKeys(modalSheetContext),
           );
         case null:
           return;
@@ -65,7 +64,6 @@ WoltModalSheetPage checkASCKeys(
       );
     },
     modalSheetContext: modalSheetContext,
-    textTheme: textTheme,
     title: 'Check ASC Keys',
   );
 }

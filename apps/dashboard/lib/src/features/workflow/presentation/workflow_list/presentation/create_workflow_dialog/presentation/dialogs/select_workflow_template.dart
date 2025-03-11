@@ -10,9 +10,8 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 import '../create_workflow_dialog_controller.dart';
 
-WoltModalSheetPage chooseWorkflowTemplate(
+WoltModalSheetPage selectWorkflowTemplate(
   BuildContext modalSheetContext,
-  TextTheme textTheme,
   OpenCIFirebaseSuite firebaseSuite,
 ) {
   return baseDialog(
@@ -25,7 +24,7 @@ WoltModalSheetPage chooseWorkflowTemplate(
       switch (state.template) {
         case OpenCIWorkflowTemplate.ipa:
           WoltModalSheet.of(modalSheetContext).pushPage(
-            checkASCKeys(modalSheetContext, textTheme),
+            checkASCKeys(modalSheetContext),
           );
         case OpenCIWorkflowTemplate.blank:
           Navigator.pop(modalSheetContext);
@@ -42,7 +41,6 @@ WoltModalSheetPage chooseWorkflowTemplate(
       }
     },
     modalSheetContext: modalSheetContext,
-    textTheme: textTheme,
     title: 'Choose Workflow Template',
     child: (ref) {
       final state = ref.watch(createWorkflowDialogControllerProvider);

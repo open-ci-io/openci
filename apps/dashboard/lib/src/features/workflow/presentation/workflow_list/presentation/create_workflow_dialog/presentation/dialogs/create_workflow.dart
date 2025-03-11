@@ -9,7 +9,6 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage createWorkflowPage(
   BuildContext modalSheetContext,
-  TextTheme textTheme,
 ) {
   var isSuccess = false;
   WorkflowModel? workflow;
@@ -66,7 +65,6 @@ WoltModalSheetPage createWorkflowPage(
       );
     },
     modalSheetContext: modalSheetContext,
-    textTheme: textTheme,
     title: 'Create Workflow',
   );
 }

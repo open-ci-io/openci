@@ -7,13 +7,12 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage selectDistribution(
   BuildContext modalSheetContext,
-  TextTheme textTheme,
 ) {
   return baseDialog(
     onBack: (ref) => WoltModalSheet.of(modalSheetContext).popPage(),
     onNext: (ref, formKey) {
       WoltModalSheet.of(modalSheetContext).pushPage(
-        createWorkflowPage(modalSheetContext, textTheme),
+        createWorkflowPage(modalSheetContext),
       );
     },
     child: (ref) {
@@ -49,7 +48,6 @@ WoltModalSheetPage selectDistribution(
       );
     },
     modalSheetContext: modalSheetContext,
-    textTheme: textTheme,
     title: 'Select Distribution',
   );
 }

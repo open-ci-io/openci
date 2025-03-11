@@ -10,7 +10,6 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage selectFlutterBuildIpaData(
   BuildContext modalSheetContext,
-  TextTheme textTheme,
 ) {
   final workflowNameEditingController = TextEditingController();
   final flutterBuildCommandEditingController = TextEditingController();
@@ -44,7 +43,7 @@ WoltModalSheetPage selectFlutterBuildIpaData(
         updateState(ref);
 
         WoltModalSheet.of(modalSheetContext).pushPage(
-          selectDistribution(modalSheetContext, textTheme),
+          selectDistribution(modalSheetContext),
         );
       }
     },
@@ -58,7 +57,6 @@ WoltModalSheetPage selectFlutterBuildIpaData(
       );
     },
     modalSheetContext: modalSheetContext,
-    textTheme: textTheme,
     title: 'Select Flutter Build .ipa Data',
   );
 }

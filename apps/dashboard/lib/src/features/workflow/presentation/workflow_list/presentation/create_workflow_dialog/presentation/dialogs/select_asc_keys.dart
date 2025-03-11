@@ -13,7 +13,6 @@ import '../create_workflow_dialog_controller.dart';
 
 WoltModalSheetPage selectASCKeys(
   BuildContext modalSheetContext,
-  TextTheme textTheme,
 ) {
   final issuerIdEditingController = TextEditingController();
   final keyIdEditingController = TextEditingController();
@@ -32,7 +31,7 @@ WoltModalSheetPage selectASCKeys(
               ),
             );
         WoltModalSheet.of(modalSheetContext).pushPage(
-          uploadASCKeys(modalSheetContext, textTheme),
+          uploadASCKeys(modalSheetContext),
         );
       }
     },
@@ -105,7 +104,6 @@ WoltModalSheetPage selectASCKeys(
       ),
     ),
     modalSheetContext: modalSheetContext,
-    textTheme: textTheme,
     title: 'Select ASC Keys',
   );
 }

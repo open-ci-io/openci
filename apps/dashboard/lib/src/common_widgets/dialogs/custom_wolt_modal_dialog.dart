@@ -5,7 +5,6 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage baseDialog({
   required BuildContext modalSheetContext,
-  required TextTheme textTheme,
   required String title,
   required Widget Function(WidgetRef) child,
   required void Function(WidgetRef) onBack,
@@ -13,6 +12,7 @@ WoltModalSheetPage baseDialog({
   Text? Function(WidgetRef)? backButtonText,
   Widget? Function(WidgetRef)? nextButtonText,
 }) {
+  final textTheme = Theme.of(modalSheetContext).textTheme;
   return WoltModalSheetPage(
     topBarTitle: Text(title, style: textTheme.titleMedium),
     isTopBarLayerAlwaysVisible: true,

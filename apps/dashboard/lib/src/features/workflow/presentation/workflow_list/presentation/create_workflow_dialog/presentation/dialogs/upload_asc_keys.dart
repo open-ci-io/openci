@@ -8,7 +8,6 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage uploadASCKeys(
   BuildContext modalSheetContext,
-  TextTheme textTheme,
 ) {
   var isSuccess = false;
   return baseDialog(
@@ -17,7 +16,7 @@ WoltModalSheetPage uploadASCKeys(
       switch (isSuccess) {
         case true:
           WoltModalSheet.of(modalSheetContext).pushPage(
-            selectFlutterBuildIpaData(modalSheetContext, textTheme),
+            selectFlutterBuildIpaData(modalSheetContext),
           );
         case false:
           WoltModalSheet.of(modalSheetContext).popPage();
@@ -58,7 +57,6 @@ WoltModalSheetPage uploadASCKeys(
       );
     },
     modalSheetContext: modalSheetContext,
-    textTheme: textTheme,
     title: 'Upload ASC Keys',
   );
 }

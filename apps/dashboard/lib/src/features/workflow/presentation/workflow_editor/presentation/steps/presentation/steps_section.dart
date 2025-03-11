@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/common_widgets/openci_dialog.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/steps/presentation/dialogs/presentation/select_step_controller.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/steps/presentation/dialogs/presentation/select_step_template.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/steps/presentation/edit_step_dialog.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
+import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 class StepsSection extends HookConsumerWidget {
   const StepsSection(this.workflowModel, {super.key});
@@ -145,9 +148,18 @@ class StepsSection extends HookConsumerWidget {
             IconButton(
               onPressed: () {
                 // controller.addStepByIndex(steps.length);
-                showDialog<void>(
+                ref.invalidate(selectStepControllerProvider);
+                WoltModalSheet.show<void>(
                   context: context,
-                  builder: (context) => const ChooseStepTemplate(),
+                  pageListBuilder: (modalSheetContext) {
+                    return [
+                      selectStepTemplate(
+                        modalSheetContext,
+                      ),
+                    ];
+                  },
+                  modalTypeBuilder: (context) => const WoltDialogType(),
+                  onModalDismissedWithBarrierTap: Navigator.of(context).pop,
                 );
               },
               icon: Icon(

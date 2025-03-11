@@ -2,7 +2,7 @@ import 'package:dashboard/colors.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/edit_workflow.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/create_workflow_dialog_controller.dart';
-import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/dialogs/choose_workflow_template.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/dialogs/select_workflow_template.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_page_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -29,11 +29,9 @@ class WorkflowListPage extends ConsumerWidget {
           WoltModalSheet.show<void>(
             context: context,
             pageListBuilder: (modalSheetContext) {
-              final textTheme = Theme.of(context).textTheme;
               return [
-                chooseWorkflowTemplate(
+                selectWorkflowTemplate(
                   modalSheetContext,
-                  textTheme,
                   firebaseSuite,
                 ),
               ];
