@@ -24,4 +24,8 @@ class SelectStepController extends _$SelectStepController {
   void setBase64(String base64) {
     state = state.copyWith(base64: base64);
   }
+
+  void setSelectedKey(String selectedKey) {
+    state = state.copyWith(selectedKey: selectedKey);
+  }
 }

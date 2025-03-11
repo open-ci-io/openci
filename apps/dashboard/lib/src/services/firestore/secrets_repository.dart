@@ -3,6 +3,7 @@ import 'package:dashboard/src/features/navigation/presentation/navigation_page.d
 import 'package:dashboard/src/services/firebase.dart';
 import 'package:dashboard/src/services/predefined_secret_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'secrets_repository.g.dart';
@@ -34,6 +35,12 @@ class SecretsRepository extends _$SecretsRepository {
       );
     }
     return user.uid;
+  }
+
+  Future<List<String>> getSecrets() async {
+    final firestore = await getFirestore();
+    final snapshot = await firestore.collection(secretsCollectionPath).get();
+    return snapshot.docs.map((e) => e.data()['key'] as String).toList();
   }
 
   Future<void> createSecret(
@@ -76,4 +83,10 @@ class SecretsRepository extends _$SecretsRepository {
       throw Exception(e);
     }
   }
+}
+
+@riverpod
+Future<List<String>> secrets(Ref ref) async {
+  final secretsRepository = ref.watch(secretsRepositoryProvider.notifier);
+  return secretsRepository.getSecrets();
 }

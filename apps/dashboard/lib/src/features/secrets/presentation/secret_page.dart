@@ -1,10 +1,8 @@
-import 'dart:convert';
-
 import 'package:dashboard/src/common_widgets/dialogs/delete_dialog.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/secrets/presentation/secrets.dart';
 import 'package:dashboard/src/services/firebase.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:dashboard/src/services/firestore/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -29,6 +27,7 @@ class SecretPage extends ConsumerWidget {
         },
         child: const Icon(Icons.add),
       ),
+      // TODO(mafreud): use riverpod instead of streambuilder
       body: StreamBuilder(
         stream: secrets(firebaseSuite),
         builder: (context, snapshot) {
@@ -162,13 +161,11 @@ class _DialogBody extends HookConsumerWidget {
               children: [
                 TextButton(
                   onPressed: () async {
-                    final result = await FilePicker.platform.pickFiles();
+                    final result = await pickFileAsBase64();
                     if (result == null) {
                       return;
                     }
-                    final file = result.files.first;
-                    final bytes = await file.xFile.readAsBytes();
-                    valueController.text = base64Encode(bytes);
+                    valueController.text = result;
                   },
                   child: const Text('Select File'),
                 ),

@@ -1,15 +1,30 @@
 import 'package:dashboard/src/common_widgets/dialogs/custom_wolt_modal_dialog.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/steps/presentation/dialogs/presentation/select_secret.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/steps/presentation/dialogs/presentation/select_step_controller.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
+import 'package:dashboard/src/services/firestore/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
-WoltModalSheetPage selectBase64AndLocation(BuildContext context, String cwd) {
+WoltModalSheetPage selectBase64AndLocation(
+  BuildContext context,
+  String cwd,
+  WorkflowEditorController workflowEditorController,
+) {
   final titleController = TextEditingController();
   final base64Controller = TextEditingController();
   final locationController = TextEditingController();
+
+  void updateState(WidgetRef ref) {
+    ref.read(selectStepControllerProvider(cwd).notifier)
+      ..setTitle(titleController.text)
+      ..setLocation(locationController.text)
+      ..setBase64(base64Controller.text);
+  }
+
   return baseDialog(
     modalSheetContext: context,
     title: 'Select Base64 and Location',
@@ -19,21 +34,38 @@ WoltModalSheetPage selectBase64AndLocation(BuildContext context, String cwd) {
         children: [
           const Text('Title'),
           verticalMargin8,
-          _Title(titleController: titleController, cwd: cwd),
+          _Title(
+            titleController: titleController,
+            cwd: cwd,
+          ),
           verticalMargin16,
           const Text('Base64'),
           verticalMargin8,
-          _Base64(base64Controller: base64Controller, cwd: cwd),
+          _Base64(
+            base64Controller: base64Controller,
+            cwd: cwd,
+          ),
           verticalMargin8,
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  updateState(ref);
+                  WoltModalSheet.of(context).pushPage(
+                    importSecrets(context, cwd),
+                  );
+                },
                 child: const Text('Import from Secrets'),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () async {
+                  final result = await pickFileAsBase64();
+                  if (result == null) {
+                    return;
+                  }
+                  base64Controller.text = result;
+                },
                 child: const Text('Select a File'),
               ),
             ],
@@ -41,23 +73,33 @@ WoltModalSheetPage selectBase64AndLocation(BuildContext context, String cwd) {
           verticalMargin16,
           const Text('File Location'),
           verticalMargin8,
-          _Location(locationController: locationController, cwd: cwd),
+          _Location(
+            locationController: locationController,
+            cwd: cwd,
+          ),
         ],
       );
     },
     onBack: (ref) {
-      ref.read(selectStepControllerProvider(cwd).notifier)
-        ..setTitle(titleController.text)
-        ..setLocation(locationController.text)
-        ..setBase64(base64Controller.text);
-
+      updateState(ref);
       WoltModalSheet.of(context).popPage();
     },
     nextButtonText: (ref) => const Text(
       'Finish',
       style: TextStyle(fontWeight: FontWeight.w300),
     ),
-    onNext: (ref, formKey) {},
+    onNext: (ref, formKey) {
+      if (!formKey.currentState!.validate()) {
+        return;
+      }
+      updateState(ref);
+      final state = ref.read(selectStepControllerProvider(cwd));
+      workflowEditorController.addStep(
+        name: state.title,
+        command: 'echo ${state.base64} > ${state.location}',
+      );
+      Navigator.pop(context);
+    },
   );
 }
 
@@ -88,6 +130,12 @@ class _Base64 extends HookConsumerWidget {
       decoration: const InputDecoration(
         labelText: 'Base64',
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Base64 is required';
+        }
+        return null;
+      },
     );
   }
 }
@@ -119,6 +167,12 @@ class _Location extends HookConsumerWidget {
       decoration: const InputDecoration(
         labelText: '/path/to/file',
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Path to file is required';
+        }
+        return null;
+      },
     );
   }
 }
@@ -149,6 +203,12 @@ class _Title extends HookConsumerWidget {
       decoration: const InputDecoration(
         labelText: 'Title',
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Title is required';
+        }
+        return null;
+      },
     );
   }
 }

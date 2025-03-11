@@ -14,6 +14,7 @@ _$SelectStepDomainImpl _$$SelectStepDomainImplFromJson(
       location: json['location'] as String,
       template: $enumDecodeNullable(_$StepTemplateEnumMap, json['template']) ??
           StepTemplate.blank,
+      selectedKey: json['selectedKey'] as String?,
     );
 
 Map<String, dynamic> _$$SelectStepDomainImplToJson(
@@ -23,6 +24,7 @@ Map<String, dynamic> _$$SelectStepDomainImplToJson(
       'base64': instance.base64,
       'location': instance.location,
       'template': _$StepTemplateEnumMap[instance.template]!,
+      'selectedKey': instance.selectedKey,
     };
 
 const _$StepTemplateEnumMap = {

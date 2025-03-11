@@ -6,7 +6,23 @@ part of 'secrets_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$secretsRepositoryHash() => r'cc2aca7a272bd485220117da30471d245015c942';
+String _$secretsHash() => r'b679e4d1fbe584979de8595f7f23c6bf30af7ba4';
+
+/// See also [secrets].
+@ProviderFor(secrets)
+final secretsProvider = AutoDisposeFutureProvider<List<String>>.internal(
+  secrets,
+  name: r'secretsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$secretsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef SecretsRef = AutoDisposeFutureProviderRef<List<String>>;
+String _$secretsRepositoryHash() => r'a0db0b7da54cc752ec0b1e56d1f142bf911aa68f';
 
 /// See also [SecretsRepository].
 @ProviderFor(SecretsRepository)

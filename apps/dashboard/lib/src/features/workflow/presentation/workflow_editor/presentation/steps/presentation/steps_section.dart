@@ -156,6 +156,7 @@ class StepsSection extends HookConsumerWidget {
                       selectStepTemplate(
                         modalSheetContext,
                         state.currentWorkingDirectory,
+                        controller,
                       ),
                     ];
                   },

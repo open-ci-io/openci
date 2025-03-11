@@ -10,6 +10,7 @@ class SelectStepDomain with _$SelectStepDomain {
     @Default('') String base64,
     required String location,
     @Default(StepTemplate.blank) StepTemplate template,
+    String? selectedKey,
   }) = _SelectStepDomain;
   factory SelectStepDomain.fromJson(Map<String, Object?> json) =>
       _$SelectStepDomainFromJson(json);

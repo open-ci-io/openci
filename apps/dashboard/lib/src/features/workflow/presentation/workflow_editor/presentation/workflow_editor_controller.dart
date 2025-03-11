@@ -57,6 +57,18 @@ class WorkflowEditorController extends _$WorkflowEditorController {
     state = state.copyWith(steps: steps);
   }
 
+  void addStep({
+    required String name,
+    required String command,
+  }) {
+    state = state.copyWith(
+      steps: [
+        ...state.steps,
+        WorkflowModelStep(name: name, command: command),
+      ],
+    );
+  }
+
   void reorderStep(int oldIndex, int newIndex) {
     final steps = state.steps.toList();
     final step = steps.removeAt(oldIndex);
