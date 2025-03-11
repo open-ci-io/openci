@@ -5,15 +5,8 @@ packages:
   - packages/**
 
 scripts:
-  runner:
-    run: cd apps/openci_runner && dart run openci_runner runner --pem-path ./github_apps.pem --service-account-path ./service_account.json --project-id open-ci-release --sentry-dsn https://e66e5ae0245821f62a4b235d829dc3fb@o4507005123166208.ingest.us.sentry.io/4507005125197824
-
-  worker_dev:
-    run: cd apps/openci_runner && dart run openci_runner runner --pem-path ./github_apps_dev.pem --service-account-path ./service_account_dev.json --project-id openci-dev --sentry-dsn https://7de9b7c871d20110595fcbd19abb5f10@o4507005123166208.ingest.us.sentry.io/4508800103350272
-
   ff:
     run: cd apps/firebase_functions && firebase deploy --only functions
 
   dashboard-runner:
     run: cd apps/dashboard && dart run build_runner watch -d
-

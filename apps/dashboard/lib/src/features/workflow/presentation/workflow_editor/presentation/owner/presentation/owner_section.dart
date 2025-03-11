@@ -14,9 +14,13 @@ class OwnersSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controller =
-        ref.watch(workflowEditorControllerProvider(workflowModel).notifier);
-    final state = ref.watch(workflowEditorControllerProvider(workflowModel));
+    final controller = ref.watch(
+      workflowEditorControllerProvider(workflowModel).notifier,
+    );
+    final state = ref.watch(
+      workflowEditorControllerProvider(workflowModel),
+    );
+    final textTheme = Theme.of(context).textTheme;
     final owners = state.owners;
     return Card(
       elevation: 0,
@@ -28,9 +32,9 @@ class OwnersSection extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Owners',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: textTheme.titleMedium,
                 ),
                 IconButton(
                   icon: const Icon(Icons.add),

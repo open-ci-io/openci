@@ -1,16 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dashboard/src/services/firebase.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 part 'workflow_editor_controller.g.dart';
 
 @riverpod
 class WorkflowEditorController extends _$WorkflowEditorController {
   @override
-  WorkflowModel build(WorkflowModel workflowModel) {
-    return workflowModel;
-  }
+  WorkflowModel build(
+    WorkflowModel workflowModel,
+  ) =>
+      workflowModel;
 
-  void updateFlutterVersion(String version) {
+  void updateFlutterVersion(FlutterVersion version) {
     state = state.copyWith.flutter(version: version);
   }
 
@@ -55,6 +57,18 @@ class WorkflowEditorController extends _$WorkflowEditorController {
     state = state.copyWith(steps: steps);
   }
 
+  void addStep({
+    required String name,
+    required String command,
+  }) {
+    state = state.copyWith(
+      steps: [
+        ...state.steps,
+        WorkflowModelStep(name: name, command: command),
+      ],
+    );
+  }
+
   void reorderStep(int oldIndex, int newIndex) {
     final steps = state.steps.toList();
     final step = steps.removeAt(oldIndex);
@@ -80,9 +94,7 @@ class WorkflowEditorController extends _$WorkflowEditorController {
   }
 
   Future<void> save() async {
-    await FirebaseFirestore.instance
-        .collection('workflows')
-        .doc(state.id)
-        .set(state.toJson());
+    final firestore = await getFirebaseFirestore();
+    await firestore.collection('workflows').doc(state.id).set(state.toJson());
   }
 }

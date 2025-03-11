@@ -5,10 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "chrome",
+            "name": "dashboard (macOS)",
             "request": "launch",
-            "name": "Open index.html",
-            "file": "/Users/masahiroaoki/Developer/open-ci/openci/apps/dashboard/web/index.html"
+            "type": "dart",
+            "program": "apps/dashboard/lib/main.dart",
+            "args": [
+                "-d",
+                "macos"
+            ]
         }
     ]
 }

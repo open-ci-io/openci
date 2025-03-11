@@ -1,78 +1,111 @@
 import 'package:dashboard/src/common_widgets/margins.dart';
+import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/edit_workflow.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/workflow_editor_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 
-class BasicInfoSection extends ConsumerWidget {
-  const BasicInfoSection(this.workflowModel, {super.key});
+class BasicInfoSection extends HookConsumerWidget {
+  const BasicInfoSection(
+    this.workflowModel, {
+    super.key,
+  });
 
   final WorkflowModel workflowModel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controller =
-        ref.watch(workflowEditorControllerProvider(workflowModel).notifier);
+    final controller = ref.watch(
+      workflowEditorControllerProvider(workflowModel).notifier,
+    );
+    final textTheme = Theme.of(context).textTheme;
 
-    return Card(
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final workflowNameFocus = useFocusNode();
+    final currentWorkingDirectoryFocus = useFocusNode();
+    final flutterVersionFocus = useFocusNode();
+    useListenable(workflowNameFocus);
+    useListenable(currentWorkingDirectoryFocus);
+    useListenable(flutterVersionFocus);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ExpansionTile(
+          title: Text(
+            'Basic Information',
+            style: textTheme.titleMedium,
+          ),
           children: [
-            const Text(
-              'Basic Information',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, top: 16),
+              child: TextFormField(
+                focusNode: workflowNameFocus,
+                initialValue: workflowModel.name,
+                decoration: InputDecoration(
+                  labelText: 'Workflow Name',
+                  labelStyle: labelStyle(hasFocus: workflowNameFocus.hasFocus),
+                ),
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return 'Please enter a workflow name';
+                  }
+                  return null;
+                },
+                onChanged: controller.updateWorkflowName,
+              ),
             ),
             verticalMargin16,
-            TextFormField(
-              initialValue: workflowModel.name,
-              decoration: const InputDecoration(
-                labelText: 'Workflow Name',
-                border: OutlineInputBorder(),
+            Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: DropdownButtonFormField<String>(
+                focusNode: flutterVersionFocus,
+                value: workflowModel.flutter.version.stringValue,
+                decoration: InputDecoration(
+                  labelText: 'Flutter Version',
+                  labelStyle:
+                      labelStyle(hasFocus: flutterVersionFocus.hasFocus),
+                ),
+                items: FlutterVersion.values.map((value) {
+                  return DropdownMenuItem(
+                    value: value.stringValue,
+                    child: Text(value.stringValue),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value == null) {
+                    return;
+                  }
+                  controller.updateFlutterVersion(
+                    FlutterVersion.fromString(value),
+                  );
+                },
               ),
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter a workflow name';
-                }
-                return null;
-              },
-              onChanged: controller.updateWorkflowName,
             ),
             verticalMargin16,
-            TextFormField(
-              initialValue: workflowModel.flutter.version,
-              decoration: const InputDecoration(
-                labelText: 'Flutter Version',
-                border: OutlineInputBorder(),
+            Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: TextFormField(
+                focusNode: currentWorkingDirectoryFocus,
+                initialValue: workflowModel.currentWorkingDirectory,
+                decoration: InputDecoration(
+                  labelText: 'Current Working Directory',
+                  labelStyle: labelStyle(
+                    hasFocus: currentWorkingDirectoryFocus.hasFocus,
+                  ),
+                ),
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return 'Please enter current working directory';
+                  }
+                  return null;
+                },
+                onChanged: controller.updateCurrentWorkingDirectory,
               ),
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter Flutter version';
-                }
-                return null;
-              },
-              onChanged: controller.updateFlutterVersion,
-            ),
-            verticalMargin16,
-            TextFormField(
-              initialValue: workflowModel.currentWorkingDirectory,
-              decoration: const InputDecoration(
-                labelText: 'Current Working Directory',
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter current working directory';
-                }
-                return null;
-              },
-              onChanged: controller.updateCurrentWorkingDirectory,
             ),
           ],
         ),
-      ),
+      ],
     );
   }
 }

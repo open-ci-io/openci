@@ -33,7 +33,8 @@
       "version": "English",
       "pages": [
         "introduction",
-        "run"
+        "run",
+        "dashboard"
       ]
     },
     {
@@ -41,7 +42,8 @@
       "version": "Japanese",
       "pages": [
         "introduction_jp",
-        "run_jp"
+        "run_jp",
+        "dashboard_jp"
       ]
     }
   ],
