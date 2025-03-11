@@ -6,7 +6,7 @@ part 'select_step_controller.g.dart';
 class SelectStepController extends _$SelectStepController {
   @override
   SelectStepDomain build() {
-    return SelectStepDomain();
+    return const SelectStepDomain();
   }
 
   void setTemplate(StepTemplate template) {
