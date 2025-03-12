@@ -306,15 +306,6 @@ Future<void> handleFlutterBuildIpa(
       currentWorkingDirectory: workflow.currentWorkingDirectory,
       jobId: buildJob.id,
     );
-
-    await runCommand(
-      logId: logId,
-      client: client,
-      command:
-          'xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey $keyId --apiIssuer $issuerId',
-      currentWorkingDirectory: workflow.currentWorkingDirectory,
-      jobId: buildJob.id,
-    );
   } finally {
     await runCommand(
       logId: logId,
