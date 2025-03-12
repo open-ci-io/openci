@@ -1,3 +1,7 @@
+## 0.10.0-dev-3
+
+- fix: remove upload ipa to app store connect script
+
 ## 0.10.0-dev-2
 
 - fix: main loop log
