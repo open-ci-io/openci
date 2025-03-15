@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dashboard/src/common_widgets/dialogs/alert_dialog.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/features/secrets/presentation/secret_page.dart';
 import 'package:dashboard/src/features/welcome_page/presentation/welcome_page.dart';
@@ -46,10 +47,18 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
           onSelectedIndexChange: (value) async {
             const logoutIndex = 2;
             if (value == logoutIndex) {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.remove('googleServiceInfoPlist');
-              await data.auth.signOut();
-              await pushAndRemoveUntil(context, const WelcomePage());
+              await showAdaptiveDialog<void>(
+                context: context,
+                builder: (context) => _Dialog(
+                  title: 'Logout',
+                  onConfirm: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.remove('googleServiceInfoPlist');
+                    await data.auth.signOut();
+                    await pushAndRemoveUntil(context, const WelcomePage());
+                  },
+                ),
+              );
               return;
             }
             setState(() {
@@ -116,4 +125,24 @@ class OpenCIFirebaseSuite {
   });
   final FirebaseAuth auth;
   final FirebaseFirestore firestore;
+}
+
+class _Dialog extends StatelessWidget {
+  const _Dialog({
+    required this.title,
+    required this.onConfirm,
+  });
+
+  final String title;
+  final Future<void> Function() onConfirm;
+
+  @override
+  Widget build(BuildContext context) {
+    return OpenCIAlertDialog(
+      title: title,
+      body: 'Are you sure you want to logout?',
+      confirmButtonText: 'Logout',
+      onConfirm: onConfirm,
+    );
+  }
 }

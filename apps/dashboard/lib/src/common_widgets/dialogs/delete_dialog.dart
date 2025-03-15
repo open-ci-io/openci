@@ -1,15 +1,5 @@
+import 'package:dashboard/src/common_widgets/dialogs/alert_dialog.dart';
 import 'package:flutter/material.dart';
-
-Future<void> showDeleteDialog({
-  required String title,
-  required BuildContext context,
-  required void Function() onDelete,
-}) {
-  return showAdaptiveDialog<void>(
-    context: context,
-    builder: (context) => DeleteDialog(title: title, onDelete: onDelete),
-  );
-}
 
 class DeleteDialog extends StatelessWidget {
   const DeleteDialog({
@@ -19,33 +9,18 @@ class DeleteDialog extends StatelessWidget {
   });
 
   final String title;
-  final VoidCallback onDelete;
+  final Future<void> Function() onDelete;
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(title),
-      content: const Text(
-        'Are you sure you want to delete this item?',
-      ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () {
-            onDelete();
-            Navigator.of(context).pop();
-          },
-          child: const Text(
-            'Delete',
-            style: TextStyle(color: Colors.red),
-          ),
-        ),
-      ],
+    return OpenCIAlertDialog(
+      title: title,
+      body: 'Are you sure you want to delete this item?',
+      confirmButtonText: 'Delete',
+      onConfirm: () async {
+        await onDelete();
+        Navigator.of(context).pop();
+      },
     );
   }
 }
