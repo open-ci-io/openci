@@ -8,13 +8,9 @@
       "mode": "auto"
     }
   ],
-  "cSpell.words": [
-    "dartssh",
-    "dotenv",
-    "googleapis",
-    "jsonwebtoken",
-    "mocktail",
-    "openci"
-  ],
-  "dart.flutterSdkPath": ".fvm/versions/stable"
+  "dart.flutterSdkPath": ".fvm/versions/stable",
+  "files.exclude": {
+    "**/*.g.dart": true,
+    "**/*.freezed.dart": true
+  }
 }

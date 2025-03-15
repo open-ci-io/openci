@@ -7,7 +7,7 @@ part of 'workflow_editor_controller.dart';
 // **************************************************************************
 
 String _$workflowEditorControllerHash() =>
-    r'45f5f9520e664aab4e62b50b5a14febad7bcc49c';
+    r'8d140ffd14d982a07ba81933c99e12458d9ebbdf';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -1,46 +1,42 @@
-import 'dart:convert';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dashboard/src/common_widgets/dialogs.dart';
-import 'package:dashboard/src/features/secrets/presentation/secret_page_controller.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:dashboard/src/common_widgets/dialogs/delete_dialog.dart';
+import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
+import 'package:dashboard/src/services/firebase.dart';
+import 'package:dashboard/src/services/firestore/file_picker.dart';
+import 'package:dashboard/src/services/firestore/secrets_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 
 class SecretPage extends ConsumerWidget {
-  const SecretPage({super.key});
+  const SecretPage({super.key, required this.firebaseSuite});
+
+  final OpenCIFirebaseSuite firebaseSuite;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stream = ref.watch(secretStreamProvider);
+    final secrets = ref.watch(secretsStreamProvider(firebaseSuite));
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog<void>(
             context: context,
-            builder: (context) => const _DialogBody(),
+            builder: (context) => _DialogBody(
+              firebaseSuite: firebaseSuite,
+            ),
           );
         },
         child: const Icon(Icons.add),
       ),
-      body: stream.when(
+      body: secrets.when(
         data: (data) {
-          if (data.docs.isEmpty) {
-            return const Center(
-              child: Text('No secrets found'),
-            );
-          }
-
           return Padding(
             padding: const EdgeInsets.all(24),
             child: ListView.builder(
-              itemCount: data.docs.length,
+              itemCount: data.length,
               itemBuilder: (context, index) {
                 final secret = OpenCISecret.fromJson(
-                  data.docs[index].data()! as Map<String, dynamic>,
+                  data[index].data()! as Map<String, dynamic>,
                 );
                 return Card(
                   elevation: 0,
@@ -61,9 +57,10 @@ class SecretPage extends ConsumerWidget {
                             showDialog<void>(
                               context: context,
                               builder: (context) => _DialogBody(
+                                firebaseSuite: firebaseSuite,
                                 secretKey: secret.key,
                                 secretValue: secret.value,
-                                documentId: data.docs[index].id,
+                                documentId: data[index].id,
                                 isEditing: true,
                               ),
                             );
@@ -76,9 +73,9 @@ class SecretPage extends ConsumerWidget {
                               title: 'Delete Secret',
                               context: context,
                               onDelete: () {
-                                FirebaseFirestore.instance
+                                firebaseSuite.firestore
                                     .collection(secretsCollectionPath)
-                                    .doc(data.docs[index].id)
+                                    .doc(data[index].id)
                                     .delete();
                               },
                             );
@@ -93,14 +90,9 @@ class SecretPage extends ConsumerWidget {
             ),
           );
         },
-        error: (error, stackTrace) {
-          return Center(
-            child: Text('Error: $error'),
-          );
-        },
-        loading: () => const Center(
-          child: Text('Loading'),
-        ),
+        error: (error, stack) => const Text('Error'),
+        loading: () =>
+            const Center(child: CircularProgressIndicator.adaptive()),
       ),
     );
   }
@@ -112,13 +104,14 @@ class _DialogBody extends HookConsumerWidget {
     this.secretValue,
     this.isEditing = false,
     this.documentId,
+    required this.firebaseSuite,
   });
 
   final String? secretKey;
   final String? secretValue;
   final bool isEditing;
   final String? documentId;
-
+  final OpenCIFirebaseSuite firebaseSuite;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final keyController = useTextEditingController(text: secretKey ?? '');
@@ -158,13 +151,11 @@ class _DialogBody extends HookConsumerWidget {
               children: [
                 TextButton(
                   onPressed: () async {
-                    final result = await FilePicker.platform.pickFiles();
+                    final result = await pickFileAsBase64();
                     if (result == null) {
                       return;
                     }
-                    final file = result.files.first;
-                    final bytes = await file.xFile.readAsBytes();
-                    valueController.text = base64Encode(bytes);
+                    valueController.text = result;
                   },
                   child: const Text('Select File'),
                 ),
@@ -184,7 +175,7 @@ class _DialogBody extends HookConsumerWidget {
                       return;
                     }
                     if (isEditing) {
-                      await FirebaseFirestore.instance
+                      await firebaseSuite.firestore
                           .collection(secretsCollectionPath)
                           .doc(documentId)
                           .update({
@@ -193,12 +184,14 @@ class _DialogBody extends HookConsumerWidget {
                         'updatedAt': DateTime.now().millisecondsSinceEpoch,
                       });
                     } else {
-                      await FirebaseFirestore.instance
+                      final auth = await getFirebaseAuth();
+                      final uid = auth.currentUser!.uid;
+                      await firebaseSuite.firestore
                           .collection(secretsCollectionPath)
                           .add({
                         'key': keyController.text,
                         'value': valueController.text,
-                        'owners': [FirebaseAuth.instance.currentUser!.uid],
+                        'owners': [uid],
                         'createdAt': DateTime.now().millisecondsSinceEpoch,
                         'updatedAt': DateTime.now().millisecondsSinceEpoch,
                       });

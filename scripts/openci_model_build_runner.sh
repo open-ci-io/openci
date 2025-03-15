@@ -1,0 +1,1 @@
+cd packages/openci_models && dart run build_runner build -d

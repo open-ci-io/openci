@@ -1,3 +1,5 @@
+# Welcome to OpenCI.
+
 # Get started
 
 Go to [OpenCI Docs](https://docs.open-ci.io) to get started.

@@ -1,3 +1,19 @@
+## 0.10.0-dev-3
+
+- fix: remove upload ipa to app store connect script
+
+## 0.10.0-dev-2
+
+- fix: main loop log
+
+## 0.10.0-dev.1
+
+- dev.1
+
+## 0.9.15
+
+- add: firebase project id arg
+
 ## 0.9.14
 
 - add: secret key for build number

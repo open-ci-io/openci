@@ -331,7 +331,8 @@ WorkflowModelFlutter _$WorkflowModelFlutterFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$WorkflowModelFlutter {
-  String get version => throw _privateConstructorUsedError;
+  @FlutterVersionConverter()
+  FlutterVersion get version => throw _privateConstructorUsedError;
 
   /// Serializes this WorkflowModelFlutter to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -349,7 +350,7 @@ abstract class $WorkflowModelFlutterCopyWith<$Res> {
           $Res Function(WorkflowModelFlutter) then) =
       _$WorkflowModelFlutterCopyWithImpl<$Res, WorkflowModelFlutter>;
   @useResult
-  $Res call({String version});
+  $Res call({@FlutterVersionConverter() FlutterVersion version});
 }
 
 /// @nodoc
@@ -374,7 +375,7 @@ class _$WorkflowModelFlutterCopyWithImpl<$Res,
       version: null == version
           ? _value.version
           : version // ignore: cast_nullable_to_non_nullable
-              as String,
+              as FlutterVersion,
     ) as $Val);
   }
 }
@@ -387,7 +388,7 @@ abstract class _$$WorkflowModelFlutterImplCopyWith<$Res>
       __$$WorkflowModelFlutterImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String version});
+  $Res call({@FlutterVersionConverter() FlutterVersion version});
 }
 
 /// @nodoc
@@ -409,7 +410,7 @@ class __$$WorkflowModelFlutterImplCopyWithImpl<$Res>
       version: null == version
           ? _value.version
           : version // ignore: cast_nullable_to_non_nullable
-              as String,
+              as FlutterVersion,
     ));
   }
 }
@@ -417,13 +418,15 @@ class __$$WorkflowModelFlutterImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$WorkflowModelFlutterImpl implements _WorkflowModelFlutter {
-  const _$WorkflowModelFlutterImpl({required this.version});
+  _$WorkflowModelFlutterImpl(
+      {@FlutterVersionConverter() required this.version});
 
   factory _$WorkflowModelFlutterImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowModelFlutterImplFromJson(json);
 
   @override
-  final String version;
+  @FlutterVersionConverter()
+  final FlutterVersion version;
 
   @override
   String toString() {
@@ -461,14 +464,16 @@ class _$WorkflowModelFlutterImpl implements _WorkflowModelFlutter {
 }
 
 abstract class _WorkflowModelFlutter implements WorkflowModelFlutter {
-  const factory _WorkflowModelFlutter({required final String version}) =
+  factory _WorkflowModelFlutter(
+          {@FlutterVersionConverter() required final FlutterVersion version}) =
       _$WorkflowModelFlutterImpl;
 
   factory _WorkflowModelFlutter.fromJson(Map<String, dynamic> json) =
       _$WorkflowModelFlutterImpl.fromJson;
 
   @override
-  String get version;
+  @FlutterVersionConverter()
+  FlutterVersion get version;
 
   /// Create a copy of WorkflowModelFlutter
   /// with the given fields replaced by the non-null parameter values.

@@ -21,6 +21,12 @@ class RunnerCommand extends Command<int> {
         mandatory: true,
       )
       ..addOption(
+        'project-id',
+        abbr: 'i',
+        help: 'Firebase Project ID',
+        mandatory: true,
+      )
+      ..addOption(
         'sentry-dsn',
         abbr: 'd',
         help: 'Sentry DSN',
@@ -39,11 +45,13 @@ class RunnerCommand extends Command<int> {
     final pem = File(pemPath).readAsStringSync();
     final serviceAccountPath = argResults?['service-account-path'] as String;
     final sentryDsn = argResults?['sentry-dsn'] as String?;
+    final projectId = argResults?['project-id'] as String;
 
     await runApp(
       serviceAccountPath: serviceAccountPath,
       pem: pem,
       sentryDsn: sentryDsn,
+      projectId: projectId,
     );
     return 0;
   }
