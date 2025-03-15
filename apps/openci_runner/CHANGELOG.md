@@ -1,3 +1,8 @@
+
+## 0.10.0
+
+- release v0.10.0
+
 ## 0.10.0-dev-3
 
 - fix: remove upload ipa to app store connect script

@@ -227,13 +227,13 @@
       "name": "openci",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "3.6"
+      "languageVersion": "3.7"
     }
   ],
-  "generated": "2025-02-16T15:38:18.569959Z",
+  "generated": "2025-03-15T10:04:07.350696Z",
   "generator": "pub",
-  "generatorVersion": "3.7.0",
+  "generatorVersion": "3.7.2",
   "flutterRoot": "file:///Users/masahiroaoki/fvm/versions/stable",
-  "flutterVersion": "3.29.0",
+  "flutterVersion": "3.29.2",
   "pubCache": "file:///Users/masahiroaoki/.pub-cache"
 }
