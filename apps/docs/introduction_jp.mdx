@@ -161,13 +161,15 @@ GitHubから送られてくるWebhookの正当性を検証するための“秘�
 
 #### GITHUB_PRIVATE_KEY
 
-<CodeGroup>
+GitHubアプリのPrivate Keyを作成します。次のステップでも使用します。
 
-  ```bash macOS
-  firebase functions:secrets:set PRIVATE_KEY
-  ```
+<Frame >
+  <img src="/images/github_private_key.png" />
+</Frame>
 
-</CodeGroup>
+このPrivate KeyをFirebase Functionsの`PRIVATE_KEY`に設定します。
+
+本来は、firebase CLIでSecretを登録すべきですが、現在のCLIは`.pem`の読み込み時にクラッシュするため、GCPのSecret ManagerからGUIで登録してください。
 
 すべてのSecretを設定したら、Firebase Functionsをデプロイします。
 
@@ -184,7 +186,7 @@ GitHubから送られてくるWebhookの正当性を検証するための“秘�
 
 ### Firebaseサービスアカウントの作成
 
-Firebaseサービスアカウントを作成し、apps/openci_runner/firebase_service_account.jsonとして配置します。
+Firebaseサービスアカウントを作成し、任意のディレクトリに配置します。
 
 これでOpenCIのセルフホストの準備は完了です。お疲れ様でした。
 
