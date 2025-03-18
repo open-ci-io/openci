@@ -77,10 +77,48 @@ const appFunction = async (app: Probot) => {
 			"pull_request.synchronize",
 			"push",
 			"check_run.rerequested",
+			"installation.created",
 		],
 		async (
-			context: Context<"pull_request"> | Context<"push"> | Context<"check_run">,
+			context:
+				| Context<"pull_request">
+				| Context<"push">
+				| Context<"check_run.rerequested">
+				| Context<"installation.created">,
 		) => {
+			if (context.name === "installation") {
+				const installationContext = context as Context<"installation">;
+				const installation = installationContext.payload.installation;
+				if (installation == null) {
+					throw new Error("installation is null, please check it.");
+				}
+				const installationId = installation.id;
+
+				const sender = installationContext.payload.sender;
+				if (sender == null) {
+					throw new Error("sender is null, please check it.");
+				}
+				const githubUserId = sender.id;
+				const githubLogin = sender.login;
+
+				const action = installationContext.payload.action;
+				if (action == null) {
+					throw new Error("action is null, please check it.");
+				}
+
+				const repositories = installationContext.payload.repositories;
+				if (repositories == null) {
+					throw new Error("repositories is null, please check it.");
+				}
+
+				console.log("installationId", installationId);
+				console.log("githubUserId", githubUserId);
+				console.log("githubLogin", githubLogin);
+				console.log("repositories", repositories);
+				console.log("action", action);
+				return;
+			}
+
 			if (context.name === "check_run") {
 				const checkRunContext = context as Context<"check_run">;
 				const _payload = checkRunContext.payload;
@@ -110,7 +148,6 @@ const appFunction = async (app: Probot) => {
 			if (context.name === "pull_request") {
 				const pullRequestContext = context as Context<"pull_request">;
 				const _payload = pullRequestContext.payload;
-
 				const pullRequest = _payload.pull_request;
 				const installation = _payload.installation;
 				if (installation == null) {
@@ -119,19 +156,16 @@ const appFunction = async (app: Probot) => {
 				const githubRepositoryUrl = pullRequest.base.repo.html_url;
 				const baseBranch = pullRequest.base.ref;
 				const currentBranch = pullRequest.head.ref;
-
 				const workflowQuerySnapshot = await getWorkflowQuerySnapshot(
 					githubRepositoryUrl,
 					"pullRequest",
 					firestore,
 				);
-
 				for (const workflowsDocs of workflowQuerySnapshot.docs) {
 					const workflowData = workflowsDocs.data();
 					const { github, name } = workflowData;
 					const branchPattern = github.branchPattern;
 					let condition = false;
-
 					if (github.baseBranch === baseBranch) {
 						if (branchPattern == null) {
 							condition = true;
@@ -141,21 +175,17 @@ const appFunction = async (app: Probot) => {
 							}
 						}
 					}
-
 					if (condition) {
 						const buildBranch = pullRequest.head.ref;
-
 						const _checks = await createChecks(pullRequestContext, name);
-
 						const appId = process.env.APP_ID;
 						if (appId == null) {
 							throw new Error("appId is null, please check it.");
 						}
-
 						const github: OpenCIGithub = {
 							repositoryUrl: githubRepositoryUrl,
-							owner: context.payload.repository.owner.login,
-							repositoryName: context.payload.repository.name,
+							owner: pullRequestContext.payload.repository.owner.login,
+							repositoryName: pullRequestContext.payload.repository.name,
 							installationId: installation.id,
 							appId: Number(appId),
 							checkRunId: _checks.data.id,
@@ -163,7 +193,6 @@ const appFunction = async (app: Probot) => {
 							buildBranch: buildBranch,
 						};
 						const documentId = uuidv4();
-
 						const buildJob: BuildJob = {
 							buildStatus: OpenCIGitHubChecksStatus.QUEUED,
 							github: github,
@@ -171,7 +200,6 @@ const appFunction = async (app: Probot) => {
 							workflowId: workflowsDocs.id,
 							createdAt: Math.floor(Date.now() / 1000),
 						};
-
 						await firestore
 							.collection(buildJobsCollectionName)
 							.doc(buildJob.id)
@@ -181,27 +209,22 @@ const appFunction = async (app: Probot) => {
 			} else if (context.name === "push") {
 				const pushContext = context as Context<"push">;
 				const _payload = pushContext.payload;
-
 				const installation = _payload.installation;
 				if (installation == null) {
 					throw new Error("installation is undefined, please check it.");
 				}
-
 				const githubRepositoryUrl = _payload.repository.html_url;
 				const baseBranch = _payload.ref.replace("refs/heads/", "");
-
 				const workflowQuerySnapshot = await getWorkflowQuerySnapshot(
 					githubRepositoryUrl,
 					"push",
 					firestore,
 				);
-
 				for (const workflowsDocs of workflowQuerySnapshot.docs) {
 					const workflowData = workflowsDocs.data();
 					const { github, name } = workflowData;
 					const branchPattern = github.branchPattern;
 					let condition = false;
-
 					if (github.baseBranch === baseBranch) {
 						if (branchPattern == null) {
 							condition = true;
@@ -211,19 +234,16 @@ const appFunction = async (app: Probot) => {
 							}
 						}
 					}
-
 					if (condition) {
 						const _checks = await createChecks(pushContext, name);
-
 						const appId = process.env.APP_ID;
 						if (appId == null) {
 							throw new Error("appId is null, please check it.");
 						}
-
 						const github: OpenCIGithub = {
 							repositoryUrl: githubRepositoryUrl,
-							owner: context.payload.repository.owner.login,
-							repositoryName: context.payload.repository.name,
+							owner: pushContext.payload.repository.owner.login,
+							repositoryName: pushContext.payload.repository.name,
 							installationId: installation.id,
 							appId: Number(appId),
 							checkRunId: _checks.data.id,
@@ -231,7 +251,6 @@ const appFunction = async (app: Probot) => {
 							buildBranch: baseBranch,
 						};
 						const documentId = uuidv4();
-
 						const buildJob: BuildJob = {
 							buildStatus: OpenCIGitHubChecksStatus.QUEUED,
 							github: github,
@@ -239,7 +258,6 @@ const appFunction = async (app: Probot) => {
 							workflowId: workflowsDocs.id,
 							createdAt: Math.floor(Date.now() / 1000),
 						};
-
 						await firestore
 							.collection(buildJobsCollectionName)
 							.doc(buildJob.id)
