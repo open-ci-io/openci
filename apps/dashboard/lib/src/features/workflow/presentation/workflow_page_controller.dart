@@ -27,6 +27,17 @@ class WorkflowPageController extends _$WorkflowPageController {
         );
   }
 
+  Stream<bool> isGitHubAppInstalled() {
+    final firestore = firebaseSuite.firestore;
+    final auth = firebaseSuite.auth;
+    final uid = auth.currentUser!.uid;
+    return firestore
+        .collection('users')
+        .doc(uid)
+        .snapshots()
+        .map((snapshot) => snapshot.data()?['github'] != null);
+  }
+
   Future<WorkflowModel> addWorkflow() async {
     final ref = firebaseSuite.firestore.collection('workflows').doc();
     final uid = firebaseSuite.auth.currentUser!.uid;
@@ -61,4 +72,14 @@ Stream<List<WorkflowModel>> workflowStream(
   final controller =
       ref.watch(workflowPageControllerProvider(firebaseSuite).notifier);
   return controller.workflows();
+}
+
+@riverpod
+Stream<bool> isGitHubAppInstalled(
+  Ref ref,
+  OpenCIFirebaseSuite firebaseSuite,
+) {
+  final controller =
+      ref.watch(workflowPageControllerProvider(firebaseSuite).notifier);
+  return controller.isGitHubAppInstalled();
 }

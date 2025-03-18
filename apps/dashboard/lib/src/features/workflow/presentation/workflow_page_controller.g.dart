@@ -161,8 +161,142 @@ class _WorkflowStreamProviderElement
       (origin as WorkflowStreamProvider).firebaseSuite;
 }
 
+String _$isGitHubAppInstalledHash() =>
+    r'3e468fce52deca7a1d5137f6983ad8a81630f8e4';
+
+/// See also [isGitHubAppInstalled].
+@ProviderFor(isGitHubAppInstalled)
+const isGitHubAppInstalledProvider = IsGitHubAppInstalledFamily();
+
+/// See also [isGitHubAppInstalled].
+class IsGitHubAppInstalledFamily extends Family<AsyncValue<bool>> {
+  /// See also [isGitHubAppInstalled].
+  const IsGitHubAppInstalledFamily();
+
+  /// See also [isGitHubAppInstalled].
+  IsGitHubAppInstalledProvider call(
+    OpenCIFirebaseSuite firebaseSuite,
+  ) {
+    return IsGitHubAppInstalledProvider(
+      firebaseSuite,
+    );
+  }
+
+  @override
+  IsGitHubAppInstalledProvider getProviderOverride(
+    covariant IsGitHubAppInstalledProvider provider,
+  ) {
+    return call(
+      provider.firebaseSuite,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'isGitHubAppInstalledProvider';
+}
+
+/// See also [isGitHubAppInstalled].
+class IsGitHubAppInstalledProvider extends AutoDisposeStreamProvider<bool> {
+  /// See also [isGitHubAppInstalled].
+  IsGitHubAppInstalledProvider(
+    OpenCIFirebaseSuite firebaseSuite,
+  ) : this._internal(
+          (ref) => isGitHubAppInstalled(
+            ref as IsGitHubAppInstalledRef,
+            firebaseSuite,
+          ),
+          from: isGitHubAppInstalledProvider,
+          name: r'isGitHubAppInstalledProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$isGitHubAppInstalledHash,
+          dependencies: IsGitHubAppInstalledFamily._dependencies,
+          allTransitiveDependencies:
+              IsGitHubAppInstalledFamily._allTransitiveDependencies,
+          firebaseSuite: firebaseSuite,
+        );
+
+  IsGitHubAppInstalledProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.firebaseSuite,
+  }) : super.internal();
+
+  final OpenCIFirebaseSuite firebaseSuite;
+
+  @override
+  Override overrideWith(
+    Stream<bool> Function(IsGitHubAppInstalledRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: IsGitHubAppInstalledProvider._internal(
+        (ref) => create(ref as IsGitHubAppInstalledRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        firebaseSuite: firebaseSuite,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<bool> createElement() {
+    return _IsGitHubAppInstalledProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is IsGitHubAppInstalledProvider &&
+        other.firebaseSuite == firebaseSuite;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, firebaseSuite.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin IsGitHubAppInstalledRef on AutoDisposeStreamProviderRef<bool> {
+  /// The parameter `firebaseSuite` of this provider.
+  OpenCIFirebaseSuite get firebaseSuite;
+}
+
+class _IsGitHubAppInstalledProviderElement
+    extends AutoDisposeStreamProviderElement<bool>
+    with IsGitHubAppInstalledRef {
+  _IsGitHubAppInstalledProviderElement(super.provider);
+
+  @override
+  OpenCIFirebaseSuite get firebaseSuite =>
+      (origin as IsGitHubAppInstalledProvider).firebaseSuite;
+}
+
 String _$workflowPageControllerHash() =>
-    r'b4fd067070fdd29e206efa7de26660dc489eec19';
+    r'd9ea6faf7837010045b8db0684ec45d1981c0e5f';
 
 abstract class _$WorkflowPageController
     extends BuildlessAutoDisposeNotifier<void> {

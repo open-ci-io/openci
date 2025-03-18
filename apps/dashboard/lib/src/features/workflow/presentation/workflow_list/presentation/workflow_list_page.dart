@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 class WorkflowListPage extends ConsumerWidget {
@@ -21,89 +22,133 @@ class WorkflowListPage extends ConsumerWidget {
       ref.invalidate(createWorkflowDialogControllerProvider);
     }
 
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'add',
-        onPressed: () {
-          invalidateCreateWorkflowDialogController();
-          WoltModalSheet.show<void>(
-            context: context,
-            pageListBuilder: (modalSheetContext) {
-              return [
-                selectWorkflowTemplate(
-                  modalSheetContext,
-                  firebaseSuite,
-                ),
-              ];
-            },
-            modalTypeBuilder: (context) => const WoltDialogType(),
-            onModalDismissedWithBarrierTap: Navigator.of(context).pop,
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
-      body: ref.watch(workflowStreamProvider(firebaseSuite)).when(
-            data: (data) {
-              final workflows = data..sort((a, b) => a.name.compareTo(b.name));
-              return Padding(
-                padding: const EdgeInsets.all(24),
-                child: ListView.separated(
-                  itemCount: workflows.length,
-                  separatorBuilder: (context, index) {
-                    final workflow = workflows[index];
-                    final nextWorkflow = index < workflows.length - 1
-                        ? workflows[index + 1]
-                        : null;
-                    final shouldShowSeparator = nextWorkflow != null &&
-                        workflow.currentWorkingDirectory ==
-                            nextWorkflow.currentWorkingDirectory;
+    final isGitHubAppInstalled =
+        ref.watch(isGitHubAppInstalledProvider(firebaseSuite));
 
-                    return shouldShowSeparator
-                        ? const Divider(
-                            color: Color(0xFF2C2C2E),
-                            height: 1,
-                          )
-                        : const SizedBox.shrink();
+    return isGitHubAppInstalled.when(
+      data: (isInstalled) {
+        if (isInstalled) {
+          return Scaffold(
+            floatingActionButton: FloatingActionButton(
+              heroTag: 'add',
+              onPressed: () {
+                invalidateCreateWorkflowDialogController();
+                WoltModalSheet.show<void>(
+                  context: context,
+                  pageListBuilder: (modalSheetContext) {
+                    return [
+                      selectWorkflowTemplate(
+                        modalSheetContext,
+                        firebaseSuite,
+                      ),
+                    ];
                   },
-                  itemBuilder: (_, index) {
-                    final workflow = workflows[index];
-                    final previousWorkflow =
-                        index > 0 ? workflows[index - 1] : null;
-                    final shouldShowWorkingDirectory =
-                        previousWorkflow == null ||
-                            workflow.currentWorkingDirectory !=
-                                previousWorkflow.currentWorkingDirectory;
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (shouldShowWorkingDirectory)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 30, bottom: 20),
-                            child: Text(
-                              workflow.currentWorkingDirectory,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
+                  modalTypeBuilder: (context) => const WoltDialogType(),
+                  onModalDismissedWithBarrierTap: Navigator.of(context).pop,
+                );
+              },
+              child: const Icon(Icons.add),
+            ),
+            body: ref.watch(workflowStreamProvider(firebaseSuite)).when(
+                  data: (data) {
+                    final workflows = data
+                      ..sort((a, b) => a.name.compareTo(b.name));
+                    return Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: ListView.separated(
+                        itemCount: workflows.length,
+                        separatorBuilder: (context, index) {
+                          final workflow = workflows[index];
+                          final nextWorkflow = index < workflows.length - 1
+                              ? workflows[index + 1]
+                              : null;
+                          final shouldShowSeparator = nextWorkflow != null &&
+                              workflow.currentWorkingDirectory ==
+                                  nextWorkflow.currentWorkingDirectory;
+
+                          return shouldShowSeparator
+                              ? const Divider(
+                                  color: Color(0xFF2C2C2E),
+                                  height: 1,
+                                )
+                              : const SizedBox.shrink();
+                        },
+                        itemBuilder: (_, index) {
+                          final workflow = workflows[index];
+                          final previousWorkflow =
+                              index > 0 ? workflows[index - 1] : null;
+                          final shouldShowWorkingDirectory =
+                              previousWorkflow == null ||
+                                  workflow.currentWorkingDirectory !=
+                                      previousWorkflow.currentWorkingDirectory;
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (shouldShowWorkingDirectory)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 30,
+                                    bottom: 20,
+                                  ),
+                                  child: Text(
+                                    workflow.currentWorkingDirectory,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                    ),
+                                  ),
+                                ),
+                              _WorkflowListItem(
+                                workflowModel: workflow,
+                                firebaseSuite: firebaseSuite,
                               ),
-                            ),
-                          ),
-                        _WorkflowListItem(
-                          workflowModel: workflow,
-                          firebaseSuite: firebaseSuite,
-                        ),
-                      ],
+                            ],
+                          );
+                        },
+                      ),
                     );
                   },
+                  error: (error, stack) => const Center(
+                    child: Text('Error'),
+                  ),
+                  loading: () => const Center(
+                    child: CircularProgressIndicator.adaptive(),
+                  ),
                 ),
-              );
-            },
-            error: (error, stack) => const Center(
-              child: Text('Error'),
-            ),
-            loading: () => const Center(
-              child: CircularProgressIndicator.adaptive(),
+          );
+        }
+        return Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('GitHub App is not installed'),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () async {
+                    const baseUrl =
+                        'https://github.com/apps/openci-dev/installations/select_target?state=';
+                    final uid = firebaseSuite.auth.currentUser!.uid;
+                    final url = '$baseUrl$uid';
+                    await launchUrl(Uri.parse(url));
+                  },
+                  child: const Text('Install GitHub App'),
+                ),
+              ],
             ),
           ),
+        );
+      },
+      error: (error, stack) => const Scaffold(
+        body: Center(
+          child: Text('An error occurred'),
+        ),
+      ),
+      loading: () => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator.adaptive(),
+        ),
+      ),
     );
   }
 }
