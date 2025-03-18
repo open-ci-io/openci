@@ -63,14 +63,13 @@ export const githubCallback = onRequest(
 				});
 
 			res.status(200).json({
-				accessToken, // GitHubアクセストークン
+				accessToken,
 				githubUserId: githubUser.id,
 				githubLogin: githubUser.login,
 			});
 		} catch (error) {
 			console.error("OAuth callback processing error:", error);
 
-			// errorはunknown型なので、適切に型チェックを行う
 			if (error instanceof Error) {
 				res
 					.status(500)
