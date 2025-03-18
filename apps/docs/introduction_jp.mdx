@@ -1,22 +1,22 @@
 ---
-title: はじめに
-description: 'OpenCIのドキュメントへようこそ'
+title: 導入 (Getting Started)
+description: 'OpenCI のドキュメントへようこそ' (Welcome to the OpenCI documentation)
 ---
 
-## 前提
+## 準備 (Prerequisites)
 
-OpenCIをセルフホストするには以下の前提条件を満たしている必要があります。
+OpenCI を自身でホスト（セルフホスト）するには、以下の前提条件を満たす必要があります。
 
-- M1以上のMac
-- macOS 14.0以上
+- M1 以降のチップを搭載した Mac
+- macOS 14.0 以降
 
-## 初期設定
+## 初期設定 (Initial Setup)
 
-OpenCIをセルフホストするためには、いくつかのツールのインストールが必要です。
+OpenCI をセルフホストするには、いくつかのツールをインストールする必要があります。
 
 ### Tart
 
-TartはmacOSのVMを管理するためのツールです。
+Tart は、macOS 仮想マシンを管理するためのツールです。
 
 <CodeGroup>
 
@@ -28,7 +28,7 @@ TartはmacOSのVMを管理するためのツールです。
 
 ### Firebase CLI
 
-OpenCIはFirebaseを使用しているため、Firebase CLIのインストールが必要です。
+OpenCI は Firebase を使用するため、Firebase CLI をインストールする必要があります。
 
 <CodeGroup>
 
@@ -40,7 +40,7 @@ OpenCIはFirebaseを使用しているため、Firebase CLIのインストール
 
 ### OpenCI Runner
 
-OpenCI RunnerはOpenCIを実行するためのCLIです。インストールにはDartが必要です。
+OpenCI Runner は、OpenCI を実行するための CLI です。インストールには Dart が必要です。
 
 <CodeGroup>
 
@@ -54,9 +54,9 @@ OpenCI RunnerはOpenCIを実行するためのCLIです。インストールに�
 
 </CodeGroup>
 
-### ベースイメージをダウンロード
+### ベースイメージのダウンロード (Download Base Image)
 
-OpenCIはベースイメージとしてmacOS 15.0を使用しています。非常に時間がかかります。
+OpenCI は macOS 15.0 をベースイメージとして使用します。これにはかなりの時間がかかります。
 
 <CodeGroup>
 
@@ -66,23 +66,25 @@ tart pull ghcr.io/open-ci-io/sequoia:0.0.4
 
 </CodeGroup>
 
-## Firebaseの設定
-OpenCIはバックエンド等にFirebaseを使用しています。そのため、Firebaseの設定が必要です。
+## Firebase の設定 (Firebase Configuration)
 
-### Firebaseのプロジェクトを作成
+OpenCI はバックエンドなどのコンポーネントに Firebase を使用します。そのため、Firebase の設定が必要です。
 
-任意のGoogleアカウントで[Firebaseのサイト](https://console.firebase.google.com/)にアクセスし、プロジェクトを作成します。
+### Firebase プロジェクトの作成 (Create a Firebase Project)
 
-### Firestoreの設定
+任意の Google アカウントで [Firebase サイト](https://console.firebase.google.com/) にアクセスし、プロジェクトを作成してください。
 
-ビルドジョブの登録にはFirestoreを使用しています。そのため、Firestoreへアクセスし、プロビジョニングを行なってください。
+### Firestore の設定 (Firestore Configuration)
 
-### Firebase Functionsの設定
-OpenCIはFirebase Functionsを使用しています。Firebase Functionsの利用はBlazeプラン(有料)の登録が必要です。料金は月数円程度です。
+Firestore はビルドジョブの登録に使用されます。Firestore にアクセスしてプロビジョニングを行ってください。
 
-### Firebaseの初期化
+### Firebase Functions の設定 (Firebase Functions Configuration)
 
-Firebaseのプロジェクトを作成したら、使用するプロジェクトを指定します。
+OpenCI は Firebase Functions を使用します。Firebase Functions の使用には、Blaze プラン（有料）への登録が必要です。費用は月額数円程度です。
+
+### Firebase の初期化 (Firebase Initialization)
+
+Firebase プロジェクトの作成後、使用するプロジェクトを指定します。
 
 <CodeGroup>
 
@@ -92,9 +94,10 @@ Firebaseのプロジェクトを作成したら、使用するプロジェクト
 
 </CodeGroup>
 
+### Firebase Functions のデプロイ (Firebase Functions Deployment)
 
-### Firebase Functionsのデプロイ
-OpenCI CLIのリポジトリをクローンします。
+OpenCI CLI リポジトリをクローンします。
+
 <CodeGroup>
 
   ```bash macOS
@@ -103,24 +106,54 @@ OpenCI CLIのリポジトリをクローンします。
 
 </CodeGroup>
 
-## GitHub アプリの設定
+## GitHub App の設定 (GitHub App Configuration)
 
-OpenCIでは、GitHubアプリを使用して、ビルドジョブを取得します。
+OpenCI は、ビルドジョブの取得に GitHub App を使用します。
 
-### GitHubアプリの作成
+### GitHub App の作成 (Create a GitHub App)
 
-[GitHubアプリの作成](https://github.com/settings/apps/new) へアクセスし、GitHubアプリを作成します。
+[GitHub App の作成](https://github.com/settings/apps/new) にアクセスし、GitHub App を作成してください。
 
-## Secretの設定
+## シークレットの設定 (Secret Configuration)
 
-Firebase Functionsで使用するGitHubアプリのシークレットをGoogle CloudのSecret Managerに登録します。
+Firebase Functions で使用する GitHub App のシークレットを Google Cloud Secret Manager に登録します。
 
-`/apps/firebase_functions/functions/`に移動し、
+`/apps/firebase_functions/functions/` に移動してください。
 
-#### GITHUB_APP_ID
+#### CLIENT_ID
+
+GitHub App の Client ID です。
+
+<Frame >
+  <img src="/images/client_id.png" />
+</Frame>
 
 <CodeGroup>
 
+  ```bash macOS
+  firebase functions:secrets:set CLIENT_ID
+  ```
+
+</CodeGroup>
+
+#### CLIENT_SECRET
+
+GitHub App の Client Secret です。生成する必要があります。
+
+<Frame >
+  <img src="/images/client_secret.png" />
+</Frame>
+
+<CodeGroup>
+
+  ```bash macOS
+  firebase functions:secrets:set CLIENT_SECRET
+  ```
+
+</CodeGroup>
+#### GITHUB_APP_ID
+
+<CodeGroup>
   ```bash macOS
   firebase functions:secrets:set APP_ID
   ```
@@ -129,9 +162,9 @@ Firebase Functionsで使用するGitHubアプリのシークレットをGoogle C
 
 #### GITHUB_WEBHOOK_SECRET
 
-GitHubから送られてくるWebhookの正当性を検証するための“秘密のランダム文字列”です。
+GitHub から送信される Webhook の信頼性を検証するために使用される「ランダムな秘密の文字列」です。
 
-以下のように文字列を生成し、
+次のように文字列を生成します。
 
 <CodeGroup>
 
@@ -141,7 +174,7 @@ GitHubから送られてくるWebhookの正当性を検証するための“秘�
 
 </CodeGroup>
 
-生成した文字列をFirebase Functionsの`GITHUB_WEBHOOK_SECRET`に設定します。
+生成された文字列を Firebase Functions で `GITHUB_WEBHOOK_SECRET` に設定します。
 
 <CodeGroup>
 
@@ -151,9 +184,9 @@ GitHubから送られてくるWebhookの正当性を検証するための“秘�
 
 </CodeGroup>
 
-そして、この文字列をGitHubアプリのWebhookのSecretに設定します。
+次に、この文字列を GitHub App の Webhook Secret に設定します。
 
-以下のようになれば、Webhookの設定は完了です。
+Webhook の設定は、次のようになれば完了です。
 
 <Frame >
   <img src="/images/webhook_setup.png" />
@@ -161,17 +194,17 @@ GitHubから送られてくるWebhookの正当性を検証するための“秘�
 
 #### GITHUB_PRIVATE_KEY
 
-GitHubアプリのPrivate Keyを作成します。次のステップでも使用します。
+GitHub App の Private Key を作成します。これは次の手順でも使用します。
 
 <Frame >
   <img src="/images/github_private_key.png" />
 </Frame>
 
-このPrivate KeyをFirebase Functionsの`PRIVATE_KEY`に設定します。
+この Private Key を Firebase Functions で `PRIVATE_KEY` に設定します。
 
-本来は、firebase CLIでSecretを登録すべきですが、現在のCLIは`.pem`の読み込み時にクラッシュするため、GCPのSecret ManagerからGUIで登録してください。
+本来であれば、Secret は firebase CLI で登録するべきですが、現在の CLI は `.pem` ファイルの読み込み時にクラッシュします。そのため、GCP Secret Manager から GUI を使用して登録してください。
 
-すべてのSecretを設定したら、Firebase Functionsをデプロイします。
+すべての Secret を設定したら、Firebase Functions をデプロイします。
 
 <CodeGroup>
 
@@ -182,17 +215,26 @@ GitHubアプリのPrivate Keyを作成します。次のステップでも使用
 
 </CodeGroup>
 
-最後に、GitHubアプリのwebhook URLに、Firebase Functionsの`gitHubAppFunction`のURLを指定します。
+最後に、Firebase Functions の `gitHubAppFunction` の URL を、GitHub App の Webhook URL として指定します。
 
-### Firebaseサービスアカウントの作成
+チェックボックスにチェックを入れるのを忘れないでください。
 
-Firebaseサービスアカウントを作成し、任意のディレクトリに配置します。
+<Frame >
+  <img src="/images/webhook_url.png" />
+</Frame>
 
-これでOpenCIのセルフホストの準備は完了です。お疲れ様でした。
+#### Callback URL
 
+Callback URL は、Firebase Functions の `githubCallbackFunction` の URL です。
 
+チェックボックスにチェックを入れるのを忘れないでください。
 
+<Frame >
+  <img src="/images/callback_url.png" />
+</Frame>
 
+### Firebase サービスアカウントの作成 (Create a Firebase Service Account)
 
+Firebase サービスアカウントを作成し、任意のディレクトリに配置します。
 
-
+これで、OpenCI のセルフホストの準備は完了です。
