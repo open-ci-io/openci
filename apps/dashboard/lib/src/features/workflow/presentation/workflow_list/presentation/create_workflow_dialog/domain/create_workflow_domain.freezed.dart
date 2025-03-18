@@ -28,6 +28,7 @@ mixin _$CreateWorkflowDomain {
       throw _privateConstructorUsedError;
   OpenCIAppDistributionTarget get appDistributionTarget =>
       throw _privateConstructorUsedError;
+  String get selectedRepository => throw _privateConstructorUsedError;
 
   /// Serializes this CreateWorkflowDomain to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -51,7 +52,8 @@ abstract class $CreateWorkflowDomainCopyWith<$Res> {
       bool isLoading,
       AppStoreConnectKey ascKey,
       FlutterBuildIpaData flutterBuildIpaData,
-      OpenCIAppDistributionTarget appDistributionTarget});
+      OpenCIAppDistributionTarget appDistributionTarget,
+      String selectedRepository});
 
   $AppStoreConnectKeyCopyWith<$Res> get ascKey;
   $FlutterBuildIpaDataCopyWith<$Res> get flutterBuildIpaData;
@@ -79,6 +81,7 @@ class _$CreateWorkflowDomainCopyWithImpl<$Res,
     Object? ascKey = null,
     Object? flutterBuildIpaData = null,
     Object? appDistributionTarget = null,
+    Object? selectedRepository = null,
   }) {
     return _then(_value.copyWith(
       template: null == template
@@ -105,6 +108,10 @@ class _$CreateWorkflowDomainCopyWithImpl<$Res,
           ? _value.appDistributionTarget
           : appDistributionTarget // ignore: cast_nullable_to_non_nullable
               as OpenCIAppDistributionTarget,
+      selectedRepository: null == selectedRepository
+          ? _value.selectedRepository
+          : selectedRepository // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 
@@ -144,7 +151,8 @@ abstract class _$$CreateWorkflowDomainImplCopyWith<$Res>
       bool isLoading,
       AppStoreConnectKey ascKey,
       FlutterBuildIpaData flutterBuildIpaData,
-      OpenCIAppDistributionTarget appDistributionTarget});
+      OpenCIAppDistributionTarget appDistributionTarget,
+      String selectedRepository});
 
   @override
   $AppStoreConnectKeyCopyWith<$Res> get ascKey;
@@ -171,6 +179,7 @@ class __$$CreateWorkflowDomainImplCopyWithImpl<$Res>
     Object? ascKey = null,
     Object? flutterBuildIpaData = null,
     Object? appDistributionTarget = null,
+    Object? selectedRepository = null,
   }) {
     return _then(_$CreateWorkflowDomainImpl(
       template: null == template
@@ -197,6 +206,10 @@ class __$$CreateWorkflowDomainImplCopyWithImpl<$Res>
           ? _value.appDistributionTarget
           : appDistributionTarget // ignore: cast_nullable_to_non_nullable
               as OpenCIAppDistributionTarget,
+      selectedRepository: null == selectedRepository
+          ? _value.selectedRepository
+          : selectedRepository // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -210,7 +223,8 @@ class _$CreateWorkflowDomainImpl implements _CreateWorkflowDomain {
       this.isLoading = false,
       this.ascKey = const AppStoreConnectKey(),
       this.flutterBuildIpaData = const FlutterBuildIpaData(),
-      this.appDistributionTarget = OpenCIAppDistributionTarget.none});
+      this.appDistributionTarget = OpenCIAppDistributionTarget.none,
+      required this.selectedRepository});
 
   factory _$CreateWorkflowDomainImpl.fromJson(Map<String, dynamic> json) =>
       _$$CreateWorkflowDomainImplFromJson(json);
@@ -233,10 +247,12 @@ class _$CreateWorkflowDomainImpl implements _CreateWorkflowDomain {
   @override
   @JsonKey()
   final OpenCIAppDistributionTarget appDistributionTarget;
+  @override
+  final String selectedRepository;
 
   @override
   String toString() {
-    return 'CreateWorkflowDomain(template: $template, isASCKeyUploaded: $isASCKeyUploaded, isLoading: $isLoading, ascKey: $ascKey, flutterBuildIpaData: $flutterBuildIpaData, appDistributionTarget: $appDistributionTarget)';
+    return 'CreateWorkflowDomain(template: $template, isASCKeyUploaded: $isASCKeyUploaded, isLoading: $isLoading, ascKey: $ascKey, flutterBuildIpaData: $flutterBuildIpaData, appDistributionTarget: $appDistributionTarget, selectedRepository: $selectedRepository)';
   }
 
   @override
@@ -254,13 +270,22 @@ class _$CreateWorkflowDomainImpl implements _CreateWorkflowDomain {
             (identical(other.flutterBuildIpaData, flutterBuildIpaData) ||
                 other.flutterBuildIpaData == flutterBuildIpaData) &&
             (identical(other.appDistributionTarget, appDistributionTarget) ||
-                other.appDistributionTarget == appDistributionTarget));
+                other.appDistributionTarget == appDistributionTarget) &&
+            (identical(other.selectedRepository, selectedRepository) ||
+                other.selectedRepository == selectedRepository));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, template, isASCKeyUploaded,
-      isLoading, ascKey, flutterBuildIpaData, appDistributionTarget);
+  int get hashCode => Object.hash(
+      runtimeType,
+      template,
+      isASCKeyUploaded,
+      isLoading,
+      ascKey,
+      flutterBuildIpaData,
+      appDistributionTarget,
+      selectedRepository);
 
   /// Create a copy of CreateWorkflowDomain
   /// with the given fields replaced by the non-null parameter values.
@@ -282,13 +307,13 @@ class _$CreateWorkflowDomainImpl implements _CreateWorkflowDomain {
 
 abstract class _CreateWorkflowDomain implements CreateWorkflowDomain {
   const factory _CreateWorkflowDomain(
-          {final OpenCIWorkflowTemplate template,
-          final bool? isASCKeyUploaded,
-          final bool isLoading,
-          final AppStoreConnectKey ascKey,
-          final FlutterBuildIpaData flutterBuildIpaData,
-          final OpenCIAppDistributionTarget appDistributionTarget}) =
-      _$CreateWorkflowDomainImpl;
+      {final OpenCIWorkflowTemplate template,
+      final bool? isASCKeyUploaded,
+      final bool isLoading,
+      final AppStoreConnectKey ascKey,
+      final FlutterBuildIpaData flutterBuildIpaData,
+      final OpenCIAppDistributionTarget appDistributionTarget,
+      required final String selectedRepository}) = _$CreateWorkflowDomainImpl;
 
   factory _CreateWorkflowDomain.fromJson(Map<String, dynamic> json) =
       _$CreateWorkflowDomainImpl.fromJson;
@@ -305,6 +330,8 @@ abstract class _CreateWorkflowDomain implements CreateWorkflowDomain {
   FlutterBuildIpaData get flutterBuildIpaData;
   @override
   OpenCIAppDistributionTarget get appDistributionTarget;
+  @override
+  String get selectedRepository;
 
   /// Create a copy of CreateWorkflowDomain
   /// with the given fields replaced by the non-null parameter values.

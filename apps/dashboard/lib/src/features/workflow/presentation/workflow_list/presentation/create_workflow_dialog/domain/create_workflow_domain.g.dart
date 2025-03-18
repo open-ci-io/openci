@@ -25,6 +25,7 @@ _$CreateWorkflowDomainImpl _$$CreateWorkflowDomainImplFromJson(
               _$OpenCIAppDistributionTargetEnumMap,
               json['appDistributionTarget']) ??
           OpenCIAppDistributionTarget.none,
+      selectedRepository: json['selectedRepository'] as String,
     );
 
 Map<String, dynamic> _$$CreateWorkflowDomainImplToJson(
@@ -37,6 +38,7 @@ Map<String, dynamic> _$$CreateWorkflowDomainImplToJson(
       'flutterBuildIpaData': instance.flutterBuildIpaData.toJson(),
       'appDistributionTarget':
           _$OpenCIAppDistributionTargetEnumMap[instance.appDistributionTarget]!,
+      'selectedRepository': instance.selectedRepository,
     };
 
 const _$OpenCIWorkflowTemplateEnumMap = {

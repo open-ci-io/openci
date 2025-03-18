@@ -845,3 +845,245 @@ abstract class _WorkflowModelStep implements WorkflowModelStep {
   _$$WorkflowModelStepImplCopyWith<_$WorkflowModelStepImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
+
+OpenCIRepository _$OpenCIRepositoryFromJson(Map<String, dynamic> json) {
+  return _OpenCIRepository.fromJson(json);
+}
+
+/// @nodoc
+mixin _$OpenCIRepository {
+  @JsonKey(name: 'full_name')
+  String get fullName => throw _privateConstructorUsedError;
+  int get id => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  @JsonKey(name: 'node_id')
+  String get nodeId => throw _privateConstructorUsedError;
+  bool get private => throw _privateConstructorUsedError;
+
+  /// Serializes this OpenCIRepository to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of OpenCIRepository
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $OpenCIRepositoryCopyWith<OpenCIRepository> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $OpenCIRepositoryCopyWith<$Res> {
+  factory $OpenCIRepositoryCopyWith(
+          OpenCIRepository value, $Res Function(OpenCIRepository) then) =
+      _$OpenCIRepositoryCopyWithImpl<$Res, OpenCIRepository>;
+  @useResult
+  $Res call(
+      {@JsonKey(name: 'full_name') String fullName,
+      int id,
+      String name,
+      @JsonKey(name: 'node_id') String nodeId,
+      bool private});
+}
+
+/// @nodoc
+class _$OpenCIRepositoryCopyWithImpl<$Res, $Val extends OpenCIRepository>
+    implements $OpenCIRepositoryCopyWith<$Res> {
+  _$OpenCIRepositoryCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of OpenCIRepository
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? fullName = null,
+    Object? id = null,
+    Object? name = null,
+    Object? nodeId = null,
+    Object? private = null,
+  }) {
+    return _then(_value.copyWith(
+      fullName: null == fullName
+          ? _value.fullName
+          : fullName // ignore: cast_nullable_to_non_nullable
+              as String,
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      nodeId: null == nodeId
+          ? _value.nodeId
+          : nodeId // ignore: cast_nullable_to_non_nullable
+              as String,
+      private: null == private
+          ? _value.private
+          : private // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$OpenCIRepositoryImplCopyWith<$Res>
+    implements $OpenCIRepositoryCopyWith<$Res> {
+  factory _$$OpenCIRepositoryImplCopyWith(_$OpenCIRepositoryImpl value,
+          $Res Function(_$OpenCIRepositoryImpl) then) =
+      __$$OpenCIRepositoryImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {@JsonKey(name: 'full_name') String fullName,
+      int id,
+      String name,
+      @JsonKey(name: 'node_id') String nodeId,
+      bool private});
+}
+
+/// @nodoc
+class __$$OpenCIRepositoryImplCopyWithImpl<$Res>
+    extends _$OpenCIRepositoryCopyWithImpl<$Res, _$OpenCIRepositoryImpl>
+    implements _$$OpenCIRepositoryImplCopyWith<$Res> {
+  __$$OpenCIRepositoryImplCopyWithImpl(_$OpenCIRepositoryImpl _value,
+      $Res Function(_$OpenCIRepositoryImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of OpenCIRepository
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? fullName = null,
+    Object? id = null,
+    Object? name = null,
+    Object? nodeId = null,
+    Object? private = null,
+  }) {
+    return _then(_$OpenCIRepositoryImpl(
+      fullName: null == fullName
+          ? _value.fullName
+          : fullName // ignore: cast_nullable_to_non_nullable
+              as String,
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      nodeId: null == nodeId
+          ? _value.nodeId
+          : nodeId // ignore: cast_nullable_to_non_nullable
+              as String,
+      private: null == private
+          ? _value.private
+          : private // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$OpenCIRepositoryImpl implements _OpenCIRepository {
+  const _$OpenCIRepositoryImpl(
+      {@JsonKey(name: 'full_name') required this.fullName,
+      required this.id,
+      required this.name,
+      @JsonKey(name: 'node_id') required this.nodeId,
+      required this.private});
+
+  factory _$OpenCIRepositoryImpl.fromJson(Map<String, dynamic> json) =>
+      _$$OpenCIRepositoryImplFromJson(json);
+
+  @override
+  @JsonKey(name: 'full_name')
+  final String fullName;
+  @override
+  final int id;
+  @override
+  final String name;
+  @override
+  @JsonKey(name: 'node_id')
+  final String nodeId;
+  @override
+  final bool private;
+
+  @override
+  String toString() {
+    return 'OpenCIRepository(fullName: $fullName, id: $id, name: $name, nodeId: $nodeId, private: $private)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$OpenCIRepositoryImpl &&
+            (identical(other.fullName, fullName) ||
+                other.fullName == fullName) &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.nodeId, nodeId) || other.nodeId == nodeId) &&
+            (identical(other.private, private) || other.private == private));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, fullName, id, name, nodeId, private);
+
+  /// Create a copy of OpenCIRepository
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$OpenCIRepositoryImplCopyWith<_$OpenCIRepositoryImpl> get copyWith =>
+      __$$OpenCIRepositoryImplCopyWithImpl<_$OpenCIRepositoryImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$OpenCIRepositoryImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _OpenCIRepository implements OpenCIRepository {
+  const factory _OpenCIRepository(
+      {@JsonKey(name: 'full_name') required final String fullName,
+      required final int id,
+      required final String name,
+      @JsonKey(name: 'node_id') required final String nodeId,
+      required final bool private}) = _$OpenCIRepositoryImpl;
+
+  factory _OpenCIRepository.fromJson(Map<String, dynamic> json) =
+      _$OpenCIRepositoryImpl.fromJson;
+
+  @override
+  @JsonKey(name: 'full_name')
+  String get fullName;
+  @override
+  int get id;
+  @override
+  String get name;
+  @override
+  @JsonKey(name: 'node_id')
+  String get nodeId;
+  @override
+  bool get private;
+
+  /// Create a copy of OpenCIRepository
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$OpenCIRepositoryImplCopyWith<_$OpenCIRepositoryImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}

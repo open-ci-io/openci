@@ -68,3 +68,17 @@ class WorkflowModelStep with _$WorkflowModelStep {
   factory WorkflowModelStep.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelStepFromJson(json);
 }
+
+@freezed
+class OpenCIRepository with _$OpenCIRepository {
+  const factory OpenCIRepository({
+    @JsonKey(name: 'full_name') required String fullName,
+    required int id,
+    required String name,
+    @JsonKey(name: 'node_id') required String nodeId,
+    required bool private,
+  }) = _OpenCIRepository;
+
+  factory OpenCIRepository.fromJson(Map<String, Object?> json) =>
+      _$OpenCIRepositoryFromJson(json);
+}

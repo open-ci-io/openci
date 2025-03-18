@@ -8,6 +8,7 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage uploadASCKeys(
   BuildContext modalSheetContext,
+  String selectedRepository,
 ) {
   var isSuccess = false;
   return baseDialog(
@@ -16,7 +17,7 @@ WoltModalSheetPage uploadASCKeys(
       switch (isSuccess) {
         case true:
           WoltModalSheet.of(modalSheetContext).pushPage(
-            selectFlutterBuildIpaData(modalSheetContext),
+            selectFlutterBuildIpaData(modalSheetContext, selectedRepository),
           );
         case false:
           WoltModalSheet.of(modalSheetContext).popPage();
@@ -40,7 +41,9 @@ WoltModalSheetPage uploadASCKeys(
       }
     },
     child: (ref) {
-      final ascKey = ref.watch(createWorkflowDialogControllerProvider).ascKey;
+      final ascKey = ref
+          .watch(createWorkflowDialogControllerProvider(selectedRepository))
+          .ascKey;
       final future = ref.watch(saveASCKeysProvider(ascKey: ascKey));
       return future.when(
         data: (data) {

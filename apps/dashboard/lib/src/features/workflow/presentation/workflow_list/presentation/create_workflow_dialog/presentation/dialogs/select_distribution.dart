@@ -7,16 +7,18 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage selectDistribution(
   BuildContext modalSheetContext,
+  String selectedRepository,
 ) {
   return baseDialog(
     onBack: (ref) => WoltModalSheet.of(modalSheetContext).popPage(),
     onNext: (ref, formKey) {
       WoltModalSheet.of(modalSheetContext).pushPage(
-        createWorkflowPage(modalSheetContext),
+        createWorkflowPage(modalSheetContext, selectedRepository),
       );
     },
     child: (ref) {
-      final state = ref.watch(createWorkflowDialogControllerProvider);
+      final state =
+          ref.watch(createWorkflowDialogControllerProvider(selectedRepository));
       final value = state.appDistributionTarget;
       return Column(
         children: [
@@ -27,7 +29,11 @@ WoltModalSheetPage selectDistribution(
             onChanged: (OpenCIAppDistributionTarget? value) {
               if (value != null) {
                 ref
-                    .read(createWorkflowDialogControllerProvider.notifier)
+                    .read(
+                      createWorkflowDialogControllerProvider(
+                        selectedRepository,
+                      ).notifier,
+                    )
                     .setAppDistributionTarget(value);
               }
             },
@@ -39,7 +45,11 @@ WoltModalSheetPage selectDistribution(
             onChanged: (OpenCIAppDistributionTarget? value) {
               if (value != null) {
                 ref
-                    .read(createWorkflowDialogControllerProvider.notifier)
+                    .read(
+                      createWorkflowDialogControllerProvider(
+                        selectedRepository,
+                      ).notifier,
+                    )
                     .setAppDistributionTarget(value);
               }
             },
