@@ -62,11 +62,11 @@ export const githubCallback = onRequest(
 					},
 				});
 
-			res.status(200).json({
-				accessToken,
-				githubUserId: githubUser.id,
-				githubLogin: githubUser.login,
-			});
+			res
+				.status(200)
+				.json(
+					"Successfully registered github callback. You can close this page.",
+				);
 		} catch (error) {
 			console.error("OAuth callback processing error:", error);
 
