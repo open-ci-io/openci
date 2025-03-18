@@ -3,7 +3,10 @@ import { type Context, Probot } from "probot";
 import { v4 as uuidv4 } from "uuid";
 import { getWorkflowQuerySnapshot } from "../workflow/get_workflow_query_snapshot.js";
 import { createChecks } from "./create_checks.js";
-import { buildJobsCollectionName } from "../firestore_path.js";
+import {
+	buildJobsCollectionName,
+	usersCollectionName,
+} from "../firestore_path.js";
 import { firestore } from "../index.js";
 import { onRequest } from "firebase-functions/https";
 import {
@@ -111,11 +114,48 @@ const appFunction = async (app: Probot) => {
 					throw new Error("repositories is null, please check it.");
 				}
 
+				let userFound = false;
+				for (let i = 0; i < 10; i++) {
+					const userQs = await firestore
+						.collection(usersCollectionName)
+						.where("github.userId", "==", githubUserId)
+						.get();
+					if (userQs.docs.length > 0) {
+						userFound = true;
+						console.log("Successfully found user");
+						break;
+					}
+					if (i < 9) {
+						console.log("waiting for callback registration...");
+						await new Promise((resolve) => setTimeout(resolve, 10000));
+					}
+				}
+
+				if (!userFound) {
+					throw new Error(`Could not find githubUserId: ${githubUserId}`);
+				}
+
+				const userQs = await firestore
+					.collection(usersCollectionName)
+					.where("github.userId", "==", githubUserId)
+					.get();
+
+				await firestore
+					.collection(usersCollectionName)
+					.doc(userQs.docs[0].id)
+					.update({
+						github: {
+							installationId: installationId,
+							login: githubLogin,
+							userId: githubUserId,
+							repositories: repositories,
+						},
+					});
+
 				console.log("installationId", installationId);
 				console.log("githubUserId", githubUserId);
 				console.log("githubLogin", githubLogin);
 				console.log("repositories", repositories);
-				console.log("action", action);
 				return;
 			}
 

@@ -1,5 +1,7 @@
 import { onRequest } from "firebase-functions/https";
 import axios from "axios";
+import { firestore } from "../index.js";
+import { usersCollectionName } from "../firestore_path.js";
 
 export const githubCallback = onRequest(
 	{ secrets: ["CLIENT_ID", "CLIENT_SECRET"] },
@@ -13,8 +15,13 @@ export const githubCallback = onRequest(
 		console.log("code", code);
 		console.log("state", state);
 
-		if (state !== "foo") {
-			res.status(400).send("Invalid state parameter");
+		const userQs = await firestore
+			.collection(usersCollectionName)
+			.where("userId", "==", state)
+			.get();
+
+		if (userQs.docs.length === 0) {
+			res.status(400).send("Could not find OpenCI user");
 			return;
 		}
 
@@ -45,9 +52,15 @@ export const githubCallback = onRequest(
 			console.log("userId", githubUser.id);
 			console.log("login", githubUser.login);
 
-			// 3. ここで、Firebase Authのuid（別途クライアント側で管理している情報と照合する）と、
-			//    GitHubユーザー情報（githubUser.id, githubUser.login）を紐づける処理を追加可能
-			//    例えば、Firestoreに保存するなどして、後続の処理で参照できるようにする
+			await firestore
+				.collection(usersCollectionName)
+				.doc(userQs.docs[0].id)
+				.update({
+					github: {
+						userId: githubUser.id,
+						login: githubUser.login,
+					},
+				});
 
 			res.status(200).json({
 				accessToken, // GitHubアクセストークン
