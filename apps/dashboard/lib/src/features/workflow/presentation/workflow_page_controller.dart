@@ -73,6 +73,7 @@ class WorkflowPageController extends _$WorkflowPageController {
     final userData = userDoc.data()!;
     final github = userData['github'] as Map<String, dynamic>;
     final repositories = github['repositories'] as List<dynamic>;
+    // ignore: avoid_dynamic_calls
     return repositories.map((e) => e['full_name'] as String).toList();
   }
 }

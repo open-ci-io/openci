@@ -19,7 +19,8 @@ WoltModalSheetPage selectFlutterBuildIpaData(
 
   void updateState(WidgetRef ref) {
     ref.read(
-        createWorkflowDialogControllerProvider(selectedRepository).notifier)
+      createWorkflowDialogControllerProvider(selectedRepository).notifier,
+    )
       ..setFlutterBuildIpaWorkflowName(
         workflowNameEditingController.text,
       )
@@ -88,7 +89,8 @@ class _BodyState extends ConsumerState<_Body> {
   Widget build(BuildContext context) {
     final state = ref
         .watch(
-            createWorkflowDialogControllerProvider(widget.selectedRepository))
+          createWorkflowDialogControllerProvider(widget.selectedRepository),
+        )
         .flutterBuildIpaData;
     useEffect(
       () {
