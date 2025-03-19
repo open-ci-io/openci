@@ -13,6 +13,7 @@ import '../create_workflow_dialog_controller.dart';
 
 WoltModalSheetPage selectASCKeys(
   BuildContext modalSheetContext,
+  String selectedRepository,
 ) {
   final issuerIdEditingController = TextEditingController();
   final keyIdEditingController = TextEditingController();
@@ -23,7 +24,12 @@ WoltModalSheetPage selectASCKeys(
     onNext: (ref, formKey) {
       if (formKey.currentState!.validate()) {
         formKey.currentState!.save();
-        ref.read(createWorkflowDialogControllerProvider.notifier).setASCKey(
+        ref
+            .read(
+              createWorkflowDialogControllerProvider(selectedRepository)
+                  .notifier,
+            )
+            .setASCKey(
               AppStoreConnectKey(
                 issuerId: issuerIdEditingController.text,
                 keyId: keyIdEditingController.text,
@@ -31,7 +37,7 @@ WoltModalSheetPage selectASCKeys(
               ),
             );
         WoltModalSheet.of(modalSheetContext).pushPage(
-          uploadASCKeys(modalSheetContext),
+          uploadASCKeys(modalSheetContext, selectedRepository),
         );
       }
     },

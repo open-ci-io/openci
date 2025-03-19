@@ -120,10 +120,40 @@ Register the GitHub app secrets used by Firebase Functions in Google Cloud's Sec
 
 Navigate to `/apps/firebase_functions/functions/`
 
-#### GITHUB_APP_ID
+#### CLIENT_ID
+
+The Client ID of the GitHub app. 
+
+<Frame >
+  <img src="/images/client_id.png" />
+</Frame>
 
 <CodeGroup>
 
+  ```bash macOS
+  firebase functions:secrets:set CLIENT_ID
+  ```
+
+</CodeGroup>
+
+#### CLIENT_SECRET
+
+The Client Secret of the GitHub app. You need to generate it.
+
+<Frame >
+  <img src="/images/client_secret.png" /> 
+</Frame>
+
+<CodeGroup>
+
+  ```bash macOS
+  firebase functions:secrets:set CLIENT_SECRET
+  ```
+
+</CodeGroup>
+#### GITHUB_APP_ID
+
+<CodeGroup>
   ```bash macOS
   firebase functions:secrets:set APP_ID
   ```
@@ -187,8 +217,24 @@ After setting all the Secrets, deploy Firebase Functions.
 
 Finally, specify the URL of Firebase Functions' `gitHubAppFunction` as the Webhook URL for the GitHub app.
 
+Don't forget to tick the check box.
+
+<Frame >
+  <img src="/images/webhook_url.png" />
+</Frame>
+
+#### Callback URL
+
+The Callback URL is the URL of Firebase Functions' `githubCallbackFunction`.
+
+Don't forget to tick the check box.
+
+<Frame >
+  <img src="/images/callback_url.png" />
+</Frame>
+
 ### Create a Firebase Service Account
 
 Create a Firebase service account and place it in an arbitrary directory.
 
-With this, the preparation for self-hosting OpenCI is complete. Congratulations!
+With this, the preparation for self-hosting OpenCI is complete.

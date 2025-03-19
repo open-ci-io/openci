@@ -6,7 +6,7 @@ part of 'workflow_page_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$workflowStreamHash() => r'59d6331bb493f28fa2a17743f5df6ca43015b70c';
+String _$workflowStreamHash() => r'c8337cf4343f76869d08fea9467f3443e8e5b3c8';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -41,9 +41,11 @@ class WorkflowStreamFamily extends Family<AsyncValue<List<WorkflowModel>>> {
   /// See also [workflowStream].
   WorkflowStreamProvider call(
     OpenCIFirebaseSuite firebaseSuite,
+    String repository,
   ) {
     return WorkflowStreamProvider(
       firebaseSuite,
+      repository,
     );
   }
 
@@ -53,6 +55,7 @@ class WorkflowStreamFamily extends Family<AsyncValue<List<WorkflowModel>>> {
   ) {
     return call(
       provider.firebaseSuite,
+      provider.repository,
     );
   }
 
@@ -77,10 +80,12 @@ class WorkflowStreamProvider
   /// See also [workflowStream].
   WorkflowStreamProvider(
     OpenCIFirebaseSuite firebaseSuite,
+    String repository,
   ) : this._internal(
           (ref) => workflowStream(
             ref as WorkflowStreamRef,
             firebaseSuite,
+            repository,
           ),
           from: workflowStreamProvider,
           name: r'workflowStreamProvider',
@@ -92,6 +97,7 @@ class WorkflowStreamProvider
           allTransitiveDependencies:
               WorkflowStreamFamily._allTransitiveDependencies,
           firebaseSuite: firebaseSuite,
+          repository: repository,
         );
 
   WorkflowStreamProvider._internal(
@@ -102,9 +108,11 @@ class WorkflowStreamProvider
     required super.debugGetCreateSourceHash,
     required super.from,
     required this.firebaseSuite,
+    required this.repository,
   }) : super.internal();
 
   final OpenCIFirebaseSuite firebaseSuite;
+  final String repository;
 
   @override
   Override overrideWith(
@@ -120,6 +128,7 @@ class WorkflowStreamProvider
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
         firebaseSuite: firebaseSuite,
+        repository: repository,
       ),
     );
   }
@@ -132,6 +141,147 @@ class WorkflowStreamProvider
   @override
   bool operator ==(Object other) {
     return other is WorkflowStreamProvider &&
+        other.firebaseSuite == firebaseSuite &&
+        other.repository == repository;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, firebaseSuite.hashCode);
+    hash = _SystemHash.combine(hash, repository.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin WorkflowStreamRef on AutoDisposeStreamProviderRef<List<WorkflowModel>> {
+  /// The parameter `firebaseSuite` of this provider.
+  OpenCIFirebaseSuite get firebaseSuite;
+
+  /// The parameter `repository` of this provider.
+  String get repository;
+}
+
+class _WorkflowStreamProviderElement
+    extends AutoDisposeStreamProviderElement<List<WorkflowModel>>
+    with WorkflowStreamRef {
+  _WorkflowStreamProviderElement(super.provider);
+
+  @override
+  OpenCIFirebaseSuite get firebaseSuite =>
+      (origin as WorkflowStreamProvider).firebaseSuite;
+  @override
+  String get repository => (origin as WorkflowStreamProvider).repository;
+}
+
+String _$isGitHubAppInstalledHash() =>
+    r'3e468fce52deca7a1d5137f6983ad8a81630f8e4';
+
+/// See also [isGitHubAppInstalled].
+@ProviderFor(isGitHubAppInstalled)
+const isGitHubAppInstalledProvider = IsGitHubAppInstalledFamily();
+
+/// See also [isGitHubAppInstalled].
+class IsGitHubAppInstalledFamily extends Family<AsyncValue<bool>> {
+  /// See also [isGitHubAppInstalled].
+  const IsGitHubAppInstalledFamily();
+
+  /// See also [isGitHubAppInstalled].
+  IsGitHubAppInstalledProvider call(
+    OpenCIFirebaseSuite firebaseSuite,
+  ) {
+    return IsGitHubAppInstalledProvider(
+      firebaseSuite,
+    );
+  }
+
+  @override
+  IsGitHubAppInstalledProvider getProviderOverride(
+    covariant IsGitHubAppInstalledProvider provider,
+  ) {
+    return call(
+      provider.firebaseSuite,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'isGitHubAppInstalledProvider';
+}
+
+/// See also [isGitHubAppInstalled].
+class IsGitHubAppInstalledProvider extends AutoDisposeStreamProvider<bool> {
+  /// See also [isGitHubAppInstalled].
+  IsGitHubAppInstalledProvider(
+    OpenCIFirebaseSuite firebaseSuite,
+  ) : this._internal(
+          (ref) => isGitHubAppInstalled(
+            ref as IsGitHubAppInstalledRef,
+            firebaseSuite,
+          ),
+          from: isGitHubAppInstalledProvider,
+          name: r'isGitHubAppInstalledProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$isGitHubAppInstalledHash,
+          dependencies: IsGitHubAppInstalledFamily._dependencies,
+          allTransitiveDependencies:
+              IsGitHubAppInstalledFamily._allTransitiveDependencies,
+          firebaseSuite: firebaseSuite,
+        );
+
+  IsGitHubAppInstalledProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.firebaseSuite,
+  }) : super.internal();
+
+  final OpenCIFirebaseSuite firebaseSuite;
+
+  @override
+  Override overrideWith(
+    Stream<bool> Function(IsGitHubAppInstalledRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: IsGitHubAppInstalledProvider._internal(
+        (ref) => create(ref as IsGitHubAppInstalledRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        firebaseSuite: firebaseSuite,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<bool> createElement() {
+    return _IsGitHubAppInstalledProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is IsGitHubAppInstalledProvider &&
         other.firebaseSuite == firebaseSuite;
   }
 
@@ -146,23 +296,158 @@ class WorkflowStreamProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin WorkflowStreamRef on AutoDisposeStreamProviderRef<List<WorkflowModel>> {
+mixin IsGitHubAppInstalledRef on AutoDisposeStreamProviderRef<bool> {
   /// The parameter `firebaseSuite` of this provider.
   OpenCIFirebaseSuite get firebaseSuite;
 }
 
-class _WorkflowStreamProviderElement
-    extends AutoDisposeStreamProviderElement<List<WorkflowModel>>
-    with WorkflowStreamRef {
-  _WorkflowStreamProviderElement(super.provider);
+class _IsGitHubAppInstalledProviderElement
+    extends AutoDisposeStreamProviderElement<bool>
+    with IsGitHubAppInstalledRef {
+  _IsGitHubAppInstalledProviderElement(super.provider);
 
   @override
   OpenCIFirebaseSuite get firebaseSuite =>
-      (origin as WorkflowStreamProvider).firebaseSuite;
+      (origin as IsGitHubAppInstalledProvider).firebaseSuite;
+}
+
+String _$getGitHubRepositoriesHash() =>
+    r'248f460f557956bdcb2c2e83f726bedcafbf1290';
+
+/// See also [getGitHubRepositories].
+@ProviderFor(getGitHubRepositories)
+const getGitHubRepositoriesProvider = GetGitHubRepositoriesFamily();
+
+/// See also [getGitHubRepositories].
+class GetGitHubRepositoriesFamily extends Family<AsyncValue<List<String>>> {
+  /// See also [getGitHubRepositories].
+  const GetGitHubRepositoriesFamily();
+
+  /// See also [getGitHubRepositories].
+  GetGitHubRepositoriesProvider call(
+    OpenCIFirebaseSuite firebaseSuite,
+  ) {
+    return GetGitHubRepositoriesProvider(
+      firebaseSuite,
+    );
+  }
+
+  @override
+  GetGitHubRepositoriesProvider getProviderOverride(
+    covariant GetGitHubRepositoriesProvider provider,
+  ) {
+    return call(
+      provider.firebaseSuite,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'getGitHubRepositoriesProvider';
+}
+
+/// See also [getGitHubRepositories].
+class GetGitHubRepositoriesProvider
+    extends AutoDisposeFutureProvider<List<String>> {
+  /// See also [getGitHubRepositories].
+  GetGitHubRepositoriesProvider(
+    OpenCIFirebaseSuite firebaseSuite,
+  ) : this._internal(
+          (ref) => getGitHubRepositories(
+            ref as GetGitHubRepositoriesRef,
+            firebaseSuite,
+          ),
+          from: getGitHubRepositoriesProvider,
+          name: r'getGitHubRepositoriesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$getGitHubRepositoriesHash,
+          dependencies: GetGitHubRepositoriesFamily._dependencies,
+          allTransitiveDependencies:
+              GetGitHubRepositoriesFamily._allTransitiveDependencies,
+          firebaseSuite: firebaseSuite,
+        );
+
+  GetGitHubRepositoriesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.firebaseSuite,
+  }) : super.internal();
+
+  final OpenCIFirebaseSuite firebaseSuite;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<String>> Function(GetGitHubRepositoriesRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: GetGitHubRepositoriesProvider._internal(
+        (ref) => create(ref as GetGitHubRepositoriesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        firebaseSuite: firebaseSuite,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<String>> createElement() {
+    return _GetGitHubRepositoriesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GetGitHubRepositoriesProvider &&
+        other.firebaseSuite == firebaseSuite;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, firebaseSuite.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin GetGitHubRepositoriesRef on AutoDisposeFutureProviderRef<List<String>> {
+  /// The parameter `firebaseSuite` of this provider.
+  OpenCIFirebaseSuite get firebaseSuite;
+}
+
+class _GetGitHubRepositoriesProviderElement
+    extends AutoDisposeFutureProviderElement<List<String>>
+    with GetGitHubRepositoriesRef {
+  _GetGitHubRepositoriesProviderElement(super.provider);
+
+  @override
+  OpenCIFirebaseSuite get firebaseSuite =>
+      (origin as GetGitHubRepositoriesProvider).firebaseSuite;
 }
 
 String _$workflowPageControllerHash() =>
-    r'b4fd067070fdd29e206efa7de26660dc489eec19';
+    r'2db02e1cb4855b2a54f0b60517f862a25bad6ef6';
 
 abstract class _$WorkflowPageController
     extends BuildlessAutoDisposeNotifier<void> {
@@ -308,6 +593,155 @@ class _WorkflowPageControllerProviderElement
   @override
   OpenCIFirebaseSuite get firebaseSuite =>
       (origin as WorkflowPageControllerProvider).firebaseSuite;
+}
+
+String _$selectedRepositoryHash() =>
+    r'4dc54560aeef8e084af4b5b14739c0e7ab18e773';
+
+abstract class _$SelectedRepository
+    extends BuildlessAsyncNotifier<GithubRepository> {
+  late final OpenCIFirebaseSuite firebaseSuite;
+
+  FutureOr<GithubRepository> build(
+    OpenCIFirebaseSuite firebaseSuite,
+  );
+}
+
+/// See also [SelectedRepository].
+@ProviderFor(SelectedRepository)
+const selectedRepositoryProvider = SelectedRepositoryFamily();
+
+/// See also [SelectedRepository].
+class SelectedRepositoryFamily extends Family<AsyncValue<GithubRepository>> {
+  /// See also [SelectedRepository].
+  const SelectedRepositoryFamily();
+
+  /// See also [SelectedRepository].
+  SelectedRepositoryProvider call(
+    OpenCIFirebaseSuite firebaseSuite,
+  ) {
+    return SelectedRepositoryProvider(
+      firebaseSuite,
+    );
+  }
+
+  @override
+  SelectedRepositoryProvider getProviderOverride(
+    covariant SelectedRepositoryProvider provider,
+  ) {
+    return call(
+      provider.firebaseSuite,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'selectedRepositoryProvider';
+}
+
+/// See also [SelectedRepository].
+class SelectedRepositoryProvider
+    extends AsyncNotifierProviderImpl<SelectedRepository, GithubRepository> {
+  /// See also [SelectedRepository].
+  SelectedRepositoryProvider(
+    OpenCIFirebaseSuite firebaseSuite,
+  ) : this._internal(
+          () => SelectedRepository()..firebaseSuite = firebaseSuite,
+          from: selectedRepositoryProvider,
+          name: r'selectedRepositoryProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$selectedRepositoryHash,
+          dependencies: SelectedRepositoryFamily._dependencies,
+          allTransitiveDependencies:
+              SelectedRepositoryFamily._allTransitiveDependencies,
+          firebaseSuite: firebaseSuite,
+        );
+
+  SelectedRepositoryProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.firebaseSuite,
+  }) : super.internal();
+
+  final OpenCIFirebaseSuite firebaseSuite;
+
+  @override
+  FutureOr<GithubRepository> runNotifierBuild(
+    covariant SelectedRepository notifier,
+  ) {
+    return notifier.build(
+      firebaseSuite,
+    );
+  }
+
+  @override
+  Override overrideWith(SelectedRepository Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: SelectedRepositoryProvider._internal(
+        () => create()..firebaseSuite = firebaseSuite,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        firebaseSuite: firebaseSuite,
+      ),
+    );
+  }
+
+  @override
+  AsyncNotifierProviderElement<SelectedRepository, GithubRepository>
+      createElement() {
+    return _SelectedRepositoryProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SelectedRepositoryProvider &&
+        other.firebaseSuite == firebaseSuite;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, firebaseSuite.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SelectedRepositoryRef on AsyncNotifierProviderRef<GithubRepository> {
+  /// The parameter `firebaseSuite` of this provider.
+  OpenCIFirebaseSuite get firebaseSuite;
+}
+
+class _SelectedRepositoryProviderElement
+    extends AsyncNotifierProviderElement<SelectedRepository, GithubRepository>
+    with SelectedRepositoryRef {
+  _SelectedRepositoryProviderElement(super.provider);
+
+  @override
+  OpenCIFirebaseSuite get firebaseSuite =>
+      (origin as SelectedRepositoryProvider).firebaseSuite;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

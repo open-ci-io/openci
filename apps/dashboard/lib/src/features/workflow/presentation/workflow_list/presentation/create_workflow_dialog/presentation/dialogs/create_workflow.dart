@@ -9,6 +9,7 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage createWorkflowPage(
   BuildContext modalSheetContext,
+  String selectedRepository,
 ) {
   var isSuccess = false;
   WorkflowModel? workflow;
@@ -48,7 +49,9 @@ WoltModalSheetPage createWorkflowPage(
       }
     },
     child: (ref) {
-      final future = ref.watch(createWorkflowProvider);
+      final future = ref.watch(
+        createWorkflowProvider(selectedRepository: selectedRepository),
+      );
       return future.when(
         data: (data) {
           isSuccess = true;

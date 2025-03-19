@@ -69,15 +69,17 @@ class SecretPage extends ConsumerWidget {
                         ),
                         IconButton(
                           onPressed: () {
-                            showDeleteDialog(
-                              title: 'Delete Secret',
+                            showAdaptiveDialog<void>(
                               context: context,
-                              onDelete: () {
-                                firebaseSuite.firestore
-                                    .collection(secretsCollectionPath)
-                                    .doc(data[index].id)
-                                    .delete();
-                              },
+                              builder: (context) => DeleteDialog(
+                                title: 'Delete Secret',
+                                onDelete: () async {
+                                  await firebaseSuite.firestore
+                                      .collection(secretsCollectionPath)
+                                      .doc(data[index].id)
+                                      .delete();
+                                },
+                              ),
                             );
                           },
                           icon: const Icon(Icons.delete),
