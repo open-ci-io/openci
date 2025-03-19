@@ -4,7 +4,7 @@
       "macos": {
         "default": {
           "projectId": "open-ci-release",
-          "appId": "1:226435817638:ios:8c55ee64c68d635ec1d467",
+          "appId": "1:226435817638:ios:3c5c26de8f8a0bc7c1d467",
           "uploadDebugSymbols": false,
           "fileOutput": "macos/Runner/GoogleService-Info.plist"
         }
@@ -13,7 +13,10 @@
         "lib/firebase_options.dart": {
           "projectId": "open-ci-release",
           "configurations": {
-            "ios": "1:226435817638:ios:aecb8b1ecfed8e9dc1d467"
+            "android": "1:226435817638:android:6848f67578b6d77ac1d467",
+            "ios": "1:226435817638:ios:aecb8b1ecfed8e9dc1d467",
+            "macos": "1:226435817638:ios:3c5c26de8f8a0bc7c1d467",
+            "web": "1:226435817638:web:76fdc7ec61d7b1aac1d467"
           }
         }
       },
@@ -37,5 +40,17 @@
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "site": "openci-dashboard-v2",
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworksBackend": {
+      "region": "asia-east1"
+    }
   }
 }
