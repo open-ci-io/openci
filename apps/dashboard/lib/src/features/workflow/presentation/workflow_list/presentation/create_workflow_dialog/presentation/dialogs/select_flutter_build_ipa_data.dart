@@ -10,6 +10,7 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage selectFlutterBuildIpaData(
   BuildContext modalSheetContext,
+  String selectedRepository,
 ) {
   final workflowNameEditingController = TextEditingController();
   final flutterBuildCommandEditingController = TextEditingController();
@@ -17,7 +18,9 @@ WoltModalSheetPage selectFlutterBuildIpaData(
   final baseBranchEditingController = TextEditingController();
 
   void updateState(WidgetRef ref) {
-    ref.read(createWorkflowDialogControllerProvider.notifier)
+    ref.read(
+      createWorkflowDialogControllerProvider(selectedRepository).notifier,
+    )
       ..setFlutterBuildIpaWorkflowName(
         workflowNameEditingController.text,
       )
@@ -43,7 +46,7 @@ WoltModalSheetPage selectFlutterBuildIpaData(
         updateState(ref);
 
         WoltModalSheet.of(modalSheetContext).pushPage(
-          selectDistribution(modalSheetContext),
+          selectDistribution(modalSheetContext, selectedRepository),
         );
       }
     },
@@ -54,6 +57,7 @@ WoltModalSheetPage selectFlutterBuildIpaData(
             flutterBuildCommandEditingController,
         cwdEditingController: cwdEditingController,
         baseBranchEditingController: baseBranchEditingController,
+        selectedRepository: selectedRepository,
       );
     },
     modalSheetContext: modalSheetContext,
@@ -67,12 +71,14 @@ class _Body extends StatefulHookConsumerWidget {
     required this.flutterBuildCommandEditingController,
     required this.cwdEditingController,
     required this.baseBranchEditingController,
+    required this.selectedRepository,
   });
 
   final TextEditingController workflowNameEditingController;
   final TextEditingController flutterBuildCommandEditingController;
   final TextEditingController cwdEditingController;
   final TextEditingController baseBranchEditingController;
+  final String selectedRepository;
 
   @override
   ConsumerState<_Body> createState() => _BodyState();
@@ -81,8 +87,11 @@ class _Body extends StatefulHookConsumerWidget {
 class _BodyState extends ConsumerState<_Body> {
   @override
   Widget build(BuildContext context) {
-    final state =
-        ref.watch(createWorkflowDialogControllerProvider).flutterBuildIpaData;
+    final state = ref
+        .watch(
+          createWorkflowDialogControllerProvider(widget.selectedRepository),
+        )
+        .flutterBuildIpaData;
     useEffect(
       () {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -166,7 +175,11 @@ class _BodyState extends ConsumerState<_Body> {
                 onChanged: (value) {
                   if (value != null) {
                     ref
-                        .read(createWorkflowDialogControllerProvider.notifier)
+                        .read(
+                          createWorkflowDialogControllerProvider(
+                            widget.selectedRepository,
+                          ).notifier,
+                        )
                         .setFlutterBuildIpaTriggerType(value);
                   }
                 },

@@ -22,6 +22,7 @@ class CreateWorkflowDomain with _$CreateWorkflowDomain {
     @Default(FlutterBuildIpaData()) FlutterBuildIpaData flutterBuildIpaData,
     @Default(OpenCIAppDistributionTarget.none)
     OpenCIAppDistributionTarget appDistributionTarget,
+    required String selectedRepository,
   }) = _CreateWorkflowDomain;
   factory CreateWorkflowDomain.fromJson(Map<String, Object?> json) =>
       _$CreateWorkflowDomainFromJson(json);

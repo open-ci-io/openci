@@ -1,4 +1,5 @@
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
+import 'package:dashboard/src/features/workflow/domain/github_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -12,13 +13,14 @@ class WorkflowPageController extends _$WorkflowPageController {
     return;
   }
 
-  Stream<List<WorkflowModel>> workflows() {
+  Stream<List<WorkflowModel>> workflows(String repository) {
     final firestore = firebaseSuite.firestore;
     final auth = firebaseSuite.auth;
     final uid = auth.currentUser!.uid;
     return firestore
         .collection(workflowsCollectionPath)
         .where('owners', arrayContains: uid)
+        .where('github.repositoryUrl', isEqualTo: repository)
         .snapshots()
         .map(
           (snapshot) => snapshot.docs
@@ -62,16 +64,29 @@ class WorkflowPageController extends _$WorkflowPageController {
   ) async {
     await firebaseSuite.firestore.collection('workflows').doc(docId).delete();
   }
+
+  Future<List<String>> getGitHubRepositories() async {
+    final firestore = firebaseSuite.firestore;
+    final auth = firebaseSuite.auth;
+    final uid = auth.currentUser!.uid;
+    final userDoc = await firestore.collection('users').doc(uid).get();
+    final userData = userDoc.data()!;
+    final github = userData['github'] as Map<String, dynamic>;
+    final repositories = github['repositories'] as List<dynamic>;
+    // ignore: avoid_dynamic_calls
+    return repositories.map((e) => e['full_name'] as String).toList();
+  }
 }
 
 @riverpod
 Stream<List<WorkflowModel>> workflowStream(
   Ref ref,
   OpenCIFirebaseSuite firebaseSuite,
+  String repository,
 ) {
   final controller =
       ref.watch(workflowPageControllerProvider(firebaseSuite).notifier);
-  return controller.workflows();
+  return controller.workflows(repository);
 }
 
 @riverpod
@@ -82,4 +97,37 @@ Stream<bool> isGitHubAppInstalled(
   final controller =
       ref.watch(workflowPageControllerProvider(firebaseSuite).notifier);
   return controller.isGitHubAppInstalled();
+}
+
+@riverpod
+Future<List<String>> getGitHubRepositories(
+  Ref ref,
+  OpenCIFirebaseSuite firebaseSuite,
+) async {
+  final controller =
+      ref.watch(workflowPageControllerProvider(firebaseSuite).notifier);
+  return controller.getGitHubRepositories();
+}
+
+@Riverpod(keepAlive: true)
+class SelectedRepository extends _$SelectedRepository {
+  @override
+  Future<GithubRepository> build(OpenCIFirebaseSuite firebaseSuite) async {
+    final list = await _controller.getGitHubRepositories();
+    return GithubRepository(
+      selectedRepository: list.first,
+      repositories: list,
+    );
+  }
+
+  WorkflowPageController get _controller =>
+      ref.watch(workflowPageControllerProvider(firebaseSuite).notifier);
+
+  Future<void> set(String repository) async {
+    final data = state.valueOrNull;
+    if (data == null) {
+      return;
+    }
+    state = AsyncData(data.copyWith(selectedRepository: repository));
+  }
 }

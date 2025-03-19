@@ -25,96 +25,152 @@ class WorkflowListPage extends ConsumerWidget {
     final isGitHubAppInstalled =
         ref.watch(isGitHubAppInstalledProvider(firebaseSuite));
 
+    final selectedRepository =
+        ref.watch(selectedRepositoryProvider(firebaseSuite));
+
     return isGitHubAppInstalled.when(
       data: (isInstalled) {
         if (isInstalled) {
-          return Scaffold(
-            floatingActionButton: FloatingActionButton(
-              heroTag: 'add',
-              onPressed: () {
-                invalidateCreateWorkflowDialogController();
-                WoltModalSheet.show<void>(
-                  context: context,
-                  pageListBuilder: (modalSheetContext) {
-                    return [
-                      selectWorkflowTemplate(
-                        modalSheetContext,
-                        firebaseSuite,
-                      ),
-                    ];
-                  },
-                  modalTypeBuilder: (context) => const WoltDialogType(),
-                  onModalDismissedWithBarrierTap: Navigator.of(context).pop,
-                );
-              },
-              child: const Icon(Icons.add),
-            ),
-            body: ref.watch(workflowStreamProvider(firebaseSuite)).when(
-                  data: (data) {
-                    final workflows = data
-                      ..sort((a, b) => a.name.compareTo(b.name));
-                    return Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: ListView.separated(
-                        itemCount: workflows.length,
-                        separatorBuilder: (context, index) {
-                          final workflow = workflows[index];
-                          final nextWorkflow = index < workflows.length - 1
-                              ? workflows[index + 1]
-                              : null;
-                          final shouldShowSeparator = nextWorkflow != null &&
-                              workflow.currentWorkingDirectory ==
-                                  nextWorkflow.currentWorkingDirectory;
-
-                          return shouldShowSeparator
-                              ? const Divider(
-                                  color: Color(0xFF2C2C2E),
-                                  height: 1,
-                                )
-                              : const SizedBox.shrink();
-                        },
-                        itemBuilder: (_, index) {
-                          final workflow = workflows[index];
-                          final previousWorkflow =
-                              index > 0 ? workflows[index - 1] : null;
-                          final shouldShowWorkingDirectory =
-                              previousWorkflow == null ||
-                                  workflow.currentWorkingDirectory !=
-                                      previousWorkflow.currentWorkingDirectory;
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (shouldShowWorkingDirectory)
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 30,
-                                    bottom: 20,
-                                  ),
-                                  child: Text(
-                                    workflow.currentWorkingDirectory,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 24,
-                                    ),
-                                  ),
-                                ),
-                              _WorkflowListItem(
-                                workflowModel: workflow,
-                                firebaseSuite: firebaseSuite,
-                              ),
-                            ],
-                          );
-                        },
-                      ),
+          return selectedRepository.when(
+            data: (repositoryData) {
+              final selectedRepository = repositoryData.selectedRepository;
+              final repositories = repositoryData.repositories;
+              return Scaffold(
+                floatingActionButton: FloatingActionButton(
+                  heroTag: 'add',
+                  onPressed: () {
+                    invalidateCreateWorkflowDialogController();
+                    WoltModalSheet.show<void>(
+                      context: context,
+                      pageListBuilder: (modalSheetContext) {
+                        return [
+                          selectWorkflowTemplate(
+                            modalSheetContext,
+                            firebaseSuite,
+                            selectedRepository,
+                          ),
+                        ];
+                      },
+                      modalTypeBuilder: (context) => const WoltDialogType(),
+                      onModalDismissedWithBarrierTap: Navigator.of(context).pop,
                     );
                   },
-                  error: (error, stack) => const Center(
-                    child: Text('Error'),
-                  ),
-                  loading: () => const Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  ),
+                  child: const Icon(Icons.add),
                 ),
+                body: ref
+                    .watch(
+                      workflowStreamProvider(
+                        firebaseSuite,
+                        selectedRepository,
+                      ),
+                    )
+                    .when(
+                      data: (data) {
+                        final workflows = data
+                          ..sort((a, b) => a.name.compareTo(b.name));
+                        return Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              DropdownMenu(
+                                onSelected: (value) {
+                                  if (value == null) {
+                                    return;
+                                  }
+                                  ref
+                                      .read(
+                                        selectedRepositoryProvider(
+                                          firebaseSuite,
+                                        ).notifier,
+                                      )
+                                      .set(value);
+                                },
+                                initialSelection: selectedRepository,
+                                width: 240,
+                                hintText: 'Select a repository',
+                                dropdownMenuEntries: repositories
+                                    .map(
+                                      (e) => DropdownMenuEntry(
+                                        value: e,
+                                        label: e,
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                              Expanded(
+                                child: ListView.separated(
+                                  itemCount: workflows.length,
+                                  separatorBuilder: (context, index) {
+                                    final workflow = workflows[index];
+                                    final nextWorkflow =
+                                        index < workflows.length - 1
+                                            ? workflows[index + 1]
+                                            : null;
+                                    final shouldShowSeparator =
+                                        nextWorkflow != null &&
+                                            workflow.currentWorkingDirectory ==
+                                                nextWorkflow
+                                                    .currentWorkingDirectory;
+
+                                    return shouldShowSeparator
+                                        ? const Divider(
+                                            color: Color(0xFF2C2C2E),
+                                            height: 1,
+                                          )
+                                        : const SizedBox.shrink();
+                                  },
+                                  itemBuilder: (_, index) {
+                                    final workflow = workflows[index];
+                                    final previousWorkflow =
+                                        index > 0 ? workflows[index - 1] : null;
+                                    final shouldShowWorkingDirectory =
+                                        previousWorkflow == null ||
+                                            workflow.currentWorkingDirectory !=
+                                                previousWorkflow
+                                                    .currentWorkingDirectory;
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (shouldShowWorkingDirectory)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 30,
+                                              bottom: 20,
+                                            ),
+                                            child: Text(
+                                              workflow.currentWorkingDirectory,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 24,
+                                              ),
+                                            ),
+                                          ),
+                                        _WorkflowListItem(
+                                          workflowModel: workflow,
+                                          firebaseSuite: firebaseSuite,
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      error: (error, stack) => Center(
+                        child: Text('Error: $error'),
+                      ),
+                      loading: () => const Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      ),
+                    ),
+              );
+            },
+            error: (e, s) => Text('Error: $e'),
+            loading: () => const Text('Loading...'),
           );
         }
         return Scaffold(

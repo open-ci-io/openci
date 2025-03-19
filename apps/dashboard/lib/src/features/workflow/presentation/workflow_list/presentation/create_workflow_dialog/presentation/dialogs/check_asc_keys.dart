@@ -8,27 +8,30 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 WoltModalSheetPage checkASCKeys(
   BuildContext modalSheetContext,
+  String selectedRepository,
 ) {
   return baseDialog(
     onBack: (ref) => WoltModalSheet.of(modalSheetContext).popPage(),
     onNext: (ref, formKey) {
-      final state = ref.watch(createWorkflowDialogControllerProvider);
+      final state =
+          ref.watch(createWorkflowDialogControllerProvider(selectedRepository));
 
       switch (state.isASCKeyUploaded) {
         case true:
           WoltModalSheet.of(modalSheetContext).pushPage(
-            selectFlutterBuildIpaData(modalSheetContext),
+            selectFlutterBuildIpaData(modalSheetContext, selectedRepository),
           );
         case false:
           WoltModalSheet.of(modalSheetContext).pushPage(
-            selectASCKeys(modalSheetContext),
+            selectASCKeys(modalSheetContext, selectedRepository),
           );
         case null:
           return;
       }
     },
     nextButtonText: (ref) {
-      final state = ref.watch(createWorkflowDialogControllerProvider);
+      final state =
+          ref.watch(createWorkflowDialogControllerProvider(selectedRepository));
       final text = switch (state.isASCKeyUploaded) {
         true => 'Next',
         false => 'Upload ASC Keys',
@@ -40,8 +43,9 @@ WoltModalSheetPage checkASCKeys(
       );
     },
     child: (ref) {
-      final controller =
-          ref.watch(createWorkflowDialogControllerProvider.notifier);
+      final controller = ref.watch(
+        createWorkflowDialogControllerProvider(selectedRepository).notifier,
+      );
       final future = ref.watch(areAppStoreConnectKeysUploadedProvider);
       return future.when(
         data: (data) {

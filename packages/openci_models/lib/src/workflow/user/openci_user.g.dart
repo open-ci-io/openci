@@ -10,24 +10,34 @@ _$OpenCIUserImpl _$$OpenCIUserImplFromJson(Map<String, dynamic> json) =>
     _$OpenCIUserImpl(
       userId: json['userId'] as String,
       createdAt: (json['createdAt'] as num).toInt(),
-      github: OpenCIUserGitHub.fromJson(json['github'] as Map<String, dynamic>),
+      github: json['github'] == null
+          ? null
+          : OpenCIUserGitHub.fromJson(json['github'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$OpenCIUserImplToJson(_$OpenCIUserImpl instance) =>
     <String, dynamic>{
       'userId': instance.userId,
       'createdAt': instance.createdAt,
-      'github': instance.github.toJson(),
+      'github': instance.github?.toJson(),
     };
 
 _$OpenCIUserGitHubImpl _$$OpenCIUserGitHubImplFromJson(
         Map<String, dynamic> json) =>
     _$OpenCIUserGitHubImpl(
-      repositoryUrl: json['repositoryUrl'] as String,
+      installationId: (json['installationId'] as num?)?.toInt(),
+      login: json['login'] as String?,
+      repositories: (json['repositories'] as List<dynamic>?)
+          ?.map((e) => OpenCIRepository.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      userId: (json['userId'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$OpenCIUserGitHubImplToJson(
         _$OpenCIUserGitHubImpl instance) =>
     <String, dynamic>{
-      'repositoryUrl': instance.repositoryUrl,
+      'installationId': instance.installationId,
+      'login': instance.login,
+      'repositories': instance.repositories?.map((e) => e.toJson()).toList(),
+      'userId': instance.userId,
     };

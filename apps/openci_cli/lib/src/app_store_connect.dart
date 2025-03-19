@@ -194,7 +194,6 @@ class AppStoreConnectClient {
       path: '/profiles/$profileId',
       method: 'DELETE',
     );
-    print('response: $response');
     return response;
   }
 

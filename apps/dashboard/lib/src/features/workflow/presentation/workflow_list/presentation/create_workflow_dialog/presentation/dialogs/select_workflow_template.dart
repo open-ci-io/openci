@@ -13,6 +13,7 @@ import '../create_workflow_dialog_controller.dart';
 WoltModalSheetPage selectWorkflowTemplate(
   BuildContext modalSheetContext,
   OpenCIFirebaseSuite firebaseSuite,
+  String selectedRepository,
 ) {
   return baseDialog(
     onBack: (ref) => Navigator.pop(modalSheetContext),
@@ -20,11 +21,12 @@ WoltModalSheetPage selectWorkflowTemplate(
       ref,
       formKey,
     ) async {
-      final state = ref.watch(createWorkflowDialogControllerProvider);
+      final state =
+          ref.watch(createWorkflowDialogControllerProvider(selectedRepository));
       switch (state.template) {
         case OpenCIWorkflowTemplate.ipa:
           WoltModalSheet.of(modalSheetContext).pushPage(
-            checkASCKeys(modalSheetContext),
+            checkASCKeys(modalSheetContext, selectedRepository),
           );
         case OpenCIWorkflowTemplate.blank:
           Navigator.pop(modalSheetContext);
@@ -43,9 +45,11 @@ WoltModalSheetPage selectWorkflowTemplate(
     modalSheetContext: modalSheetContext,
     title: 'Choose Workflow Template',
     child: (ref) {
-      final state = ref.watch(createWorkflowDialogControllerProvider);
-      final controller =
-          ref.watch(createWorkflowDialogControllerProvider.notifier);
+      final state =
+          ref.watch(createWorkflowDialogControllerProvider(selectedRepository));
+      final controller = ref.read(
+        createWorkflowDialogControllerProvider(selectedRepository).notifier,
+      );
       final template = state.template;
       return Column(
         children: [
