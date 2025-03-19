@@ -596,10 +596,10 @@ class _WorkflowPageControllerProviderElement
 }
 
 String _$selectedRepositoryHash() =>
-    r'498368a62b01982923ba7397232572d2ab7f92c8';
+    r'4dc54560aeef8e084af4b5b14739c0e7ab18e773';
 
 abstract class _$SelectedRepository
-    extends BuildlessAutoDisposeAsyncNotifier<GithubRepository> {
+    extends BuildlessAsyncNotifier<GithubRepository> {
   late final OpenCIFirebaseSuite firebaseSuite;
 
   FutureOr<GithubRepository> build(
@@ -650,8 +650,8 @@ class SelectedRepositoryFamily extends Family<AsyncValue<GithubRepository>> {
 }
 
 /// See also [SelectedRepository].
-class SelectedRepositoryProvider extends AutoDisposeAsyncNotifierProviderImpl<
-    SelectedRepository, GithubRepository> {
+class SelectedRepositoryProvider
+    extends AsyncNotifierProviderImpl<SelectedRepository, GithubRepository> {
   /// See also [SelectedRepository].
   SelectedRepositoryProvider(
     OpenCIFirebaseSuite firebaseSuite,
@@ -707,7 +707,7 @@ class SelectedRepositoryProvider extends AutoDisposeAsyncNotifierProviderImpl<
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<SelectedRepository, GithubRepository>
+  AsyncNotifierProviderElement<SelectedRepository, GithubRepository>
       createElement() {
     return _SelectedRepositoryProviderElement(this);
   }
@@ -729,15 +729,14 @@ class SelectedRepositoryProvider extends AutoDisposeAsyncNotifierProviderImpl<
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SelectedRepositoryRef
-    on AutoDisposeAsyncNotifierProviderRef<GithubRepository> {
+mixin SelectedRepositoryRef on AsyncNotifierProviderRef<GithubRepository> {
   /// The parameter `firebaseSuite` of this provider.
   OpenCIFirebaseSuite get firebaseSuite;
 }
 
 class _SelectedRepositoryProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<SelectedRepository,
-        GithubRepository> with SelectedRepositoryRef {
+    extends AsyncNotifierProviderElement<SelectedRepository, GithubRepository>
+    with SelectedRepositoryRef {
   _SelectedRepositoryProviderElement(super.provider);
 
   @override

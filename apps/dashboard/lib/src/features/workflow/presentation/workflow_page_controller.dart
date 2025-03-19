@@ -108,7 +108,7 @@ Future<List<String>> getGitHubRepositories(
   return controller.getGitHubRepositories();
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class SelectedRepository extends _$SelectedRepository {
   @override
   Future<GithubRepository> build(OpenCIFirebaseSuite firebaseSuite) async {

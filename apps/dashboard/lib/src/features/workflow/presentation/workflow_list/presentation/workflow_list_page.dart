@@ -74,6 +74,18 @@ class WorkflowListPage extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               DropdownMenu(
+                                onSelected: (value) {
+                                  if (value == null) {
+                                    return;
+                                  }
+                                  ref
+                                      .read(
+                                        selectedRepositoryProvider(
+                                          firebaseSuite,
+                                        ).notifier,
+                                      )
+                                      .set(value);
+                                },
                                 initialSelection: selectedRepository,
                                 width: 240,
                                 hintText: 'Select a repository',
