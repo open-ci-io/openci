@@ -182,10 +182,10 @@ class WorkflowListPage extends ConsumerWidget {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () async {
-                    const baseUrl =
-                        'https://github.com/apps/openci-dev/installations/select_target?state=';
-                    final uid = firebaseSuite.auth.currentUser!.uid;
-                    final url = '$baseUrl$uid';
+                    final url = ref
+                        .read(workflowPageControllerProvider(firebaseSuite)
+                            .notifier)
+                        .getInstallationUrl();
                     await launchUrl(Uri.parse(url));
                   },
                   child: const Text('Install GitHub App'),
