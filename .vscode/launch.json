@@ -5,13 +5,27 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "dashboard (macOS)",
+            "name": "🚧 dashboard (macOS, DEV)",
             "request": "launch",
             "type": "dart",
             "program": "apps/dashboard/lib/main.dart",
             "args": [
                 "-d",
-                "macos"
+                "macos",
+                "dart-define",
+                "ENV=dev"
+            ]
+        },
+        {
+            "name": "🚀 dashboard (macOS, PROD)",
+            "request": "launch",
+            "type": "dart",
+            "program": "apps/dashboard/lib/main.dart",
+            "args": [
+                "-d",
+                "macos",
+                "dart-define",
+                "ENV=prod"
             ]
         }
     ]

@@ -76,6 +76,13 @@ class WorkflowPageController extends _$WorkflowPageController {
     // ignore: avoid_dynamic_calls
     return repositories.map((e) => e['full_name'] as String).toList();
   }
+
+  String getInstallationUrl() {
+    const env = String.fromEnvironment('ENV');
+    const appName = env == 'prod' ? 'openci-io' : 'openci-dev';
+    final uid = firebaseSuite.auth.currentUser!.uid;
+    return 'https://github.com/apps/$appName/installations/select_target?state=$uid';
+  }
 }
 
 @riverpod
