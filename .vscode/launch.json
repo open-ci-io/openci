@@ -12,7 +12,7 @@
             "args": [
                 "-d",
                 "macos",
-                "dart-define",
+                "--dart-define",
                 "ENV=dev"
             ]
         },
@@ -24,7 +24,7 @@
             "args": [
                 "-d",
                 "macos",
-                "dart-define",
+                "--dart-define",
                 "ENV=prod"
             ]
         }
