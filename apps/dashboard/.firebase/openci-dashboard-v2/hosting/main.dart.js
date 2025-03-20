@@ -51056,7 +51056,7 @@ A.azF.prototype={
 $0(){var s=0,r=A.z(t.H),q=this
 var $async$$0=A.v(function(a,b){if(a===1)return A.w(b,r)
 while(true)switch(s){case 0:s=2
-return A.t(A.aUo(A.e7("https://github.com/apps/openci-dev/installations/select_target?state="+q.a.e.a.giu().a.c.a.a,0,null)),$async$$0)
+return A.t(A.aUo(A.e7("https://github.com/apps/openci-io/installations/select_target?state="+q.a.e.a.giu().a.c.a.a,0,null)),$async$$0)
 case 2:return A.x(null,r)}})
 return A.y($async$$0,r)},
 $S:7}

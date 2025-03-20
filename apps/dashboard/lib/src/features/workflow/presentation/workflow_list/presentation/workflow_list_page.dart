@@ -183,7 +183,7 @@ class WorkflowListPage extends ConsumerWidget {
                 TextButton(
                   onPressed: () async {
                     const baseUrl =
-                        'https://github.com/apps/openci-dev/installations/select_target?state=';
+                        'https://github.com/apps/openci-io/installations/select_target?state=';
                     final uid = firebaseSuite.auth.currentUser!.uid;
                     final url = '$baseUrl$uid';
                     await launchUrl(Uri.parse(url));
