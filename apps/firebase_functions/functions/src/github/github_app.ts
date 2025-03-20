@@ -193,7 +193,7 @@ const appFunction = async (app: Probot) => {
 				if (installation == null) {
 					throw new Error("installation is null, please check it.");
 				}
-				const githubRepositoryUrl = pullRequest.base.repo.html_url;
+				const githubRepositoryUrl = pullRequest.base.repo.full_name;
 				const baseBranch = pullRequest.base.ref;
 				const currentBranch = pullRequest.head.ref;
 				const workflowQuerySnapshot = await getWorkflowQuerySnapshot(
@@ -253,7 +253,7 @@ const appFunction = async (app: Probot) => {
 				if (installation == null) {
 					throw new Error("installation is undefined, please check it.");
 				}
-				const githubRepositoryUrl = _payload.repository.html_url;
+				const githubRepositoryUrl = _payload.repository.full_name;
 				const baseBranch = _payload.ref.replace("refs/heads/", "");
 				const workflowQuerySnapshot = await getWorkflowQuerySnapshot(
 					githubRepositoryUrl,
