@@ -1,9 +1,9 @@
 import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_models/openci_models.dart';
+import 'package:openci_runner/src/github/get_github_installation_token.dart';
+import 'package:openci_runner/src/github/git_clone.dart';
 import 'package:openci_runner/src/log.dart';
 import 'package:openci_runner/src/run_command.dart';
-import 'package:openci_runner/src/github/git_clone.dart';
-import 'package:openci_runner/src/github/get_github_installation_token.dart';
 
 Future<void> cloneRepo(
   BuildJob buildJob,
@@ -11,7 +11,7 @@ Future<void> cloneRepo(
   SSHClient client,
   String pem,
 ) async {
-  final repoUrl = buildJob.github.repositoryUrl;
+  final repoFullName = buildJob.github.repositoryUrl;
   final token = await getGitHubInstallationToken(
     installationId: buildJob.github.installationId,
     appId: buildJob.github.appId,
@@ -21,7 +21,7 @@ Future<void> cloneRepo(
   await runCommand(
     logId: logId,
     client: client,
-    command: cloneCommand(repoUrl, buildJob.github.buildBranch, token),
+    command: cloneCommand(repoFullName, buildJob.github.buildBranch, token),
     currentWorkingDirectory: null,
     jobId: buildJob.id,
   );

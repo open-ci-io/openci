@@ -29,7 +29,7 @@ class WorkflowModel with _$WorkflowModel {
         id: docId,
         flutter: WorkflowModelFlutter(version: FlutterVersion.getDefault()),
         github: WorkflowModelGitHub(
-          repositoryUrl: 'https://github.com/example/repo',
+          repositoryUrl: 'example/repo',
           triggerType: GitHubTriggerType.push,
           baseBranch: 'main',
         ),
