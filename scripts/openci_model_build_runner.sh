@@ -1,1 +1,0 @@
-cd packages/openci_models && dart run build_runner watch -d

@@ -273,6 +273,7 @@ OpenCIGithub _$OpenCIGithubFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$OpenCIGithub {
+// TODO(someone): rename to repositoryFullName
   String get repositoryUrl => throw _privateConstructorUsedError;
   String get owner => throw _privateConstructorUsedError;
   String get repositoryName => throw _privateConstructorUsedError;
@@ -478,6 +479,7 @@ class _$OpenCIGithubImpl implements _OpenCIGithub {
   factory _$OpenCIGithubImpl.fromJson(Map<String, dynamic> json) =>
       _$$OpenCIGithubImplFromJson(json);
 
+// TODO(someone): rename to repositoryFullName
   @override
   final String repositoryUrl;
   @override
@@ -571,6 +573,7 @@ abstract class _OpenCIGithub implements OpenCIGithub {
   factory _OpenCIGithub.fromJson(Map<String, dynamic> json) =
       _$OpenCIGithubImpl.fromJson;
 
+// TODO(someone): rename to repositoryFullName
   @override
   String get repositoryUrl;
   @override

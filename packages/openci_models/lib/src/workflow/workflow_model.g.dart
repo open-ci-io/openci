@@ -80,23 +80,3 @@ Map<String, dynamic> _$$WorkflowModelStepImplToJson(
       'name': instance.name,
       'command': instance.command,
     };
-
-_$OpenCIRepositoryImpl _$$OpenCIRepositoryImplFromJson(
-        Map<String, dynamic> json) =>
-    _$OpenCIRepositoryImpl(
-      fullName: json['full_name'] as String,
-      id: (json['id'] as num).toInt(),
-      name: json['name'] as String,
-      nodeId: json['node_id'] as String,
-      private: json['private'] as bool,
-    );
-
-Map<String, dynamic> _$$OpenCIRepositoryImplToJson(
-        _$OpenCIRepositoryImpl instance) =>
-    <String, dynamic>{
-      'full_name': instance.fullName,
-      'id': instance.id,
-      'name': instance.name,
-      'node_id': instance.nodeId,
-      'private': instance.private,
-    };

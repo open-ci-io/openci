@@ -4,11 +4,6 @@ import 'package:openci_models/openci_models.dart';
 part 'workflow_model.freezed.dart';
 part 'workflow_model.g.dart';
 
-enum GitHubTriggerType {
-  push,
-  pullRequest,
-}
-
 @Freezed(makeCollectionsUnmodifiable: false)
 class WorkflowModel with _$WorkflowModel {
   const factory WorkflowModel({
@@ -29,7 +24,7 @@ class WorkflowModel with _$WorkflowModel {
         id: docId,
         flutter: WorkflowModelFlutter(version: FlutterVersion.getDefault()),
         github: WorkflowModelGitHub(
-          repositoryUrl: 'https://github.com/example/repo',
+          repositoryUrl: 'example/repo',
           triggerType: GitHubTriggerType.push,
           baseBranch: 'main',
         ),
@@ -67,18 +62,4 @@ class WorkflowModelStep with _$WorkflowModelStep {
   }) = _WorkflowModelStep;
   factory WorkflowModelStep.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelStepFromJson(json);
-}
-
-@freezed
-class OpenCIRepository with _$OpenCIRepository {
-  const factory OpenCIRepository({
-    @JsonKey(name: 'full_name') required String fullName,
-    required int id,
-    required String name,
-    @JsonKey(name: 'node_id') required String nodeId,
-    required bool private,
-  }) = _OpenCIRepository;
-
-  factory OpenCIRepository.fromJson(Map<String, Object?> json) =>
-      _$OpenCIRepositoryFromJson(json);
 }

@@ -27,6 +27,7 @@ class BuildJob with _$BuildJob {
 @freezed
 class OpenCIGithub with _$OpenCIGithub {
   const factory OpenCIGithub({
+    // TODO(someone): rename to repositoryFullName
     required String repositoryUrl,
     required String owner,
     required String repositoryName,

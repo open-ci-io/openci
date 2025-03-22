@@ -183,8 +183,10 @@ class WorkflowListPage extends ConsumerWidget {
                 TextButton(
                   onPressed: () async {
                     final url = ref
-                        .read(workflowPageControllerProvider(firebaseSuite)
-                            .notifier)
+                        .read(
+                          workflowPageControllerProvider(firebaseSuite)
+                              .notifier,
+                        )
                         .getInstallationUrl();
                     await launchUrl(Uri.parse(url));
                   },
