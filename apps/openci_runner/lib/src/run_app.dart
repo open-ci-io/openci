@@ -1,4 +1,4 @@
-import 'package:dart_firebase_admin_plus/firestore.dart';
+import 'package:dart_firebase_admin/firestore.dart';
 import 'package:openci_runner/src/firebase.dart';
 import 'package:openci_runner/src/log.dart';
 import 'package:openci_runner/src/main_loop.dart';
