@@ -41,7 +41,8 @@ Future<void> handleFlutterBuildIpa(
   await runCommand(
     logId: logId,
     client: client,
-    command: 'openci_cli2 update',
+    command:
+        'dart pub global deactivate openci_cli2 && dart pub global activate openci_cli2',
     currentWorkingDirectory: workflow.currentWorkingDirectory,
     jobId: buildJob.id,
   );

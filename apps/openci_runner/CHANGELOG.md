@@ -1,4 +1,8 @@
 
+## 0.10.2
+
+- fix: update openci_cli2
+
 ## 0.10.1
 
 - fix: clone repo
