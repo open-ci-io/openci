@@ -5,7 +5,7 @@ part 'openci_user.freezed.dart';
 part 'openci_user.g.dart';
 
 @freezed
-class OpenCIUser with _$OpenCIUser {
+abstract class OpenCIUser with _$OpenCIUser {
   const factory OpenCIUser({
     required String userId,
     required int createdAt,

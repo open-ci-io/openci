@@ -6,8 +6,7 @@ part of 'openci_user.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$OpenCIUserImpl _$$OpenCIUserImplFromJson(Map<String, dynamic> json) =>
-    _$OpenCIUserImpl(
+_OpenCIUser _$OpenCIUserFromJson(Map<String, dynamic> json) => _OpenCIUser(
       userId: json['userId'] as String,
       createdAt: (json['createdAt'] as num).toInt(),
       github: json['github'] == null
@@ -15,7 +14,7 @@ _$OpenCIUserImpl _$$OpenCIUserImplFromJson(Map<String, dynamic> json) =>
           : OpenCIUserGitHub.fromJson(json['github'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$$OpenCIUserImplToJson(_$OpenCIUserImpl instance) =>
+Map<String, dynamic> _$OpenCIUserToJson(_OpenCIUser instance) =>
     <String, dynamic>{
       'userId': instance.userId,
       'createdAt': instance.createdAt,

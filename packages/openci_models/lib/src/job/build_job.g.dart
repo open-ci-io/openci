@@ -6,8 +6,7 @@ part of 'build_job.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$BuildJobImpl _$$BuildJobImplFromJson(Map<String, dynamic> json) =>
-    _$BuildJobImpl(
+_BuildJob _$BuildJobFromJson(Map<String, dynamic> json) => _BuildJob(
       buildStatus:
           $enumDecode(_$OpenCIGitHubChecksStatusEnumMap, json['buildStatus']),
       github: OpenCIGithub.fromJson(json['github'] as Map<String, dynamic>),
@@ -16,8 +15,7 @@ _$BuildJobImpl _$$BuildJobImplFromJson(Map<String, dynamic> json) =>
       createdAt: (json['createdAt'] as num?)?.toInt() ?? null,
     );
 
-Map<String, dynamic> _$$BuildJobImplToJson(_$BuildJobImpl instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$BuildJobToJson(_BuildJob instance) => <String, dynamic>{
       'buildStatus': _$OpenCIGitHubChecksStatusEnumMap[instance.buildStatus]!,
       'github': instance.github.toJson(),
       'id': instance.id,
@@ -32,8 +30,8 @@ const _$OpenCIGitHubChecksStatusEnumMap = {
   OpenCIGitHubChecksStatus.success: 'success',
 };
 
-_$OpenCIGithubImpl _$$OpenCIGithubImplFromJson(Map<String, dynamic> json) =>
-    _$OpenCIGithubImpl(
+_OpenCIGithub _$OpenCIGithubFromJson(Map<String, dynamic> json) =>
+    _OpenCIGithub(
       repositoryUrl: json['repositoryUrl'] as String,
       owner: json['owner'] as String,
       repositoryName: json['repositoryName'] as String,
@@ -45,7 +43,7 @@ _$OpenCIGithubImpl _$$OpenCIGithubImplFromJson(Map<String, dynamic> json) =>
       buildBranch: json['buildBranch'] as String,
     );
 
-Map<String, dynamic> _$$OpenCIGithubImplToJson(_$OpenCIGithubImpl instance) =>
+Map<String, dynamic> _$OpenCIGithubToJson(_OpenCIGithub instance) =>
     <String, dynamic>{
       'repositoryUrl': instance.repositoryUrl,
       'owner': instance.owner,

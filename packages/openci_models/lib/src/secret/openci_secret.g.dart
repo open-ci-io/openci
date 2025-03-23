@@ -6,8 +6,8 @@ part of 'openci_secret.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$OpenCISecretImpl _$$OpenCISecretImplFromJson(Map<String, dynamic> json) =>
-    _$OpenCISecretImpl(
+_OpenCISecret _$OpenCISecretFromJson(Map<String, dynamic> json) =>
+    _OpenCISecret(
       key: json['key'] as String,
       value: json['value'] as String,
       owners:
@@ -16,7 +16,7 @@ _$OpenCISecretImpl _$$OpenCISecretImplFromJson(Map<String, dynamic> json) =>
       updatedAt: (json['updatedAt'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$OpenCISecretImplToJson(_$OpenCISecretImpl instance) =>
+Map<String, dynamic> _$OpenCISecretToJson(_OpenCISecret instance) =>
     <String, dynamic>{
       'key': instance.key,
       'value': instance.value,

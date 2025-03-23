@@ -6,9 +6,9 @@ part of 'repository.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$OpenCIGitHubRepositoryImpl _$$OpenCIGitHubRepositoryImplFromJson(
+_OpenCIGitHubRepository _$OpenCIGitHubRepositoryFromJson(
         Map<String, dynamic> json) =>
-    _$OpenCIGitHubRepositoryImpl(
+    _OpenCIGitHubRepository(
       fullName: json['full_name'] as String,
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
@@ -16,8 +16,8 @@ _$OpenCIGitHubRepositoryImpl _$$OpenCIGitHubRepositoryImplFromJson(
       private: json['private'] as bool,
     );
 
-Map<String, dynamic> _$$OpenCIGitHubRepositoryImplToJson(
-        _$OpenCIGitHubRepositoryImpl instance) =>
+Map<String, dynamic> _$OpenCIGitHubRepositoryToJson(
+        _OpenCIGitHubRepository instance) =>
     <String, dynamic>{
       'full_name': instance.fullName,
       'id': instance.id,

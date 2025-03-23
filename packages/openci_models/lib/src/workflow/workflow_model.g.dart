@@ -6,8 +6,8 @@ part of 'workflow_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
-    _$WorkflowModelImpl(
+_WorkflowModel _$WorkflowModelFromJson(Map<String, dynamic> json) =>
+    _WorkflowModel(
       currentWorkingDirectory: json['currentWorkingDirectory'] as String,
       name: json['name'] as String,
       id: json['id'] as String,
@@ -22,7 +22,7 @@ _$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
           .toList(),
     );
 
-Map<String, dynamic> _$$WorkflowModelImplToJson(_$WorkflowModelImpl instance) =>
+Map<String, dynamic> _$WorkflowModelToJson(_WorkflowModel instance) =>
     <String, dynamic>{
       'currentWorkingDirectory': instance.currentWorkingDirectory,
       'name': instance.name,
@@ -33,29 +33,28 @@ Map<String, dynamic> _$$WorkflowModelImplToJson(_$WorkflowModelImpl instance) =>
       'steps': instance.steps.map((e) => e.toJson()).toList(),
     };
 
-_$WorkflowModelFlutterImpl _$$WorkflowModelFlutterImplFromJson(
+_WorkflowModelFlutter _$WorkflowModelFlutterFromJson(
         Map<String, dynamic> json) =>
-    _$WorkflowModelFlutterImpl(
+    _WorkflowModelFlutter(
       version:
           const FlutterVersionConverter().fromJson(json['version'] as String),
     );
 
-Map<String, dynamic> _$$WorkflowModelFlutterImplToJson(
-        _$WorkflowModelFlutterImpl instance) =>
+Map<String, dynamic> _$WorkflowModelFlutterToJson(
+        _WorkflowModelFlutter instance) =>
     <String, dynamic>{
       'version': const FlutterVersionConverter().toJson(instance.version),
     };
 
-_$WorkflowModelGitHubImpl _$$WorkflowModelGitHubImplFromJson(
-        Map<String, dynamic> json) =>
-    _$WorkflowModelGitHubImpl(
+_WorkflowModelGitHub _$WorkflowModelGitHubFromJson(Map<String, dynamic> json) =>
+    _WorkflowModelGitHub(
       repositoryUrl: json['repositoryUrl'] as String,
       triggerType: $enumDecode(_$GitHubTriggerTypeEnumMap, json['triggerType']),
       baseBranch: json['baseBranch'] as String,
     );
 
-Map<String, dynamic> _$$WorkflowModelGitHubImplToJson(
-        _$WorkflowModelGitHubImpl instance) =>
+Map<String, dynamic> _$WorkflowModelGitHubToJson(
+        _WorkflowModelGitHub instance) =>
     <String, dynamic>{
       'repositoryUrl': instance.repositoryUrl,
       'triggerType': _$GitHubTriggerTypeEnumMap[instance.triggerType]!,
@@ -67,15 +66,13 @@ const _$GitHubTriggerTypeEnumMap = {
   GitHubTriggerType.pullRequest: 'pullRequest',
 };
 
-_$WorkflowModelStepImpl _$$WorkflowModelStepImplFromJson(
-        Map<String, dynamic> json) =>
-    _$WorkflowModelStepImpl(
+_WorkflowModelStep _$WorkflowModelStepFromJson(Map<String, dynamic> json) =>
+    _WorkflowModelStep(
       name: json['name'] as String? ?? '',
       command: json['command'] as String? ?? '',
     );
 
-Map<String, dynamic> _$$WorkflowModelStepImplToJson(
-        _$WorkflowModelStepImpl instance) =>
+Map<String, dynamic> _$WorkflowModelStepToJson(_WorkflowModelStep instance) =>
     <String, dynamic>{
       'name': instance.name,
       'command': instance.command,

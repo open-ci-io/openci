@@ -5,7 +5,7 @@ part 'user.g.dart';
 part 'user.freezed.dart';
 
 @freezed
-class OpenCIUserGitHub with _$OpenCIUserGitHub {
+abstract class OpenCIUserGitHub with _$OpenCIUserGitHub {
   const factory OpenCIUserGitHub({
     int? installationId,
     String? login,

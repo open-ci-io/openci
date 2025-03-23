@@ -5,7 +5,7 @@ part 'workflow_model.freezed.dart';
 part 'workflow_model.g.dart';
 
 @Freezed(makeCollectionsUnmodifiable: false)
-class WorkflowModel with _$WorkflowModel {
+abstract class WorkflowModel with _$WorkflowModel {
   const factory WorkflowModel({
     required String currentWorkingDirectory,
     required String name,
@@ -34,7 +34,7 @@ class WorkflowModel with _$WorkflowModel {
 }
 
 @freezed
-class WorkflowModelFlutter with _$WorkflowModelFlutter {
+abstract class WorkflowModelFlutter with _$WorkflowModelFlutter {
   factory WorkflowModelFlutter({
     @FlutterVersionConverter() required FlutterVersion version,
   }) = _WorkflowModelFlutter;
@@ -44,7 +44,7 @@ class WorkflowModelFlutter with _$WorkflowModelFlutter {
 }
 
 @freezed
-class WorkflowModelGitHub with _$WorkflowModelGitHub {
+abstract class WorkflowModelGitHub with _$WorkflowModelGitHub {
   const factory WorkflowModelGitHub({
     required String repositoryUrl,
     required GitHubTriggerType triggerType,
@@ -55,7 +55,7 @@ class WorkflowModelGitHub with _$WorkflowModelGitHub {
 }
 
 @Freezed(makeCollectionsUnmodifiable: false)
-class WorkflowModelStep with _$WorkflowModelStep {
+abstract class WorkflowModelStep with _$WorkflowModelStep {
   const factory WorkflowModelStep({
     @Default('') String name,
     @Default('') String command,
