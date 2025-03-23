@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_models/openci_models.dart';
-import 'package:openci_runner/src/clone_repo.dart';
 import 'package:openci_runner/src/features/tart_vm/clone_vm.dart';
 import 'package:openci_runner/src/features/tart_vm/get_vm_ip.dart';
 import 'package:openci_runner/src/features/tart_vm/run_vm.dart';
@@ -25,8 +24,6 @@ Future<SSHClient> initializeVM(
     username: 'admin',
     onPasswordRequest: () => 'admin',
   );
-
-  await cloneRepo(buildJob, logId, client, pem);
 
   return client;
 }

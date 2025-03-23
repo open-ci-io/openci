@@ -1,4 +1,8 @@
 
+## 1.3.2
+
+- update: models
+
 ## 1.3.1
 
 - update: models

@@ -1,0 +1,4 @@
+enum GitHubTriggerType {
+  push,
+  pullRequest,
+}
