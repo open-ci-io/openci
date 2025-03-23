@@ -77,6 +77,34 @@ class WorkflowPageController extends _$WorkflowPageController {
     return repositories.map((e) => e['full_name'] as String).toList();
   }
 
+  Stream<List<String>> getGitHubRepositoriesStream() {
+    final firestore = firebaseSuite.firestore;
+    final auth = firebaseSuite.auth;
+    final uid = auth.currentUser!.uid;
+
+    return firestore.collection('users').doc(uid).snapshots().map((snapshot) {
+      if (!snapshot.exists || snapshot.data() == null) {
+        return <String>[];
+      }
+
+      final userData = snapshot.data()!;
+
+      if (!userData.containsKey('github')) {
+        return <String>[];
+      }
+
+      final github = userData['github'] as Map<String, dynamic>;
+
+      if (!github.containsKey('repositories')) {
+        return <String>[];
+      }
+
+      final repositories = github['repositories'] as List<dynamic>;
+      // ignore: avoid_dynamic_calls
+      return repositories.map((e) => e['full_name'] as String).toList();
+    });
+  }
+
   String getInstallationUrl() {
     const env = String.fromEnvironment('ENV');
     const appName = env == 'prod' ? 'openci-io' : 'openci-dev';
@@ -119,12 +147,20 @@ Future<List<String>> getGitHubRepositories(
 @Riverpod(keepAlive: true)
 class SelectedRepository extends _$SelectedRepository {
   @override
-  Future<GithubRepository> build(OpenCIFirebaseSuite firebaseSuite) async {
-    final list = await _controller.getGitHubRepositories();
-    return GithubRepository(
-      selectedRepository: list.first,
-      repositories: list,
-    );
+  Stream<GithubRepository> build(OpenCIFirebaseSuite firebaseSuite) {
+    return _controller.getGitHubRepositoriesStream().map((repoList) {
+      if (repoList.isEmpty) {
+        return const GithubRepository(
+          selectedRepository: '',
+          repositories: [],
+        );
+      }
+
+      return GithubRepository(
+        selectedRepository: repoList.first,
+        repositories: repoList,
+      );
+    });
   }
 
   WorkflowPageController get _controller =>

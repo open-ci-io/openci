@@ -30,6 +30,12 @@ class SecretPage extends ConsumerWidget {
       ),
       body: secrets.when(
         data: (data) {
+          if (data.isEmpty) {
+            return const Center(
+              child: Text('No secrets found'),
+            );
+          }
+
           return Padding(
             padding: const EdgeInsets.all(24),
             child: ListView.builder(

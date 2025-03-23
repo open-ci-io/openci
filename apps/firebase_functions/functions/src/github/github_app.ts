@@ -140,17 +140,24 @@ const appFunction = async (app: Probot) => {
 					.where("github.userId", "==", githubUserId)
 					.get();
 
-				await firestore
-					.collection(usersCollectionName)
-					.doc(userQs.docs[0].id)
-					.update({
-						github: {
-							installationId: installationId,
-							login: githubLogin,
-							userId: githubUserId,
-							repositories: repositories,
-						},
-					});
+				const userId = userQs.docs[0].id;
+				console.log("userId", userId);
+
+				try {
+					await firestore
+						.collection(usersCollectionName)
+						.doc(userId)
+						.update({
+							github: {
+								installationId: installationId,
+								login: githubLogin,
+								userId: githubUserId,
+								repositories: repositories,
+							},
+						});
+				} catch (error) {
+					console.error("Error updating user:", error);
+				}
 
 				console.log("installationId", installationId);
 				console.log("githubUserId", githubUserId);

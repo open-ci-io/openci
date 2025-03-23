@@ -4,7 +4,7 @@ part 'select_step_domain.freezed.dart';
 part 'select_step_domain.g.dart';
 
 @freezed
-class SelectStepDomain with _$SelectStepDomain {
+abstract class SelectStepDomain with _$SelectStepDomain {
   const factory SelectStepDomain({
     @Default('Base64 to File') String title,
     @Default('') String base64,

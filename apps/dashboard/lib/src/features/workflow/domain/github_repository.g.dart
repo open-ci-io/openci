@@ -6,17 +6,15 @@ part of 'github_repository.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$GithubRepositoryImpl _$$GithubRepositoryImplFromJson(
-        Map<String, dynamic> json) =>
-    _$GithubRepositoryImpl(
+_GithubRepository _$GithubRepositoryFromJson(Map<String, dynamic> json) =>
+    _GithubRepository(
       selectedRepository: json['selectedRepository'] as String,
       repositories: (json['repositories'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
     );
 
-Map<String, dynamic> _$$GithubRepositoryImplToJson(
-        _$GithubRepositoryImpl instance) =>
+Map<String, dynamic> _$GithubRepositoryToJson(_GithubRepository instance) =>
     <String, dynamic>{
       'selectedRepository': instance.selectedRepository,
       'repositories': instance.repositories,
