@@ -6,9 +6,8 @@ part of 'select_step_domain.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$SelectStepDomainImpl _$$SelectStepDomainImplFromJson(
-        Map<String, dynamic> json) =>
-    _$SelectStepDomainImpl(
+_SelectStepDomain _$SelectStepDomainFromJson(Map<String, dynamic> json) =>
+    _SelectStepDomain(
       title: json['title'] as String? ?? 'Base64 to File',
       base64: json['base64'] as String? ?? '',
       location: json['location'] as String? ?? '',
@@ -17,8 +16,7 @@ _$SelectStepDomainImpl _$$SelectStepDomainImplFromJson(
       selectedKey: json['selectedKey'] as String?,
     );
 
-Map<String, dynamic> _$$SelectStepDomainImplToJson(
-        _$SelectStepDomainImpl instance) =>
+Map<String, dynamic> _$SelectStepDomainToJson(_SelectStepDomain instance) =>
     <String, dynamic>{
       'title': instance.title,
       'base64': instance.base64,

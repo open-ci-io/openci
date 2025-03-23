@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,100 +10,59 @@ part of 'select_step_domain.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-SelectStepDomain _$SelectStepDomainFromJson(Map<String, dynamic> json) {
-  return _SelectStepDomain.fromJson(json);
-}
 
 /// @nodoc
 mixin _$SelectStepDomain {
-  String get title => throw _privateConstructorUsedError;
-  String get base64 => throw _privateConstructorUsedError;
-  String get location => throw _privateConstructorUsedError;
-  StepTemplate get template => throw _privateConstructorUsedError;
-  String? get selectedKey => throw _privateConstructorUsedError;
-
-  /// Serializes this SelectStepDomain to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get title;
+  String get base64;
+  String get location;
+  StepTemplate get template;
+  String? get selectedKey;
 
   /// Create a copy of SelectStepDomain
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $SelectStepDomainCopyWith<SelectStepDomain> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $SelectStepDomainCopyWith<$Res> {
-  factory $SelectStepDomainCopyWith(
-          SelectStepDomain value, $Res Function(SelectStepDomain) then) =
-      _$SelectStepDomainCopyWithImpl<$Res, SelectStepDomain>;
-  @useResult
-  $Res call(
-      {String title,
-      String base64,
-      String location,
-      StepTemplate template,
-      String? selectedKey});
-}
-
-/// @nodoc
-class _$SelectStepDomainCopyWithImpl<$Res, $Val extends SelectStepDomain>
-    implements $SelectStepDomainCopyWith<$Res> {
-  _$SelectStepDomainCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of SelectStepDomain
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $SelectStepDomainCopyWith<SelectStepDomain> get copyWith =>
+      _$SelectStepDomainCopyWithImpl<SelectStepDomain>(
+          this as SelectStepDomain, _$identity);
+
+  /// Serializes this SelectStepDomain to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? title = null,
-    Object? base64 = null,
-    Object? location = null,
-    Object? template = null,
-    Object? selectedKey = freezed,
-  }) {
-    return _then(_value.copyWith(
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      base64: null == base64
-          ? _value.base64
-          : base64 // ignore: cast_nullable_to_non_nullable
-              as String,
-      location: null == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as String,
-      template: null == template
-          ? _value.template
-          : template // ignore: cast_nullable_to_non_nullable
-              as StepTemplate,
-      selectedKey: freezed == selectedKey
-          ? _value.selectedKey
-          : selectedKey // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SelectStepDomain &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.base64, base64) || other.base64 == base64) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
+            (identical(other.template, template) ||
+                other.template == template) &&
+            (identical(other.selectedKey, selectedKey) ||
+                other.selectedKey == selectedKey));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, title, base64, location, template, selectedKey);
+
+  @override
+  String toString() {
+    return 'SelectStepDomain(title: $title, base64: $base64, location: $location, template: $template, selectedKey: $selectedKey)';
   }
 }
 
 /// @nodoc
-abstract class _$$SelectStepDomainImplCopyWith<$Res>
-    implements $SelectStepDomainCopyWith<$Res> {
-  factory _$$SelectStepDomainImplCopyWith(_$SelectStepDomainImpl value,
-          $Res Function(_$SelectStepDomainImpl) then) =
-      __$$SelectStepDomainImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $SelectStepDomainCopyWith<$Res> {
+  factory $SelectStepDomainCopyWith(
+          SelectStepDomain value, $Res Function(SelectStepDomain) _then) =
+      _$SelectStepDomainCopyWithImpl;
   @useResult
   $Res call(
       {String title,
@@ -113,12 +73,12 @@ abstract class _$$SelectStepDomainImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$SelectStepDomainImplCopyWithImpl<$Res>
-    extends _$SelectStepDomainCopyWithImpl<$Res, _$SelectStepDomainImpl>
-    implements _$$SelectStepDomainImplCopyWith<$Res> {
-  __$$SelectStepDomainImplCopyWithImpl(_$SelectStepDomainImpl _value,
-      $Res Function(_$SelectStepDomainImpl) _then)
-      : super(_value, _then);
+class _$SelectStepDomainCopyWithImpl<$Res>
+    implements $SelectStepDomainCopyWith<$Res> {
+  _$SelectStepDomainCopyWithImpl(this._self, this._then);
+
+  final SelectStepDomain _self;
+  final $Res Function(SelectStepDomain) _then;
 
   /// Create a copy of SelectStepDomain
   /// with the given fields replaced by the non-null parameter values.
@@ -131,25 +91,25 @@ class __$$SelectStepDomainImplCopyWithImpl<$Res>
     Object? template = null,
     Object? selectedKey = freezed,
   }) {
-    return _then(_$SelectStepDomainImpl(
+    return _then(_self.copyWith(
       title: null == title
-          ? _value.title
+          ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
       base64: null == base64
-          ? _value.base64
+          ? _self.base64
           : base64 // ignore: cast_nullable_to_non_nullable
               as String,
       location: null == location
-          ? _value.location
+          ? _self.location
           : location // ignore: cast_nullable_to_non_nullable
               as String,
       template: null == template
-          ? _value.template
+          ? _self.template
           : template // ignore: cast_nullable_to_non_nullable
               as StepTemplate,
       selectedKey: freezed == selectedKey
-          ? _value.selectedKey
+          ? _self.selectedKey
           : selectedKey // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
@@ -158,16 +118,15 @@ class __$$SelectStepDomainImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$SelectStepDomainImpl implements _SelectStepDomain {
-  const _$SelectStepDomainImpl(
+class _SelectStepDomain implements SelectStepDomain {
+  const _SelectStepDomain(
       {this.title = 'Base64 to File',
       this.base64 = '',
       this.location = '',
       this.template = StepTemplate.blank,
       this.selectedKey});
-
-  factory _$SelectStepDomainImpl.fromJson(Map<String, dynamic> json) =>
-      _$$SelectStepDomainImplFromJson(json);
+  factory _SelectStepDomain.fromJson(Map<String, dynamic> json) =>
+      _$SelectStepDomainFromJson(json);
 
   @override
   @JsonKey()
@@ -184,16 +143,26 @@ class _$SelectStepDomainImpl implements _SelectStepDomain {
   @override
   final String? selectedKey;
 
+  /// Create a copy of SelectStepDomain
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'SelectStepDomain(title: $title, base64: $base64, location: $location, template: $template, selectedKey: $selectedKey)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SelectStepDomainCopyWith<_SelectStepDomain> get copyWith =>
+      __$SelectStepDomainCopyWithImpl<_SelectStepDomain>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$SelectStepDomainToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SelectStepDomainImpl &&
+            other is _SelectStepDomain &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.base64, base64) || other.base64 == base64) &&
             (identical(other.location, location) ||
@@ -209,49 +178,70 @@ class _$SelectStepDomainImpl implements _SelectStepDomain {
   int get hashCode =>
       Object.hash(runtimeType, title, base64, location, template, selectedKey);
 
-  /// Create a copy of SelectStepDomain
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$SelectStepDomainImplCopyWith<_$SelectStepDomainImpl> get copyWith =>
-      __$$SelectStepDomainImplCopyWithImpl<_$SelectStepDomainImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$SelectStepDomainImplToJson(
-      this,
-    );
+  String toString() {
+    return 'SelectStepDomain(title: $title, base64: $base64, location: $location, template: $template, selectedKey: $selectedKey)';
   }
 }
 
-abstract class _SelectStepDomain implements SelectStepDomain {
-  const factory _SelectStepDomain(
-      {final String title,
-      final String base64,
-      final String location,
-      final StepTemplate template,
-      final String? selectedKey}) = _$SelectStepDomainImpl;
+/// @nodoc
+abstract mixin class _$SelectStepDomainCopyWith<$Res>
+    implements $SelectStepDomainCopyWith<$Res> {
+  factory _$SelectStepDomainCopyWith(
+          _SelectStepDomain value, $Res Function(_SelectStepDomain) _then) =
+      __$SelectStepDomainCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String title,
+      String base64,
+      String location,
+      StepTemplate template,
+      String? selectedKey});
+}
 
-  factory _SelectStepDomain.fromJson(Map<String, dynamic> json) =
-      _$SelectStepDomainImpl.fromJson;
+/// @nodoc
+class __$SelectStepDomainCopyWithImpl<$Res>
+    implements _$SelectStepDomainCopyWith<$Res> {
+  __$SelectStepDomainCopyWithImpl(this._self, this._then);
 
-  @override
-  String get title;
-  @override
-  String get base64;
-  @override
-  String get location;
-  @override
-  StepTemplate get template;
-  @override
-  String? get selectedKey;
+  final _SelectStepDomain _self;
+  final $Res Function(_SelectStepDomain) _then;
 
   /// Create a copy of SelectStepDomain
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SelectStepDomainImplCopyWith<_$SelectStepDomainImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? title = null,
+    Object? base64 = null,
+    Object? location = null,
+    Object? template = null,
+    Object? selectedKey = freezed,
+  }) {
+    return _then(_SelectStepDomain(
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      base64: null == base64
+          ? _self.base64
+          : base64 // ignore: cast_nullable_to_non_nullable
+              as String,
+      location: null == location
+          ? _self.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String,
+      template: null == template
+          ? _self.template
+          : template // ignore: cast_nullable_to_non_nullable
+              as StepTemplate,
+      selectedKey: freezed == selectedKey
+          ? _self.selectedKey
+          : selectedKey // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
 }
+
+// dart format on

@@ -447,7 +447,7 @@ class _GetGitHubRepositoriesProviderElement
 }
 
 String _$workflowPageControllerHash() =>
-    r'2db02e1cb4855b2a54f0b60517f862a25bad6ef6';
+    r'4d0fb383f2c86239ff6f48b23c652a25ff9e91cc';
 
 abstract class _$WorkflowPageController
     extends BuildlessAutoDisposeNotifier<void> {
@@ -596,13 +596,13 @@ class _WorkflowPageControllerProviderElement
 }
 
 String _$selectedRepositoryHash() =>
-    r'4dc54560aeef8e084af4b5b14739c0e7ab18e773';
+    r'e75e6b6135bef8f52321db75e21ee38b1bfdfd08';
 
 abstract class _$SelectedRepository
-    extends BuildlessAsyncNotifier<GithubRepository> {
+    extends BuildlessStreamNotifier<GithubRepository> {
   late final OpenCIFirebaseSuite firebaseSuite;
 
-  FutureOr<GithubRepository> build(
+  Stream<GithubRepository> build(
     OpenCIFirebaseSuite firebaseSuite,
   );
 }
@@ -651,7 +651,7 @@ class SelectedRepositoryFamily extends Family<AsyncValue<GithubRepository>> {
 
 /// See also [SelectedRepository].
 class SelectedRepositoryProvider
-    extends AsyncNotifierProviderImpl<SelectedRepository, GithubRepository> {
+    extends StreamNotifierProviderImpl<SelectedRepository, GithubRepository> {
   /// See also [SelectedRepository].
   SelectedRepositoryProvider(
     OpenCIFirebaseSuite firebaseSuite,
@@ -682,7 +682,7 @@ class SelectedRepositoryProvider
   final OpenCIFirebaseSuite firebaseSuite;
 
   @override
-  FutureOr<GithubRepository> runNotifierBuild(
+  Stream<GithubRepository> runNotifierBuild(
     covariant SelectedRepository notifier,
   ) {
     return notifier.build(
@@ -707,7 +707,7 @@ class SelectedRepositoryProvider
   }
 
   @override
-  AsyncNotifierProviderElement<SelectedRepository, GithubRepository>
+  StreamNotifierProviderElement<SelectedRepository, GithubRepository>
       createElement() {
     return _SelectedRepositoryProviderElement(this);
   }
@@ -729,13 +729,13 @@ class SelectedRepositoryProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SelectedRepositoryRef on AsyncNotifierProviderRef<GithubRepository> {
+mixin SelectedRepositoryRef on StreamNotifierProviderRef<GithubRepository> {
   /// The parameter `firebaseSuite` of this provider.
   OpenCIFirebaseSuite get firebaseSuite;
 }
 
 class _SelectedRepositoryProviderElement
-    extends AsyncNotifierProviderElement<SelectedRepository, GithubRepository>
+    extends StreamNotifierProviderElement<SelectedRepository, GithubRepository>
     with SelectedRepositoryRef {
   _SelectedRepositoryProviderElement(super.provider);
 

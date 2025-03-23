@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,88 +10,63 @@ part of 'github_repository.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-GithubRepository _$GithubRepositoryFromJson(Map<String, dynamic> json) {
-  return _GithubRepository.fromJson(json);
-}
 
 /// @nodoc
 mixin _$GithubRepository {
-  String get selectedRepository => throw _privateConstructorUsedError;
-  List<String> get repositories => throw _privateConstructorUsedError;
-
-  /// Serializes this GithubRepository to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get selectedRepository;
+  List<String> get repositories;
 
   /// Create a copy of GithubRepository
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $GithubRepositoryCopyWith<GithubRepository> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $GithubRepositoryCopyWith<$Res> {
-  factory $GithubRepositoryCopyWith(
-          GithubRepository value, $Res Function(GithubRepository) then) =
-      _$GithubRepositoryCopyWithImpl<$Res, GithubRepository>;
-  @useResult
-  $Res call({String selectedRepository, List<String> repositories});
-}
-
-/// @nodoc
-class _$GithubRepositoryCopyWithImpl<$Res, $Val extends GithubRepository>
-    implements $GithubRepositoryCopyWith<$Res> {
-  _$GithubRepositoryCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of GithubRepository
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $GithubRepositoryCopyWith<GithubRepository> get copyWith =>
+      _$GithubRepositoryCopyWithImpl<GithubRepository>(
+          this as GithubRepository, _$identity);
+
+  /// Serializes this GithubRepository to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? selectedRepository = null,
-    Object? repositories = null,
-  }) {
-    return _then(_value.copyWith(
-      selectedRepository: null == selectedRepository
-          ? _value.selectedRepository
-          : selectedRepository // ignore: cast_nullable_to_non_nullable
-              as String,
-      repositories: null == repositories
-          ? _value.repositories
-          : repositories // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is GithubRepository &&
+            (identical(other.selectedRepository, selectedRepository) ||
+                other.selectedRepository == selectedRepository) &&
+            const DeepCollectionEquality()
+                .equals(other.repositories, repositories));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, selectedRepository,
+      const DeepCollectionEquality().hash(repositories));
+
+  @override
+  String toString() {
+    return 'GithubRepository(selectedRepository: $selectedRepository, repositories: $repositories)';
   }
 }
 
 /// @nodoc
-abstract class _$$GithubRepositoryImplCopyWith<$Res>
-    implements $GithubRepositoryCopyWith<$Res> {
-  factory _$$GithubRepositoryImplCopyWith(_$GithubRepositoryImpl value,
-          $Res Function(_$GithubRepositoryImpl) then) =
-      __$$GithubRepositoryImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $GithubRepositoryCopyWith<$Res> {
+  factory $GithubRepositoryCopyWith(
+          GithubRepository value, $Res Function(GithubRepository) _then) =
+      _$GithubRepositoryCopyWithImpl;
   @useResult
   $Res call({String selectedRepository, List<String> repositories});
 }
 
 /// @nodoc
-class __$$GithubRepositoryImplCopyWithImpl<$Res>
-    extends _$GithubRepositoryCopyWithImpl<$Res, _$GithubRepositoryImpl>
-    implements _$$GithubRepositoryImplCopyWith<$Res> {
-  __$$GithubRepositoryImplCopyWithImpl(_$GithubRepositoryImpl _value,
-      $Res Function(_$GithubRepositoryImpl) _then)
-      : super(_value, _then);
+class _$GithubRepositoryCopyWithImpl<$Res>
+    implements $GithubRepositoryCopyWith<$Res> {
+  _$GithubRepositoryCopyWithImpl(this._self, this._then);
+
+  final GithubRepository _self;
+  final $Res Function(GithubRepository) _then;
 
   /// Create a copy of GithubRepository
   /// with the given fields replaced by the non-null parameter values.
@@ -100,13 +76,13 @@ class __$$GithubRepositoryImplCopyWithImpl<$Res>
     Object? selectedRepository = null,
     Object? repositories = null,
   }) {
-    return _then(_$GithubRepositoryImpl(
+    return _then(_self.copyWith(
       selectedRepository: null == selectedRepository
-          ? _value.selectedRepository
+          ? _self.selectedRepository
           : selectedRepository // ignore: cast_nullable_to_non_nullable
               as String,
       repositories: null == repositories
-          ? _value._repositories
+          ? _self.repositories
           : repositories // ignore: cast_nullable_to_non_nullable
               as List<String>,
     ));
@@ -115,14 +91,13 @@ class __$$GithubRepositoryImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$GithubRepositoryImpl implements _GithubRepository {
-  const _$GithubRepositoryImpl(
+class _GithubRepository implements GithubRepository {
+  const _GithubRepository(
       {required this.selectedRepository,
       required final List<String> repositories})
       : _repositories = repositories;
-
-  factory _$GithubRepositoryImpl.fromJson(Map<String, dynamic> json) =>
-      _$$GithubRepositoryImplFromJson(json);
+  factory _GithubRepository.fromJson(Map<String, dynamic> json) =>
+      _$GithubRepositoryFromJson(json);
 
   @override
   final String selectedRepository;
@@ -134,16 +109,26 @@ class _$GithubRepositoryImpl implements _GithubRepository {
     return EqualUnmodifiableListView(_repositories);
   }
 
+  /// Create a copy of GithubRepository
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'GithubRepository(selectedRepository: $selectedRepository, repositories: $repositories)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$GithubRepositoryCopyWith<_GithubRepository> get copyWith =>
+      __$GithubRepositoryCopyWithImpl<_GithubRepository>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$GithubRepositoryToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$GithubRepositoryImpl &&
+            other is _GithubRepository &&
             (identical(other.selectedRepository, selectedRepository) ||
                 other.selectedRepository == selectedRepository) &&
             const DeepCollectionEquality()
@@ -155,40 +140,50 @@ class _$GithubRepositoryImpl implements _GithubRepository {
   int get hashCode => Object.hash(runtimeType, selectedRepository,
       const DeepCollectionEquality().hash(_repositories));
 
-  /// Create a copy of GithubRepository
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$GithubRepositoryImplCopyWith<_$GithubRepositoryImpl> get copyWith =>
-      __$$GithubRepositoryImplCopyWithImpl<_$GithubRepositoryImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$GithubRepositoryImplToJson(
-      this,
-    );
+  String toString() {
+    return 'GithubRepository(selectedRepository: $selectedRepository, repositories: $repositories)';
   }
 }
 
-abstract class _GithubRepository implements GithubRepository {
-  const factory _GithubRepository(
-      {required final String selectedRepository,
-      required final List<String> repositories}) = _$GithubRepositoryImpl;
-
-  factory _GithubRepository.fromJson(Map<String, dynamic> json) =
-      _$GithubRepositoryImpl.fromJson;
-
+/// @nodoc
+abstract mixin class _$GithubRepositoryCopyWith<$Res>
+    implements $GithubRepositoryCopyWith<$Res> {
+  factory _$GithubRepositoryCopyWith(
+          _GithubRepository value, $Res Function(_GithubRepository) _then) =
+      __$GithubRepositoryCopyWithImpl;
   @override
-  String get selectedRepository;
-  @override
-  List<String> get repositories;
+  @useResult
+  $Res call({String selectedRepository, List<String> repositories});
+}
+
+/// @nodoc
+class __$GithubRepositoryCopyWithImpl<$Res>
+    implements _$GithubRepositoryCopyWith<$Res> {
+  __$GithubRepositoryCopyWithImpl(this._self, this._then);
+
+  final _GithubRepository _self;
+  final $Res Function(_GithubRepository) _then;
 
   /// Create a copy of GithubRepository
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$GithubRepositoryImplCopyWith<_$GithubRepositoryImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? selectedRepository = null,
+    Object? repositories = null,
+  }) {
+    return _then(_GithubRepository(
+      selectedRepository: null == selectedRepository
+          ? _self.selectedRepository
+          : selectedRepository // ignore: cast_nullable_to_non_nullable
+              as String,
+      repositories: null == repositories
+          ? _self._repositories
+          : repositories // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
 }
+
+// dart format on
