@@ -4,7 +4,7 @@ part 'repository.freezed.dart';
 part 'repository.g.dart';
 
 @freezed
-class OpenCIGitHubRepository with _$OpenCIGitHubRepository {
+abstract class OpenCIGitHubRepository with _$OpenCIGitHubRepository {
   const factory OpenCIGitHubRepository({
     @JsonKey(name: 'full_name') required String fullName,
     required int id,

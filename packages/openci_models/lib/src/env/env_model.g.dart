@@ -6,8 +6,7 @@ part of 'env_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$EnvModelImpl _$$EnvModelImplFromJson(Map<String, dynamic> json) =>
-    _$EnvModelImpl(
+_EnvModel _$EnvModelFromJson(Map<String, dynamic> json) => _EnvModel(
       firebaseServiceAccountBase64:
           json['firebaseServiceAccountBase64'] as String,
       firebaseProjectName: json['firebaseProjectName'] as String,
@@ -15,8 +14,7 @@ _$EnvModelImpl _$$EnvModelImplFromJson(Map<String, dynamic> json) =>
       githubAppId: json['githubAppId'] as String,
     );
 
-Map<String, dynamic> _$$EnvModelImplToJson(_$EnvModelImpl instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$EnvModelToJson(_EnvModel instance) => <String, dynamic>{
       'firebaseServiceAccountBase64': instance.firebaseServiceAccountBase64,
       'firebaseProjectName': instance.firebaseProjectName,
       'pemBase64': instance.pemBase64,

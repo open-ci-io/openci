@@ -5,7 +5,7 @@ part 'env_model.freezed.dart';
 part 'env_model.g.dart';
 
 @freezed
-class EnvModel with _$EnvModel {
+abstract class EnvModel with _$EnvModel {
   const factory EnvModel({
     required String firebaseServiceAccountBase64,
     required String firebaseProjectName,

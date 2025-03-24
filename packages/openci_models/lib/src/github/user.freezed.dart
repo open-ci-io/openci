@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,94 +10,56 @@ part of 'user.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-OpenCIUserGitHub _$OpenCIUserGitHubFromJson(Map<String, dynamic> json) {
-  return _OpenCIUserGitHub.fromJson(json);
-}
 
 /// @nodoc
 mixin _$OpenCIUserGitHub {
-  int? get installationId => throw _privateConstructorUsedError;
-  String? get login => throw _privateConstructorUsedError;
-  List<OpenCIGitHubRepository>? get repositories =>
-      throw _privateConstructorUsedError;
-  int? get userId => throw _privateConstructorUsedError;
-
-  /// Serializes this OpenCIUserGitHub to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  int? get installationId;
+  String? get login;
+  List<OpenCIGitHubRepository>? get repositories;
+  int? get userId;
 
   /// Create a copy of OpenCIUserGitHub
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $OpenCIUserGitHubCopyWith<OpenCIUserGitHub> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $OpenCIUserGitHubCopyWith<$Res> {
-  factory $OpenCIUserGitHubCopyWith(
-          OpenCIUserGitHub value, $Res Function(OpenCIUserGitHub) then) =
-      _$OpenCIUserGitHubCopyWithImpl<$Res, OpenCIUserGitHub>;
-  @useResult
-  $Res call(
-      {int? installationId,
-      String? login,
-      List<OpenCIGitHubRepository>? repositories,
-      int? userId});
-}
-
-/// @nodoc
-class _$OpenCIUserGitHubCopyWithImpl<$Res, $Val extends OpenCIUserGitHub>
-    implements $OpenCIUserGitHubCopyWith<$Res> {
-  _$OpenCIUserGitHubCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of OpenCIUserGitHub
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $OpenCIUserGitHubCopyWith<OpenCIUserGitHub> get copyWith =>
+      _$OpenCIUserGitHubCopyWithImpl<OpenCIUserGitHub>(
+          this as OpenCIUserGitHub, _$identity);
+
+  /// Serializes this OpenCIUserGitHub to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? installationId = freezed,
-    Object? login = freezed,
-    Object? repositories = freezed,
-    Object? userId = freezed,
-  }) {
-    return _then(_value.copyWith(
-      installationId: freezed == installationId
-          ? _value.installationId
-          : installationId // ignore: cast_nullable_to_non_nullable
-              as int?,
-      login: freezed == login
-          ? _value.login
-          : login // ignore: cast_nullable_to_non_nullable
-              as String?,
-      repositories: freezed == repositories
-          ? _value.repositories
-          : repositories // ignore: cast_nullable_to_non_nullable
-              as List<OpenCIGitHubRepository>?,
-      userId: freezed == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as int?,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is OpenCIUserGitHub &&
+            (identical(other.installationId, installationId) ||
+                other.installationId == installationId) &&
+            (identical(other.login, login) || other.login == login) &&
+            const DeepCollectionEquality()
+                .equals(other.repositories, repositories) &&
+            (identical(other.userId, userId) || other.userId == userId));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, installationId, login,
+      const DeepCollectionEquality().hash(repositories), userId);
+
+  @override
+  String toString() {
+    return 'OpenCIUserGitHub(installationId: $installationId, login: $login, repositories: $repositories, userId: $userId)';
   }
 }
 
 /// @nodoc
-abstract class _$$OpenCIUserGitHubImplCopyWith<$Res>
-    implements $OpenCIUserGitHubCopyWith<$Res> {
-  factory _$$OpenCIUserGitHubImplCopyWith(_$OpenCIUserGitHubImpl value,
-          $Res Function(_$OpenCIUserGitHubImpl) then) =
-      __$$OpenCIUserGitHubImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $OpenCIUserGitHubCopyWith<$Res> {
+  factory $OpenCIUserGitHubCopyWith(
+          OpenCIUserGitHub value, $Res Function(OpenCIUserGitHub) _then) =
+      _$OpenCIUserGitHubCopyWithImpl;
   @useResult
   $Res call(
       {int? installationId,
@@ -106,12 +69,12 @@ abstract class _$$OpenCIUserGitHubImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$OpenCIUserGitHubImplCopyWithImpl<$Res>
-    extends _$OpenCIUserGitHubCopyWithImpl<$Res, _$OpenCIUserGitHubImpl>
-    implements _$$OpenCIUserGitHubImplCopyWith<$Res> {
-  __$$OpenCIUserGitHubImplCopyWithImpl(_$OpenCIUserGitHubImpl _value,
-      $Res Function(_$OpenCIUserGitHubImpl) _then)
-      : super(_value, _then);
+class _$OpenCIUserGitHubCopyWithImpl<$Res>
+    implements $OpenCIUserGitHubCopyWith<$Res> {
+  _$OpenCIUserGitHubCopyWithImpl(this._self, this._then);
+
+  final OpenCIUserGitHub _self;
+  final $Res Function(OpenCIUserGitHub) _then;
 
   /// Create a copy of OpenCIUserGitHub
   /// with the given fields replaced by the non-null parameter values.
@@ -123,21 +86,21 @@ class __$$OpenCIUserGitHubImplCopyWithImpl<$Res>
     Object? repositories = freezed,
     Object? userId = freezed,
   }) {
-    return _then(_$OpenCIUserGitHubImpl(
+    return _then(_self.copyWith(
       installationId: freezed == installationId
-          ? _value.installationId
+          ? _self.installationId
           : installationId // ignore: cast_nullable_to_non_nullable
               as int?,
       login: freezed == login
-          ? _value.login
+          ? _self.login
           : login // ignore: cast_nullable_to_non_nullable
               as String?,
       repositories: freezed == repositories
-          ? _value._repositories
+          ? _self.repositories
           : repositories // ignore: cast_nullable_to_non_nullable
               as List<OpenCIGitHubRepository>?,
       userId: freezed == userId
-          ? _value.userId
+          ? _self.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as int?,
     ));
@@ -146,16 +109,15 @@ class __$$OpenCIUserGitHubImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$OpenCIUserGitHubImpl implements _OpenCIUserGitHub {
-  const _$OpenCIUserGitHubImpl(
+class _OpenCIUserGitHub implements OpenCIUserGitHub {
+  const _OpenCIUserGitHub(
       {this.installationId,
       this.login,
       final List<OpenCIGitHubRepository>? repositories,
       this.userId})
       : _repositories = repositories;
-
-  factory _$OpenCIUserGitHubImpl.fromJson(Map<String, dynamic> json) =>
-      _$$OpenCIUserGitHubImplFromJson(json);
+  factory _OpenCIUserGitHub.fromJson(Map<String, dynamic> json) =>
+      _$OpenCIUserGitHubFromJson(json);
 
   @override
   final int? installationId;
@@ -174,16 +136,26 @@ class _$OpenCIUserGitHubImpl implements _OpenCIUserGitHub {
   @override
   final int? userId;
 
+  /// Create a copy of OpenCIUserGitHub
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'OpenCIUserGitHub(installationId: $installationId, login: $login, repositories: $repositories, userId: $userId)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$OpenCIUserGitHubCopyWith<_OpenCIUserGitHub> get copyWith =>
+      __$OpenCIUserGitHubCopyWithImpl<_OpenCIUserGitHub>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$OpenCIUserGitHubToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$OpenCIUserGitHubImpl &&
+            other is _OpenCIUserGitHub &&
             (identical(other.installationId, installationId) ||
                 other.installationId == installationId) &&
             (identical(other.login, login) || other.login == login) &&
@@ -197,46 +169,64 @@ class _$OpenCIUserGitHubImpl implements _OpenCIUserGitHub {
   int get hashCode => Object.hash(runtimeType, installationId, login,
       const DeepCollectionEquality().hash(_repositories), userId);
 
-  /// Create a copy of OpenCIUserGitHub
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$OpenCIUserGitHubImplCopyWith<_$OpenCIUserGitHubImpl> get copyWith =>
-      __$$OpenCIUserGitHubImplCopyWithImpl<_$OpenCIUserGitHubImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$OpenCIUserGitHubImplToJson(
-      this,
-    );
+  String toString() {
+    return 'OpenCIUserGitHub(installationId: $installationId, login: $login, repositories: $repositories, userId: $userId)';
   }
 }
 
-abstract class _OpenCIUserGitHub implements OpenCIUserGitHub {
-  const factory _OpenCIUserGitHub(
-      {final int? installationId,
-      final String? login,
-      final List<OpenCIGitHubRepository>? repositories,
-      final int? userId}) = _$OpenCIUserGitHubImpl;
+/// @nodoc
+abstract mixin class _$OpenCIUserGitHubCopyWith<$Res>
+    implements $OpenCIUserGitHubCopyWith<$Res> {
+  factory _$OpenCIUserGitHubCopyWith(
+          _OpenCIUserGitHub value, $Res Function(_OpenCIUserGitHub) _then) =
+      __$OpenCIUserGitHubCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {int? installationId,
+      String? login,
+      List<OpenCIGitHubRepository>? repositories,
+      int? userId});
+}
 
-  factory _OpenCIUserGitHub.fromJson(Map<String, dynamic> json) =
-      _$OpenCIUserGitHubImpl.fromJson;
+/// @nodoc
+class __$OpenCIUserGitHubCopyWithImpl<$Res>
+    implements _$OpenCIUserGitHubCopyWith<$Res> {
+  __$OpenCIUserGitHubCopyWithImpl(this._self, this._then);
 
-  @override
-  int? get installationId;
-  @override
-  String? get login;
-  @override
-  List<OpenCIGitHubRepository>? get repositories;
-  @override
-  int? get userId;
+  final _OpenCIUserGitHub _self;
+  final $Res Function(_OpenCIUserGitHub) _then;
 
   /// Create a copy of OpenCIUserGitHub
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$OpenCIUserGitHubImplCopyWith<_$OpenCIUserGitHubImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? installationId = freezed,
+    Object? login = freezed,
+    Object? repositories = freezed,
+    Object? userId = freezed,
+  }) {
+    return _then(_OpenCIUserGitHub(
+      installationId: freezed == installationId
+          ? _self.installationId
+          : installationId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      login: freezed == login
+          ? _self.login
+          : login // ignore: cast_nullable_to_non_nullable
+              as String?,
+      repositories: freezed == repositories
+          ? _self._repositories
+          : repositories // ignore: cast_nullable_to_non_nullable
+              as List<OpenCIGitHubRepository>?,
+      userId: freezed == userId
+          ? _self.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ));
+  }
 }
+
+// dart format on

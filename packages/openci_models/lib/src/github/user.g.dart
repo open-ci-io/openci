@@ -6,9 +6,8 @@ part of 'user.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$OpenCIUserGitHubImpl _$$OpenCIUserGitHubImplFromJson(
-        Map<String, dynamic> json) =>
-    _$OpenCIUserGitHubImpl(
+_OpenCIUserGitHub _$OpenCIUserGitHubFromJson(Map<String, dynamic> json) =>
+    _OpenCIUserGitHub(
       installationId: (json['installationId'] as num?)?.toInt(),
       login: json['login'] as String?,
       repositories: (json['repositories'] as List<dynamic>?)
@@ -18,8 +17,7 @@ _$OpenCIUserGitHubImpl _$$OpenCIUserGitHubImplFromJson(
       userId: (json['userId'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$$OpenCIUserGitHubImplToJson(
-        _$OpenCIUserGitHubImpl instance) =>
+Map<String, dynamic> _$OpenCIUserGitHubToJson(_OpenCIUserGitHub instance) =>
     <String, dynamic>{
       'installationId': instance.installationId,
       'login': instance.login,
