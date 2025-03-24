@@ -18,15 +18,21 @@ abstract class WorkflowModel with _$WorkflowModel {
   factory WorkflowModel.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelFromJson(json);
 
-  factory WorkflowModel.empty(String docId, String uid) => WorkflowModel(
+  factory WorkflowModel.empty(
+    String docId,
+    String uid,
+    String repoFullName,
+    String? baseBranch,
+  ) =>
+      WorkflowModel(
         currentWorkingDirectory: '',
         name: 'New Workflow',
         id: docId,
         flutter: WorkflowModelFlutter(version: FlutterVersion.getDefault()),
         github: WorkflowModelGitHub(
-          repositoryUrl: 'example/repo',
+          repositoryFullName: repoFullName,
           triggerType: GitHubTriggerType.push,
-          baseBranch: 'main',
+          baseBranch: baseBranch ?? 'main',
         ),
         owners: [uid],
         steps: [],
@@ -46,7 +52,7 @@ abstract class WorkflowModelFlutter with _$WorkflowModelFlutter {
 @freezed
 abstract class WorkflowModelGitHub with _$WorkflowModelGitHub {
   const factory WorkflowModelGitHub({
-    required String repositoryUrl,
+    required String repositoryFullName,
     required GitHubTriggerType triggerType,
     required String baseBranch,
   }) = _WorkflowModelGitHub;

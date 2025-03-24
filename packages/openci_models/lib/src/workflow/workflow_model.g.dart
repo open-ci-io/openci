@@ -48,7 +48,7 @@ Map<String, dynamic> _$WorkflowModelFlutterToJson(
 
 _WorkflowModelGitHub _$WorkflowModelGitHubFromJson(Map<String, dynamic> json) =>
     _WorkflowModelGitHub(
-      repositoryUrl: json['repositoryUrl'] as String,
+      repositoryFullName: json['repositoryFullName'] as String,
       triggerType: $enumDecode(_$GitHubTriggerTypeEnumMap, json['triggerType']),
       baseBranch: json['baseBranch'] as String,
     );
@@ -56,7 +56,7 @@ _WorkflowModelGitHub _$WorkflowModelGitHubFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$WorkflowModelGitHubToJson(
         _WorkflowModelGitHub instance) =>
     <String, dynamic>{
-      'repositoryUrl': instance.repositoryUrl,
+      'repositoryFullName': instance.repositoryFullName,
       'triggerType': _$GitHubTriggerTypeEnumMap[instance.triggerType]!,
       'baseBranch': instance.baseBranch,
     };

@@ -147,7 +147,7 @@ Future<WorkflowModel> createWorkflow(
     version: FlutterVersion.getDefault(),
   );
   final github = WorkflowModelGitHub(
-    repositoryUrl: selectedRepository,
+    repositoryFullName: selectedRepository,
     triggerType: state.flutterBuildIpaData.triggerType,
     baseBranch: state.flutterBuildIpaData.baseBranch,
   );

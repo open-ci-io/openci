@@ -32,7 +32,7 @@ WoltModalSheetPage selectWorkflowTemplate(
           Navigator.pop(modalSheetContext);
           final workflowModel = await ref
               .read(workflowPageControllerProvider(firebaseSuite).notifier)
-              .addWorkflow();
+              .addWorkflow(selectedRepository);
           await Navigator.push(
             modalSheetContext,
             MaterialPageRoute<void>(

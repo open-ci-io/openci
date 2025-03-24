@@ -447,7 +447,7 @@ class _GetGitHubRepositoriesProviderElement
 }
 
 String _$workflowPageControllerHash() =>
-    r'4d0fb383f2c86239ff6f48b23c652a25ff9e91cc';
+    r'57f88aeb84860f4e6f505ca267ce816ed9906e58';
 
 abstract class _$WorkflowPageController
     extends BuildlessAutoDisposeNotifier<void> {

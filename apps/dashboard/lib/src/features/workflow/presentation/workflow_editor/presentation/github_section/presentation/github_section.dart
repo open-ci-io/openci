@@ -41,7 +41,7 @@ class GitHubSection extends HookConsumerWidget {
               padding: const EdgeInsets.only(left: 16, top: 16),
               child: TextFormField(
                 focusNode: repoUrlFocusNode,
-                initialValue: workflowModel.github.repositoryUrl,
+                initialValue: workflowModel.github.repositoryFullName,
                 decoration: InputDecoration(
                   labelText: 'Repository URL',
                   labelStyle: labelStyle(hasFocus: repoUrlFocusNode.hasFocus),
@@ -52,7 +52,7 @@ class GitHubSection extends HookConsumerWidget {
                   }
                   return null;
                 },
-                onChanged: controller.updateGitHubRepoUrl,
+                onChanged: controller.updateGitHubRepoFullName,
               ),
             ),
             verticalMargin16,

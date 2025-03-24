@@ -20,7 +20,7 @@ class WorkflowPageController extends _$WorkflowPageController {
     return firestore
         .collection(workflowsCollectionPath)
         .where('owners', arrayContains: uid)
-        .where('github.repositoryUrl', isEqualTo: repository)
+        .where('github.repositoryFullName', isEqualTo: repository)
         .snapshots()
         .map(
           (snapshot) => snapshot.docs
@@ -40,10 +40,10 @@ class WorkflowPageController extends _$WorkflowPageController {
         .map((snapshot) => snapshot.data()?['github'] != null);
   }
 
-  Future<WorkflowModel> addWorkflow() async {
+  Future<WorkflowModel> addWorkflow(String repoFullName) async {
     final ref = firebaseSuite.firestore.collection('workflows').doc();
     final uid = firebaseSuite.auth.currentUser!.uid;
-    final workflow = WorkflowModel.empty(ref.id, uid);
+    final workflow = WorkflowModel.empty(ref.id, uid, repoFullName, null);
     await ref.set(workflow.toJson());
     return workflow;
   }
