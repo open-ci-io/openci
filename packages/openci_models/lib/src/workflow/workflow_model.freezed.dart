@@ -485,7 +485,7 @@ class __$WorkflowModelFlutterCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$WorkflowModelGitHub {
-  String get repositoryUrl;
+  String get repositoryFullName;
   GitHubTriggerType get triggerType;
   String get baseBranch;
 
@@ -505,8 +505,8 @@ mixin _$WorkflowModelGitHub {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is WorkflowModelGitHub &&
-            (identical(other.repositoryUrl, repositoryUrl) ||
-                other.repositoryUrl == repositoryUrl) &&
+            (identical(other.repositoryFullName, repositoryFullName) ||
+                other.repositoryFullName == repositoryFullName) &&
             (identical(other.triggerType, triggerType) ||
                 other.triggerType == triggerType) &&
             (identical(other.baseBranch, baseBranch) ||
@@ -516,11 +516,11 @@ mixin _$WorkflowModelGitHub {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, repositoryUrl, triggerType, baseBranch);
+      Object.hash(runtimeType, repositoryFullName, triggerType, baseBranch);
 
   @override
   String toString() {
-    return 'WorkflowModelGitHub(repositoryUrl: $repositoryUrl, triggerType: $triggerType, baseBranch: $baseBranch)';
+    return 'WorkflowModelGitHub(repositoryFullName: $repositoryFullName, triggerType: $triggerType, baseBranch: $baseBranch)';
   }
 }
 
@@ -531,7 +531,9 @@ abstract mixin class $WorkflowModelGitHubCopyWith<$Res> {
       _$WorkflowModelGitHubCopyWithImpl;
   @useResult
   $Res call(
-      {String repositoryUrl, GitHubTriggerType triggerType, String baseBranch});
+      {String repositoryFullName,
+      GitHubTriggerType triggerType,
+      String baseBranch});
 }
 
 /// @nodoc
@@ -547,14 +549,14 @@ class _$WorkflowModelGitHubCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? repositoryUrl = null,
+    Object? repositoryFullName = null,
     Object? triggerType = null,
     Object? baseBranch = null,
   }) {
     return _then(_self.copyWith(
-      repositoryUrl: null == repositoryUrl
-          ? _self.repositoryUrl
-          : repositoryUrl // ignore: cast_nullable_to_non_nullable
+      repositoryFullName: null == repositoryFullName
+          ? _self.repositoryFullName
+          : repositoryFullName // ignore: cast_nullable_to_non_nullable
               as String,
       triggerType: null == triggerType
           ? _self.triggerType
@@ -572,14 +574,14 @@ class _$WorkflowModelGitHubCopyWithImpl<$Res>
 @JsonSerializable()
 class _WorkflowModelGitHub implements WorkflowModelGitHub {
   const _WorkflowModelGitHub(
-      {required this.repositoryUrl,
+      {required this.repositoryFullName,
       required this.triggerType,
       required this.baseBranch});
   factory _WorkflowModelGitHub.fromJson(Map<String, dynamic> json) =>
       _$WorkflowModelGitHubFromJson(json);
 
   @override
-  final String repositoryUrl;
+  final String repositoryFullName;
   @override
   final GitHubTriggerType triggerType;
   @override
@@ -606,8 +608,8 @@ class _WorkflowModelGitHub implements WorkflowModelGitHub {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _WorkflowModelGitHub &&
-            (identical(other.repositoryUrl, repositoryUrl) ||
-                other.repositoryUrl == repositoryUrl) &&
+            (identical(other.repositoryFullName, repositoryFullName) ||
+                other.repositoryFullName == repositoryFullName) &&
             (identical(other.triggerType, triggerType) ||
                 other.triggerType == triggerType) &&
             (identical(other.baseBranch, baseBranch) ||
@@ -617,11 +619,11 @@ class _WorkflowModelGitHub implements WorkflowModelGitHub {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, repositoryUrl, triggerType, baseBranch);
+      Object.hash(runtimeType, repositoryFullName, triggerType, baseBranch);
 
   @override
   String toString() {
-    return 'WorkflowModelGitHub(repositoryUrl: $repositoryUrl, triggerType: $triggerType, baseBranch: $baseBranch)';
+    return 'WorkflowModelGitHub(repositoryFullName: $repositoryFullName, triggerType: $triggerType, baseBranch: $baseBranch)';
   }
 }
 
@@ -634,7 +636,9 @@ abstract mixin class _$WorkflowModelGitHubCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String repositoryUrl, GitHubTriggerType triggerType, String baseBranch});
+      {String repositoryFullName,
+      GitHubTriggerType triggerType,
+      String baseBranch});
 }
 
 /// @nodoc
@@ -650,14 +654,14 @@ class __$WorkflowModelGitHubCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? repositoryUrl = null,
+    Object? repositoryFullName = null,
     Object? triggerType = null,
     Object? baseBranch = null,
   }) {
     return _then(_WorkflowModelGitHub(
-      repositoryUrl: null == repositoryUrl
-          ? _self.repositoryUrl
-          : repositoryUrl // ignore: cast_nullable_to_non_nullable
+      repositoryFullName: null == repositoryFullName
+          ? _self.repositoryFullName
+          : repositoryFullName // ignore: cast_nullable_to_non_nullable
               as String,
       triggerType: null == triggerType
           ? _self.triggerType
