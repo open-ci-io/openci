@@ -13,7 +13,7 @@ enum LoadinState {
 }
 
 @freezed
-class CreateWorkflowDomain with _$CreateWorkflowDomain {
+abstract class CreateWorkflowDomain with _$CreateWorkflowDomain {
   const factory CreateWorkflowDomain({
     @Default(OpenCIWorkflowTemplate.ipa) OpenCIWorkflowTemplate template,
     @Default(null) bool? isASCKeyUploaded,
@@ -29,7 +29,7 @@ class CreateWorkflowDomain with _$CreateWorkflowDomain {
 }
 
 @freezed
-class AppStoreConnectKey with _$AppStoreConnectKey {
+abstract class AppStoreConnectKey with _$AppStoreConnectKey {
   const factory AppStoreConnectKey({
     @Default(null) String? issuerId,
     @Default(null) String? keyId,
@@ -40,7 +40,7 @@ class AppStoreConnectKey with _$AppStoreConnectKey {
 }
 
 @freezed
-class FlutterBuildIpaData with _$FlutterBuildIpaData {
+abstract class FlutterBuildIpaData with _$FlutterBuildIpaData {
   const factory FlutterBuildIpaData({
     @Default('Release iOS build') String workflowName,
     @Default('flutter build ipa') String flutterBuildCommand,

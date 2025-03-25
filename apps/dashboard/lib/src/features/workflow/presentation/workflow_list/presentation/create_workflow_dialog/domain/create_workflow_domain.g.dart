@@ -6,9 +6,9 @@ part of 'create_workflow_domain.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$CreateWorkflowDomainImpl _$$CreateWorkflowDomainImplFromJson(
+_CreateWorkflowDomain _$CreateWorkflowDomainFromJson(
         Map<String, dynamic> json) =>
-    _$CreateWorkflowDomainImpl(
+    _CreateWorkflowDomain(
       template: $enumDecodeNullable(
               _$OpenCIWorkflowTemplateEnumMap, json['template']) ??
           OpenCIWorkflowTemplate.ipa,
@@ -28,8 +28,8 @@ _$CreateWorkflowDomainImpl _$$CreateWorkflowDomainImplFromJson(
       selectedRepository: json['selectedRepository'] as String,
     );
 
-Map<String, dynamic> _$$CreateWorkflowDomainImplToJson(
-        _$CreateWorkflowDomainImpl instance) =>
+Map<String, dynamic> _$CreateWorkflowDomainToJson(
+        _CreateWorkflowDomain instance) =>
     <String, dynamic>{
       'template': _$OpenCIWorkflowTemplateEnumMap[instance.template]!,
       'isASCKeyUploaded': instance.isASCKeyUploaded,
@@ -53,25 +53,22 @@ const _$OpenCIAppDistributionTargetEnumMap = {
   OpenCIAppDistributionTarget.testflight: 'testflight',
 };
 
-_$AppStoreConnectKeyImpl _$$AppStoreConnectKeyImplFromJson(
-        Map<String, dynamic> json) =>
-    _$AppStoreConnectKeyImpl(
+_AppStoreConnectKey _$AppStoreConnectKeyFromJson(Map<String, dynamic> json) =>
+    _AppStoreConnectKey(
       issuerId: json['issuerId'] as String? ?? null,
       keyId: json['keyId'] as String? ?? null,
       keyFileBase64: json['keyFileBase64'] as String? ?? null,
     );
 
-Map<String, dynamic> _$$AppStoreConnectKeyImplToJson(
-        _$AppStoreConnectKeyImpl instance) =>
+Map<String, dynamic> _$AppStoreConnectKeyToJson(_AppStoreConnectKey instance) =>
     <String, dynamic>{
       'issuerId': instance.issuerId,
       'keyId': instance.keyId,
       'keyFileBase64': instance.keyFileBase64,
     };
 
-_$FlutterBuildIpaDataImpl _$$FlutterBuildIpaDataImplFromJson(
-        Map<String, dynamic> json) =>
-    _$FlutterBuildIpaDataImpl(
+_FlutterBuildIpaData _$FlutterBuildIpaDataFromJson(Map<String, dynamic> json) =>
+    _FlutterBuildIpaData(
       workflowName: json['workflowName'] as String? ?? 'Release iOS build',
       flutterBuildCommand:
           json['flutterBuildCommand'] as String? ?? 'flutter build ipa',
@@ -82,8 +79,8 @@ _$FlutterBuildIpaDataImpl _$$FlutterBuildIpaDataImplFromJson(
           GitHubTriggerType.push,
     );
 
-Map<String, dynamic> _$$FlutterBuildIpaDataImplToJson(
-        _$FlutterBuildIpaDataImpl instance) =>
+Map<String, dynamic> _$FlutterBuildIpaDataToJson(
+        _FlutterBuildIpaData instance) =>
     <String, dynamic>{
       'workflowName': instance.workflowName,
       'flutterBuildCommand': instance.flutterBuildCommand,

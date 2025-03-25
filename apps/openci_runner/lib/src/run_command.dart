@@ -1,4 +1,4 @@
-import 'package:dart_firebase_admin_plus/firestore.dart';
+import 'package:dart_firebase_admin/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/exceptions/command_execution_exception.dart';

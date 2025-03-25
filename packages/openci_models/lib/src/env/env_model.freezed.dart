@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,170 +10,31 @@ part of 'env_model.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-EnvModel _$EnvModelFromJson(Map<String, dynamic> json) {
-  return _EnvModel.fromJson(json);
-}
 
 /// @nodoc
 mixin _$EnvModel {
-  String get firebaseServiceAccountBase64 => throw _privateConstructorUsedError;
-  String get firebaseProjectName => throw _privateConstructorUsedError;
-  String get pemBase64 => throw _privateConstructorUsedError;
-  String get githubAppId => throw _privateConstructorUsedError;
-
-  /// Serializes this EnvModel to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get firebaseServiceAccountBase64;
+  String get firebaseProjectName;
+  String get pemBase64;
+  String get githubAppId;
 
   /// Create a copy of EnvModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $EnvModelCopyWith<EnvModel> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+      _$EnvModelCopyWithImpl<EnvModel>(this as EnvModel, _$identity);
 
-/// @nodoc
-abstract class $EnvModelCopyWith<$Res> {
-  factory $EnvModelCopyWith(EnvModel value, $Res Function(EnvModel) then) =
-      _$EnvModelCopyWithImpl<$Res, EnvModel>;
-  @useResult
-  $Res call(
-      {String firebaseServiceAccountBase64,
-      String firebaseProjectName,
-      String pemBase64,
-      String githubAppId});
-}
-
-/// @nodoc
-class _$EnvModelCopyWithImpl<$Res, $Val extends EnvModel>
-    implements $EnvModelCopyWith<$Res> {
-  _$EnvModelCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of EnvModel
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? firebaseServiceAccountBase64 = null,
-    Object? firebaseProjectName = null,
-    Object? pemBase64 = null,
-    Object? githubAppId = null,
-  }) {
-    return _then(_value.copyWith(
-      firebaseServiceAccountBase64: null == firebaseServiceAccountBase64
-          ? _value.firebaseServiceAccountBase64
-          : firebaseServiceAccountBase64 // ignore: cast_nullable_to_non_nullable
-              as String,
-      firebaseProjectName: null == firebaseProjectName
-          ? _value.firebaseProjectName
-          : firebaseProjectName // ignore: cast_nullable_to_non_nullable
-              as String,
-      pemBase64: null == pemBase64
-          ? _value.pemBase64
-          : pemBase64 // ignore: cast_nullable_to_non_nullable
-              as String,
-      githubAppId: null == githubAppId
-          ? _value.githubAppId
-          : githubAppId // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$EnvModelImplCopyWith<$Res>
-    implements $EnvModelCopyWith<$Res> {
-  factory _$$EnvModelImplCopyWith(
-          _$EnvModelImpl value, $Res Function(_$EnvModelImpl) then) =
-      __$$EnvModelImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String firebaseServiceAccountBase64,
-      String firebaseProjectName,
-      String pemBase64,
-      String githubAppId});
-}
-
-/// @nodoc
-class __$$EnvModelImplCopyWithImpl<$Res>
-    extends _$EnvModelCopyWithImpl<$Res, _$EnvModelImpl>
-    implements _$$EnvModelImplCopyWith<$Res> {
-  __$$EnvModelImplCopyWithImpl(
-      _$EnvModelImpl _value, $Res Function(_$EnvModelImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of EnvModel
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? firebaseServiceAccountBase64 = null,
-    Object? firebaseProjectName = null,
-    Object? pemBase64 = null,
-    Object? githubAppId = null,
-  }) {
-    return _then(_$EnvModelImpl(
-      firebaseServiceAccountBase64: null == firebaseServiceAccountBase64
-          ? _value.firebaseServiceAccountBase64
-          : firebaseServiceAccountBase64 // ignore: cast_nullable_to_non_nullable
-              as String,
-      firebaseProjectName: null == firebaseProjectName
-          ? _value.firebaseProjectName
-          : firebaseProjectName // ignore: cast_nullable_to_non_nullable
-              as String,
-      pemBase64: null == pemBase64
-          ? _value.pemBase64
-          : pemBase64 // ignore: cast_nullable_to_non_nullable
-              as String,
-      githubAppId: null == githubAppId
-          ? _value.githubAppId
-          : githubAppId // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$EnvModelImpl implements _EnvModel {
-  const _$EnvModelImpl(
-      {required this.firebaseServiceAccountBase64,
-      required this.firebaseProjectName,
-      required this.pemBase64,
-      required this.githubAppId});
-
-  factory _$EnvModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$EnvModelImplFromJson(json);
-
-  @override
-  final String firebaseServiceAccountBase64;
-  @override
-  final String firebaseProjectName;
-  @override
-  final String pemBase64;
-  @override
-  final String githubAppId;
-
-  @override
-  String toString() {
-    return 'EnvModel(firebaseServiceAccountBase64: $firebaseServiceAccountBase64, firebaseProjectName: $firebaseProjectName, pemBase64: $pemBase64, githubAppId: $githubAppId)';
-  }
+  /// Serializes this EnvModel to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$EnvModelImpl &&
+            other is EnvModel &&
             (identical(other.firebaseServiceAccountBase64,
                     firebaseServiceAccountBase64) ||
                 other.firebaseServiceAccountBase64 ==
@@ -190,45 +52,175 @@ class _$EnvModelImpl implements _EnvModel {
   int get hashCode => Object.hash(runtimeType, firebaseServiceAccountBase64,
       firebaseProjectName, pemBase64, githubAppId);
 
-  /// Create a copy of EnvModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$EnvModelImplCopyWith<_$EnvModelImpl> get copyWith =>
-      __$$EnvModelImplCopyWithImpl<_$EnvModelImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$EnvModelImplToJson(
-      this,
-    );
+  String toString() {
+    return 'EnvModel(firebaseServiceAccountBase64: $firebaseServiceAccountBase64, firebaseProjectName: $firebaseProjectName, pemBase64: $pemBase64, githubAppId: $githubAppId)';
   }
 }
 
-abstract class _EnvModel implements EnvModel {
-  const factory _EnvModel(
-      {required final String firebaseServiceAccountBase64,
-      required final String firebaseProjectName,
-      required final String pemBase64,
-      required final String githubAppId}) = _$EnvModelImpl;
+/// @nodoc
+abstract mixin class $EnvModelCopyWith<$Res> {
+  factory $EnvModelCopyWith(EnvModel value, $Res Function(EnvModel) _then) =
+      _$EnvModelCopyWithImpl;
+  @useResult
+  $Res call(
+      {String firebaseServiceAccountBase64,
+      String firebaseProjectName,
+      String pemBase64,
+      String githubAppId});
+}
 
-  factory _EnvModel.fromJson(Map<String, dynamic> json) =
-      _$EnvModelImpl.fromJson;
+/// @nodoc
+class _$EnvModelCopyWithImpl<$Res> implements $EnvModelCopyWith<$Res> {
+  _$EnvModelCopyWithImpl(this._self, this._then);
+
+  final EnvModel _self;
+  final $Res Function(EnvModel) _then;
+
+  /// Create a copy of EnvModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? firebaseServiceAccountBase64 = null,
+    Object? firebaseProjectName = null,
+    Object? pemBase64 = null,
+    Object? githubAppId = null,
+  }) {
+    return _then(_self.copyWith(
+      firebaseServiceAccountBase64: null == firebaseServiceAccountBase64
+          ? _self.firebaseServiceAccountBase64
+          : firebaseServiceAccountBase64 // ignore: cast_nullable_to_non_nullable
+              as String,
+      firebaseProjectName: null == firebaseProjectName
+          ? _self.firebaseProjectName
+          : firebaseProjectName // ignore: cast_nullable_to_non_nullable
+              as String,
+      pemBase64: null == pemBase64
+          ? _self.pemBase64
+          : pemBase64 // ignore: cast_nullable_to_non_nullable
+              as String,
+      githubAppId: null == githubAppId
+          ? _self.githubAppId
+          : githubAppId // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _EnvModel implements EnvModel {
+  const _EnvModel(
+      {required this.firebaseServiceAccountBase64,
+      required this.firebaseProjectName,
+      required this.pemBase64,
+      required this.githubAppId});
+  factory _EnvModel.fromJson(Map<String, dynamic> json) =>
+      _$EnvModelFromJson(json);
 
   @override
-  String get firebaseServiceAccountBase64;
+  final String firebaseServiceAccountBase64;
   @override
-  String get firebaseProjectName;
+  final String firebaseProjectName;
   @override
-  String get pemBase64;
+  final String pemBase64;
   @override
-  String get githubAppId;
+  final String githubAppId;
 
   /// Create a copy of EnvModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$EnvModelImplCopyWith<_$EnvModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$EnvModelCopyWith<_EnvModel> get copyWith =>
+      __$EnvModelCopyWithImpl<_EnvModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$EnvModelToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _EnvModel &&
+            (identical(other.firebaseServiceAccountBase64,
+                    firebaseServiceAccountBase64) ||
+                other.firebaseServiceAccountBase64 ==
+                    firebaseServiceAccountBase64) &&
+            (identical(other.firebaseProjectName, firebaseProjectName) ||
+                other.firebaseProjectName == firebaseProjectName) &&
+            (identical(other.pemBase64, pemBase64) ||
+                other.pemBase64 == pemBase64) &&
+            (identical(other.githubAppId, githubAppId) ||
+                other.githubAppId == githubAppId));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, firebaseServiceAccountBase64,
+      firebaseProjectName, pemBase64, githubAppId);
+
+  @override
+  String toString() {
+    return 'EnvModel(firebaseServiceAccountBase64: $firebaseServiceAccountBase64, firebaseProjectName: $firebaseProjectName, pemBase64: $pemBase64, githubAppId: $githubAppId)';
+  }
 }
+
+/// @nodoc
+abstract mixin class _$EnvModelCopyWith<$Res>
+    implements $EnvModelCopyWith<$Res> {
+  factory _$EnvModelCopyWith(_EnvModel value, $Res Function(_EnvModel) _then) =
+      __$EnvModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String firebaseServiceAccountBase64,
+      String firebaseProjectName,
+      String pemBase64,
+      String githubAppId});
+}
+
+/// @nodoc
+class __$EnvModelCopyWithImpl<$Res> implements _$EnvModelCopyWith<$Res> {
+  __$EnvModelCopyWithImpl(this._self, this._then);
+
+  final _EnvModel _self;
+  final $Res Function(_EnvModel) _then;
+
+  /// Create a copy of EnvModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? firebaseServiceAccountBase64 = null,
+    Object? firebaseProjectName = null,
+    Object? pemBase64 = null,
+    Object? githubAppId = null,
+  }) {
+    return _then(_EnvModel(
+      firebaseServiceAccountBase64: null == firebaseServiceAccountBase64
+          ? _self.firebaseServiceAccountBase64
+          : firebaseServiceAccountBase64 // ignore: cast_nullable_to_non_nullable
+              as String,
+      firebaseProjectName: null == firebaseProjectName
+          ? _self.firebaseProjectName
+          : firebaseProjectName // ignore: cast_nullable_to_non_nullable
+              as String,
+      pemBase64: null == pemBase64
+          ? _self.pemBase64
+          : pemBase64 // ignore: cast_nullable_to_non_nullable
+              as String,
+      githubAppId: null == githubAppId
+          ? _self.githubAppId
+          : githubAppId // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+// dart format on

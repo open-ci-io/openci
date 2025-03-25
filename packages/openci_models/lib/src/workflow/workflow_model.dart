@@ -4,13 +4,8 @@ import 'package:openci_models/openci_models.dart';
 part 'workflow_model.freezed.dart';
 part 'workflow_model.g.dart';
 
-enum GitHubTriggerType {
-  push,
-  pullRequest,
-}
-
 @Freezed(makeCollectionsUnmodifiable: false)
-class WorkflowModel with _$WorkflowModel {
+abstract class WorkflowModel with _$WorkflowModel {
   const factory WorkflowModel({
     required String currentWorkingDirectory,
     required String name,
@@ -23,15 +18,21 @@ class WorkflowModel with _$WorkflowModel {
   factory WorkflowModel.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelFromJson(json);
 
-  factory WorkflowModel.empty(String docId, String uid) => WorkflowModel(
+  factory WorkflowModel.empty(
+    String docId,
+    String uid,
+    String repoFullName,
+    String? baseBranch,
+  ) =>
+      WorkflowModel(
         currentWorkingDirectory: '',
         name: 'New Workflow',
         id: docId,
         flutter: WorkflowModelFlutter(version: FlutterVersion.getDefault()),
         github: WorkflowModelGitHub(
-          repositoryUrl: 'https://github.com/example/repo',
+          repositoryFullName: repoFullName,
           triggerType: GitHubTriggerType.push,
-          baseBranch: 'main',
+          baseBranch: baseBranch ?? 'main',
         ),
         owners: [uid],
         steps: [],
@@ -39,7 +40,7 @@ class WorkflowModel with _$WorkflowModel {
 }
 
 @freezed
-class WorkflowModelFlutter with _$WorkflowModelFlutter {
+abstract class WorkflowModelFlutter with _$WorkflowModelFlutter {
   factory WorkflowModelFlutter({
     @FlutterVersionConverter() required FlutterVersion version,
   }) = _WorkflowModelFlutter;
@@ -49,9 +50,9 @@ class WorkflowModelFlutter with _$WorkflowModelFlutter {
 }
 
 @freezed
-class WorkflowModelGitHub with _$WorkflowModelGitHub {
+abstract class WorkflowModelGitHub with _$WorkflowModelGitHub {
   const factory WorkflowModelGitHub({
-    required String repositoryUrl,
+    required String repositoryFullName,
     required GitHubTriggerType triggerType,
     required String baseBranch,
   }) = _WorkflowModelGitHub;
@@ -60,25 +61,11 @@ class WorkflowModelGitHub with _$WorkflowModelGitHub {
 }
 
 @Freezed(makeCollectionsUnmodifiable: false)
-class WorkflowModelStep with _$WorkflowModelStep {
+abstract class WorkflowModelStep with _$WorkflowModelStep {
   const factory WorkflowModelStep({
     @Default('') String name,
     @Default('') String command,
   }) = _WorkflowModelStep;
   factory WorkflowModelStep.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelStepFromJson(json);
-}
-
-@freezed
-class OpenCIRepository with _$OpenCIRepository {
-  const factory OpenCIRepository({
-    @JsonKey(name: 'full_name') required String fullName,
-    required int id,
-    required String name,
-    @JsonKey(name: 'node_id') required String nodeId,
-    required bool private,
-  }) = _OpenCIRepository;
-
-  factory OpenCIRepository.fromJson(Map<String, Object?> json) =>
-      _$OpenCIRepositoryFromJson(json);
 }

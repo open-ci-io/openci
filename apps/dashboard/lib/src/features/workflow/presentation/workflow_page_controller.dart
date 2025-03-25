@@ -20,7 +20,7 @@ class WorkflowPageController extends _$WorkflowPageController {
     return firestore
         .collection(workflowsCollectionPath)
         .where('owners', arrayContains: uid)
-        .where('github.repositoryUrl', isEqualTo: repository)
+        .where('github.repositoryFullName', isEqualTo: repository)
         .snapshots()
         .map(
           (snapshot) => snapshot.docs
@@ -40,10 +40,10 @@ class WorkflowPageController extends _$WorkflowPageController {
         .map((snapshot) => snapshot.data()?['github'] != null);
   }
 
-  Future<WorkflowModel> addWorkflow() async {
+  Future<WorkflowModel> addWorkflow(String repoFullName) async {
     final ref = firebaseSuite.firestore.collection('workflows').doc();
     final uid = firebaseSuite.auth.currentUser!.uid;
-    final workflow = WorkflowModel.empty(ref.id, uid);
+    final workflow = WorkflowModel.empty(ref.id, uid, repoFullName, null);
     await ref.set(workflow.toJson());
     return workflow;
   }
@@ -75,6 +75,34 @@ class WorkflowPageController extends _$WorkflowPageController {
     final repositories = github['repositories'] as List<dynamic>;
     // ignore: avoid_dynamic_calls
     return repositories.map((e) => e['full_name'] as String).toList();
+  }
+
+  Stream<List<String>> getGitHubRepositoriesStream() {
+    final firestore = firebaseSuite.firestore;
+    final auth = firebaseSuite.auth;
+    final uid = auth.currentUser!.uid;
+
+    return firestore.collection('users').doc(uid).snapshots().map((snapshot) {
+      if (!snapshot.exists || snapshot.data() == null) {
+        return <String>[];
+      }
+
+      final userData = snapshot.data()!;
+
+      if (!userData.containsKey('github')) {
+        return <String>[];
+      }
+
+      final github = userData['github'] as Map<String, dynamic>;
+
+      if (!github.containsKey('repositories')) {
+        return <String>[];
+      }
+
+      final repositories = github['repositories'] as List<dynamic>;
+      // ignore: avoid_dynamic_calls
+      return repositories.map((e) => e['full_name'] as String).toList();
+    });
   }
 
   String getInstallationUrl() {
@@ -119,12 +147,20 @@ Future<List<String>> getGitHubRepositories(
 @Riverpod(keepAlive: true)
 class SelectedRepository extends _$SelectedRepository {
   @override
-  Future<GithubRepository> build(OpenCIFirebaseSuite firebaseSuite) async {
-    final list = await _controller.getGitHubRepositories();
-    return GithubRepository(
-      selectedRepository: list.first,
-      repositories: list,
-    );
+  Stream<GithubRepository> build(OpenCIFirebaseSuite firebaseSuite) {
+    return _controller.getGitHubRepositoriesStream().map((repoList) {
+      if (repoList.isEmpty) {
+        return const GithubRepository(
+          selectedRepository: '',
+          repositories: [],
+        );
+      }
+
+      return GithubRepository(
+        selectedRepository: repoList.first,
+        repositories: repoList,
+      );
+    });
   }
 
   WorkflowPageController get _controller =>

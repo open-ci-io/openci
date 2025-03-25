@@ -4,7 +4,7 @@ part 'openci_secret.freezed.dart';
 part 'openci_secret.g.dart';
 
 @freezed
-class OpenCISecret with _$OpenCISecret {
+abstract class OpenCISecret with _$OpenCISecret {
   const factory OpenCISecret({
     required String key,
     required String value,

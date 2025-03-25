@@ -140,17 +140,24 @@ const appFunction = async (app: Probot) => {
 					.where("github.userId", "==", githubUserId)
 					.get();
 
-				await firestore
-					.collection(usersCollectionName)
-					.doc(userQs.docs[0].id)
-					.update({
-						github: {
-							installationId: installationId,
-							login: githubLogin,
-							userId: githubUserId,
-							repositories: repositories,
-						},
-					});
+				const userId = userQs.docs[0].id;
+				console.log("userId", userId);
+
+				try {
+					await firestore
+						.collection(usersCollectionName)
+						.doc(userId)
+						.update({
+							github: {
+								installationId: installationId,
+								login: githubLogin,
+								userId: githubUserId,
+								repositories: repositories,
+							},
+						});
+				} catch (error) {
+					console.error("Error updating user:", error);
+				}
 
 				console.log("installationId", installationId);
 				console.log("githubUserId", githubUserId);
@@ -193,7 +200,7 @@ const appFunction = async (app: Probot) => {
 				if (installation == null) {
 					throw new Error("installation is null, please check it.");
 				}
-				const githubRepositoryUrl = pullRequest.base.repo.html_url;
+				const githubRepositoryUrl = pullRequest.base.repo.full_name;
 				const baseBranch = pullRequest.base.ref;
 				const currentBranch = pullRequest.head.ref;
 				const workflowQuerySnapshot = await getWorkflowQuerySnapshot(
@@ -253,7 +260,7 @@ const appFunction = async (app: Probot) => {
 				if (installation == null) {
 					throw new Error("installation is undefined, please check it.");
 				}
-				const githubRepositoryUrl = _payload.repository.html_url;
+				const githubRepositoryUrl = _payload.repository.full_name;
 				const baseBranch = _payload.ref.replace("refs/heads/", "");
 				const workflowQuerySnapshot = await getWorkflowQuerySnapshot(
 					githubRepositoryUrl,

@@ -104,9 +104,12 @@ Future<void> saveASCKeys(
 @riverpod
 Future<bool> areAppStoreConnectKeysUploaded(Ref ref) async {
   final firestore = await getFirebaseFirestore();
+  final suite = await getOpenCIFirebaseSuite();
+  final currentUserId = suite.auth.currentUser!.uid;
   var qs = await firestore
       .collection(secretsCollectionPath)
       .where('key', isEqualTo: AppStoreConnectAPIKey.keyId.key)
+      .where('owners', arrayContains: currentUserId)
       .get();
   if (qs.docs.isEmpty) {
     return false;
@@ -114,6 +117,7 @@ Future<bool> areAppStoreConnectKeysUploaded(Ref ref) async {
   qs = await firestore
       .collection(secretsCollectionPath)
       .where('key', isEqualTo: AppStoreConnectAPIKey.issuerId.key)
+      .where('owners', arrayContains: currentUserId)
       .get();
   if (qs.docs.isEmpty) {
     return false;
@@ -121,6 +125,7 @@ Future<bool> areAppStoreConnectKeysUploaded(Ref ref) async {
   qs = await firestore
       .collection(secretsCollectionPath)
       .where('key', isEqualTo: AppStoreConnectAPIKey.keyBase64.key)
+      .where('owners', arrayContains: currentUserId)
       .get();
   if (qs.docs.isEmpty) {
     return false;
@@ -142,7 +147,7 @@ Future<WorkflowModel> createWorkflow(
     version: FlutterVersion.getDefault(),
   );
   final github = WorkflowModelGitHub(
-    repositoryUrl: selectedRepository,
+    repositoryFullName: selectedRepository,
     triggerType: state.flutterBuildIpaData.triggerType,
     baseBranch: state.flutterBuildIpaData.baseBranch,
   );

@@ -4,7 +4,7 @@ part 'session_result.freezed.dart';
 part 'session_result.g.dart';
 
 @freezed
-class SessionResult with _$SessionResult {
+abstract class SessionResult with _$SessionResult {
   const factory SessionResult({
     required String stdout,
     required String stderr,

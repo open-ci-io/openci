@@ -24,8 +24,8 @@ class WorkflowEditorController extends _$WorkflowEditorController {
     state = state.copyWith(name: name);
   }
 
-  void updateGitHubRepoUrl(String repoUrl) {
-    state = state.copyWith.github(repositoryUrl: repoUrl);
+  void updateGitHubRepoFullName(String repoFullName) {
+    state = state.copyWith.github(repositoryFullName: repoFullName);
   }
 
   void updateGitHubTriggerType(GitHubTriggerType triggerType) {

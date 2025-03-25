@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:dart_firebase_admin_plus/firestore.dart';
+import 'package:dart_firebase_admin/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_models/openci_models.dart';
 import 'package:openci_runner/src/env.dart';
@@ -41,7 +41,8 @@ Future<void> handleFlutterBuildIpa(
   await runCommand(
     logId: logId,
     client: client,
-    command: 'openci_cli2 update',
+    command:
+        'dart pub global deactivate openci_cli2 && dart pub global activate openci_cli2',
     currentWorkingDirectory: workflow.currentWorkingDirectory,
     jobId: buildJob.id,
   );

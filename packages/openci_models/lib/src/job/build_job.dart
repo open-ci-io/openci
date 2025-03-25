@@ -11,7 +11,7 @@ enum OpenCIGitHubChecksStatus {
 }
 
 @freezed
-class BuildJob with _$BuildJob {
+abstract class BuildJob with _$BuildJob {
   const factory BuildJob({
     required OpenCIGitHubChecksStatus buildStatus,
     required OpenCIGithub github,
@@ -25,8 +25,9 @@ class BuildJob with _$BuildJob {
 }
 
 @freezed
-class OpenCIGithub with _$OpenCIGithub {
+abstract class OpenCIGithub with _$OpenCIGithub {
   const factory OpenCIGithub({
+    // TODO(someone): rename to repositoryFullName
     required String repositoryUrl,
     required String owner,
     required String repositoryName,
