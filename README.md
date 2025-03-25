@@ -14,10 +14,10 @@ Join our [Discord channel](https://discord.gg/gwbnwWtefk) to get help from the c
 
 # Goals of OpenCI
 
-The best CI/CD service for you and me.
+The best CI/CD service.
 
 1. Super fast loading of dashboards
-2. Extremely easy setup of CI/CD
+2. Extremely easy setup
 3. No charges for builds during setup
 4. Free or very low-cost usage for small-scale development
 5. Ability to self-host
@@ -25,6 +25,7 @@ The best CI/CD service for you and me.
 7. Accessible to everyone
 8. Super fast CI/CD processes
 9. Positive impact of OpenCI on Flutter and the entire software community
+10. Contribute to the success of the business and make a big contribution to humanity
 
 # branch strategy
 
