@@ -1,4 +1,4 @@
-# Welcome to OpenCI.
+# Welcome to OpenCI
 
 # Get started
 
