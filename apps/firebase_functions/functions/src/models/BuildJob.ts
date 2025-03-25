@@ -14,7 +14,6 @@ export enum OpenCIGitHubChecksStatus {
 }
 
 export interface OpenCIGithub {
-	repositoryUrl: string;
 	owner: string;
 	repositoryName: string;
 	installationId: number;

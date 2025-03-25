@@ -1,15 +1,15 @@
 import { workflowCollectionName } from "../firestore_path.js";
 
 export async function getWorkflowQuerySnapshot(
-	githubRepositoryUrl: string,
+	githubRepositoryFullName: string,
 	triggerType: string,
 	firestore: FirebaseFirestore.Firestore,
 ) {
-	console.log("githubRepositoryUrl", githubRepositoryUrl);
+	console.log("githubRepositoryFullName", githubRepositoryFullName);
 	console.log("triggerType", triggerType);
 	const workflowQuerySnapshot = await firestore
 		.collection(workflowCollectionName)
-		.where("github.repositoryUrl", "==", githubRepositoryUrl)
+		.where("github.repositoryFullName", "==", githubRepositoryFullName)
 		.where("github.triggerType", "==", triggerType)
 		.get();
 
