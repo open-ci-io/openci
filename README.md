@@ -1,4 +1,4 @@
-# Welcome to OpenCI.
+# Welcome to OpenCI
 
 # Get started
 
@@ -16,7 +16,7 @@ Join our [Discord channel](https://discord.gg/gwbnwWtefk) to get help from the c
 
 The best CI/CD service.
 
-1. Super fast loading of dashboards
+1. Fast loading of dashboards
 2. Extremely easy setup
 3. No charges for builds during setup
 4. Free or very low-cost usage for small-scale development
