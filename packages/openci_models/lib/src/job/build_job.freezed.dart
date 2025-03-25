@@ -263,8 +263,6 @@ class __$BuildJobCopyWithImpl<$Res> implements _$BuildJobCopyWith<$Res> {
 
 /// @nodoc
 mixin _$OpenCIGithub {
-// TODO(someone): rename to repositoryFullName
-  String get repositoryUrl;
   String get owner;
   String get repositoryName;
   int get installationId;
@@ -290,8 +288,6 @@ mixin _$OpenCIGithub {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is OpenCIGithub &&
-            (identical(other.repositoryUrl, repositoryUrl) ||
-                other.repositoryUrl == repositoryUrl) &&
             (identical(other.owner, owner) || other.owner == owner) &&
             (identical(other.repositoryName, repositoryName) ||
                 other.repositoryName == repositoryName) &&
@@ -310,21 +306,12 @@ mixin _$OpenCIGithub {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      repositoryUrl,
-      owner,
-      repositoryName,
-      installationId,
-      appId,
-      checkRunId,
-      issueNumber,
-      baseBranch,
-      buildBranch);
+  int get hashCode => Object.hash(runtimeType, owner, repositoryName,
+      installationId, appId, checkRunId, issueNumber, baseBranch, buildBranch);
 
   @override
   String toString() {
-    return 'OpenCIGithub(repositoryUrl: $repositoryUrl, owner: $owner, repositoryName: $repositoryName, installationId: $installationId, appId: $appId, checkRunId: $checkRunId, issueNumber: $issueNumber, baseBranch: $baseBranch, buildBranch: $buildBranch)';
+    return 'OpenCIGithub(owner: $owner, repositoryName: $repositoryName, installationId: $installationId, appId: $appId, checkRunId: $checkRunId, issueNumber: $issueNumber, baseBranch: $baseBranch, buildBranch: $buildBranch)';
   }
 }
 
@@ -335,8 +322,7 @@ abstract mixin class $OpenCIGithubCopyWith<$Res> {
       _$OpenCIGithubCopyWithImpl;
   @useResult
   $Res call(
-      {String repositoryUrl,
-      String owner,
+      {String owner,
       String repositoryName,
       int installationId,
       int appId,
@@ -358,7 +344,6 @@ class _$OpenCIGithubCopyWithImpl<$Res> implements $OpenCIGithubCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? repositoryUrl = null,
     Object? owner = null,
     Object? repositoryName = null,
     Object? installationId = null,
@@ -369,10 +354,6 @@ class _$OpenCIGithubCopyWithImpl<$Res> implements $OpenCIGithubCopyWith<$Res> {
     Object? buildBranch = null,
   }) {
     return _then(_self.copyWith(
-      repositoryUrl: null == repositoryUrl
-          ? _self.repositoryUrl
-          : repositoryUrl // ignore: cast_nullable_to_non_nullable
-              as String,
       owner: null == owner
           ? _self.owner
           : owner // ignore: cast_nullable_to_non_nullable
@@ -411,23 +392,20 @@ class _$OpenCIGithubCopyWithImpl<$Res> implements $OpenCIGithubCopyWith<$Res> {
 
 /// @nodoc
 @JsonSerializable()
-class _OpenCIGithub implements OpenCIGithub {
+class _OpenCIGithub extends OpenCIGithub {
   const _OpenCIGithub(
-      {required this.repositoryUrl,
-      required this.owner,
+      {required this.owner,
       required this.repositoryName,
       required this.installationId,
       required this.appId,
       required this.checkRunId,
       this.issueNumber = null,
       required this.baseBranch,
-      required this.buildBranch});
+      required this.buildBranch})
+      : super._();
   factory _OpenCIGithub.fromJson(Map<String, dynamic> json) =>
       _$OpenCIGithubFromJson(json);
 
-// TODO(someone): rename to repositoryFullName
-  @override
-  final String repositoryUrl;
   @override
   final String owner;
   @override
@@ -466,8 +444,6 @@ class _OpenCIGithub implements OpenCIGithub {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _OpenCIGithub &&
-            (identical(other.repositoryUrl, repositoryUrl) ||
-                other.repositoryUrl == repositoryUrl) &&
             (identical(other.owner, owner) || other.owner == owner) &&
             (identical(other.repositoryName, repositoryName) ||
                 other.repositoryName == repositoryName) &&
@@ -486,21 +462,12 @@ class _OpenCIGithub implements OpenCIGithub {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      repositoryUrl,
-      owner,
-      repositoryName,
-      installationId,
-      appId,
-      checkRunId,
-      issueNumber,
-      baseBranch,
-      buildBranch);
+  int get hashCode => Object.hash(runtimeType, owner, repositoryName,
+      installationId, appId, checkRunId, issueNumber, baseBranch, buildBranch);
 
   @override
   String toString() {
-    return 'OpenCIGithub(repositoryUrl: $repositoryUrl, owner: $owner, repositoryName: $repositoryName, installationId: $installationId, appId: $appId, checkRunId: $checkRunId, issueNumber: $issueNumber, baseBranch: $baseBranch, buildBranch: $buildBranch)';
+    return 'OpenCIGithub(owner: $owner, repositoryName: $repositoryName, installationId: $installationId, appId: $appId, checkRunId: $checkRunId, issueNumber: $issueNumber, baseBranch: $baseBranch, buildBranch: $buildBranch)';
   }
 }
 
@@ -513,8 +480,7 @@ abstract mixin class _$OpenCIGithubCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String repositoryUrl,
-      String owner,
+      {String owner,
       String repositoryName,
       int installationId,
       int appId,
@@ -537,7 +503,6 @@ class __$OpenCIGithubCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? repositoryUrl = null,
     Object? owner = null,
     Object? repositoryName = null,
     Object? installationId = null,
@@ -548,10 +513,6 @@ class __$OpenCIGithubCopyWithImpl<$Res>
     Object? buildBranch = null,
   }) {
     return _then(_OpenCIGithub(
-      repositoryUrl: null == repositoryUrl
-          ? _self.repositoryUrl
-          : repositoryUrl // ignore: cast_nullable_to_non_nullable
-              as String,
       owner: null == owner
           ? _self.owner
           : owner // ignore: cast_nullable_to_non_nullable

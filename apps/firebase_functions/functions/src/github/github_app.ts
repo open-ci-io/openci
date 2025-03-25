@@ -200,11 +200,11 @@ const appFunction = async (app: Probot) => {
 				if (installation == null) {
 					throw new Error("installation is null, please check it.");
 				}
-				const githubRepositoryUrl = pullRequest.base.repo.full_name;
+				const githubRepositoryFullName = pullRequest.base.repo.full_name;
 				const baseBranch = pullRequest.base.ref;
 				const currentBranch = pullRequest.head.ref;
 				const workflowQuerySnapshot = await getWorkflowQuerySnapshot(
-					githubRepositoryUrl,
+					githubRepositoryFullName,
 					"pullRequest",
 					firestore,
 				);
@@ -230,7 +230,6 @@ const appFunction = async (app: Probot) => {
 							throw new Error("appId is null, please check it.");
 						}
 						const github: OpenCIGithub = {
-							repositoryUrl: githubRepositoryUrl,
 							owner: pullRequestContext.payload.repository.owner.login,
 							repositoryName: pullRequestContext.payload.repository.name,
 							installationId: installation.id,
@@ -288,7 +287,6 @@ const appFunction = async (app: Probot) => {
 							throw new Error("appId is null, please check it.");
 						}
 						const github: OpenCIGithub = {
-							repositoryUrl: githubRepositoryUrl,
 							owner: pushContext.payload.repository.owner.login,
 							repositoryName: pushContext.payload.repository.name,
 							installationId: installation.id,

@@ -1,4 +1,8 @@
 
+## 0.10.3
+
+- update: openci_models
+
 ## 0.10.2
 
 - fix: update openci_cli2

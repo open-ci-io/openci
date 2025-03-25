@@ -32,7 +32,6 @@ const _$OpenCIGitHubChecksStatusEnumMap = {
 
 _OpenCIGithub _$OpenCIGithubFromJson(Map<String, dynamic> json) =>
     _OpenCIGithub(
-      repositoryUrl: json['repositoryUrl'] as String,
       owner: json['owner'] as String,
       repositoryName: json['repositoryName'] as String,
       installationId: (json['installationId'] as num).toInt(),
@@ -45,7 +44,6 @@ _OpenCIGithub _$OpenCIGithubFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$OpenCIGithubToJson(_OpenCIGithub instance) =>
     <String, dynamic>{
-      'repositoryUrl': instance.repositoryUrl,
       'owner': instance.owner,
       'repositoryName': instance.repositoryName,
       'installationId': instance.installationId,

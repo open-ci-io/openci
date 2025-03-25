@@ -11,7 +11,7 @@ Future<void> cloneRepo(
   SSHClient client,
   String pem,
 ) async {
-  final repoFullName = buildJob.github.repositoryUrl;
+  final repoFullName = buildJob.github.repoFullName;
   final token = await getGitHubInstallationToken(
     installationId: buildJob.github.installationId,
     appId: buildJob.github.appId,
