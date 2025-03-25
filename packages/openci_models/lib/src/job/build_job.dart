@@ -26,7 +26,7 @@ abstract class BuildJob with _$BuildJob {
 
 @freezed
 abstract class OpenCIGithub with _$OpenCIGithub {
-  OpenCIGithub._();
+  const OpenCIGithub._();
   const factory OpenCIGithub({
     required String owner,
     required String repositoryName,
@@ -41,5 +41,5 @@ abstract class OpenCIGithub with _$OpenCIGithub {
   factory OpenCIGithub.fromJson(Map<String, dynamic> json) =>
       _$OpenCIGithubFromJson(json);
 
-  String get repoFullName => 'https://github.com/$owner/$repositoryName';
+  String get repoFullName => '$owner/$repositoryName';
 }
