@@ -24,7 +24,7 @@ Future<void> translate(
   }
   final content = await inputFile.readAsString();
   final model = GenerativeModel(
-    model: 'gemini-2.0-flash',
+    model: 'gemini-2.5-pro-exp-03-25',
     apiKey: apiKey,
   );
   final basicPrompt = 'Translate the following text to English:';
