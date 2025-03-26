@@ -48,7 +48,7 @@ class WelcomePage extends HookConsumerWidget {
                 children: [
                   appVersion.when(
                     data: (appVersion) => _Title(
-                      title: 'Welcome to Open CI : $appVersion',
+                      title: 'Welcome to Open CI : v$appVersion',
                     ),
                     error: (error, stackTrace) => Text(error.toString()),
                     loading: () => const SizedBox.shrink(),
