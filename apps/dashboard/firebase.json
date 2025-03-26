@@ -43,7 +43,7 @@
   },
   "hosting": {
     "site": "openci-dashboard-v2",
-    "source": ".",
+    "public": "build/web",
     "ignore": [
       "firebase.json",
       "**/.*",
