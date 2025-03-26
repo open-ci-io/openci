@@ -1,7 +1,7 @@
 name: dashboard
 description: "A Dashboard for OpenCI"
 publish_to: 'none'
-version: 1.1.0+11
+version: 1.1.1+1
 environment:
   sdk: ">=3.6.0 <4.0.0"
   
@@ -26,6 +26,7 @@ dependencies:
   modal_progress_hud_nsn: ^0.5.1
   openci_models:
     path: ../../packages/openci_models
+  package_info_plus: ^8.3.0
   propertylistserialization: ^1.4.1
   riverpod_annotation: ^2.5.3
   sentry_flutter: ^8.13.0-beta.3

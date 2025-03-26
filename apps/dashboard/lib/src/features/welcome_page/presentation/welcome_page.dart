@@ -6,6 +6,7 @@ import 'package:dashboard/src/common_widgets/dialogs/error_dialog.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/extensions/build_context_extension.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
+import 'package:dashboard/src/features/welcome_page/presentation/fetch_app_version.dart';
 import 'package:dashboard/src/services/firebase.dart';
 import 'package:dashboard/src/services/plist.dart';
 import 'package:file_picker/file_picker.dart';
@@ -13,6 +14,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:openci_models/openci_models.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _defaultProjectId = 'openci-release(default)';
@@ -27,48 +31,62 @@ class WelcomePage extends HookConsumerWidget {
     final projectId = useState(_defaultProjectId);
     final screenWidth = context.screenWidth;
     final formKey = useMemoized(GlobalKey<FormState>.new);
+    final isLoading = useState(false);
+    final appVersion = ref.watch(fetchAppVersionProvider);
 
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const _Title(
-                  title: 'Welcome to Open CI',
-                ),
-                verticalMargin40,
-                _EmailField(emailTextController: emailTextController),
-                verticalMargin16,
-                _PasswordField(passwordTextController: passwordTextController),
-                verticalMargin24,
-                Text('Project ID: ${projectId.value}'),
-                verticalMargin24,
-                Wrap(
-                  runSpacing: 16,
-                  children: [
-                    RegisterButton(
-                      formKey: formKey,
-                      emailTextController: emailTextController,
-                      passwordTextController: passwordTextController,
+      body: ModalProgressHUD(
+        progressIndicator: const CircularProgressIndicator.adaptive(),
+        inAsyncCall: isLoading.value,
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  appVersion.when(
+                    data: (appVersion) => _Title(
+                      title: 'Welcome to Open CI : $appVersion',
                     ),
-                    horizontalMargin16,
-                    _LoginButton(
-                      formKey: formKey,
-                      emailTextController: emailTextController,
-                      passwordTextController: passwordTextController,
-                      projectId: projectId.value,
-                    ),
-                    horizontalMargin16,
-                    _SelectFirebaseProjectButton(
-                      projectId: projectId,
-                    ),
-                  ],
-                ),
-              ],
+                    error: (error, stackTrace) => Text(error.toString()),
+                    loading: () => const SizedBox.shrink(),
+                  ),
+                  verticalMargin40,
+                  _EmailField(emailTextController: emailTextController),
+                  verticalMargin16,
+                  _PasswordField(
+                    passwordTextController: passwordTextController,
+                  ),
+                  verticalMargin24,
+                  Text('Project ID: ${projectId.value}'),
+                  verticalMargin24,
+                  Wrap(
+                    runSpacing: 16,
+                    children: [
+                      RegisterButton(
+                        isLoading: isLoading,
+                        formKey: formKey,
+                        emailTextController: emailTextController,
+                        passwordTextController: passwordTextController,
+                      ),
+                      horizontalMargin16,
+                      _LoginButton(
+                        formKey: formKey,
+                        emailTextController: emailTextController,
+                        passwordTextController: passwordTextController,
+                        projectId: projectId.value,
+                        isLoading: isLoading,
+                      ),
+                      horizontalMargin16,
+                      _SelectFirebaseProjectButton(
+                        projectId: projectId,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -83,12 +101,13 @@ class RegisterButton extends StatelessWidget {
     required this.formKey,
     required this.emailTextController,
     required this.passwordTextController,
+    required this.isLoading,
   });
 
   final GlobalKey<FormState> formKey;
   final TextEditingController emailTextController;
   final TextEditingController passwordTextController;
-
+  final ValueNotifier<bool> isLoading;
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -100,6 +119,7 @@ class RegisterButton extends StatelessWidget {
       onPressed: () async {
         if (formKey.currentState!.validate()) {
           formKey.currentState!.save();
+          isLoading.value = true;
 
           final auth = await getFirebaseAuth();
           try {
@@ -109,18 +129,22 @@ class RegisterButton extends StatelessWidget {
             );
             final userId = user.user!.uid;
             final firestore = await getFirebaseFirestore();
-            await firestore.collection('users').doc(userId).set({
+            await firestore.collection(usersCollectionPath).doc(userId).set({
               'userId': userId,
               'createdAt': Timestamp.now().microsecondsSinceEpoch,
             });
             await pushAndRemoveUntil(context, const NavigationPage());
-          } on FirebaseAuthException catch (e) {
+          } on FirebaseAuthException catch (e, s) {
+            await Sentry.captureException(e, stackTrace: s);
             await showErrorDialog(
               context,
               e.message ?? 'An error occurred',
             );
-          } on Exception catch (e) {
+          } on Exception catch (e, s) {
+            await Sentry.captureException(e, stackTrace: s);
             await showErrorDialog(context, e.toString());
+          } finally {
+            isLoading.value = false;
           }
         }
       },
@@ -148,12 +172,14 @@ class _LoginButton extends StatelessWidget {
     required this.emailTextController,
     required this.passwordTextController,
     required this.projectId,
+    required this.isLoading,
   });
 
   final GlobalKey<FormState> formKey;
   final TextEditingController emailTextController;
   final TextEditingController passwordTextController;
   final String projectId;
+  final ValueNotifier<bool> isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -167,6 +193,7 @@ class _LoginButton extends StatelessWidget {
       onPressed: () async {
         if (formKey.currentState!.validate()) {
           formKey.currentState!.save();
+          isLoading.value = true;
           final auth = await getFirebaseAuth();
           try {
             await auth.signInWithEmailAndPassword(
@@ -174,13 +201,17 @@ class _LoginButton extends StatelessWidget {
               password: passwordTextController.text,
             );
             await pushAndRemoveUntil(context, const NavigationPage());
-          } on FirebaseAuthException catch (e) {
+          } on FirebaseAuthException catch (e, s) {
+            await Sentry.captureException(e, stackTrace: s);
             await showErrorDialog(
               context,
               e.message ?? 'An error occurred',
             );
-          } on Exception catch (e) {
+          } on Exception catch (e, s) {
+            await Sentry.captureException(e, stackTrace: s);
             await showErrorDialog(context, e.toString());
+          } finally {
+            isLoading.value = false;
           }
         }
       },
@@ -315,9 +346,9 @@ class _Title extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text(
-      'Welcome to Open CI',
-      style: TextStyle(
+    return Text(
+      title,
+      style: const TextStyle(
         fontSize: 26,
       ),
     );
