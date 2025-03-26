@@ -1,9 +1,23 @@
 ---
-title: OpenCI ダッシュボード
+title: OpenCI ダッシュボード(管理画面)
 description: 'OpenCI ダッシュボードの使い方'
 ---
 
-OpenCI ダッシュボードは、OpenCIの各種操作を行うことができます。現在macOSのみ対応しています。
+<Frame >
+  <img src="/images/dashboard.png" />
+</Frame>
+
+OpenCI ダッシュボードは、OpenCIの各種操作を行うことができます。対応プラットフォームはwebおよびmacOSです。
+
+機能に違いはありませんので、お好きな方をお使いください。macOSの方が速度が速いですが、インストールが必要です。webの方は、ブラウザでアクセスするだけです。
+
+webのリンクは、https://dashboard.open-ci.io/ です。
+
+macOSの方は、https://github.com/open-ci-io/openci/releases/download/v0.3.2/openci_v0.3.2.dmg からdashboard.dmgをダウンロードしてください。
+
+# セルフホスティングしている場合
+
+OpenCIはセルフホスティングが可能です。Firebaseを使用するため、事前にFirebaseプロジェクトの作成が必要です。
 
 ## GoogleService-Info.plistの設定
 
@@ -13,18 +27,28 @@ Firebaseのプロジェクトに、macOS用のアプリを追加してくださ�
 
 macOS用のアプリを追加したら、GoogleService-Info.plistをダウンロードしてください。
 
-## ダッシュボードの起動
-
-https://github.com/open-ci-io/openci からDashboard.dmgをダウンロードしてください。
-
-ダウンロードしたDashboard.dmgを開くと、OpenCI ダッシュボードが起動します。
-
 ## ダッシュボードの設定
 
 OpenCI ダッシュボードを起動したら、GoogleService-Info.plistを設定してください。
+
+<Frame >
+  <img src="/images/how_to_setting_google_service_info_plist.png" />
+</Frame>
 
 ## Firebaseの設定
 
 OpenCIはFirestore, Firebase Authを使用しています。Firestoreをプロビジョニングし、Firebase Authのメールアドレス認証を有効化してください。
 
-その後、アカウントの作成が可能になります。
+### Firestoreのプロビジョニング
+
+<Frame >
+  <img src="/images/how_to_provision_firestore.png" />
+</Frame>
+
+### Firebase Authのメールアドレス認証の有効化
+
+Firebase Authのメールアドレス認証を有効化します。
+
+<Frame >
+  <img src="/images/how_to_enable_email_auth.png" />
+</Frame>

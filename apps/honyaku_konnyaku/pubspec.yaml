@@ -1,6 +1,6 @@
 name: hk
 description: A CLI app to translate text using Gemini.
-version: 0.1.1
+version: 0.2.0
 repository: https://github.com/open-ci-io/openci/tree/develop/apps/honyaku_konnyaku
 
 environment:
