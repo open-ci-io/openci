@@ -1,30 +1,54 @@
 ---
 title: OpenCI Dashboard
-description: 'How to use the OpenCI Dashboard'
+description: How to use the OpenCI Dashboard
 ---
 
-The OpenCI Dashboard allows you to perform various OpenCI operations. Currently, it only supports macOS.
+<Frame >
+  <img src="/images/dashboard.png" />
+</Frame>
+
+The OpenCI Dashboard allows you to perform various operations for OpenCI. It is available on the web and macOS.
+
+There is no difference in functionality, so feel free to use whichever you prefer. The macOS version offers better performance but requires installation, while the web version can be accessed directly through your browser.
+
+The web version is available at: https://dashboard.open-ci.io/
+
+For macOS, download the application DMG from: https://github.com/open-ci-io/openci/releases/download/v0.3.2/openci_v0.3.2.dmg
+
+# If You Are Self-Hosting
+
+OpenCI can be self-hosted. As it utilizes Firebase, you must first create a Firebase project.
 
 ## GoogleService-Info.plist Configuration
 
-The OpenCI Dashboard uses GoogleService-Info.plist for Firebase authentication.
+The OpenCI Dashboard uses `GoogleService-Info.plist` for Firebase authentication.
 
-Add a macOS app to your Firebase project. The bundle ID is `io.openci.dashboard.ios`.
+Add a macOS app to your Firebase project. The required bundle ID is `io.openci.dashboard.ios`.
 
-After adding the macOS app, download the GoogleService-Info.plist file.
+Once you have added the macOS app, download the `GoogleService-Info.plist` file.
 
-## Launching the Dashboard
+## Dashboard Configuration
 
-Download the Dashboard.dmg file from https://github.com/open-ci-io/openci.
+Once you launch the OpenCI Dashboard, configure it by providing the `GoogleService-Info.plist` file.
 
-Open the downloaded Dashboard.dmg file to launch the OpenCI Dashboard.
-
-## Configuring the Dashboard
-
-After launching the OpenCI Dashboard, configure the GoogleService-Info.plist.
+<Frame >
+  <img src="/images/how_to_setting_google_service_info_plist.png" />
+</Frame>
 
 ## Firebase Configuration
 
-OpenCI uses Firestore and Firebase Auth. Provision Firestore and enable email address sign-in in Firebase Auth.
+OpenCI utilizes Firestore and Firebase Authentication. You need to provision Firestore and enable Email authentication within Firebase Auth.
 
-After that, you will be able to create an account.
+### Provisioning Firestore
+
+<Frame >
+  <img src="/images/how_to_provision_firestore.png" />
+</Frame>
+
+### Enabling Email Authentication in Firebase Auth
+
+Enable Email authentication in Firebase Auth.
+
+<Frame >
+  <img src="/images/how_to_enable_email_auth.png" />
+</Frame>
