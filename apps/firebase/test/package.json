@@ -1,0 +1,20 @@
+{
+    "name": "unit-test-security-rules-v9",
+    "version": "1.0.0",
+    "engines": {
+        "node": ">= 18"
+    },
+    "scripts": {
+        "test": "jest",
+        "test-firestore": "jest --forceExit test/test.ts",
+        "test:watch": "jest --watch"
+    },
+    "devDependencies": {
+        "@firebase/rules-unit-testing": "^4.0.1",
+        "@types/jest": "^29.5.14",
+        "firebase": "^11.5.0",
+        "jest": "^29.7.0",
+        "ts-jest": "^29.3.0",
+        "typescript": "^5.8.2"
+    }
+}

@@ -8,7 +8,7 @@ import {
 	usersCollectionName,
 } from "../firestore_path.js";
 import { firestore } from "../index.js";
-import { onRequest } from "firebase-functions/https";
+import { onRequest } from "firebase-functions/v2/https";
 import {
 	type BuildJob,
 	type OpenCIGithub,
