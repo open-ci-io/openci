@@ -1,12 +1,10 @@
 import {
 	initializeTestEnvironment,
 	type RulesTestEnvironment,
-	assertSucceeds,
-	assertFails,
 } from "@firebase/rules-unit-testing";
 import { readFileSync } from "node:fs";
-import { deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { describe, test, beforeAll, afterAll } from "@jest/globals";
+import { describe, beforeAll, afterAll } from "@jest/globals";
+import { runBuildJobsV3CollectionTests } from "./firestore.build-jobs-v3.test";
 import { runUsersCollectionTests } from "./firestore.users.test";
 
 const PROJECT_ID = "open-ci-release";
@@ -28,4 +26,5 @@ afterAll(async () => {
 
 describe("Firestore Rules", () => {
 	runUsersCollectionTests(() => testEnv);
+	runBuildJobsV3CollectionTests(() => testEnv);
 });

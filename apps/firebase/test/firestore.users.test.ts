@@ -5,7 +5,7 @@ import {
 } from "@firebase/rules-unit-testing";
 import { deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { describe, test, beforeEach } from "@jest/globals";
-import { anotherUserId, userId } from "./consts";
+import { anotherUserId, userId, userCollectionPath } from "./consts";
 
 export function runUsersCollectionTests(
 	testEnvGetter: () => RulesTestEnvironment,
@@ -21,7 +21,7 @@ export function runUsersCollectionTests(
 			const authenticatedUser = testEnv.authenticatedContext(userId);
 			const authDb = authenticatedUser.firestore();
 			await assertSucceeds(
-				setDoc(doc(authDb, "users", userId), {
+				setDoc(doc(authDb, userCollectionPath, userId), {
 					name: "Test User Create",
 				}),
 			);
@@ -31,7 +31,9 @@ export function runUsersCollectionTests(
 			const unauthenticatedUser = testEnv.unauthenticatedContext();
 			const authDb = unauthenticatedUser.firestore();
 			await assertFails(
-				setDoc(doc(authDb, "users", userId), { name: "Test User Create Fail" }),
+				setDoc(doc(authDb, userCollectionPath, userId), {
+					name: "Test User Create Fail",
+				}),
 			);
 		});
 
@@ -39,7 +41,7 @@ export function runUsersCollectionTests(
 			const authenticatedUser = testEnv.authenticatedContext(userId);
 			const authDb = authenticatedUser.firestore();
 			await assertFails(
-				setDoc(doc(authDb, "users", anotherUserId), {
+				setDoc(doc(authDb, userCollectionPath, anotherUserId), {
 					name: "Test User Create Fail Other",
 				}),
 			);
@@ -50,37 +52,39 @@ export function runUsersCollectionTests(
 		test("should allow an authenticated user to read their own user document", async () => {
 			await testEnv.withSecurityRulesDisabled(async (context) => {
 				const adminDb = context.firestore();
-				await setDoc(doc(adminDb, "users", userId), { name: "Test User Read" });
+				await setDoc(doc(adminDb, userCollectionPath, userId), {
+					name: "Test User Read",
+				});
 			});
 
 			const authenticatedUser = testEnv.authenticatedContext(userId);
 			const authDb = authenticatedUser.firestore();
-			await assertSucceeds(getDoc(doc(authDb, "users", userId)));
+			await assertSucceeds(getDoc(doc(authDb, userCollectionPath, userId)));
 		});
 
 		test("should not allow an unauthenticated user to read any user document", async () => {
 			await testEnv.withSecurityRulesDisabled(async (context) => {
 				const adminDb = context.firestore();
-				await setDoc(doc(adminDb, "users", userId), {
+				await setDoc(doc(adminDb, userCollectionPath, userId), {
 					name: "Test User Read Fail",
 				});
 			});
 			const unauthenticatedUser = testEnv.unauthenticatedContext();
 			const authDb = unauthenticatedUser.firestore();
-			await assertFails(getDoc(doc(authDb, "users", userId)));
+			await assertFails(getDoc(doc(authDb, userCollectionPath, userId)));
 		});
 
 		test("should deny an authenticated user from reading another user's document", async () => {
 			await testEnv.withSecurityRulesDisabled(async (context) => {
 				const adminDb = context.firestore();
-				await setDoc(doc(adminDb, "users", anotherUserId), {
+				await setDoc(doc(adminDb, userCollectionPath, anotherUserId), {
 					name: "Test User Read Fail Other",
 				});
 			});
 
 			const authenticatedUser = testEnv.authenticatedContext(userId);
 			const authDb = authenticatedUser.firestore();
-			await assertFails(getDoc(doc(authDb, "users", anotherUserId)));
+			await assertFails(getDoc(doc(authDb, userCollectionPath, anotherUserId)));
 		});
 	});
 
@@ -88,7 +92,7 @@ export function runUsersCollectionTests(
 		test("should allow an authenticated user to update their own user document", async () => {
 			await testEnv.withSecurityRulesDisabled(async (context) => {
 				const adminDb = context.firestore();
-				await setDoc(doc(adminDb, "users", userId), {
+				await setDoc(doc(adminDb, userCollectionPath, userId), {
 					name: "Test User Update",
 				});
 			});
@@ -96,28 +100,32 @@ export function runUsersCollectionTests(
 			const authenticatedUser = testEnv.authenticatedContext(userId);
 			const authDb = authenticatedUser.firestore();
 			await assertSucceeds(
-				updateDoc(doc(authDb, "users", userId), { name: "Updated User" }),
+				updateDoc(doc(authDb, userCollectionPath, userId), {
+					name: "Updated User",
+				}),
 			);
 		});
 
 		test("should not allow an unauthenticated user to update a user document", async () => {
 			await testEnv.withSecurityRulesDisabled(async (context) => {
 				const adminDb = context.firestore();
-				await setDoc(doc(adminDb, "users", userId), {
+				await setDoc(doc(adminDb, userCollectionPath, userId), {
 					name: "Test User Update Fail",
 				});
 			});
 			const unauthenticatedUser = testEnv.unauthenticatedContext();
 			const authDb = unauthenticatedUser.firestore();
 			await assertFails(
-				updateDoc(doc(authDb, "users", userId), { name: "Updated User Fail" }),
+				updateDoc(doc(authDb, userCollectionPath, userId), {
+					name: "Updated User Fail",
+				}),
 			);
 		});
 
 		test("should deny an authenticated user from updating another user's document", async () => {
 			await testEnv.withSecurityRulesDisabled(async (context) => {
 				const adminDb = context.firestore();
-				await setDoc(doc(adminDb, "users", anotherUserId), {
+				await setDoc(doc(adminDb, userCollectionPath, anotherUserId), {
 					name: "Test User Update Fail Other",
 				});
 			});
@@ -125,7 +133,7 @@ export function runUsersCollectionTests(
 			const authenticatedUser = testEnv.authenticatedContext(userId);
 			const authDb = authenticatedUser.firestore();
 			await assertFails(
-				updateDoc(doc(authDb, "users", anotherUserId), {
+				updateDoc(doc(authDb, userCollectionPath, anotherUserId), {
 					name: "Updated User Fail Other",
 				}),
 			);
@@ -136,39 +144,41 @@ export function runUsersCollectionTests(
 		test("should allow an authenticated user to delete their own user document", async () => {
 			await testEnv.withSecurityRulesDisabled(async (context) => {
 				const adminDb = context.firestore();
-				await setDoc(doc(adminDb, "users", userId), {
+				await setDoc(doc(adminDb, userCollectionPath, userId), {
 					name: "Test User Delete",
 				});
 			});
 
 			const authenticatedUser = testEnv.authenticatedContext(userId);
 			const authDb = authenticatedUser.firestore();
-			await assertSucceeds(deleteDoc(doc(authDb, "users", userId)));
+			await assertSucceeds(deleteDoc(doc(authDb, userCollectionPath, userId)));
 		});
 
 		test("should not allow an unauthenticated user to delete a user document", async () => {
 			await testEnv.withSecurityRulesDisabled(async (context) => {
 				const adminDb = context.firestore();
-				await setDoc(doc(adminDb, "users", userId), {
+				await setDoc(doc(adminDb, userCollectionPath, userId), {
 					name: "Test User Delete Fail",
 				});
 			});
 			const unauthenticatedUser = testEnv.unauthenticatedContext();
 			const authDb = unauthenticatedUser.firestore();
-			await assertFails(deleteDoc(doc(authDb, "users", userId)));
+			await assertFails(deleteDoc(doc(authDb, userCollectionPath, userId)));
 		});
 
 		test("should deny an authenticated user from deleting another user's document", async () => {
 			await testEnv.withSecurityRulesDisabled(async (context) => {
 				const adminDb = context.firestore();
-				await setDoc(doc(adminDb, "users", anotherUserId), {
+				await setDoc(doc(adminDb, userCollectionPath, anotherUserId), {
 					name: "Test User Delete Fail Other",
 				});
 			});
 
 			const authenticatedUser = testEnv.authenticatedContext(userId);
 			const authDb = authenticatedUser.firestore();
-			await assertFails(deleteDoc(doc(authDb, "users", anotherUserId)));
+			await assertFails(
+				deleteDoc(doc(authDb, userCollectionPath, anotherUserId)),
+			);
 		});
 	});
 }

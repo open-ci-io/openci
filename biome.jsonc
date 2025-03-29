@@ -1,0 +1,14 @@
+{
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "correctness": {
+                "noUnusedImports": "error"
+            }
+        }
+    },
+    "organizeImports": {
+        "enabled": true
+    }
+}
