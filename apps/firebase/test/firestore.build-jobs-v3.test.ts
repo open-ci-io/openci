@@ -12,7 +12,7 @@ import {
 	userId,
 	workflowCollectionPath,
 	workflowId,
-} from "./consts";
+} from "./constants";
 
 export function runBuildJobsV3CollectionTests(
 	testEnvGetter: () => RulesTestEnvironment,
