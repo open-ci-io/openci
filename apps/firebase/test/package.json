@@ -5,9 +5,9 @@
         "node": ">= 18"
     },
     "scripts": {
-        "test": "jest",
-        "test-firestore": "jest --forceExit test/index.test.ts",
-        "test:watch": "jest --watch"
+        "test": "npx jest",
+        "test-firestore": "npx jest --forceExit test/index.test.ts",
+        "test:watch": "npx jest --watch"
     },
     "devDependencies": {
         "@firebase/rules-unit-testing": "^4.0.1",
