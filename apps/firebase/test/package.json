@@ -6,7 +6,7 @@
     },
     "scripts": {
         "test": "jest",
-        "test-firestore": "jest --forceExit test/test.ts",
+        "test-firestore": "jest --forceExit test/index.test.ts",
         "test:watch": "jest --watch"
     },
     "devDependencies": {
