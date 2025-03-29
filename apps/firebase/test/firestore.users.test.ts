@@ -5,7 +5,7 @@ import {
 } from "@firebase/rules-unit-testing";
 import { deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { describe, test, beforeEach } from "@jest/globals";
-import { anotherUserId, userId, userCollectionPath } from "./constants";
+import { anotherUserId, userId, userCollectionPath } from "./consts";
 
 export function runUsersCollectionTests(
 	testEnvGetter: () => RulesTestEnvironment,
