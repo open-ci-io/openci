@@ -3,7 +3,7 @@ import {
 	assertFails,
 	assertSucceeds,
 } from "@firebase/rules-unit-testing";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { describe, test, beforeEach } from "@jest/globals";
 import {
 	anotherUserId,
@@ -25,10 +25,22 @@ export function runBuildJobsV3CollectionTests(
 	});
 
 	describe("Build Jobs v3 collection: create", () => {
-		test("should not allow any users to create build job documents", async () => {
-			const authDb = testEnv.authenticatedContext(userId).firestore();
+		test("should not allow an unauthenticated user to create a build job", async () => {
+			const unauthenticatedDb = testEnv.unauthenticatedContext().firestore();
 			await assertFails(
-				setDoc(doc(authDb, buildJobCollectionPath, buildJobId), {
+				setDoc(doc(unauthenticatedDb, buildJobCollectionPath, buildJobId), {
+					workflowId: workflowId,
+					status: "running",
+				}),
+			);
+		});
+
+		test("should not allow an authenticated user to create a build job for another user", async () => {
+			const authenticatedDb = testEnv
+				.authenticatedContext(anotherUserId)
+				.firestore();
+			await assertFails(
+				setDoc(doc(authenticatedDb, buildJobCollectionPath, buildJobId), {
 					workflowId: workflowId,
 					status: "running",
 				}),
@@ -121,6 +133,76 @@ export function runBuildJobsV3CollectionTests(
 			const authDb = testEnv.authenticatedContext(userId).firestore();
 			await assertFails(
 				getDoc(doc(authDb, buildJobCollectionPath, buildJobId)),
+			);
+		});
+	});
+
+	describe("Build Jobs v3 collection: update", () => {
+		test("should not allow an unauthenticated user to update a build job", async () => {
+			await testEnv.withSecurityRulesDisabled(async (context) => {
+				const adminDb = context.firestore();
+				await setDoc(doc(adminDb, buildJobCollectionPath, buildJobId), {
+					workflowId: workflowId,
+					status: "running",
+				});
+			});
+			const unauthenticatedDb = testEnv.unauthenticatedContext().firestore();
+			await assertFails(
+				updateDoc(doc(unauthenticatedDb, buildJobCollectionPath, buildJobId), {
+					workflowId: workflowId,
+					status: "running",
+				}),
+			);
+		});
+
+		test("should not allow an authenticated user to update a build job for another user", async () => {
+			await testEnv.withSecurityRulesDisabled(async (context) => {
+				const adminDb = context.firestore();
+				await setDoc(doc(adminDb, buildJobCollectionPath, buildJobId), {
+					workflowId: workflowId,
+					status: "running",
+				});
+			});
+			const authenticatedDb = testEnv
+				.authenticatedContext(anotherUserId)
+				.firestore();
+			await assertFails(
+				updateDoc(doc(authenticatedDb, buildJobCollectionPath, buildJobId), {
+					workflowId: workflowId,
+					status: "running",
+				}),
+			);
+		});
+	});
+
+	describe("Build Jobs v3 collection: delete", () => {
+		test("should not allow an unauthenticated user to delete a build job", async () => {
+			await testEnv.withSecurityRulesDisabled(async (context) => {
+				const adminDb = context.firestore();
+				await setDoc(doc(adminDb, buildJobCollectionPath, buildJobId), {
+					workflowId: workflowId,
+					status: "running",
+				});
+			});
+			const unauthenticatedDb = testEnv.unauthenticatedContext().firestore();
+			await assertFails(
+				deleteDoc(doc(unauthenticatedDb, buildJobCollectionPath, buildJobId)),
+			);
+		});
+
+		test("should not allow an authenticated user to update a build job for another user", async () => {
+			await testEnv.withSecurityRulesDisabled(async (context) => {
+				const adminDb = context.firestore();
+				await setDoc(doc(adminDb, buildJobCollectionPath, buildJobId), {
+					workflowId: workflowId,
+					status: "running",
+				});
+			});
+			const authenticatedDb = testEnv
+				.authenticatedContext(anotherUserId)
+				.firestore();
+			await assertFails(
+				deleteDoc(doc(authenticatedDb, buildJobCollectionPath, buildJobId)),
 			);
 		});
 	});

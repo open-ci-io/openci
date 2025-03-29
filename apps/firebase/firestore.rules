@@ -15,6 +15,7 @@ service cloud.firestore {
                      isWorkflowOwner(resource.data.workflowId);
       // Note: Write rules for build_jobs_v3 are currently missing.
       // Add 'allow write: ...' rules if needed.
+      
     }
 
     // environmental_variables_v1
