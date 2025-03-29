@@ -2,6 +2,6 @@
 module.exports = {
 	testEnvironment: "node",
 	transform: {
-		"^.+.tsx?$": ["ts-jest", {}],
+		"^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js",
 	},
 };
