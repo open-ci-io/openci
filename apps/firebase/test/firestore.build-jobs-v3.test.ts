@@ -24,6 +24,18 @@ export function runBuildJobsV3CollectionTests(
 		await testEnv.clearFirestore();
 	});
 
+	describe("Build Jobs v3 collection: create", () => {
+		test("should not allow any users to create build job documents", async () => {
+			const authDb = testEnv.authenticatedContext(userId).firestore();
+			await assertFails(
+				setDoc(doc(authDb, buildJobCollectionPath, buildJobId), {
+					workflowId: workflowId,
+					status: "running",
+				}),
+			);
+		});
+	});
+
 	describe("Build Jobs v3 collection: read", () => {
 		test("should allow authenticated owner to read build job", async () => {
 			await testEnv.withSecurityRulesDisabled(async (context) => {
