@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { describe, beforeAll, afterAll } from "@jest/globals";
 import { runBuildJobsV3CollectionTests } from "./firestore.build-jobs-v3.test";
 import { runUsersCollectionTests } from "./firestore.users.test";
-
+import { runWorkflowsCollectionTests } from "./firestore.workflows.test";
 const PROJECT_ID = "open-ci-release";
 
 let testEnv: RulesTestEnvironment;
@@ -27,4 +27,5 @@ afterAll(async () => {
 describe("Firestore Rules", () => {
 	runUsersCollectionTests(() => testEnv);
 	runBuildJobsV3CollectionTests(() => testEnv);
+	runWorkflowsCollectionTests(() => testEnv);
 });
