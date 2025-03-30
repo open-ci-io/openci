@@ -1,0 +1,35 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /build_jobs_v3/{jobId} {
+      function isWorkflowOwner(workflowId) {
+        return workflowId != null &&
+               request.auth.uid in get(/databases/$(database)/documents/workflows/$(workflowId)).data.owners;
+      }
+      allow read: if request.auth.uid != null &&
+                     resource.data.workflowId != null &&
+                     isWorkflowOwner(resource.data.workflowId);      
+    }
+
+    match /secrets_v1/{secretId} {
+      allow create: if request.auth.uid != null;
+      allow list: if request.auth.uid != null;
+      allow read, update, delete: if request.auth.uid != null
+        && resource.data.owners.hasAny([request.auth.uid]);
+        // Consider changing hasAny to 'in' for consistency
+        // && request.auth.uid in resource.data.owners;
+    }
+
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+
+    match /workflows/{workflowId} {
+      allow create: if request.auth.uid != null;
+      allow read, update, delete: if request.auth.uid != null
+        && request.auth.uid in resource.data.owners;
+    }
+  }
+}
