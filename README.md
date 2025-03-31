@@ -27,6 +27,9 @@ The best CI/CD service.
 9. Positive impact of OpenCI on Flutter and the entire software community
 10. Contribute to the success of the business and make a big contribution to humanity
 
+# Pricing
+Free
+
 # branch strategy
 
 - `main` is the default branch.
