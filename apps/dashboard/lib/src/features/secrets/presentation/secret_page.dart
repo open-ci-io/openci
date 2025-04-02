@@ -1,5 +1,4 @@
 import 'package:dashboard/colors.dart';
-import 'package:dashboard/src/common_widgets/dialogs/delete_dialog.dart';
 import 'package:dashboard/src/common_widgets/divider.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/services/firebase.dart';
@@ -9,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openci_models/openci_models.dart';
-import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 class SecretPage extends ConsumerWidget {
   const SecretPage({super.key, required this.firebaseSuite});
@@ -57,6 +55,7 @@ class SecretPage extends ConsumerWidget {
                         firebaseSuite: firebaseSuite,
                         isEditing: true,
                         secretName: secret.name,
+                        documentId: data[index].id,
                       ),
                     );
                   },
@@ -92,21 +91,19 @@ class SecretPage extends ConsumerWidget {
 class _DialogBody extends HookConsumerWidget {
   const _DialogBody({
     this.secretName,
-    this.secretValue,
     this.isEditing = false,
     this.documentId,
     required this.firebaseSuite,
   });
 
   final String? secretName;
-  final String? secretValue;
   final bool isEditing;
   final String? documentId;
   final OpenCIFirebaseSuite firebaseSuite;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final keyController = useTextEditingController(text: secretName ?? '');
-    final valueController = useTextEditingController(text: secretValue ?? '');
+    final valueController = useTextEditingController(text: '');
     final screenWidth = MediaQuery.of(context).size.width;
     return AlertDialog(
       title: Row(
