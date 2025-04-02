@@ -15,8 +15,7 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$OpenCISecret {
-  String get key;
-  String get value;
+  String get name;
   List<String> get owners;
   int get createdAt;
   int get updatedAt;
@@ -37,8 +36,7 @@ mixin _$OpenCISecret {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is OpenCISecret &&
-            (identical(other.key, key) || other.key == key) &&
-            (identical(other.value, value) || other.value == value) &&
+            (identical(other.name, name) || other.name == name) &&
             const DeepCollectionEquality().equals(other.owners, owners) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
@@ -48,12 +46,12 @@ mixin _$OpenCISecret {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, key, value,
+  int get hashCode => Object.hash(runtimeType, name,
       const DeepCollectionEquality().hash(owners), createdAt, updatedAt);
 
   @override
   String toString() {
-    return 'OpenCISecret(key: $key, value: $value, owners: $owners, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'OpenCISecret(name: $name, owners: $owners, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
 
@@ -63,12 +61,7 @@ abstract mixin class $OpenCISecretCopyWith<$Res> {
           OpenCISecret value, $Res Function(OpenCISecret) _then) =
       _$OpenCISecretCopyWithImpl;
   @useResult
-  $Res call(
-      {String key,
-      String value,
-      List<String> owners,
-      int createdAt,
-      int updatedAt});
+  $Res call({String name, List<String> owners, int createdAt, int updatedAt});
 }
 
 /// @nodoc
@@ -83,20 +76,15 @@ class _$OpenCISecretCopyWithImpl<$Res> implements $OpenCISecretCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? key = null,
-    Object? value = null,
+    Object? name = null,
     Object? owners = null,
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
     return _then(_self.copyWith(
-      key: null == key
-          ? _self.key
-          : key // ignore: cast_nullable_to_non_nullable
-              as String,
-      value: null == value
-          ? _self.value
-          : value // ignore: cast_nullable_to_non_nullable
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
               as String,
       owners: null == owners
           ? _self.owners
@@ -118,8 +106,7 @@ class _$OpenCISecretCopyWithImpl<$Res> implements $OpenCISecretCopyWith<$Res> {
 @JsonSerializable()
 class _OpenCISecret implements OpenCISecret {
   const _OpenCISecret(
-      {required this.key,
-      required this.value,
+      {required this.name,
       required final List<String> owners,
       required this.createdAt,
       required this.updatedAt})
@@ -128,9 +115,7 @@ class _OpenCISecret implements OpenCISecret {
       _$OpenCISecretFromJson(json);
 
   @override
-  final String key;
-  @override
-  final String value;
+  final String name;
   final List<String> _owners;
   @override
   List<String> get owners {
@@ -164,8 +149,7 @@ class _OpenCISecret implements OpenCISecret {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _OpenCISecret &&
-            (identical(other.key, key) || other.key == key) &&
-            (identical(other.value, value) || other.value == value) &&
+            (identical(other.name, name) || other.name == name) &&
             const DeepCollectionEquality().equals(other._owners, _owners) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
@@ -175,12 +159,12 @@ class _OpenCISecret implements OpenCISecret {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, key, value,
+  int get hashCode => Object.hash(runtimeType, name,
       const DeepCollectionEquality().hash(_owners), createdAt, updatedAt);
 
   @override
   String toString() {
-    return 'OpenCISecret(key: $key, value: $value, owners: $owners, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'OpenCISecret(name: $name, owners: $owners, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
 
@@ -192,12 +176,7 @@ abstract mixin class _$OpenCISecretCopyWith<$Res>
       __$OpenCISecretCopyWithImpl;
   @override
   @useResult
-  $Res call(
-      {String key,
-      String value,
-      List<String> owners,
-      int createdAt,
-      int updatedAt});
+  $Res call({String name, List<String> owners, int createdAt, int updatedAt});
 }
 
 /// @nodoc
@@ -213,20 +192,15 @@ class __$OpenCISecretCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? key = null,
-    Object? value = null,
+    Object? name = null,
     Object? owners = null,
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
     return _then(_OpenCISecret(
-      key: null == key
-          ? _self.key
-          : key // ignore: cast_nullable_to_non_nullable
-              as String,
-      value: null == value
-          ? _self.value
-          : value // ignore: cast_nullable_to_non_nullable
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
               as String,
       owners: null == owners
           ? _self._owners

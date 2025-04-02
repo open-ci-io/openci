@@ -1,4 +1,5 @@
 import 'package:dashboard/colors.dart';
+import 'package:dashboard/src/common_widgets/divider.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_editor/presentation/edit_workflow.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/create_workflow_dialog/presentation/create_workflow_dialog_controller.dart';
@@ -114,10 +115,7 @@ class WorkflowListPage extends ConsumerWidget {
                                                     .currentWorkingDirectory;
 
                                     return shouldShowSeparator
-                                        ? const Divider(
-                                            color: Color(0xFF2C2C2E),
-                                            height: 1,
-                                          )
+                                        ? const OpenCIDivider()
                                         : const SizedBox.shrink();
                                   },
                                   itemBuilder: (_, index) {

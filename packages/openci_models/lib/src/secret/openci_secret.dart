@@ -6,8 +6,7 @@ part 'openci_secret.g.dart';
 @freezed
 abstract class OpenCISecret with _$OpenCISecret {
   const factory OpenCISecret({
-    required String key,
-    required String value,
+    required String name,
     required List<String> owners,
     required int createdAt,
     required int updatedAt,
