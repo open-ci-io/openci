@@ -64,8 +64,7 @@ class AuthPage extends HookConsumerWidget {
                   verticalMargin24,
                   Text('Project ID: ${projectId.value}'),
                   verticalMargin24,
-                  Wrap(
-                    runSpacing: 16,
+                  Column(
                     children: [
                       RegisterButton(
                         isLoading: isLoading,
@@ -73,7 +72,7 @@ class AuthPage extends HookConsumerWidget {
                         emailTextController: emailTextController,
                         passwordTextController: passwordTextController,
                       ),
-                      horizontalMargin16,
+                      verticalMargin16,
                       _LoginButton(
                         formKey: formKey,
                         emailTextController: emailTextController,
@@ -81,7 +80,7 @@ class AuthPage extends HookConsumerWidget {
                         projectId: projectId.value,
                         isLoading: isLoading,
                       ),
-                      horizontalMargin16,
+                      verticalMargin16,
                       _SelectFirebaseProjectButton(
                         projectId: projectId,
                       ),
@@ -113,11 +112,6 @@ class RegisterButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        side: BorderSide(
-          color: Theme.of(context).colorScheme.primary,
-        ),
-      ),
       onPressed: () async {
         if (formKey.currentState!.validate()) {
           formKey.currentState!.save();
@@ -186,11 +180,6 @@ class _LoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        side: BorderSide(
-          color: context.primaryColor,
-        ),
-      ),
       child: const Text('Login'),
       onPressed: () async {
         if (formKey.currentState!.validate()) {
@@ -281,11 +270,6 @@ class _SelectFirebaseProjectButton extends StatelessWidget {
           ),
         );
       },
-      style: ElevatedButton.styleFrom(
-        side: BorderSide(
-          color: context.primaryColor,
-        ),
-      ),
       child: const Text('Use My Firebase Project'),
     );
   }

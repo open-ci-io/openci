@@ -34,6 +34,8 @@ void main() async {
   );
 }
 
+const minButtonWidth = 300.0;
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -85,8 +87,12 @@ class MyApp extends StatelessWidget {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: OpenCIColors.primaryDark,
-            foregroundColor: Colors.black,
+            minimumSize: const Size(minButtonWidth, 50),
+            backgroundColor: OpenCIColors.surface,
+            side: const BorderSide(
+              color: OpenCIColors.primary,
+              width: 0.6,
+            ),
           ),
         ),
         expansionTileTheme: const ExpansionTileThemeData(
