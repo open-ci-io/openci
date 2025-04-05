@@ -21,6 +21,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const _defaultProjectId = 'openci-release(default)';
 
+const textFieldMaxWidth = 600.0;
+
 class WelcomePage extends HookConsumerWidget {
   const WelcomePage({super.key});
 
@@ -298,19 +300,22 @@ class _PasswordField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: passwordTextController,
-      decoration: const InputDecoration(
-        labelText: 'Password',
-        hintStyle: TextStyle(),
+    return SizedBox(
+      width: textFieldMaxWidth,
+      child: TextFormField(
+        controller: passwordTextController,
+        decoration: const InputDecoration(
+          labelText: 'Password',
+          hintStyle: TextStyle(),
+        ),
+        obscureText: true,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Enter your password';
+          }
+          return null;
+        },
       ),
-      obscureText: true,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Enter your password';
-        }
-        return null;
-      },
     );
   }
 }
@@ -324,15 +329,18 @@ class _EmailField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: emailTextController,
-      decoration: const InputDecoration(labelText: 'Email'),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Enter your email';
-        }
-        return null;
-      },
+    return SizedBox(
+      width: textFieldMaxWidth,
+      child: TextFormField(
+        controller: emailTextController,
+        decoration: const InputDecoration(labelText: 'Email'),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Enter your email';
+          }
+          return null;
+        },
+      ),
     );
   }
 }

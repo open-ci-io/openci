@@ -193,7 +193,6 @@ class _DialogBody extends HookConsumerWidget {
                             .collection(secretsCollectionPath)
                             .doc(documentId)
                             .update({
-                          'key': keyController.text,
                           'value': valueController.text,
                           'updatedAt': DateTime.now().millisecondsSinceEpoch,
                         });
