@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/common_widgets/dialogs/alert_dialog.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/features/secrets/presentation/secret_page.dart';
-import 'package:dashboard/src/features/welcome_page/presentation/welcome_page.dart';
+import 'package:dashboard/src/features/auth/presentation/auth_page.dart';
 import 'package:dashboard/src/features/workflow/presentation/workflow_list/presentation/workflow_list_page.dart';
 import 'package:dashboard/src/services/firebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -55,7 +55,7 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.remove('googleServiceInfoPlist');
                     await data.auth.signOut();
-                    await pushAndRemoveUntil(context, const WelcomePage());
+                    await pushAndRemoveUntil(context, const AuthPage());
                   },
                 ),
               );
@@ -81,7 +81,7 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
                   await data.auth.signOut();
                   final prefs = await SharedPreferences.getInstance();
                   await prefs.remove('googleServiceInfoPlist');
-                  await pushAndRemoveUntil(context, const WelcomePage());
+                  await pushAndRemoveUntil(context, const AuthPage());
                 },
                 icon: const Icon(Icons.logout),
               ),

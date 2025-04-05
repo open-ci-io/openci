@@ -5,8 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/src/common_widgets/dialogs/error_dialog.dart';
 import 'package:dashboard/src/common_widgets/margins.dart';
 import 'package:dashboard/src/extensions/build_context_extension.dart';
+import 'package:dashboard/src/features/auth/presentation/fetch_app_version.dart';
 import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
-import 'package:dashboard/src/features/welcome_page/presentation/fetch_app_version.dart';
 import 'package:dashboard/src/services/firebase.dart';
 import 'package:dashboard/src/services/plist.dart';
 import 'package:file_picker/file_picker.dart';
@@ -23,8 +23,8 @@ const _defaultProjectId = 'openci-release(default)';
 
 const textFieldMaxWidth = 600.0;
 
-class WelcomePage extends HookConsumerWidget {
-  const WelcomePage({super.key});
+class AuthPage extends HookConsumerWidget {
+  const AuthPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
