@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard/colors.dart';
-import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/features/auth/presentation/auth_page.dart';
+import 'package:dashboard/src/features/navigation/presentation/navigation_page.dart';
 import 'package:dashboard/src/services/firebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
