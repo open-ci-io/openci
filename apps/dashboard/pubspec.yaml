@@ -29,7 +29,7 @@ dependencies:
   package_info_plus: ^8.3.0
   propertylistserialization: ^1.4.1
   riverpod_annotation: ^2.5.3
-  sentry_flutter: ^8.13.0-beta.3
+  sentry_flutter: ^8.14.2
   shared_preferences: ^2.5.2
   signals: ^6.0.2
   timelines_plus: ^1.0.6
