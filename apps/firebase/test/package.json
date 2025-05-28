@@ -5,7 +5,8 @@
         "node": ">= 18"
     },
     "scripts": {
-        "test": "npx jest",
+        "test": "npx jest --detectOpenHandles",
+        "test:emulator": "cd .. && firebase emulators:exec --only firestore 'cd test && yarn test'",
         "test-firestore": "npx jest --forceExit test/index.test.ts",
         "test:watch": "npx jest --watch"
     },
