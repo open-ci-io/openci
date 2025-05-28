@@ -12,3 +12,7 @@ class LogoutIntent extends Intent {
 class PopIntent extends Intent {
   const PopIntent();
 }
+
+class CreateWorkflowIntent extends Intent {
+  const CreateWorkflowIntent();
+}

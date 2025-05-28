@@ -32,3 +32,14 @@ class PopAction extends Action<PopIntent> {
     return null;
   }
 }
+
+class CreateWorkflowAction extends Action<CreateWorkflowIntent> {
+  CreateWorkflowAction({required this.callback});
+  final VoidCallback callback;
+
+  @override
+  Object? invoke(CreateWorkflowIntent intent) {
+    callback();
+    return null;
+  }
+}
