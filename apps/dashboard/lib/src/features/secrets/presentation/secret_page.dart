@@ -98,7 +98,7 @@ class SecretPage extends ConsumerWidget {
             ),
           );
         },
-        error: (error, stack) => const Text('Error'),
+        error: (error, stack) => const Center(child: Text('Error')),
         loading: () =>
             const Center(child: CircularProgressIndicator.adaptive()),
       ),
