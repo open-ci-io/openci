@@ -4,12 +4,12 @@ version: 0.2.0
 repository: https://github.com/open-ci-io/openci/tree/develop/apps/honyaku_konnyaku
 
 environment:
-  sdk: ^3.5.4
+  sdk: ^3.8.1
 
 dependencies:
-  args: ^2.4.2
-  google_generative_ai: ^0.4.6
+  args: ^2.7.0
+  google_generative_ai: ^0.4.7
 
 dev_dependencies:
   lints: ^5.1.1
-  test: ^1.24.0
+  test: ^1.26.2
