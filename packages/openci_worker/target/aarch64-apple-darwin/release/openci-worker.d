@@ -1,0 +1,1 @@
+/Users/masahiroaoki/Developer/openci-inc/openci/packages/openci_worker/target/aarch64-apple-darwin/release/openci-worker: /Users/masahiroaoki/Developer/openci-inc/openci/packages/openci_worker/src/main.rs
