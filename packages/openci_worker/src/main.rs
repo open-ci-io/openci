@@ -1,3 +1,6 @@
 fn main() {
-    println!("Hello, world!");
+
+    for count in 0.. {
+        println!("count: {}", count);
+    }
 }
