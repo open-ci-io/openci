@@ -1,6 +1,8 @@
 [package]
 name = "openci-controller"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
+axum = "0.8.4"
+tokio = "1.45.1"
