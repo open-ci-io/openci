@@ -6,3 +6,5 @@ melos.yaml
 gen_dmg.sh
 
 sh/
+
+target/
