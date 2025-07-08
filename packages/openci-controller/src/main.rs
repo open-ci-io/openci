@@ -22,7 +22,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(|| async { "Hello, OpenCI!" }))
         .route("/users", get(handlers::user_handler::get_users))
-        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
+        .merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .with_state(pool);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
