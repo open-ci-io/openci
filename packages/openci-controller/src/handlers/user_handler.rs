@@ -18,3 +18,35 @@ pub async fn get_users(State(pool): State<PgPool>) -> Json<Vec<User>> {
 
     Json(users)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sqlx::PgPool;
+
+    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    async fn test_get_users(pool: PgPool) {
+        let response = get_users(State(pool)).await;
+        assert!(!response.0.is_empty());
+    }
+
+    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    async fn test_get_users_returns_correct_data(pool: PgPool) {
+        let response = get_users(State(pool)).await;
+        let users = response.0;
+
+        // 件数の確認
+        assert_eq!(users.len(), 3);
+
+        // 具体的なデータの確認
+        let user_names: Vec<String> = users.iter().map(|u| u.name.clone()).collect();
+        assert!(user_names.contains(&"John Doe".to_string()));
+        assert!(user_names.contains(&"Jane Smith".to_string()));
+    }
+
+    #[sqlx::test]
+    async fn test_get_users_empty_database(pool: PgPool) {
+        let response = get_users(State(pool)).await;
+        assert!(response.0.is_empty());
+    }
+}
