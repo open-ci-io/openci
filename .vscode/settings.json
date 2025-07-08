@@ -22,5 +22,6 @@
 	"rust-analyzer.linkedProjects": [
 		"packages/openci-worker/Cargo.toml",
 		"packages/openci-controller/Cargo.toml"
-	]
+	],
+	"cSpell.words": ["chrono", "dotenv", "dotenvy", "serde", "sqlx", "utoipa"]
 }

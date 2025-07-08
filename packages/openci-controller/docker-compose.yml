@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: openci_password
       POSTGRES_DB: openci_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile
     container_name: openci-controller
     environment:
-      DATABASE_URL: postgres://openci:openci_password@postgres:5432/openci_db
+      DATABASE_URL: postgres://openci:openci_password@postgres:5433/openci_db
       RUST_LOG: info
     ports:
       - "8080:8080"
