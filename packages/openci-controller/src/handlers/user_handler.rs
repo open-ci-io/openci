@@ -35,10 +35,8 @@ mod tests {
         let response = get_users(State(pool)).await;
         let users = response.0;
 
-        // 件数の確認
         assert_eq!(users.len(), 3);
 
-        // 具体的なデータの確認
         let user_names: Vec<String> = users.iter().map(|u| u.name.clone()).collect();
         assert!(user_names.contains(&"John Doe".to_string()));
         assert!(user_names.contains(&"Jane Smith".to_string()));
