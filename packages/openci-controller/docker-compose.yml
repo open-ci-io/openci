@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: openci-postgres
+    environment:
+      POSTGRES_USER: openci
+      POSTGRES_PASSWORD: openci_password
+      POSTGRES_DB: openci_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - openci-network
+
+  openci-controller:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openci-controller
+    environment:
+      DATABASE_URL: postgres://openci:openci_password@postgres:5433/openci_db
+      RUST_LOG: info
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - openci-network
+
+volumes:
+  postgres_data:
+
+networks:
+  openci-network:
+    driver: bridge
