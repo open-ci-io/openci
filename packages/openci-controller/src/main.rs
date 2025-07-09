@@ -17,7 +17,10 @@ async fn main() {
         .max_connections(5)
         .connect(&database_url)
         .await
-        .expect("Failed to connect to the database");
+        .unwrap_or_else(|err| {
+            eprintln!("Failed to connect to database: {}", err);
+            std::process::exit(1);
+        });
 
     let app = Router::new()
         .route("/", get(|| async { "Hello, OpenCI!" }))
