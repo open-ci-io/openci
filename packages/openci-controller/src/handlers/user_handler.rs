@@ -1,5 +1,5 @@
 use crate::models::user::User;
-use axum::{extract::State, Json};
+use axum::{extract::State, http::StatusCode, Json};
 use sqlx::PgPool;
 
 #[utoipa::path(
@@ -10,13 +10,21 @@ use sqlx::PgPool;
         (status = 500, description = "Internal server error. Note: current implementation panics.")
     )
 )]
-pub async fn get_users(State(pool): State<PgPool>) -> Json<Vec<User>> {
+pub async fn get_users(
+    State(pool): State<PgPool>,
+) -> Result<Json<Vec<User>>, (StatusCode, String)> {
     let users = sqlx::query_as::<_, User>("SELECT * FROM users")
         .fetch_all(&pool)
         .await
-        .expect("Failed to fetch users");
+        .map_err(|e| {
+            eprintln!("Failed to fetch users: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to fetch users".to_string(),
+            )
+        })?;
 
-    Json(users)
+    Ok(Json(users))
 }
 
 #[cfg(test)]
@@ -26,13 +34,13 @@ mod tests {
 
     #[sqlx::test(fixtures("../../fixtures/users.sql"))]
     async fn test_get_users(pool: PgPool) {
-        let response = get_users(State(pool)).await;
+        let response = get_users(State(pool)).await.unwrap();
         assert!(!response.0.is_empty());
     }
 
     #[sqlx::test(fixtures("../../fixtures/users.sql"))]
     async fn test_get_users_returns_correct_data(pool: PgPool) {
-        let response = get_users(State(pool)).await;
+        let response = get_users(State(pool)).await.unwrap();
         let users = response.0;
 
         assert_eq!(users.len(), 3);
@@ -44,7 +52,7 @@ mod tests {
 
     #[sqlx::test]
     async fn test_get_users_empty_database(pool: PgPool) {
-        let response = get_users(State(pool)).await;
+        let response = get_users(State(pool)).await.unwrap();
         assert!(response.0.is_empty());
     }
 }
