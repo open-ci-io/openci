@@ -24,7 +24,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(|| async { "Hello, OpenCI!" }))
-        .route("/users", get(handlers::user_handler::get_users))
+        .route("/users", get(crate::handlers::user_handler::get_users))
         .merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .with_state(pool);
 
