@@ -23,5 +23,15 @@
 		"packages/openci-worker/Cargo.toml",
 		"packages/openci-controller/Cargo.toml"
 	],
-	"cSpell.words": ["chrono", "dotenv", "dotenvy", "serde", "sqlx", "utoipa"]
+	"cSpell.words": [
+		"Bitrise",
+		"chrono",
+		"Codemagic",
+		"dotenv",
+		"dotenvy",
+		"jsonwebtoken",
+		"serde",
+		"sqlx",
+		"utoipa"
+	]
 }
