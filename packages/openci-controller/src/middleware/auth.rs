@@ -14,7 +14,7 @@ pub async fn auth_middleware(
 ) -> Result<Response, StatusCode> {
     let api_key = request
         .headers()
-        .get("x-api-key")
+        .get("X-API-Key")
         .and_then(|value| value.to_str().ok());
 
     let api_key = match api_key {
