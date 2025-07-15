@@ -56,11 +56,11 @@ impl AppConfig {
             server_host: env::var("SERVER_HOST").unwrap_or_else(|_| "0.0.0.0".to_string()),
             server_port: {
                 let port_str = env::var("SERVER_PORT").unwrap_or_else(|_| "8080".to_string());
-                let port: u16 = port_str.parse().map_err(ConfigError::ParseInt)?;
-                if port == 0 {
-                    return Err(ConfigError::InvalidPort(port));
+                let port_num: u32 = port_str.parse().map_err(ConfigError::ParseInt)?;
+                if port_num == 0 || port_num > 65535 {
+                    return Err(ConfigError::InvalidPort(port_num as u16));
                 }
-                port
+                port_num as u16
             },
             max_connections: {
                 let conn_str =
