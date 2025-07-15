@@ -34,7 +34,7 @@ async fn shutdown_signal() {
     let terminate = async {
         match tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()) {
             Ok(mut signal) => {
-                info!("SIGTERM signal handler installed successfully");
+                info!("SIGTERM signal handler created, waiting for signal");
                 signal.recv().await;
                 Some(())
             }
