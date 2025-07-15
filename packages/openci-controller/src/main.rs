@@ -1,43 +1,33 @@
-use crate::models::{error_response::ErrorResponse, user::User};
-use axum::{routing::get, Router};
 use dotenvy::dotenv;
-use sqlx::postgres::PgPoolOptions;
-use std::env;
-use utoipa::OpenApi;
-use utoipa_swagger_ui::SwaggerUi;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
+mod api;
+mod config;
+mod db;
 mod handlers;
+mod middleware;
 mod models;
+mod server;
+mod services;
 
 #[tokio::main(flavor = "current_thread")]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&database_url)
-        .await
-        .unwrap_or_else(|err| {
-            eprintln!("Failed to connect to database: {}", err);
-            std::process::exit(1);
-        });
 
-    let app = Router::new()
-        .route("/", get(|| async { "Hello, OpenCI!" }))
-        .route("/users", get(crate::handlers::user_handler::get_users))
-        .merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", ApiDoc::openapi()))
-        .with_state(pool);
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into()),
+        )
+        .with(tracing_subscriber::fmt::layer().json())
+        .init();
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
+    let config = config::app::AppConfig::from_env()?;
 
-    println!("Server running on http://0.0.0.0:8080");
+    let pool = db::pool::create_pool(&config).await?;
 
-    axum::serve(listener, app).await.unwrap();
+    let app = api::routes::create_routes(pool);
+
+    server::startup::run(app, &config.server_addr()).await?;
+
+    Ok(())
 }
-
-#[derive(OpenApi)]
-#[openapi(
-    paths(handlers::user_handler::get_users),
-    components(schemas(User, ErrorResponse))
-)]
-struct ApiDoc;
