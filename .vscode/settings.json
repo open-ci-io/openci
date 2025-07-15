@@ -32,7 +32,6 @@
 		"jsonwebtoken",
 		"mockall",
 		"nonexistentkey",
-		"opnci",
 		"serde",
 		"sqlx",
 		"thiserror",

@@ -2,7 +2,7 @@ use rand::Rng;
 use sha2::{Digest, Sha256};
 use sqlx::PgPool;
 
-const API_KEY_PREFIX: &str = "opnci_";
+const API_KEY_PREFIX: &str = "openci_";
 const API_KEY_BODY_LENGTH: usize = 32;
 
 pub fn generate_api_key_body() -> String {
