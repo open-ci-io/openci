@@ -127,7 +127,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_validate_api_key_with_database_error() {
-        let api_key = "opnci_errorkey123";
+        let api_key = "openci_error_key123";
         let hashed_key = hash_api_key(api_key);
 
         let mut mock_repo = MockApiKeyRepository::new();
@@ -142,7 +142,7 @@ mod tests {
 
     #[test]
     fn test_hash_api_key_consistency() {
-        let api_key = "opnci_test123456789";
+        let api_key = "openci_test123456789";
         let hash1 = hash_api_key(api_key);
         let hash2 = hash_api_key(api_key);
         assert_eq!(hash1, hash2);
@@ -150,8 +150,8 @@ mod tests {
 
     #[test]
     fn test_hash_api_key_different_inputs() {
-        let api_key1 = "opnci_test123456789";
-        let api_key2 = "opnci_test987654321";
+        let api_key1 = "openci_test123456789";
+        let api_key2 = "openci_test987654321";
         let hash1 = hash_api_key(api_key1);
         let hash2 = hash_api_key(api_key2);
         assert_ne!(hash1, hash2);
