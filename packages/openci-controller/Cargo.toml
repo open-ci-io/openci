@@ -22,3 +22,4 @@ utoipa-swagger-ui = { version = "9.0.2", features = ["axum"] }
 chrono = { version = "0.4", features = ["serde"] }
 bcrypt = "0.17.0"
 rand = "0.9.1"
+sha2 = "0.10.9"
