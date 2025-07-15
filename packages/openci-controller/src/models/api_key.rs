@@ -9,8 +9,6 @@ pub struct ApiKey {
     pub id: i32,
     pub user_id: i32,
     pub name: String,
-    #[serde(skip)]
-    pub hashed_key: String,
     pub created_at: DateTime<Utc>,
     pub last_used_at: Option<DateTime<Utc>>,
     pub prefix: String,
@@ -18,7 +16,7 @@ pub struct ApiKey {
 
 #[derive(Deserialize, ToSchema, Validate)]
 pub struct CreateApiKeyRequest {
-    #[validate(length(min = 1, max = 64))]
+    #[validate(length(min = 1, max = 64), custom(function = "validate_api_key_name"))]
     pub name: String,
 }
 
@@ -29,4 +27,11 @@ pub struct CreateApiKeyResponse {
     pub api_key: String,
     pub prefix: String,
     pub created_at: DateTime<Utc>,
+}
+
+fn validate_api_key_name(name: &String) -> Result<(), validator::ValidationError> {
+    if name.trim().is_empty() {
+        return Err(validator::ValidationError::new("name_empty_or_whitespace"));
+    }
+    Ok(())
 }
