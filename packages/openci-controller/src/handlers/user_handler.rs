@@ -1,6 +1,7 @@
 use crate::models::user::User;
 use axum::{extract::State, http::StatusCode, Json};
 use sqlx::PgPool;
+use tracing::error;
 
 #[utoipa::path(
     get,
@@ -17,7 +18,7 @@ pub async fn get_users(
         .fetch_all(&pool)
         .await
         .map_err(|e| {
-            eprintln!("Failed to fetch users: {}", e);
+            error!("Failed to fetch users: {}", e);
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "Failed to fetch users".to_string(),

@@ -1,6 +1,7 @@
 use rand::Rng;
 use sha2::{Digest, Sha256};
 use sqlx::PgPool;
+use tracing::error;
 
 const API_KEY_PREFIX: &str = "openci_";
 const API_KEY_BODY_LENGTH: usize = 32;
@@ -35,7 +36,7 @@ pub async fn validate_api_key<R: ApiKeyRepository>(repo: &R, api_key: &str) -> O
     match repo.update_and_get_user_id(&hashed_key).await {
         Ok(user_id) => user_id,
         Err(e) => {
-            eprintln!("API key validation database error: {}", e);
+            error!("API key validation database error: {}", e);
             None
         }
     }

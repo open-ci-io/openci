@@ -5,14 +5,14 @@ use tracing::{error, info};
 pub async fn run(app: Router, addr: &str) -> Result<(), std::io::Error> {
     let listener = TcpListener::bind(addr).await?;
 
-    println!("Server running on http://{}", addr);
+    info!("Server running on http://{}", addr);
 
     let graceful = axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await
         .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e));
 
-    println!("Server has been shut down gracefully");
+    info!("Server has been shut down gracefully");
     graceful
 }
 

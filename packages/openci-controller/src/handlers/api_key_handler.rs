@@ -8,6 +8,7 @@ use axum::{
     Json,
 };
 use sqlx::PgPool;
+use tracing::error;
 
 #[utoipa::path(
     post,
@@ -44,7 +45,7 @@ pub async fn create_api_key(
     .fetch_one(&pool)
     .await
     .map_err(|e| {
-        eprintln!("Failed to create API key: {}", e);
+        error!("Failed to create API key: {}", e);
         (
             StatusCode::INTERNAL_SERVER_ERROR,
             "Failed to create API key".into(),
