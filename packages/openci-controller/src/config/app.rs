@@ -1,7 +1,4 @@
-use std::fmt;
-use std::{env, num::ParseIntError};
-
-use std::error::Error;
+use std::{env, error::Error, fmt, num::ParseIntError};
 
 #[derive(Debug)]
 pub enum ConfigError {
