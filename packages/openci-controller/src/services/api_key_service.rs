@@ -81,7 +81,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_validate_api_key_with_valid_key() {
-        let api_key = "opnci_validkey123";
+        let api_key = "openci_validkey123";
         let hashed_key = hash_api_key(api_key);
 
         let mut mock_repo = MockApiKeyRepository::new();
@@ -97,7 +97,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_validate_api_key_with_nonexistent_key() {
-        let api_key = "opnci_nonexistentkey123";
+        let api_key = "openci_nonexistentkey123";
         let hashed_key = hash_api_key(api_key);
 
         let mut mock_repo = MockApiKeyRepository::new();
