@@ -7,6 +7,7 @@ mod handlers;
 mod middleware;
 mod models;
 mod server;
+mod services;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

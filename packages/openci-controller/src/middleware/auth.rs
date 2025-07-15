@@ -1,4 +1,4 @@
-use crate::handlers::api_key_handler::validate_api_key;
+use crate::services::api_key_service::validate_api_key;
 use axum::{
     extract::{Request, State},
     http::StatusCode,

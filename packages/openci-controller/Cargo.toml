@@ -23,3 +23,5 @@ chrono = { version = "0.4", features = ["serde"] }
 bcrypt = "0.17.0"
 rand = "0.9.1"
 sha2 = "0.10.9"
+async-trait = "0.1.88"
+mockall = "0.13.1"

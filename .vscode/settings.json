@@ -30,9 +30,13 @@
 		"dotenv",
 		"dotenvy",
 		"jsonwebtoken",
+		"mockall",
+		"nonexistentkey",
 		"opnci",
 		"serde",
 		"sqlx",
-		"utoipa"
+		"thiserror",
+		"utoipa",
+		"validkey"
 	]
 }
