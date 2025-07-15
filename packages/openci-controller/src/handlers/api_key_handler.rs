@@ -5,8 +5,7 @@ use crate::services::api_key_service::{
 use axum::{
     extract::{Path, State},
     http::StatusCode,
-    Extension, // Extension を追加
-    Json,
+    Extension, Json,
 };
 use sqlx::PgPool;
 use tracing::error;
