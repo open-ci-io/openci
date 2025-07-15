@@ -2,13 +2,13 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use utoipa::ToSchema;
+use validator::Validate;
 
 #[derive(Serialize, FromRow, ToSchema)]
 pub struct ApiKey {
     pub id: i32,
     pub user_id: i32,
     pub name: String,
-    #[allow(dead_code)]
     #[serde(skip)]
     pub hashed_key: String,
     pub created_at: DateTime<Utc>,
@@ -16,8 +16,9 @@ pub struct ApiKey {
     pub prefix: String,
 }
 
-#[derive(Deserialize, ToSchema)]
+#[derive(Deserialize, ToSchema, Validate)]
 pub struct CreateApiKeyRequest {
+    #[validate(length(min = 1, max = 64))]
     pub name: String,
 }
 
