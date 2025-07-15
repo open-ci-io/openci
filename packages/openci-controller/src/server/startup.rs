@@ -1,5 +1,6 @@
 use axum::Router;
 use tokio::net::TcpListener;
+use tracing::{error, info};
 
 pub async fn run(app: Router, addr: &str) -> Result<(), std::io::Error> {
     let listener = TcpListener::bind(addr).await?;
@@ -17,28 +18,46 @@ pub async fn run(app: Router, addr: &str) -> Result<(), std::io::Error> {
 
 async fn shutdown_signal() {
     let ctrl_c = async {
-        tokio::signal::ctrl_c()
-            .await
-            .expect("Failed to install Ctrl+C handler");
+        match tokio::signal::ctrl_c().await {
+            Ok(_) => {
+                info!("Received Ctrl+C signal");
+                Some(())
+            }
+            Err(e) => {
+                error!("Failed to install Ctrl+C handler: {}", e);
+                None
+            }
+        }
     };
 
     #[cfg(unix)]
     let terminate = async {
-        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
-            .expect("Failed to install signal handler")
-            .recv()
-            .await;
+        match tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()) {
+            Ok(mut signal) => {
+                info!("SIGTERM signal handler installed successfully");
+                signal.recv().await;
+                Some(())
+            }
+            Err(e) => {
+                error!("Failed to install SIGTERM handler: {}", e);
+                None
+            }
+        }
     };
 
     #[cfg(not(unix))]
-    let terminate = std::future::pending::<()>();
+    let terminate = async { std::future::pending::<Option<()>>().await };
 
     tokio::select! {
-        _ = ctrl_c => {
-            println!("Received Ctrl+C, starting graceful shutdown...");
+        result = ctrl_c => {
+            if result.is_some() {
+                info!("Received Ctrl+C, starting graceful shutdown...");
+            }
         },
-        _ = terminate => {
-            println!("Received SIGTERM, starting graceful shutdown...");
+        result = terminate => {
+            if result.is_some() {
+                info!("Received SIGTERM, starting graceful shutdown...");
+            }
         },
     }
 }

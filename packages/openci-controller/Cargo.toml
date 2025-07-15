@@ -24,3 +24,10 @@ rand = "0.9.1"
 sha2 = "0.10.9"
 async-trait = "0.1.88"
 mockall = "0.13.1"
+
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = [
+    "env-filter",
+    "json",
+    "fmt",
+] }
