@@ -25,20 +25,25 @@ pub fn hash_api_key(api_key: &str) -> String {
 }
 
 pub async fn validate_api_key<R: ApiKeyRepository>(repo: &R, api_key: &str) -> Option<i32> {
-    if api_key.is_empty() {
-        return None;
-    }
-    if !api_key.starts_with(API_KEY_PREFIX) {
-        return None;
-    }
+    // Validate key format
+    let is_valid_format = !api_key.is_empty() && api_key.starts_with(API_KEY_PREFIX);
 
     let hashed_key = hash_api_key(api_key);
-    match repo.update_and_get_user_id(&hashed_key).await {
+
+    // Always perform database lookup to maintain constant time
+    let result = match repo.update_and_get_user_id(&hashed_key).await {
         Ok(user_id) => user_id,
         Err(e) => {
             error!("API key validation database error: {}", e);
             None
         }
+    };
+
+    // Return None if format was invalid or no user found
+    if is_valid_format {
+        result
+    } else {
+        None
     }
 }
 
@@ -113,15 +118,33 @@ mod tests {
 
     #[tokio::test]
     async fn test_validate_api_key_with_empty_key() {
-        let mock_repo = MockApiKeyRepository::new();
-        let result = validate_api_key(&mock_repo, "").await;
+        let api_key = "";
+        let hashed_key = hash_api_key(api_key);
+
+        let mut mock_repo = MockApiKeyRepository::new();
+        mock_repo
+            .expect_update_and_get_user_id()
+            .with(eq(hashed_key))
+            .times(1)
+            .returning(|_| Ok(None));
+
+        let result = validate_api_key(&mock_repo, api_key).await;
         assert_eq!(result, None);
     }
 
     #[tokio::test]
     async fn test_validate_api_key_with_invalid_prefix() {
-        let mock_repo = MockApiKeyRepository::new();
-        let result = validate_api_key(&mock_repo, "invalid_prefix_key").await;
+        let api_key = "invalid_prefix_key";
+        let hashed_key = hash_api_key(api_key);
+
+        let mut mock_repo = MockApiKeyRepository::new();
+        mock_repo
+            .expect_update_and_get_user_id()
+            .with(eq(hashed_key))
+            .times(1)
+            .returning(|_| Ok(None));
+
+        let result = validate_api_key(&mock_repo, api_key).await;
         assert_eq!(result, None);
     }
 
