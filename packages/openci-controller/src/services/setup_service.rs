@@ -2,6 +2,7 @@ use crate::services::api_key_service;
 use sqlx::PgPool;
 use std::env;
 use tracing::{debug, info};
+use validator::ValidateEmail;
 
 #[derive(Debug, Clone)]
 struct InitialAdminConfig {
@@ -14,7 +15,16 @@ fn load_initial_admin_config() -> Option<InitialAdminConfig> {
         env::var("OPENCI_INITIAL_ADMIN_NAME").ok(),
         env::var("OPENCI_INITIAL_ADMIN_EMAIL").ok(),
     ) {
-        (Some(name), Some(email)) => Some(InitialAdminConfig { name, email }),
+        (Some(name), Some(email)) => {
+            if !email.validate_email() {
+                info!(
+                    "Invalid email format in OPENCI_INITIAL_ADMIN_EMAIL: {}",
+                    email
+                );
+                return None;
+            }
+            Some(InitialAdminConfig { name, email })
+        }
         _ => None,
     }
 }
@@ -158,6 +168,54 @@ mod tests {
         let config = load_initial_admin_config();
 
         assert!(config.is_none());
+    }
+
+    #[test]
+    fn test_load_initial_admin_config_invalid_email() {
+        env::set_var("OPENCI_INITIAL_ADMIN_NAME", "Test Admin");
+        env::set_var("OPENCI_INITIAL_ADMIN_EMAIL", "invalid-email");
+
+        let config = load_initial_admin_config();
+
+        assert!(config.is_none());
+
+        cleanup_env_vars();
+    }
+
+    #[test]
+    fn test_load_initial_admin_config_valid_email_formats() {
+        env::set_var("OPENCI_INITIAL_ADMIN_NAME", "Test Admin");
+
+        let valid_emails = vec![
+            "user@example.com",
+            "user.name@example.com",
+            "user+tag@example.co.jp",
+            "user_name@sub.example.com",
+        ];
+
+        for email in valid_emails {
+            env::set_var("OPENCI_INITIAL_ADMIN_EMAIL", email);
+            let config = load_initial_admin_config();
+            assert!(config.is_some(), "Email {} should be valid", email);
+        }
+
+        let invalid_emails = vec![
+            "@example.com",
+            "user@",
+            "user",
+            "user@@example.com",
+            "user@.com",
+            "user@example",
+            "",
+        ];
+
+        for email in invalid_emails {
+            env::set_var("OPENCI_INITIAL_ADMIN_EMAIL", email);
+            let config = load_initial_admin_config();
+            assert!(config.is_none(), "Email {} should be invalid", email);
+        }
+
+        cleanup_env_vars();
     }
 
     #[test]
