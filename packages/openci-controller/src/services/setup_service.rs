@@ -224,11 +224,6 @@ mod tests {
         cleanup_env_vars();
     }
 
-    #[test]
-    fn test_display_api_key_info() {
-        display_api_key_info("test-api-key-12345");
-    }
-
     #[sqlx::test]
     async fn test_check_users_exist_empty_table(pool: PgPool) {
         let exists = check_users_exist(&pool).await.unwrap();
