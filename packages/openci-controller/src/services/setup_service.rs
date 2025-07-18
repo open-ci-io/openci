@@ -1,5 +1,5 @@
 use crate::services::api_key_service;
-use sqlx::PgPool;
+use sqlx::{PgPool, Postgres, Transaction};
 use std::borrow::Cow;
 use std::env;
 use tracing::{debug, info};
@@ -36,7 +36,10 @@ async fn check_users_exist(pool: &PgPool) -> Result<bool, sqlx::Error> {
         .await
 }
 
-async fn create_admin_user(pool: &PgPool, config: &InitialAdminConfig) -> Result<i32, sqlx::Error> {
+async fn create_admin_user_tx(
+    tx: &mut Transaction<'_, Postgres>,
+    config: &InitialAdminConfig,
+) -> Result<i32, sqlx::Error> {
     let name = config.name.trim();
     let email = config.email.trim();
 
@@ -55,7 +58,7 @@ async fn create_admin_user(pool: &PgPool, config: &InitialAdminConfig) -> Result
         name,
         email
     )
-    .fetch_one(pool)
+    .fetch_one(&mut **tx)
     .await
     .map_err(|e| {
         if let sqlx::Error::Database(db_err) = &e {
@@ -69,7 +72,10 @@ async fn create_admin_user(pool: &PgPool, config: &InitialAdminConfig) -> Result
     Ok(record.id)
 }
 
-pub async fn create_initial_api_key(pool: &PgPool, user_id: i32) -> Result<String, sqlx::Error> {
+async fn create_initial_api_key_tx(
+    tx: &mut Transaction<'_, Postgres>,
+    user_id: i32,
+) -> Result<String, sqlx::Error> {
     let api_key_body = api_key_service::generate_api_key_body();
     let full_api_key = api_key_service::create_full_api_key(&api_key_body);
     let hashed_key = api_key_service::hash_api_key(&full_api_key);
@@ -83,7 +89,7 @@ pub async fn create_initial_api_key(pool: &PgPool, user_id: i32) -> Result<Strin
         hashed_key,
         api_key_service::get_api_key_prefix(),
     )
-    .execute(pool)
+    .execute(&mut **tx)
     .await?;
 
     Ok(full_api_key)
@@ -120,9 +126,12 @@ pub async fn setup_initial_admin(pool: &PgPool) -> Result<(), Box<dyn std::error
 
     info!("Creating initial admin user: {}", config.email);
 
-    let user_id = create_admin_user(pool, &config).await?;
+    let mut tx = pool.begin().await?;
 
-    let api_key = create_initial_api_key(pool, user_id).await?;
+    let user_id = create_admin_user_tx(&mut tx, &config).await?;
+    let api_key = create_initial_api_key_tx(&mut tx, user_id).await?;
+
+    tx.commit().await?;
 
     display_api_key_info(&api_key);
     info!("Initial admin user and API key created successfully");
@@ -267,14 +276,18 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn test_create_admin_user(pool: PgPool) {
+    async fn test_create_admin_user_tx(pool: PgPool) {
         let config = InitialAdminConfig {
             name: "Test Admin".to_string(),
             email: "admin@test.com".to_string(),
         };
 
-        let user_id = create_admin_user(&pool, &config).await.unwrap();
+        let mut tx = pool.begin().await.unwrap();
+
+        let user_id = create_admin_user_tx(&mut tx, &config).await.unwrap();
         assert!(user_id > 0);
+
+        tx.commit().await.unwrap();
 
         let user = sqlx::query!("SELECT name, email, role FROM users WHERE id = $1", user_id)
             .fetch_one(&pool)
@@ -287,7 +300,7 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn test_create_initial_api_key(pool: PgPool) {
+    async fn test_create_initial_api_key_tx(pool: PgPool) {
         let user_id = sqlx::query_scalar!(
             "INSERT INTO users (name, email, role) VALUES ($1, $2, $3) RETURNING id",
             "Test User",
@@ -298,7 +311,11 @@ mod tests {
         .await
         .unwrap();
 
-        let api_key = create_initial_api_key(&pool, user_id).await.unwrap();
+        let mut tx = pool.begin().await.unwrap();
+
+        let api_key = create_initial_api_key_tx(&mut tx, user_id).await.unwrap();
+
+        tx.commit().await.unwrap();
 
         assert!(api_key.starts_with("openci_"));
         assert!(api_key.len() > 20);
