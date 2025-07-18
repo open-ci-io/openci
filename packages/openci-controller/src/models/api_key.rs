@@ -39,7 +39,7 @@ impl std::fmt::Debug for CreateApiKeyResponse {
         f.debug_struct("CreateApiKeyResponse")
             .field("id", &self.id)
             .field("name", &self.name)
-            .field("api_key", &"[REDACTED]") // APIキーを隠す
+            .field("api_key", &"[REDACTED]")
             .field("prefix", &self.prefix)
             .field("created_at", &self.created_at)
             .finish()

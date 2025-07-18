@@ -11,6 +11,7 @@ use tracing::error;
         (status = 500, description = "Internal server error. Note: current implementation panics.")
     )
 )]
+#[tracing::instrument(skip(pool))]
 pub async fn get_users(
     State(pool): State<PgPool>,
 ) -> Result<Json<Vec<User>>, (StatusCode, String)> {
