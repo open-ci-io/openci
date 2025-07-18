@@ -1,5 +1,6 @@
 use crate::services::api_key_service;
 use sqlx::PgPool;
+use std::borrow::Cow;
 use std::env;
 use tracing::{debug, info};
 use validator::ValidateEmail;
@@ -36,17 +37,34 @@ async fn check_users_exist(pool: &PgPool) -> Result<bool, sqlx::Error> {
 }
 
 async fn create_admin_user(pool: &PgPool, config: &InitialAdminConfig) -> Result<i32, sqlx::Error> {
+    let name = config.name.trim();
+    let email = config.email.trim();
+
+    if name.is_empty() {
+        return Err(sqlx::Error::Protocol(
+            "Name cannot be empty".to_string().into(),
+        ));
+    }
+
     let record = sqlx::query!(
         r#"
         INSERT INTO users (name, email, role)
         VALUES ($1, $2, 'admin')
         RETURNING id
         "#,
-        config.name,
-        config.email
+        name,
+        email
     )
     .fetch_one(pool)
-    .await?;
+    .await
+    .map_err(|e| {
+        if let sqlx::Error::Database(db_err) = &e {
+            if db_err.code() == Some(Cow::from("23505")) {
+                tracing::info!("Email already exists: {}", email);
+            }
+        }
+        e
+    })?;
 
     Ok(record.id)
 }
