@@ -205,8 +205,14 @@ mod tests {
             "user",
             "user@@example.com",
             "user@.com",
-            "user@example",
             "",
+            "user @example.com",
+            "user@example..com",
+            "user<>@example.com",
+            "user@example,com",
+            "user@",
+            "plainaddress",
+            "@",
         ];
 
         for email in invalid_emails {
