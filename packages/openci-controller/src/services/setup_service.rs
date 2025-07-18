@@ -90,16 +90,18 @@ pub async fn create_initial_api_key(pool: &PgPool, user_id: i32) -> Result<Strin
 }
 
 pub fn display_api_key_info(api_key: &str) {
-    println!("\n");
-    println!("========================================");
-    println!("Initial Admin Setup Completed!");
-    println!("");
-    println!("API Key: {}", api_key);
-    println!("");
-    println!("IMPORTANT: Save this key securely!");
-    println!("This is the only time it will be shown.");
-    println!("========================================");
-    println!("\n");
+    let message = format!(
+        "\n========================================\n\
+         Initial Admin Setup Completed!\n\n\
+         API Key: {}\n\n\
+         IMPORTANT: Save this key securely!\n\
+         This is the only time it will be shown.\n\
+         ========================================\n",
+        api_key
+    );
+
+    println!("{}", message);
+    info!("Initial admin API key displayed to console");
 }
 
 pub async fn setup_initial_admin(pool: &PgPool) -> Result<(), Box<dyn std::error::Error>> {
