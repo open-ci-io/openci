@@ -7,6 +7,8 @@ use axum::{
 };
 use sqlx::PgPool;
 
+const API_KEY_HEADER: &str = "X-API-Key";
+
 pub async fn auth_middleware(
     State(pool): State<PgPool>,
     mut request: Request,
@@ -14,7 +16,7 @@ pub async fn auth_middleware(
 ) -> Result<Response, StatusCode> {
     let api_key = request
         .headers()
-        .get("X-API-Key")
+        .get(API_KEY_HEADER)
         .and_then(|value| value.to_str().ok());
 
     let api_key = match api_key {

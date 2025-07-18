@@ -32,6 +32,7 @@
 		"jsonwebtoken",
 		"mockall",
 		"nonexistentkey",
+		"plainaddress",
 		"rngs",
 		"serde",
 		"sqlx",
