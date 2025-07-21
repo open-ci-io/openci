@@ -30,6 +30,7 @@
 		"dotenv",
 		"dotenvy",
 		"jsonwebtoken",
+		"libpq",
 		"mockall",
 		"nonexistentkey",
 		"plainaddress",
