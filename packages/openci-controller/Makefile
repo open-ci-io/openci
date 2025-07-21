@@ -78,7 +78,7 @@ rebuild:
 
 up-prod: ensure-env build
 	docker-compose -f docker-compose.yml up postgres -d
-	sleep 2
+	sleep 5 
 	# Run migrations inside the container
 	docker-compose -f docker-compose.yml run --rm openci-controller sqlx migrate run
 	docker-compose -f docker-compose.yml up openci-controller -d
