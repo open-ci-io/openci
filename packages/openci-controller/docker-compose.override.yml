@@ -7,3 +7,4 @@ services:
     volumes:
       - ./src:/app/src
       - ./Cargo.toml:/app/Cargo.toml
+      - ./Cargo.lock:/app/Cargo.lock
