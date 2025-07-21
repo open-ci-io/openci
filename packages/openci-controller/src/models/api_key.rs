@@ -9,8 +9,6 @@ pub struct ApiKey {
     pub id: i32,
     pub user_id: i32,
     pub name: String,
-    #[serde(skip)]
-    pub hashed_key: String,
     pub created_at: DateTime<Utc>,
     pub last_used_at: Option<DateTime<Utc>>,
     pub prefix: String,
