@@ -25,11 +25,13 @@
 	],
 	"cSpell.words": [
 		"Bitrise",
+		"CHANGEME",
 		"chrono",
 		"Codemagic",
 		"dotenv",
 		"dotenvy",
 		"jsonwebtoken",
+		"libpq",
 		"mockall",
 		"nonexistentkey",
 		"plainaddress",
@@ -37,6 +39,7 @@
 		"serde",
 		"sqlx",
 		"thiserror",
+		"urandom",
 		"utoipa",
 		"validkey"
 	]

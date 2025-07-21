@@ -1,0 +1,10 @@
+services:
+  postgres:
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT}:5432"
+
+  openci-controller:
+    volumes:
+      - ./src:/app/src
+      - ./Cargo.toml:/app/Cargo.toml
+      - ./Cargo.lock:/app/Cargo.lock
