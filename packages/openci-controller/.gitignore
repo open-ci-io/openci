@@ -34,4 +34,3 @@ Thumbs.db
 *.zip
 
 .env
-docker-compose.override.yml

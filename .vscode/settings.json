@@ -25,6 +25,7 @@
 	],
 	"cSpell.words": [
 		"Bitrise",
+		"CHANGEME",
 		"chrono",
 		"Codemagic",
 		"dotenv",
@@ -38,6 +39,7 @@
 		"serde",
 		"sqlx",
 		"thiserror",
+		"urandom",
 		"utoipa",
 		"validkey"
 	]
