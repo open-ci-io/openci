@@ -40,8 +40,8 @@ ensure-env:
 		echo "RUST_LOG=info" >> .env; \
 		echo "" >> .env; \
 		echo "# Initial Admin (Optional)" >> .env; \
-		echo "#OPENCI_INITIAL_ADMIN_NAME=admin" >> .env; \
-		echo "#OPENCI_INITIAL_ADMIN_EMAIL=admin@example.com" >> .env; \
+		echo "OPENCI_INITIAL_ADMIN_NAME=admin" >> .env; \
+		echo "OPENCI_INITIAL_ADMIN_EMAIL=admin@example.com" >> .env; \
 		\
 		echo "✅ .env file created successfully"; \
 		echo "📋 Configuration:"; \
