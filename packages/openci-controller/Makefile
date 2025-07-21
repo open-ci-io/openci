@@ -9,11 +9,11 @@ ensure-env:
 		echo "⚠️  .env file not found, creating with random ports..."; \
 		echo "🔐 Generating configuration..."; \
 		\
-		OPENCI_PORT=$$(( 49152 + $$RANDOM % 16384 )); \
-		POSTGRES_PORT=$$(( 49152 + $$RANDOM % 16384 )); \
+		OPENCI_PORT=$$(( 49152 + $$(od -An -N2 -i /dev/urandom | tr -d ' ') % 16384 )); \
+		POSTGRES_PORT=$$(( 49152 + $$(od -An -N2 -i /dev/urandom | tr -d ' ') % 16384 )); \
 		\
 		while [ $$OPENCI_PORT -eq $$POSTGRES_PORT ]; do \
-			POSTGRES_PORT=$$(( 49152 + $$RANDOM % 16384 )); \
+			POSTGRES_PORT=$$(( 49152 + $$(od -An -N2 -i /dev/urandom | tr -d ' ') % 16384 )); \
 		done; \
 		\
 		POSTGRES_PASSWORD=$$(LC_ALL=C tr -dc 'A-Za-z0-9!^*()_+-=' < /dev/urandom | head -c 25); \
