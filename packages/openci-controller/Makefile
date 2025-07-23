@@ -1,4 +1,10 @@
-.PHONY: down up-dev full-up-dev up-prod ensure-env build rebuild
+# Load environment variables from .env file if it exists
+ifneq ($(wildcard ./.env),)
+	include .env
+	export
+endif
+
+.PHONY: down up-dev full-up-dev up-prod ensure-env build rebuild db-schema
 
 down: 
 	docker-compose down -v
@@ -75,6 +81,11 @@ build:
 rebuild:
 	docker-compose -f docker-compose.yml build --no-cache openci-controller
 	@echo "🔨 OpenCI Controller image rebuilt (no cache)"
+
+db-schema: ensure-env
+	@echo "🔄 Generating database schema file (schema.sql)..."
+	@docker-compose -f docker-compose.yml -f docker-compose.override.yml exec -T postgres pg_dump -s -U $(POSTGRES_USER) -d $(POSTGRES_DB) > schema.sql
+	@echo "✅ schema.sql has been successfully generated."
 
 up-prod: ensure-env build
 	docker-compose -f docker-compose.yml up postgres -d
