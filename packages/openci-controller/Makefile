@@ -1,9 +1,3 @@
-# Load environment variables from .env file if it exists
-ifneq ($(wildcard ./.env),)
-	include .env
-	export
-endif
-
 .PHONY: down up-dev full-up-dev up-prod ensure-env build rebuild db-schema
 
 down: 
@@ -63,14 +57,14 @@ ensure-env:
 up-dev: ensure-env
 	docker-compose up postgres -d
 	sleep 2
-	sqlx migrate run
-	cargo run
+	@set -a; . ./.env; set +a; sqlx migrate run
+	@set -a; . ./.env; set +a; cargo run
 	@echo "🚀 OpenCI Controller started"
 
 full-up-dev: ensure-env
 	docker-compose up postgres -d
 	sleep 2
-	sqlx migrate run
+	@set -a; . ./.env; set +a; sqlx migrate run
 	docker-compose up openci-controller -d
 	@echo "🚀 OpenCI Controller started"
 
@@ -84,7 +78,8 @@ rebuild:
 
 db-schema: ensure-env
 	@echo "🔄 Generating database schema file (schema.sql)..."
-	@docker-compose -f docker-compose.yml -f docker-compose.override.yml exec -T postgres pg_dump -s -U $(POSTGRES_USER) -d $(POSTGRES_DB) > schema.sql
+	@set -a; . ./.env; set +a; \
+	docker-compose -f docker-compose.yml -f docker-compose.override.yml exec -T postgres pg_dump -s -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" > schema.sql
 	@echo "✅ schema.sql has been successfully generated."
 
 up-prod: ensure-env build
