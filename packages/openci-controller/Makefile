@@ -91,6 +91,8 @@ rebuild:
 
 db-schema: ensure-env
 	@echo "🔄 Generating database schema file (schema.sql)..."
+	@docker-compose ps --services --filter "status=running" | grep -q "^postgres$$" \
+		|| { echo "❌ postgres container is not running. Did you run \`make up-dev\`?"; exit 1; }
 	@set -a; . ./.env; set +a; \
 	docker-compose -f docker-compose.yml -f docker-compose.override.yml exec -T postgres pg_dump -s -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" > schema.sql
 	@echo "✅ schema.sql has been successfully generated."
