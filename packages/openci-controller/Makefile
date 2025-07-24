@@ -1,4 +1,17 @@
-.PHONY: down up-dev full-up-dev up-prod ensure-env build rebuild db-schema
+.PHONY: all clean test down up-dev full-up-dev up-prod ensure-env build rebuild db-schema
+
+all: build
+
+clean: down
+	@echo "🧹 Cleaning up project..."
+	rm -rf target
+	rm -f schema.sql
+	@echo "✅ Cleanup complete"
+
+test: ensure-env
+	@echo "🧪 Running tests..."
+	@set -a; . ./.env; set +a; cargo test
+	@echo "✅ Tests passed"
 
 down: 
 	docker-compose down -v
