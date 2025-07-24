@@ -28,33 +28,36 @@ CREATE TABLE workflows (
 );
 CREATE TABLE build_jobs (
     id SERIAL PRIMARY KEY,
-    workflow_id INTEGER NOT NULL REFERENCES workflows(id),
-    repository_id INTEGER NOT NULL REFERENCES repositories(id) ON DELETE CASCADE,
-    build_status VARCHAR(50) NOT NULL DEFAULT 'queued' CHECK (
-        build_status IN (
-            'queued',
-            'inProgress',
-            'failure',
-            'success',
-            'cancelled'
-        )
-    ),
-    commit_sha VARCHAR(40) NOT NULL,
-    build_branch VARCHAR(255) NOT NULL,
-    base_branch VARCHAR(255) NOT NULL,
-    commit_message TEXT,
-    commit_author_name VARCHAR(255),
-    commit_author_email VARCHAR(255),
-    pr_number INTEGER,
-    pr_title TEXT,
-    github_check_run_id BIGINT NOT NULL,
-    github_app_id INTEGER NOT NULL,
-    github_installation_id BIGINT NOT NULL,
-    started_at TIMESTAMPTZ,
-    finished_at TIMESTAMPTZ,
-    worker_id VARCHAR(255),
-    exit_code INTEGER,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    workflow_id INTEGER REFERENCES workflows(id) ON DELETE
+    SET NULL,
+        repository_id INTEGER NOT NULL REFERENCES repositories(id) ON DELETE CASCADE,
+        workflow_name VARCHAR(255),
+        workflow_config JSONB,
+        build_status VARCHAR(50) NOT NULL DEFAULT 'queued' CHECK (
+            build_status IN (
+                'queued',
+                'inProgress',
+                'failure',
+                'success',
+                'cancelled'
+            )
+        ),
+        commit_sha VARCHAR(40) NOT NULL,
+        build_branch VARCHAR(255) NOT NULL,
+        base_branch VARCHAR(255) NOT NULL,
+        commit_message TEXT,
+        commit_author_name VARCHAR(255),
+        commit_author_email VARCHAR(255),
+        pr_number INTEGER,
+        pr_title TEXT,
+        github_check_run_id BIGINT NOT NULL,
+        github_app_id INTEGER NOT NULL,
+        github_installation_id BIGINT NOT NULL,
+        started_at TIMESTAMPTZ,
+        finished_at TIMESTAMPTZ,
+        worker_id VARCHAR(255),
+        exit_code INTEGER,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE TABLE command_logs (
     id SERIAL PRIMARY KEY,
@@ -87,7 +90,8 @@ CREATE TABLE secrets (
 );
 CREATE INDEX idx_repositories_user_id ON repositories(user_id);
 CREATE INDEX idx_workflows_repository_id ON workflows(repository_id);
-CREATE INDEX idx_build_jobs_workflow_id ON build_jobs(workflow_id);
+CREATE INDEX idx_build_jobs_workflow_id ON build_jobs(workflow_id)
+WHERE workflow_id IS NOT NULL;
 CREATE INDEX idx_build_jobs_repository_id ON build_jobs(repository_id);
 CREATE INDEX idx_build_jobs_build_status ON build_jobs(build_status);
 CREATE INDEX idx_command_logs_build_job_id ON command_logs(build_job_id);
