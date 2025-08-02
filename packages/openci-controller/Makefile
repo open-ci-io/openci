@@ -1,4 +1,4 @@
-.PHONY: all clean test down up-dev full-up-dev up-prod ensure-env build rebuild db-schema prepare
+.PHONY: all clean test down up-dev full-up-dev up-prod ensure-env build rebuild db-schema
 
 all: build
 
