@@ -1,4 +1,4 @@
-.PHONY: all clean test down up-dev full-up-dev up-prod ensure-env build rebuild db-schema
+.PHONY: all clean test down up-dev full-up-dev up-prod ensure-env build rebuild db-schema prepare
 
 all: build
 
@@ -29,7 +29,7 @@ ensure-env:
 			POSTGRES_PORT=$$(( 49152 + $$(od -An -N2 -i /dev/urandom | tr -d ' ') % 16384 )); \
 		done; \
 		\
-		POSTGRES_PASSWORD=$$(LC_ALL=C tr -dc 'A-Za-z0-9!^*()_+\-=' < /dev/urandom | head -c 25); \
+		POSTGRES_PASSWORD=$$(LC_ALL=C tr -dc 'A-Za-z0-9!^*_+\-=' < /dev/urandom | head -c 25); \
 		\
 		echo "# OpenCI Controller Configuration" > .env; \
 		echo "# Generated on $$(date)" >> .env; \
@@ -71,8 +71,8 @@ up-dev: ensure-env
 	docker-compose up postgres -d
 	sleep 2
 	@set -a; . ./.env; set +a; sqlx migrate run
+	@set -a; . ./.env; set +a; cargo sqlx prepare
 	@set -a; . ./.env; set +a; cargo run
-	@echo "🚀 OpenCI Controller started"
 
 full-up-dev: ensure-env
 	docker-compose up postgres -d
@@ -104,4 +104,3 @@ up-prod: ensure-env build
 	docker-compose -f docker-compose.yml run --rm openci-controller sqlx migrate run
 	docker-compose -f docker-compose.yml up openci-controller -d
 	@echo "🚀 OpenCI Controller started in production mode"
-	
