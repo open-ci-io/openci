@@ -20,7 +20,6 @@ pub async fn get_build_jobs(
         .fetch_all(&pool)
         .await
         .map_err(|e| {
-            // より詳細なエラー情報を表示
             error!("Failed to fetch build jobs: {:?}", e);
             error!("Error details: {}", e);
             (
@@ -43,7 +42,6 @@ mod tests {
     async fn test_get_build_jobs_returns_all_jobs(pool: PgPool) {
         let result = get_build_jobs(State(pool)).await;
 
-        // エラーの詳細を表示
         match &result {
             Ok(_) => println!("Success!"),
             Err((status, message)) => {
