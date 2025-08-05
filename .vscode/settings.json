@@ -35,6 +35,7 @@
 		"mockall",
 		"nonexistentkey",
 		"plainaddress",
+		"plpgsql",
 		"rngs",
 		"serde",
 		"sqlx",
