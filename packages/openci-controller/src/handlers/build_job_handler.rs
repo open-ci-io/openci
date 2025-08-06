@@ -41,14 +41,6 @@ mod tests {
     #[sqlx::test(fixtures("../../fixtures/users.sql", "../../fixtures/build-jobs.sql"))]
     async fn test_get_build_jobs_returns_all_jobs(pool: PgPool) {
         let result = get_build_jobs(State(pool)).await;
-
-        match &result {
-            Ok(_) => println!("Success!"),
-            Err((status, message)) => {
-                eprintln!("Error occurred: Status={:?}, Message={}", status, message);
-            }
-        }
-
         assert!(
             result.is_ok(),
             "Failed to get build jobs: {:?}",
