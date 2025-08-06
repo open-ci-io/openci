@@ -14,6 +14,10 @@ pub fn create_routes(pool: PgPool) -> Router {
     let authenticated_routes = Router::new()
         .route("/users", get(handlers::user_handler::get_users))
         .route(
+            "/build-jobs",
+            get(handlers::build_job_handler::get_build_jobs),
+        )
+        .route(
             "/users/{user_id}/api-keys",
             post(handlers::api_key_handler::create_api_key),
         )
