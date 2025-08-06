@@ -9,7 +9,7 @@ use crate::models::build_job::BuildJob;
     path = "/build-jobs",
     responses(
         (status = 200, description = "List of build jobs", body = [BuildJob]),
-        (status = 500, description = "Internal server error. Note: current implementation panics.")
+        (status = 500, description = "Internal server error")
     )
 )]
 #[tracing::instrument(skip(pool))]
