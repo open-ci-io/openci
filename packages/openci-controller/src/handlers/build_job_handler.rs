@@ -50,12 +50,15 @@ mod tests {
 
         assert_eq!(build_jobs.len(), 5);
 
-        let statuses: Vec<&BuildStatus> = build_jobs.iter().map(|job| &job.build_status).collect();
+        let statuses: Vec<BuildStatus> = build_jobs
+            .iter()
+            .map(|job| job.build_status.clone())
+            .collect();
 
-        assert!(statuses.contains(&&BuildStatus::Queued));
-        assert!(statuses.contains(&&BuildStatus::InProgress));
-        assert!(statuses.contains(&&BuildStatus::Success));
-        assert!(statuses.contains(&&BuildStatus::Failure));
-        assert!(statuses.contains(&&BuildStatus::Cancelled));
+        assert!(statuses.contains(&BuildStatus::Queued));
+        assert!(statuses.contains(&BuildStatus::InProgress));
+        assert!(statuses.contains(&BuildStatus::Success));
+        assert!(statuses.contains(&BuildStatus::Failure));
+        assert!(statuses.contains(&BuildStatus::Cancelled));
     }
 }
