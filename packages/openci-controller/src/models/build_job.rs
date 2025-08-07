@@ -79,3 +79,23 @@ pub struct BuildJob {
     pub exit_code: Option<i32>,
     pub created_at: DateTime<Utc>,
 }
+
+#[derive(Debug, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateBuildJobRequest {
+    pub workflow_id: Option<i32>,
+    pub repository_id: i32,
+    pub workflow_name: Option<String>,
+    pub workflow_config: Option<Value>,
+    pub commit_sha: String,
+    pub build_branch: String,
+    pub base_branch: String,
+    pub commit_message: Option<String>,
+    pub commit_author_name: Option<String>,
+    pub commit_author_email: Option<String>,
+    pub pr_number: Option<i32>,
+    pub pr_title: Option<String>,
+    pub github_check_run_id: i64,
+    pub github_app_id: i32,
+    pub github_installation_id: i64,
+}

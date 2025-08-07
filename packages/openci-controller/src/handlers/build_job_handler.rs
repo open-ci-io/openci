@@ -2,14 +2,14 @@ use axum::{extract::State, http::StatusCode, Json};
 use sqlx::PgPool;
 use tracing::error;
 
-use crate::models::build_job::BuildJob;
+use crate::models::build_job::{BuildJob, BuildStatus, CreateBuildJobRequest};
 
 #[utoipa::path(
     get,
     path = "/build-jobs",
     responses(
         (status = 200, description = "List of build jobs", body = [BuildJob]),
-        (status = 500, description = "Internal server error")
+       (status = 500, description = "Internal server error")
     )
 )]
 #[tracing::instrument(skip(pool))]
@@ -30,12 +30,96 @@ pub async fn get_build_jobs(
 
     Ok(Json(build_jobs))
 }
+#[utoipa::path(
+    post,
+    path = "/build-jobs",
+    request_body = CreateBuildJobRequest,
+    responses(
+        (status = 201, description = "Build job created successfully", body = BuildJob),
+        (status = 400, description = "Invalid request"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+#[tracing::instrument(skip(pool))]
+pub async fn post_build_job(
+    State(pool): State<PgPool>,
+    Json(request): Json<CreateBuildJobRequest>,
+) -> Result<(StatusCode, Json<BuildJob>), (StatusCode, String)> {
+    let build_job = sqlx::query_as::<_, BuildJob>(
+        r#"
+        INSERT INTO build_jobs (
+            workflow_id,
+            repository_id,
+            workflow_name,
+            workflow_config,
+            build_status,
+            commit_sha,
+            build_branch,
+            base_branch,
+            commit_message,
+            commit_author_name,
+            commit_author_email,
+            pr_number,
+            pr_title,
+            github_check_run_id,
+            github_app_id,
+            github_installation_id
+        ) VALUES (
+            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
+        )
+        RETURNING *
+        "#,
+    )
+    .bind(request.workflow_id)
+    .bind(request.repository_id)
+    .bind(request.workflow_name)
+    .bind(request.workflow_config)
+    .bind(BuildStatus::Queued)
+    .bind(request.commit_sha)
+    .bind(request.build_branch)
+    .bind(request.base_branch)
+    .bind(request.commit_message)
+    .bind(request.commit_author_name)
+    .bind(request.commit_author_email)
+    .bind(request.pr_number)
+    .bind(request.pr_title)
+    .bind(request.github_check_run_id)
+    .bind(request.github_app_id)
+    .bind(request.github_installation_id)
+    .fetch_one(&pool)
+    .await
+    .map_err(|e| {
+        error!("Failed to create build job: {:?}", e);
+        match e {
+            sqlx::Error::Database(db_err) => {
+                if db_err.code() == Some(std::borrow::Cow::from("23503")) {
+                    (
+                        StatusCode::BAD_REQUEST,
+                        format!("Invalid repository_id or workflow_id"),
+                    )
+                } else {
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        format!("Database error: {}", db_err),
+                    )
+                }
+            }
+            _ => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Failed to create build job: {}", e),
+            ),
+        }
+    })?;
+
+    Ok((StatusCode::CREATED, Json(build_job)))
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::models::build_job::BuildStatus;
     use axum::extract::State;
+    use serde_json::json;
     use sqlx::PgPool;
 
     #[sqlx::test(fixtures("../../fixtures/users.sql", "../../fixtures/build-jobs.sql"))]
@@ -60,5 +144,65 @@ mod tests {
         assert!(statuses.contains(&BuildStatus::Success));
         assert!(statuses.contains(&BuildStatus::Failure));
         assert!(statuses.contains(&BuildStatus::Cancelled));
+    }
+
+    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    async fn test_post_build_job_creates_new_job(pool: PgPool) {
+        let user_id = sqlx::query_scalar!("SELECT id FROM users ORDER BY id LIMIT 1")
+            .fetch_one(&pool.clone())
+            .await
+            .unwrap();
+
+        let repo_id = sqlx::query_scalar!(
+            "INSERT INTO repositories (user_id, owner, name, full_name, github_id, default_branch, created_at) 
+             VALUES ($1, $2, $3, $4, $5, $6, NOW()) 
+             RETURNING id",
+            user_id,  // user_id を追加
+            "test-owner",
+            "test-repo",
+            "test-owner/test-repo",
+            123456i64,
+            "main"
+        )
+        .fetch_one(&pool.clone())
+        .await
+        .unwrap();
+
+        let request = CreateBuildJobRequest {
+            workflow_id: None,
+            repository_id: repo_id,
+            workflow_name: Some("Test Workflow".to_string()),
+            workflow_config: Some(json!({"key": "value"})),
+            commit_sha: "abc123def456".to_string(),
+            build_branch: "feature/test".to_string(),
+            base_branch: "main".to_string(),
+            commit_message: Some("Test commit message".to_string()),
+            commit_author_name: Some("Test Author".to_string()),
+            commit_author_email: Some("test@example.com".to_string()),
+            pr_number: Some(42),
+            pr_title: Some("Test PR".to_string()),
+            github_check_run_id: 789012,
+            github_app_id: 123,
+            github_installation_id: 456,
+        };
+
+        let result = post_build_job(State(pool.clone()), Json(request)).await;
+
+        assert!(
+            result.is_ok(),
+            "Failed to create build job: {:?}",
+            result.err()
+        );
+
+        let (status_code, build_job) = result.unwrap();
+        assert_eq!(status_code, StatusCode::CREATED);
+
+        let build_job = build_job.0;
+        assert!(build_job.id > 0);
+        assert_eq!(build_job.repository_id, repo_id);
+        assert_eq!(build_job.build_status, BuildStatus::Queued);
+        assert_eq!(build_job.commit_sha, "abc123def456");
+        assert_eq!(build_job.build_branch, "feature/test");
+        assert_eq!(build_job.base_branch, "main");
     }
 }

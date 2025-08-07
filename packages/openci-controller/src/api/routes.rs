@@ -27,6 +27,10 @@ pub fn create_routes(pool: PgPool) -> Router {
         ));
     Router::new()
         .route("/", get(|| async { "Hello, welcome to OpenCI!" }))
+        .route(
+            "/build-jobs",
+            post(handlers::build_job_handler::post_build_job),
+        )
         .merge(authenticated_routes)
         .merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .with_state(pool)
