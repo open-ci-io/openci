@@ -30,6 +30,7 @@ pub async fn get_build_jobs(
 
     Ok(Json(build_jobs))
 }
+
 #[utoipa::path(
     post,
     path = "/build-jobs",
@@ -45,6 +46,89 @@ pub async fn post_build_job(
     State(pool): State<PgPool>,
     Json(request): Json<CreateBuildJobRequest>,
 ) -> Result<(StatusCode, Json<BuildJob>), (StatusCode, String)> {
+    if request.commit_sha.len() != 40 || !request.commit_sha.chars().all(|c| c.is_ascii_hexdigit())
+    {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "commit_sha must be a valid 40-character hex string".to_string(),
+        ));
+    }
+
+    let build_branch_trimmed = request.build_branch.trim();
+    let base_branch_trimmed = request.base_branch.trim();
+
+    if build_branch_trimmed.is_empty() || base_branch_trimmed.is_empty() {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "build_branch and base_branch cannot be empty".to_string(),
+        ));
+    }
+
+    if request.build_branch.chars().any(|c| c.is_whitespace())
+        || request.base_branch.chars().any(|c| c.is_whitespace())
+    {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "branch names cannot contain whitespace".to_string(),
+        ));
+    }
+
+    if 255 < request.build_branch.len() || 255 < request.base_branch.len() {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "build_branch and base_branch must be <= 255 characters".to_string(),
+        ));
+    }
+
+    if let Some(name) = &request.workflow_name {
+        if 255 < name.len() {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                "workflow_name must be <= 255 characters".to_string(),
+            ));
+        }
+    }
+    if let Some(author) = &request.commit_author_name {
+        if 255 < author.len() {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                "commit_author_name must be <= 255 characters".to_string(),
+            ));
+        }
+    }
+    if let Some(email) = &request.commit_author_email {
+        if 255 < email.len() {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                "commit_author_email must be <= 255 characters".to_string(),
+            ));
+        }
+    }
+
+    if request.repository_id <= 0 {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "repository_id must be a positive integer".to_string(),
+        ));
+    }
+    if let Some(wid) = request.workflow_id {
+        if wid <= 0 {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                "workflow_id must be a positive integer when provided".to_string(),
+            ));
+        }
+    }
+    if request.github_check_run_id <= 0
+        || request.github_app_id <= 0
+        || request.github_installation_id <= 0
+    {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "GitHub identifiers must be positive numbers".to_string(),
+        ));
+    }
+
     let build_job = sqlx::query_as::<_, BuildJob>(
         r#"
         INSERT INTO build_jobs (
@@ -173,7 +257,7 @@ mod tests {
             repository_id: repo_id,
             workflow_name: Some("Test Workflow".to_string()),
             workflow_config: Some(json!({"key": "value"})),
-            commit_sha: "abc123def456".to_string(),
+            commit_sha: "0123456789abcdef0123456789abcdef01234567".to_string(),
             build_branch: "feature/test".to_string(),
             base_branch: "main".to_string(),
             commit_message: Some("Test commit message".to_string()),
@@ -201,8 +285,85 @@ mod tests {
         assert!(build_job.id > 0);
         assert_eq!(build_job.repository_id, repo_id);
         assert_eq!(build_job.build_status, BuildStatus::Queued);
-        assert_eq!(build_job.commit_sha, "abc123def456");
+        assert_eq!(
+            build_job.commit_sha,
+            "0123456789abcdef0123456789abcdef01234567"
+        );
         assert_eq!(build_job.build_branch, "feature/test");
         assert_eq!(build_job.base_branch, "main");
+    }
+
+    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    async fn test_post_build_job_rejects_invalid_commit_sha(pool: PgPool) {
+        let user_id = sqlx::query_scalar!("SELECT id FROM users ORDER BY id LIMIT 1")
+            .fetch_one(&pool.clone())
+            .await
+            .unwrap();
+
+        let repo_id = sqlx::query_scalar!(
+            "INSERT INTO repositories (user_id, owner, name, full_name, github_id, default_branch, created_at)
+             VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id",
+            user_id, "o", "n", "o/n", 1_i64, "main"
+        ).fetch_one(&pool.clone()).await.unwrap();
+
+        let bad = CreateBuildJobRequest {
+            workflow_id: None,
+            repository_id: repo_id,
+            workflow_name: Some("w".into()),
+            workflow_config: Some(serde_json::json!({"k":"v"})),
+            commit_sha: "abc123".into(), // invalid
+            build_branch: "feature/x".into(),
+            base_branch: "main".into(),
+            commit_message: None,
+            commit_author_name: None,
+            commit_author_email: None,
+            pr_number: None,
+            pr_title: None,
+            github_check_run_id: 1,
+            github_app_id: 1,
+            github_installation_id: 1,
+        };
+
+        let res = post_build_job(State(pool.clone()), Json(bad)).await;
+        assert!(res.is_err());
+        let (code, _) = res.err().unwrap();
+        assert_eq!(code, StatusCode::BAD_REQUEST);
+    }
+
+    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    async fn test_post_build_job_rejects_empty_branch(pool: PgPool) {
+        let user_id = sqlx::query_scalar!("SELECT id FROM users ORDER BY id LIMIT 1")
+            .fetch_one(&pool.clone())
+            .await
+            .unwrap();
+
+        let repo_id = sqlx::query_scalar!(
+            "INSERT INTO repositories (user_id, owner, name, full_name, github_id, default_branch, created_at)
+             VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id",
+            user_id, "o", "n", "o/n", 1_i64, "main"
+        ).fetch_one(&pool.clone()).await.unwrap();
+
+        let bad = CreateBuildJobRequest {
+            workflow_id: None,
+            repository_id: repo_id,
+            workflow_name: None,
+            workflow_config: None,
+            commit_sha: "0123456789abcdef0123456789abcdef01234567".into(),
+            build_branch: "  ".into(), // empty after trim
+            base_branch: "".into(),
+            commit_message: None,
+            commit_author_name: None,
+            commit_author_email: None,
+            pr_number: None,
+            pr_title: None,
+            github_check_run_id: 1,
+            github_app_id: 1,
+            github_installation_id: 1,
+        };
+
+        let res = post_build_job(State(pool.clone()), Json(bad)).await;
+        assert!(res.is_err());
+        let (code, _) = res.err().unwrap();
+        assert_eq!(code, StatusCode::BAD_REQUEST);
     }
 }
