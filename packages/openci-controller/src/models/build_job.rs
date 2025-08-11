@@ -5,6 +5,7 @@ use sqlx::encode::IsNull;
 use sqlx::postgres::{PgArgumentBuffer, PgTypeInfo};
 use sqlx::FromRow;
 use utoipa::ToSchema;
+use validator::Validate;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, PartialEq)]
 #[serde(rename_all = "camelCase")]
@@ -80,22 +81,36 @@ pub struct BuildJob {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize, ToSchema)]
+#[derive(Debug, Deserialize, ToSchema, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateBuildJobRequest {
+    #[validate(range(min = 1))]
     pub workflow_id: Option<i32>,
+    #[validate(range(min = 1))]
     pub repository_id: i32,
+    #[validate(length(max = 255))]
     pub workflow_name: Option<String>,
     pub workflow_config: Option<Value>,
+    #[validate(length(equal = 40))]
     pub commit_sha: String,
+    #[validate(length(max = 255, min = 1))]
     pub build_branch: String,
+    #[validate(length(max = 255, min = 1))]
     pub base_branch: String,
+    #[validate(length(max = 255, min = 1))]
     pub commit_message: Option<String>,
+    #[validate(length(max = 255, min = 1))]
     pub commit_author_name: Option<String>,
+    #[validate(length(max = 255), email)]
     pub commit_author_email: Option<String>,
+    #[validate(range(min = 1))]
     pub pr_number: Option<i32>,
+    #[validate(length(max = 255))]
     pub pr_title: Option<String>,
+    #[validate(range(min = 1))]
     pub github_check_run_id: i64,
+    #[validate(range(min = 1))]
     pub github_app_id: i32,
+    #[validate(range(min = 1))]
     pub github_installation_id: i64,
 }
