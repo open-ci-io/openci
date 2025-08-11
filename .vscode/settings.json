@@ -30,6 +30,7 @@
 		"Codemagic",
 		"dotenv",
 		"dotenvy",
+		"hexdigit",
 		"jsonwebtoken",
 		"libpq",
 		"mockall",
