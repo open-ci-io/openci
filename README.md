@@ -1,17 +1,5 @@
 # Welcome to OpenCI.
 
-# Get started
-
-Go to [OpenCI Docs](https://docs.open-ci.io) to get started.
-
-## Contribute to OpenCI Docs
-
-If you want to contribute to our docs, please fork apps/docs and make a PR.
-
-## Discord Channel
-
-Join our [Discord channel](https://discord.gg/gwbnwWtefk) to get help from the community.
-
 # Goals of OpenCI
 
 The best CI/CD service.
@@ -26,6 +14,18 @@ The best CI/CD service.
 8. Super fast CI/CD processes
 9. Positive impact of OpenCI on Flutter and the entire software community
 10. Contribute to the success of the business and make a big contribution to humanity
+
+# Get started
+
+Go to [OpenCI Docs](https://docs.open-ci.io) to get started.
+
+## Contribute to OpenCI Docs
+
+If you want to contribute to our docs, please fork apps/docs and make a PR.
+
+## Discord Channel
+
+Join our [Discord channel](https://discord.gg/gwbnwWtefk) to get help from the community.
 
 # Pricing
 Free
