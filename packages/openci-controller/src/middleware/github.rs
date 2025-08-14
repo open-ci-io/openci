@@ -11,8 +11,11 @@ pub async fn verify_github_webhook(request: Request, next: Next) -> Result<Respo
     let (parts, body) = request.into_parts();
     let headers = &parts.headers;
 
-    let signature = match headers.get("X-Hub-Signature-256") {
-        Some(s) => s.to_str().unwrap_or(""),
+    let signature = match headers
+        .get("X-Hub-Signature-256")
+        .and_then(|s| s.to_str().ok())
+    {
+        Some(s) => s,
         None => return Err(StatusCode::UNAUTHORIZED),
     };
 
