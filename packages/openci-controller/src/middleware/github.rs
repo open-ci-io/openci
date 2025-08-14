@@ -26,6 +26,7 @@ pub async fn verify_github_webhook(request: Request, next: Next) -> Result<Respo
         .map_err(|_| StatusCode::PAYLOAD_TOO_LARGE)?;
 
     if verify_signature(signature, &body_bytes).is_err() {
+        tracing::warn!("GitHub webhook HMAC verification failed");
         return Err(StatusCode::UNAUTHORIZED);
     }
 
