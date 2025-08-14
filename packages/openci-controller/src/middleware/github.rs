@@ -5,6 +5,8 @@ use hmac::{Hmac, Mac};
 use sha2::Sha256;
 use std::env;
 
+const MAX_WEBHOOK_SIZE: usize = 1_048_576; // 1 MiB
+
 type HmacSha256 = Hmac<Sha256>;
 
 pub async fn verify_github_webhook(request: Request, next: Next) -> Result<Response, StatusCode> {
@@ -19,9 +21,9 @@ pub async fn verify_github_webhook(request: Request, next: Next) -> Result<Respo
         None => return Err(StatusCode::UNAUTHORIZED),
     };
 
-    let body_bytes = to_bytes(body, usize::MAX)
+    let body_bytes = to_bytes(body, MAX_WEBHOOK_SIZE)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|_| StatusCode::PAYLOAD_TOO_LARGE)?;
 
     if verify_signature(signature, &body_bytes).is_err() {
         return Err(StatusCode::UNAUTHORIZED);
