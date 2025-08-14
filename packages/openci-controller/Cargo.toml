@@ -30,3 +30,4 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 validator = { version = "0.18.1", features = ["derive"] }
 hmac = "0.12.1"
 hex = "0.4.3"
+tower-http = { version = "0.6.6", features = ["limit"] }
