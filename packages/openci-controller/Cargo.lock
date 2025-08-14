@@ -1206,6 +1206,8 @@ dependencies = [
  "bcrypt",
  "chrono",
  "dotenvy",
+ "hex",
+ "hmac",
  "mockall",
  "rand 0.9.1",
  "secrecy",
