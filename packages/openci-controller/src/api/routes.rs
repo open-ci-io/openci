@@ -35,8 +35,8 @@ pub fn create_routes(pool: PgPool) -> Router {
         .route(
             "/build-jobs",
             post(handlers::build_job_handler::post_build_job)
-                .route_layer(middleware::from_fn(verify_github_webhook))
-                .route_layer(RequestBodyLimitLayer::new(1_048_576)),
+                .route_layer(RequestBodyLimitLayer::new(1_048_576))
+                .route_layer(middleware::from_fn(verify_github_webhook)),
         )
         .merge(authenticated_routes)
         .merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", ApiDoc::openapi()))
