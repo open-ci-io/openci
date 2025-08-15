@@ -2,7 +2,7 @@
 
 ## Goals of OpenCI
 
-The best CI/CD service for people who love peace, who are making world a better place. Hence, no crime that violates human rights can be committed using this service.
+The best CI/CD service for people who love peace, who are making world a better place. Hence, OpenCI cannot be used for services that violate human rights.
 
 1. Super fast loading of dashboards
 2. Extremely easy setup
