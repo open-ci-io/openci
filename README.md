@@ -19,9 +19,18 @@ The best CI/CD service for people who love peace, who are making world a better 
 
 Go to [OpenCI Docs](https://docs.open-ci.io) to get started.
 
-## Contribute to OpenCI Docs
+## We are looking for contributors
 
-If you want to contribute to our docs, please fork apps/docs and make a PR.
+- Improve documentation
+- Fix bugs
+- Propose new features
+- Add test code
+- Update packages
+- Translate documentation
+- Review and proofread documentation
+- Become a GitHub Sponsor
+
+If you share OpenCI’s vision, we’d love your help.
 
 ## Discord Channel
 
