@@ -7,37 +7,27 @@ use sqlx::PgPool;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
-use tower_http::limit::RequestBodyLimitLayer;
-
 use super::doc::ApiDoc;
-use crate::{
-    handlers,
-    middleware::{auth::auth_middleware, github::verify_github_webhook},
-};
+use crate::{handlers, middleware::auth::auth_middleware};
 
 pub fn create_routes(pool: PgPool) -> Router {
     let authenticated_routes = Router::new()
         .route("/users", get(handlers::user_handler::get_users))
         .route(
-            "/build-jobs",
-            get(handlers::build_job_handler::get_build_jobs),
-        )
-        .route(
             "/users/{user_id}/api-keys",
             post(handlers::api_key_handler::create_api_key),
+        )
+        .route(
+            "/workflows",
+            post(handlers::workflow_handler::post_workflow),
         )
         .route_layer(middleware::from_fn_with_state(
             pool.clone(),
             auth_middleware,
         ));
+
     Router::new()
         .route("/", get(|| async { "Hello, welcome to OpenCI!" }))
-        .route(
-            "/build-jobs",
-            post(handlers::build_job_handler::post_build_job)
-                .route_layer(RequestBodyLimitLayer::new(1_048_576))
-                .route_layer(middleware::from_fn(verify_github_webhook)),
-        )
         .merge(authenticated_routes)
         .merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .with_state(pool)

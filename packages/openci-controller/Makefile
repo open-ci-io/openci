@@ -104,3 +104,6 @@ up-prod: ensure-env build
 	docker-compose -f docker-compose.yml run --rm openci-controller sqlx migrate run
 	docker-compose -f docker-compose.yml up openci-controller -d
 	@echo "🚀 OpenCI Controller started in production mode"
+
+add-migration-files:
+	sqlx migrate add

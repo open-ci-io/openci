@@ -36,6 +36,7 @@
 		"libpq",
 		"mockall",
 		"nonexistentkey",
+		"openci",
 		"plainaddress",
 		"plpgsql",
 		"rngs",
@@ -45,5 +46,8 @@
 		"urandom",
 		"utoipa",
 		"validkey"
-	]
+	],
+	"rust-analyzer.inlayHints.typeHints.enable": false,
+	"rust-analyzer.inlayHints.parameterHints.enable": false,
+	"rust-analyzer.inlayHints.chainingHints.enable": false
 }
