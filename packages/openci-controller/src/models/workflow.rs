@@ -11,14 +11,14 @@ pub struct Workflow {
     pub github_trigger_type: GitHubTriggerType,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct CreateWorkflowRequest {
     pub name: String,
     pub github_trigger_type: GitHubTriggerType,
 }
 
-#[derive(Debug, Serialize, Deserialize, sqlx::Type, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, sqlx::Type, PartialEq, utoipa::ToSchema)]
 #[sqlx(type_name = "text", rename_all = "snake_case")]
 pub enum GitHubTriggerType {
     Push,

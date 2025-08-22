@@ -1,5 +1,7 @@
 use crate::handlers::api_key_handler;
 use crate::handlers::user_handler;
+use crate::handlers::workflow_handler;
+use crate::models::workflow::GitHubTriggerType;
 use crate::models::{
     api_key::{CreateApiKeyRequest, CreateApiKeyResponse},
     error_response::ErrorResponse,
@@ -17,16 +19,19 @@ use utoipa::OpenApi;
     paths(
         user_handler::get_users,
         api_key_handler::create_api_key,
+        workflow_handler::post_workflow,
     ),
     components(schemas(
         User,
         ErrorResponse,
         CreateApiKeyRequest,
         CreateApiKeyResponse,
+        GitHubTriggerType,
     )),
     tags(
         (name = "users", description = "User management endpoints"),
         (name = "api-keys", description = "API key management endpoints"),
+        (name = "workflows", description = "Workflow management endpoints"),
     )
 )]
 pub struct ApiDoc;

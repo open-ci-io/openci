@@ -4,6 +4,16 @@ use axum::{extract::State, http::StatusCode};
 use sqlx::PgPool;
 use tracing::error;
 
+#[utoipa::path(
+    post,
+    path = "/workflows",
+    request_body = CreateWorkflowRequest,
+    responses(
+        (status = 201, description = "Workflow created successfully"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+#[tracing::instrument(skip(pool))]
 pub async fn post_workflow(
     State(pool): State<PgPool>,
     Json(request): Json<CreateWorkflowRequest>,
