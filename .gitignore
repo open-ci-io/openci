@@ -1,8 +1,0 @@
-melos.yaml
-
-# FVM Version Cache
-.fvm/
-
-gen_dmg.sh
-
-sh/
