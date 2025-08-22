@@ -18,7 +18,7 @@ pub fn create_routes(pool: PgPool) -> Router {
             post(handlers::api_key_handler::create_api_key),
         )
         .route(
-            "/workflows/{workflow_id}",
+            "/workflows",
             post(handlers::workflow_handler::post_workflow),
         )
         .route_layer(middleware::from_fn_with_state(
