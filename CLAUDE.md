@@ -32,26 +32,33 @@ This is a **monorepo** managed with **Melos** containing multiple interconnected
    - Location: `/apps/openci_cli/`
    - Purpose: Certificate management, provisioning profiles, App Store operations
 
-5. **docs** (Mintlify) - Documentation site
+5. **openci_models** (Dart package) - Shared data models
+   - Location: `/packages/openci_models/`
+   - Purpose: Common data structures used across all Dart/Flutter components
+
+6. **docs** (Mintlify) - Documentation site
    - Location: `/apps/docs/`
    - Supports English and Japanese localization
 
 ### Database Architecture
 
 PostgreSQL with comprehensive schema covering:
-- **Users & Authentication**: Users table with API key-based auth
-- **Repositories**: GitHub repository metadata and webhook configuration  
-- **Workflows**: CI/CD pipeline definitions with Flutter-specific config
-- **Build Jobs**: Individual build executions with status tracking
-- **Command Logs**: Detailed build output and command execution logs
-- **GitHub Events**: Webhook event processing and build triggering
-- **Secrets**: Encrypted secret management with owner-based access
+- **Users & Authentication**: Users table with roles and API key-based auth
+- **Workflows**: CI/CD pipeline definitions with workflow steps
+- **API Keys**: User authentication tokens with proper security
+- **Future Tables**: repositories, build_jobs, command_logs, github_events, secrets
+
+Current schema includes:
+- `users` (id, name, email, role, created_at)
+- `api_keys` (linked to users for authentication)
+- `workflows` (id, name, github_trigger_type, created_at, updated_at)
+- `workflow_steps` (id, workflow_id, step_order, name, command, timestamps)
 
 ### Key Architectural Patterns
 
 - **Event-driven**: GitHub webhooks → Build job creation → Worker processing
 - **Microservices**: Separate concerns between API, UI, worker, and tooling
-- **API-first**: RESTful API with OpenAPI/Swagger documentation
+- **API-first**: RESTful API with OpenAPI/Swagger documentation at `/docs`
 - **Security**: HMAC webhook verification, API key authentication, encrypted secrets
 - **Scalability**: Worker-pool model for build execution, horizontal scaling ready
 
@@ -69,7 +76,7 @@ PostgreSQL with comprehensive schema covering:
 
 ### Frontend (dashboard)  
 - **Framework**: Flutter 3.6+ with Material Design
-- **State Management**: Riverpod with hooks
+- **State Management**: Riverpod with hooks and code generation
 - **Backend**: Firebase (Firestore, Auth) + OpenCI REST API
 - **UI Components**: Adaptive scaffolding, modal sheets, timelines
 - **Platform Support**: Web, macOS, iOS, Android
@@ -89,7 +96,7 @@ PostgreSQL with comprehensive schema covering:
 
 ### Getting Started
 1. **Prerequisites**: Rust, Dart SDK 3.6+, Docker, PostgreSQL
-2. **Setup**: `make ensure-env` (generates `.env` with random ports/passwords)
+2. **Setup**: `cd packages/openci-controller && make ensure-env` (generates `.env`)
 3. **Development**: `make up-dev` (starts PostgreSQL, runs migrations, starts API)
 4. **Testing**: `make test` (runs Rust test suite)
 
@@ -98,22 +105,50 @@ PostgreSQL with comprehensive schema covering:
 **Rust Backend (openci-controller)**:
 ```bash
 cd packages/openci-controller
+make ensure-env       # Generate .env with random ports/passwords
 make up-dev          # Start development environment
 make test           # Run tests  
 make clean          # Clean up containers and build artifacts
 make build          # Build Docker image
+make rebuild        # Rebuild Docker image without cache
 make db-schema      # Generate schema.sql from running database
+make up-prod        # Start production environment
+```
+
+**Flutter Dashboard Development**:
+```bash
+cd apps/dashboard
+flutter run -d chrome          # Run web version
+flutter run -d macos           # Run macOS version  
+flutter test                   # Run widget tests
+flutter analyze                # Static analysis
+dart run build_runner watch -d # Hot reload with code generation
+```
+
+**CLI Tools Development**:
+```bash
+# OpenCI Runner (Build Worker)
+cd apps/openci_runner
+dart run bin/openci_runner.dart # Run locally
+dart test --coverage           # Run tests with coverage
+
+# OpenCI CLI (App Store Connect tooling)
+cd apps/openci_cli  
+dart run bin/openci_cli.dart --help # Show available commands
 ```
 
 **Monorepo Management (from root)**:
 ```bash
-melos pub get       # Install all package dependencies
-melos run ff        # Deploy Firebase functions  
-melos publish       # Publish packages to pub.dev
+melos pub get                 # Install all package dependencies
+melos run ff                  # Deploy Firebase functions
+melos run dashboard-runner    # Start dashboard with hot reload
+melos version                 # Bump versions across packages
+melos publish                 # Publish packages to pub.dev
 ```
 
 **Database Operations**:
 ```bash
+cd packages/openci-controller
 sqlx migrate add <name>    # Create new migration
 sqlx migrate run           # Apply pending migrations  
 cargo sqlx prepare         # Generate offline query metadata
@@ -153,6 +188,15 @@ src/
 **Authentication**: Middleware-based with user ID injection
 **Database**: SQLx with compile-time query verification
 
+**Flutter Dashboard Structure**:
+```
+lib/src/
+├── common_widgets/    # Reusable UI components
+├── extensions/        # Dart extensions
+├── features/         # Feature-driven modules
+└── services/         # Business logic and repositories
+```
+
 ### Testing Strategy
 
 - **Unit Tests**: Services and models with mockall for database mocking
@@ -172,8 +216,9 @@ src/
 
 - **State Management**: Riverpod with code generation (`riverpod_generator`)
 - **Code Generation**: `build_runner` for serialization and providers
-- **Linting**: `pedantic_mono` for consistent code style
+- **Linting**: `pedantic_mono` for consistent code style in dashboard
 - **Architecture**: Feature-driven structure in `/src/features/`
+- **Shared Models**: `openci_models` package for common data structures
 
 ### Key Integration Points
 
@@ -181,38 +226,43 @@ src/
 - **Firebase Integration**: Dashboard authentication and real-time updates  
 - **App Store Integration**: Certificate and provisioning profile management
 - **Worker Communication**: REST API polling for build job assignment
+- **Shared Models**: `openci_models` package provides common data structures
 
 ### Branch Strategy
 
 - **Main Branch**: `main` (production deployments)
 - **Development Branch**: `develop` (default for PRs, uses development environment)
 - **Feature Branches**: Short-lived branches for individual features
-- **Current Branch**: `OP-185` (working branch for workflow handler implementation)
 
-## Common Development Tasks
+## Development Tasks
 
 ### Adding New API Endpoints
-1. Add route in `src/api/routes.rs`
+1. Add route in `packages/openci-controller/src/api/routes.rs`
 2. Create handler in appropriate `src/handlers/` module  
 3. Define models in `src/models/`
 4. Add OpenAPI documentation with `utoipa` macros
 5. Run `make up-dev` to test with Swagger UI at `/docs`
 
 ### Database Schema Changes
-1. `sqlx migrate add descriptive_name`
+1. `cd packages/openci-controller && sqlx migrate add descriptive_name`
 2. Write up/down migrations in generated files
 3. `make up-dev` applies migrations automatically
 4. `cargo sqlx prepare` for offline query compilation
 
 ### Adding New Flutter Features  
-1. Create feature modules in `apps/dashboard/src/features/`
+1. Create feature modules in `apps/dashboard/lib/src/features/`
 2. Use Riverpod providers for state management
 3. Follow adaptive design patterns for cross-platform support
-4. Run `melos run dashboard-runner` for hot reload during development
+4. Run `dart run build_runner watch -d` for code generation during development
+
+### Working with Shared Models
+1. Add/modify models in `packages/openci_models/lib/src/`
+2. Run `dart run build_runner build` to generate serialization code
+3. Update version in `pubspec.yaml` and run `melos version` to sync across workspace
 
 ### Worker Job Processing
-1. Extend `build_job` model for new job types
-2. Add processing logic in `openci_runner` 
+1. Extend build job models in `openci_models` 
+2. Add processing logic in `apps/openci_runner/lib/src/`
 3. Update status reporting back to controller API
 4. Test against local controller instance
 
