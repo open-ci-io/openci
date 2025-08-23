@@ -198,27 +198,44 @@ pub async fn patch_workflow(
     delete,
     path = "/workflows/{workflow_id}",
     responses(
-        (status = 200, description = "Workflow deleted successfully"),
+        (status = 204, description = "Workflow deleted successfully"),
+        (status = 404, description = "Specified workflow not found"),
+        (status = 409, description = "Conflict: Workflow has dependent records"),
         (status = 500, description = "Internal server error")
+    ),
+    params(
+        ("workflow_id" = i32, Path, description = "Workflow ID")
     )
 )]
 #[tracing::instrument(skip(pool))]
 pub async fn delete_workflow(
     State(pool): State<PgPool>,
     Path(workflow_id): Path<i32>,
-) -> Result<(), (StatusCode, String)> {
-    sqlx::query!("DELETE FROM workflows WHERE id = $1", workflow_id)
+) -> Result<StatusCode, (StatusCode, String)> {
+    let result = sqlx::query!("DELETE FROM workflows WHERE id = $1", workflow_id)
         .execute(&pool)
-        .await
-        .map_err(|e| {
-            error!("Failed to delete workflow: {}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to delete workflow".to_string(),
-            )
-        })?;
+        .await;
 
-    Ok(())
+    match result {
+        Ok(res) if res.rows_affected() == 0 => {
+            Err((StatusCode::NOT_FOUND, "Workflow not found".to_string()))
+        }
+        Ok(_) => Ok(StatusCode::NO_CONTENT),
+        Err(e) => {
+            if e.to_string().contains("foreign key") || e.to_string().contains("constraint") {
+                Err((
+                    StatusCode::CONFLICT,
+                    "Cannot delete workflow with dependent records".to_string(),
+                ))
+            } else {
+                error!("Failed to delete workflow: {}", e);
+                Err((
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to delete workflow".to_string(),
+                ))
+            }
+        }
+    }
 }
 
 #[cfg(test)]
