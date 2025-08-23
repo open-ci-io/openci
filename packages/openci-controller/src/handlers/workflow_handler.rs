@@ -21,7 +21,7 @@ pub async fn get_workflows(
         r#"
         SELECT id, name, created_at, updated_at, github_trigger_type
         FROM workflows
-        ORDER BY created_at DESC
+        ORDER BY created_at DESC, id DESC
         "#,
     )
     .fetch_all(&pool)
@@ -124,13 +124,9 @@ mod tests {
         assert!(result1.is_ok());
         let created_workflow1 = result1.unwrap().0;
 
-        tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
-
         let result2 = post_workflow(State(pool.clone()), Json(workflow2)).await;
         assert!(result2.is_ok());
         let created_workflow2 = result2.unwrap().0;
-
-        tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
 
         let result3 = post_workflow(State(pool.clone()), Json(workflow3)).await;
         assert!(result3.is_ok());

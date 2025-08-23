@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id, name, created_at, updated_at, github_trigger_type\n        FROM workflows\n        ORDER BY created_at DESC\n        ",
+  "query": "\n        SELECT id, name, created_at, updated_at, github_trigger_type\n        FROM workflows\n        ORDER BY created_at DESC, id DESC\n        ",
   "describe": {
     "columns": [
       {
@@ -40,5 +40,5 @@
       false
     ]
   },
-  "hash": "f31ba824de9f523ecb487e3262f5105ff6e3c2ccbb4fc3340906da2ccc9ec136"
+  "hash": "bdde4a9887fadf4ffbb7eb47ea077860b42b2c1782118c0bb14bdeaead035904"
 }
