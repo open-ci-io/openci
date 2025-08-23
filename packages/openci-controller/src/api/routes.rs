@@ -21,6 +21,7 @@ pub fn create_routes(pool: PgPool) -> Router {
             "/workflows",
             post(handlers::workflow_handler::post_workflow),
         )
+        .route("/workflows", get(handlers::workflow_handler::get_workflows))
         .route_layer(middleware::from_fn_with_state(
             pool.clone(),
             auth_middleware,

@@ -270,3 +270,4 @@ This architecture enables rapid development while maintaining security, scalabil
 
 # Our requests
 Please tell me the architecture details rather than just the implementation specifics.
+Reply in Japanese.
