@@ -1,4 +1,6 @@
-use crate::models::workflow::{CreateWorkflowRequest, GitHubTriggerType, Workflow};
+use crate::models::workflow::{
+    CreateWorkflowRequest, GitHubTriggerType, UpdateWorkflowRequest, Workflow,
+};
 use axum::extract::Path;
 use axum::Json;
 use axum::{extract::State, http::StatusCode};
@@ -121,6 +123,77 @@ pub async fn post_workflow(
     Ok(Json(workflow))
 }
 
+#[utoipa::path(
+    patch,
+    path = "/workflows/{workflow_id}",
+    request_body = UpdateWorkflowRequest,
+    responses(
+        (status = 200, description = "Workflow updated successfully"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+#[tracing::instrument(skip(pool))]
+pub async fn patch_workflow(
+    State(pool): State<PgPool>,
+    Path(workflow_id): Path<i32>,
+    Json(request): Json<UpdateWorkflowRequest>,
+) -> Result<Json<Workflow>, (StatusCode, String)> {
+    if let Some(name) = request.name {
+        sqlx::query!(
+            "UPDATE workflows SET name = $1, updated_at = NOW() WHERE id = $2",
+            name,
+            workflow_id
+        )
+        .execute(&pool)
+        .await
+        .map_err(|e| {
+            error!("Failed to update name: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to update workflow".to_string(),
+            )
+        })?;
+    }
+
+    if let Some(github_trigger_type) = request.github_trigger_type {
+        let trigger_str = match github_trigger_type {
+            GitHubTriggerType::Push => "push",
+            GitHubTriggerType::PullRequest => "pull_request",
+        };
+        sqlx::query!(
+            "UPDATE workflows SET github_trigger_type = $1, updated_at = NOW() WHERE id = $2",
+            trigger_str,
+            workflow_id
+        )
+        .execute(&pool)
+        .await
+        .map_err(|e| {
+            error!("Failed to update github_trigger_type: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to update workflow".to_string(),
+            )
+        })?;
+    }
+
+    let workflow = sqlx::query_as!(
+        Workflow,
+        "SELECT id, name, created_at, updated_at, github_trigger_type FROM workflows WHERE id = $1",
+        workflow_id
+    )
+    .fetch_one(&pool)
+    .await
+    .map_err(|e| {
+        error!("Failed to fetch workflow: {}", e);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to fetch workflow".to_string(),
+        )
+    })?;
+
+    Ok(Json(workflow))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -215,5 +288,25 @@ mod tests {
         assert_eq!(workflow.id, 1);
         assert_eq!(workflow.name, "workflow");
         assert_eq!(workflow.github_trigger_type, GitHubTriggerType::Push);
+    }
+    #[sqlx::test]
+    async fn test_patch_workflow(pool: PgPool) {
+        let request = CreateWorkflowRequest {
+            name: "workflow".to_string(),
+            github_trigger_type: GitHubTriggerType::Push,
+        };
+        let result = post_workflow(State(pool.clone()), Json(request)).await;
+        assert!(result.is_ok());
+
+        let workflow_id = result.unwrap().0.id;
+
+        let patch_request = UpdateWorkflowRequest {
+            name: Some("updated_workflow".to_string()),
+            github_trigger_type: None,
+        };
+        let patch_result =
+            patch_workflow(State(pool), Path(workflow_id), Json(patch_request)).await;
+
+        assert_eq!(patch_result.unwrap().0.name, "updated_workflow")
     }
 }
