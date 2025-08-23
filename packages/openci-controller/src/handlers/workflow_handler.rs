@@ -194,6 +194,50 @@ pub async fn patch_workflow(
     Ok(Json(workflow))
 }
 
+#[utoipa::path(
+    delete,
+    path = "/workflows/{workflow_id}",
+    responses(
+        (status = 204, description = "Workflow deleted successfully"),
+        (status = 404, description = "Specified workflow not found"),
+        (status = 409, description = "Conflict: Workflow has dependent records"),
+        (status = 500, description = "Internal server error")
+    ),
+    params(
+        ("workflow_id" = i32, Path, description = "Workflow ID")
+    )
+)]
+#[tracing::instrument(skip(pool))]
+pub async fn delete_workflow(
+    State(pool): State<PgPool>,
+    Path(workflow_id): Path<i32>,
+) -> Result<StatusCode, (StatusCode, String)> {
+    let result = sqlx::query!("DELETE FROM workflows WHERE id = $1", workflow_id)
+        .execute(&pool)
+        .await;
+
+    match result {
+        Ok(res) if res.rows_affected() == 0 => {
+            Err((StatusCode::NOT_FOUND, "Workflow not found".to_string()))
+        }
+        Ok(_) => Ok(StatusCode::NO_CONTENT),
+        Err(e) => {
+            if e.to_string().contains("foreign key") || e.to_string().contains("constraint") {
+                Err((
+                    StatusCode::CONFLICT,
+                    "Cannot delete workflow with dependent records".to_string(),
+                ))
+            } else {
+                error!("Failed to delete workflow: {}", e);
+                Err((
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to delete workflow".to_string(),
+                ))
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -308,5 +352,29 @@ mod tests {
             patch_workflow(State(pool), Path(workflow_id), Json(patch_request)).await;
 
         assert_eq!(patch_result.unwrap().0.name, "updated_workflow")
+    }
+
+    #[sqlx::test]
+    async fn test_delete_workflow(pool: PgPool) {
+        let request = CreateWorkflowRequest {
+            name: "workflow".to_string(),
+            github_trigger_type: GitHubTriggerType::Push,
+        };
+        let result = post_workflow(State(pool.clone()), Json(request)).await;
+        assert!(result.is_ok());
+        let workflow_id = result.unwrap().0.id;
+
+        assert!(delete_workflow(State(pool.clone()), Path(workflow_id))
+            .await
+            .is_ok());
+
+        assert!(get_workflow(State(pool), Path(workflow_id)).await.is_err());
+    }
+    #[sqlx::test]
+    async fn test_delete_workflow_not_found(pool: PgPool) {
+        let res = delete_workflow(State(pool), Path(999_999)).await;
+        assert!(res.is_err());
+        let (status, _msg) = res.err().unwrap();
+        assert_eq!(status, StatusCode::NOT_FOUND);
     }
 }
