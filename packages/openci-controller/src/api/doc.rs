@@ -23,6 +23,7 @@ use utoipa::OpenApi;
         api_key_handler::create_api_key,
         workflow_handler::post_workflow,
         workflow_handler::get_workflows,
+        workflow_handler::get_workflow,
     ),
     components(schemas(
         User,

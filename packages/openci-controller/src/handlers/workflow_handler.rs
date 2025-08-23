@@ -1,4 +1,5 @@
 use crate::models::workflow::{CreateWorkflowRequest, GitHubTriggerType, Workflow};
+use axum::extract::Path;
 use axum::Json;
 use axum::{extract::State, http::StatusCode};
 use sqlx::PgPool;
@@ -30,11 +31,51 @@ pub async fn get_workflows(
         error!("Database error: {}", e);
         (
             StatusCode::INTERNAL_SERVER_ERROR,
-            "Failed to create workflow".to_string(),
+            "Failed to fetch workflows".to_string(),
         )
     })?;
 
     Ok(Json(workflows))
+}
+
+#[utoipa::path(
+    get,
+    path = "/workflows/{workflow_id}",
+    responses(
+        (status = 200, description = "Workflow retrieved successfully", body = Workflow),
+        (status = 404, description = "Specified workflow not found"),
+        (status = 500, description = "Internal server error")
+    ),
+    params(
+          ("workflow_id" = i32, Path, description = "Workflow ID")
+    )
+)]
+#[tracing::instrument(skip(pool))]
+pub async fn get_workflow(
+    State(pool): State<PgPool>,
+    Path(workflow_id): Path<i32>,
+) -> Result<Json<Workflow>, (StatusCode, String)> {
+    let workflow = sqlx::query_as!(
+        Workflow,
+        r#"
+    SELECT id, name, created_at, updated_at, github_trigger_type
+    FROM workflows
+    WHERE id = $1
+    ORDER BY created_at DESC, id DESC
+    "#,
+        workflow_id
+    )
+    .fetch_one(&pool)
+    .await
+    .map_err(|e| {
+        error!("Database error: {}", e);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to fetch workflow".to_string(),
+        )
+    })?;
+
+    Ok(Json(workflow))
 }
 
 #[utoipa::path(
@@ -152,5 +193,24 @@ mod tests {
             GitHubTriggerType::PullRequest
         );
         assert_eq!(workflows[2].github_trigger_type, GitHubTriggerType::Push);
+    }
+
+    #[sqlx::test]
+    async fn test_get_workflow_by_workflow_id(pool: PgPool) {
+        let request = CreateWorkflowRequest {
+            name: "workflow".to_string(),
+            github_trigger_type: GitHubTriggerType::Push,
+        };
+        let result = post_workflow(State(pool.clone()), Json(request)).await;
+        assert!(result.is_ok());
+        let workflow_id = result.unwrap().0.id;
+
+        let workflow_result = get_workflow(State(pool), Path(workflow_id)).await;
+        assert!(workflow_result.is_ok());
+        let workflow = workflow_result.unwrap().0;
+
+        assert_eq!(workflow.id, 1);
+        assert_eq!(workflow.name, "workflow");
+        assert_eq!(workflow.github_trigger_type, GitHubTriggerType::Push);
     }
 }
