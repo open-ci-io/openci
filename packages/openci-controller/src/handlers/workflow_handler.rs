@@ -194,6 +194,33 @@ pub async fn patch_workflow(
     Ok(Json(workflow))
 }
 
+#[utoipa::path(
+    delete,
+    path = "/workflows/{workflow_id}",
+    responses(
+        (status = 200, description = "Workflow deleted successfully"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+#[tracing::instrument(skip(pool))]
+pub async fn delete_workflow(
+    State(pool): State<PgPool>,
+    Path(workflow_id): Path<i32>,
+) -> Result<(), (StatusCode, String)> {
+    sqlx::query!("DELETE FROM workflows WHERE id = $1", workflow_id)
+        .execute(&pool)
+        .await
+        .map_err(|e| {
+            error!("Failed to delete workflow: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to delete workflow".to_string(),
+            )
+        })?;
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -308,5 +335,22 @@ mod tests {
             patch_workflow(State(pool), Path(workflow_id), Json(patch_request)).await;
 
         assert_eq!(patch_result.unwrap().0.name, "updated_workflow")
+    }
+
+    #[sqlx::test]
+    async fn test_delete_workflow(pool: PgPool) {
+        let request = CreateWorkflowRequest {
+            name: "workflow".to_string(),
+            github_trigger_type: GitHubTriggerType::Push,
+        };
+        let result = post_workflow(State(pool.clone()), Json(request)).await;
+        assert!(result.is_ok());
+        let workflow_id = result.unwrap().0.id;
+
+        assert!(delete_workflow(State(pool.clone()), Path(workflow_id))
+            .await
+            .is_ok());
+
+        assert!(get_workflow(State(pool), Path(workflow_id)).await.is_err());
     }
 }

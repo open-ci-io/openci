@@ -26,6 +26,7 @@ use utoipa::OpenApi;
         workflow_handler::get_workflows,
         workflow_handler::get_workflow,
         workflow_handler::patch_workflow,
+        workflow_handler::delete_workflow,
     ),
     components(schemas(
         User,
