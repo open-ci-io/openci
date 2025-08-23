@@ -370,4 +370,11 @@ mod tests {
 
         assert!(get_workflow(State(pool), Path(workflow_id)).await.is_err());
     }
+    #[sqlx::test]
+    async fn test_delete_workflow_not_found(pool: PgPool) {
+        let res = delete_workflow(State(pool), Path(999_999)).await;
+        assert!(res.is_err());
+        let (status, _msg) = res.err().unwrap();
+        assert_eq!(status, StatusCode::NOT_FOUND);
+    }
 }
