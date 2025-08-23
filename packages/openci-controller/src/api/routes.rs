@@ -1,6 +1,6 @@
 use axum::{
     middleware,
-    routing::{get, post},
+    routing::{get, patch, post},
     Router,
 };
 use sqlx::PgPool;
@@ -25,6 +25,10 @@ pub fn create_routes(pool: PgPool) -> Router {
         .route(
             "/workflows/{workflow_id}",
             get(handlers::workflow_handler::get_workflow),
+        )
+        .route(
+            "workflows/{workflow_id}",
+            patch(handlers::workflow_handler::patch_workflow),
         )
         .route_layer(middleware::from_fn_with_state(
             pool.clone(),

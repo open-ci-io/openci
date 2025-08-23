@@ -3,6 +3,7 @@ use crate::handlers::user_handler;
 use crate::handlers::workflow_handler;
 use crate::models::workflow::CreateWorkflowRequest;
 use crate::models::workflow::GitHubTriggerType;
+use crate::models::workflow::UpdateWorkflowRequest;
 use crate::models::workflow::Workflow;
 use crate::models::{
     api_key::{CreateApiKeyRequest, CreateApiKeyResponse},
@@ -24,6 +25,7 @@ use utoipa::OpenApi;
         workflow_handler::post_workflow,
         workflow_handler::get_workflows,
         workflow_handler::get_workflow,
+        workflow_handler::patch_workflow,
     ),
     components(schemas(
         User,
@@ -33,6 +35,7 @@ use utoipa::OpenApi;
         GitHubTriggerType,
         Workflow,
         CreateWorkflowRequest,
+        UpdateWorkflowRequest,
     )),
     tags(
         (name = "users", description = "User management endpoints"),

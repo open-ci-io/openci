@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use mockall::predicate::str;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
@@ -16,6 +17,11 @@ pub struct Workflow {
 pub struct CreateWorkflowRequest {
     pub name: String,
     pub github_trigger_type: GitHubTriggerType,
+}
+#[derive(Debug, serde::Deserialize, utoipa::ToSchema)]
+pub struct UpdateWorkflowRequest {
+    pub name: Option<String>,
+    pub github_trigger_type: Option<GitHubTriggerType>,
 }
 
 #[derive(Debug, Serialize, Deserialize, sqlx::Type, PartialEq, utoipa::ToSchema)]
