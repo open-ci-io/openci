@@ -128,7 +128,7 @@ pub async fn post_workflow(
     path = "/workflows/{workflow_id}",
     request_body = UpdateWorkflowRequest,
     responses(
-        (status = 201, description = "Workflow updated successfully"),
+        (status = 200, description = "Workflow updated successfully"),
         (status = 500, description = "Internal server error")
     )
 )]
