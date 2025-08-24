@@ -22,9 +22,19 @@ pub struct CreateWorkflowRequest {
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(rename_all = "snake_case")]
+#[schema(example = json!({
+    "step_order": 1,
+    "name": "Build",
+    "command": "flutter build"
+}))]
 pub struct CreateWorkflowStepRequest {
+    #[schema(minimum = 0, example = 1)]
     pub step_order: i32,
+
+    #[schema(max_length = 255, example = "Build")]
     pub name: String,
+
+    #[schema(max_length = 255, example = "flutter build")]
     pub command: String,
 }
 
