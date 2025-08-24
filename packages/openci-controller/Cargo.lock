@@ -449,6 +449,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "email_address"
+version = "0.2.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e079f19b08ca6239f47f8ba8509c11cf3ea30095831f7fed61441475edd8c449"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "equivalent"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1212,6 +1221,7 @@ dependencies = [
  "rand 0.9.1",
  "secrecy",
  "serde",
+ "serde-email",
  "serde_json",
  "sha2",
  "sqlx",
@@ -1621,6 +1631,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f0e2c6ed6606019b4e29e69dbaba95b11854410e5347d525002456dbbb786b6"
 dependencies = [
  "serde_derive",
+]
+
+[[package]]
+name = "serde-email"
+version = "3.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5185e64f83980e6bce8058beda9ae593c5589e90c2cdde62a01e3ecd960acd76"
+dependencies = [
+ "email_address",
+ "serde",
 ]
 
 [[package]]

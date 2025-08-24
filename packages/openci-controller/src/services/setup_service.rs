@@ -1,9 +1,9 @@
 use crate::services::api_key_service;
+use serde_email::is_valid_email;
 use sqlx::{PgPool, Postgres, Transaction};
 use std::borrow::Cow;
 use std::env;
 use tracing::{debug, info};
-use validator::ValidateEmail;
 
 #[derive(Debug, Clone)]
 struct InitialAdminConfig {
@@ -17,7 +17,7 @@ fn load_initial_admin_config() -> Option<InitialAdminConfig> {
         env::var("OPENCI_INITIAL_ADMIN_EMAIL").ok(),
     ) {
         (Some(name), Some(email)) => {
-            if !email.validate_email() {
+            if !is_valid_email(&email) {
                 info!(
                     "Invalid email format in OPENCI_INITIAL_ADMIN_EMAIL: {}",
                     email
@@ -156,6 +156,7 @@ mod tests {
     }
     #[test]
     fn test_load_initial_admin_config_with_valid_env() {
+        cleanup_env_vars();
         setup_env_vars();
 
         let config = load_initial_admin_config();
@@ -170,6 +171,7 @@ mod tests {
 
     #[test]
     fn test_load_initial_admin_config_missing_name() {
+        cleanup_env_vars();
         env::set_var("OPENCI_INITIAL_ADMIN_EMAIL", "admin@test.com");
 
         let config = load_initial_admin_config();
@@ -177,10 +179,12 @@ mod tests {
         assert!(config.is_none());
 
         env::remove_var("OPENCI_INITIAL_ADMIN_EMAIL");
+        cleanup_env_vars();
     }
 
     #[test]
     fn test_load_initial_admin_config_missing_email() {
+        cleanup_env_vars();
         env::set_var("OPENCI_INITIAL_ADMIN_NAME", "Test Admin");
 
         let config = load_initial_admin_config();
@@ -188,6 +192,7 @@ mod tests {
         assert!(config.is_none());
 
         env::remove_var("OPENCI_INITIAL_ADMIN_NAME");
+        cleanup_env_vars();
     }
 
     #[test]
@@ -197,10 +202,12 @@ mod tests {
         let config = load_initial_admin_config();
 
         assert!(config.is_none());
+        cleanup_env_vars();
     }
 
     #[test]
     fn test_load_initial_admin_config_invalid_email() {
+        cleanup_env_vars();
         env::set_var("OPENCI_INITIAL_ADMIN_NAME", "Test Admin");
         env::set_var("OPENCI_INITIAL_ADMIN_EMAIL", "invalid-email");
 
@@ -213,6 +220,7 @@ mod tests {
 
     #[test]
     fn test_load_initial_admin_config_valid_email_formats() {
+        cleanup_env_vars();
         env::set_var("OPENCI_INITIAL_ADMIN_NAME", "Test Admin");
 
         let valid_emails = vec![
@@ -332,6 +340,7 @@ mod tests {
 
     #[sqlx::test]
     async fn test_setup_initial_admin_full_flow(pool: PgPool) {
+        cleanup_env_vars();
         setup_env_vars();
 
         let result = setup_initial_admin(&pool).await;
@@ -376,5 +385,6 @@ mod tests {
             .unwrap_or(0);
 
         assert_eq!(user_count, 0);
+        cleanup_env_vars();
     }
 }
