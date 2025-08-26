@@ -2,9 +2,11 @@ use crate::handlers::api_key_handler;
 use crate::handlers::user_handler;
 use crate::handlers::workflow_handler;
 use crate::models::workflow::CreateWorkflowRequest;
+use crate::models::workflow::CreateWorkflowStepRequest;
 use crate::models::workflow::GitHubTriggerType;
 use crate::models::workflow::UpdateWorkflowRequest;
 use crate::models::workflow::Workflow;
+use crate::models::workflow::WorkflowStep;
 use crate::models::workflow::WorkflowWithSteps;
 use crate::models::{
     api_key::{CreateApiKeyRequest, CreateApiKeyResponse},
@@ -36,8 +38,10 @@ use utoipa::OpenApi;
         CreateApiKeyResponse,
         GitHubTriggerType,
         Workflow,
+        WorkflowStep,
         WorkflowWithSteps,
         CreateWorkflowRequest,
+        CreateWorkflowStepRequest,
         UpdateWorkflowRequest,
     )),
     tags(
