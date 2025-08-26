@@ -1,10 +1,11 @@
 use crate::models::workflow::{
-    CreateWorkflowRequest, GitHubTriggerType, UpdateWorkflowRequest, Workflow,
+    CreateWorkflowRequest, GitHubTriggerType, UpdateWorkflowRequest, Workflow, WorkflowStep,
+    WorkflowWithSteps,
 };
 use axum::extract::Path;
 use axum::Json;
 use axum::{extract::State, http::StatusCode};
-use sqlx::PgPool;
+use sqlx::{PgPool, QueryBuilder};
 use tracing::error;
 
 #[utoipa::path(
@@ -96,7 +97,14 @@ pub async fn get_workflow(
 pub async fn post_workflow(
     State(pool): State<PgPool>,
     Json(request): Json<CreateWorkflowRequest>,
-) -> Result<Json<Workflow>, (StatusCode, String)> {
+) -> Result<Json<WorkflowWithSteps>, (StatusCode, String)> {
+    let mut tx = pool.begin().await.map_err(|e| {
+        error!("Failed to begin transaction: {}", e);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Transaction error".to_string(),
+        )
+    })?;
     let workflow = sqlx::query_as!(
         Workflow,
         r#"
@@ -110,7 +118,7 @@ pub async fn post_workflow(
             GitHubTriggerType::PullRequest => "pull_request",
         }
     )
-    .fetch_one(&pool)
+    .fetch_one(&mut *tx)
     .await
     .map_err(|e| {
         error!("Database error: {}", e);
@@ -120,7 +128,56 @@ pub async fn post_workflow(
         )
     })?;
 
-    Ok(Json(workflow))
+    let mut created_steps = Vec::new();
+    if !request.steps.is_empty() {
+        let mut query = QueryBuilder::new(
+            "INSERT INTO workflow_steps (workflow_id, step_order, name, command) ",
+        );
+
+        query.push_values(request.steps.iter(), |mut b, step| {
+            b.push_bind(workflow.id)
+                .push_bind(&step.step_order)
+                .push_bind(&step.name)
+                .push_bind(&step.command);
+        });
+
+        query.build().execute(&mut *tx).await.map_err(|e| {
+            error!("Database error: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to create workflow steps".to_string(),
+            )
+        })?;
+
+        created_steps = sqlx::query_as!(
+            WorkflowStep,
+            "SELECT * FROM workflow_steps WHERE workflow_id = $1 ORDER BY 
+  step_order",
+            workflow.id
+        )
+        .fetch_all(&mut *tx)
+        .await
+        .map_err(|e| {
+            error!("Failed to fetch created workflow steps: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to fetch created workflow steps".to_string(),
+            )
+        })?;
+    }
+
+    tx.commit().await.map_err(|e| {
+        error!("Failed to commit: {}", e);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to commit".to_string(),
+        )
+    })?;
+
+    Ok(Json(WorkflowWithSteps {
+        workflow,
+        steps: created_steps,
+    }))
 }
 
 #[utoipa::path(
@@ -247,14 +304,17 @@ mod tests {
         let request = CreateWorkflowRequest {
             name: "test-workflow".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
+            steps: vec![],
         };
 
         let result = post_workflow(State(pool), Json(request)).await;
         assert!(result.is_ok());
 
-        let workflow = result.unwrap().0;
+        let response = result.unwrap().0;
+        let workflow = response.workflow;
         assert_eq!(workflow.name, "test-workflow");
         assert_eq!(workflow.github_trigger_type, GitHubTriggerType::Push);
+        assert_eq!(response.steps.len(), 0);
     }
 
     #[sqlx::test]
@@ -271,14 +331,17 @@ mod tests {
         let workflow1 = CreateWorkflowRequest {
             name: "workflow-1".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
+            steps: vec![],
         };
         let workflow2 = CreateWorkflowRequest {
             name: "workflow-2".to_string(),
             github_trigger_type: GitHubTriggerType::PullRequest,
+            steps: vec![],
         };
         let workflow3 = CreateWorkflowRequest {
             name: "workflow-3".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
+            steps: vec![],
         };
 
         let result1 = post_workflow(State(pool.clone()), Json(workflow1)).await;
@@ -300,11 +363,11 @@ mod tests {
 
         assert_eq!(workflows.len(), 3);
 
-        assert_eq!(workflows[0].id, created_workflow3.id);
+        assert_eq!(workflows[0].id, created_workflow3.workflow.id);
         assert_eq!(workflows[0].name, "workflow-3");
-        assert_eq!(workflows[1].id, created_workflow2.id);
+        assert_eq!(workflows[1].id, created_workflow2.workflow.id);
         assert_eq!(workflows[1].name, "workflow-2");
-        assert_eq!(workflows[2].id, created_workflow1.id);
+        assert_eq!(workflows[2].id, created_workflow1.workflow.id);
         assert_eq!(workflows[2].name, "workflow-1");
 
         assert_eq!(workflows[0].github_trigger_type, GitHubTriggerType::Push);
@@ -320,10 +383,11 @@ mod tests {
         let request = CreateWorkflowRequest {
             name: "workflow".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
+            steps: vec![],
         };
         let result = post_workflow(State(pool.clone()), Json(request)).await;
         assert!(result.is_ok());
-        let workflow_id = result.unwrap().0.id;
+        let workflow_id = result.unwrap().0.workflow.id;
 
         let workflow_result = get_workflow(State(pool), Path(workflow_id)).await;
         assert!(workflow_result.is_ok());
@@ -338,11 +402,12 @@ mod tests {
         let request = CreateWorkflowRequest {
             name: "workflow".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
+            steps: vec![],
         };
         let result = post_workflow(State(pool.clone()), Json(request)).await;
         assert!(result.is_ok());
 
-        let workflow_id = result.unwrap().0.id;
+        let workflow_id = result.unwrap().0.workflow.id;
 
         let patch_request = UpdateWorkflowRequest {
             name: Some("updated_workflow".to_string()),
@@ -359,10 +424,11 @@ mod tests {
         let request = CreateWorkflowRequest {
             name: "workflow".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
+            steps: vec![],
         };
         let result = post_workflow(State(pool.clone()), Json(request)).await;
         assert!(result.is_ok());
-        let workflow_id = result.unwrap().0.id;
+        let workflow_id = result.unwrap().0.workflow.id;
 
         assert!(delete_workflow(State(pool.clone()), Path(workflow_id))
             .await

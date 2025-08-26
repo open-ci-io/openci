@@ -17,7 +17,34 @@ pub struct Workflow {
 pub struct CreateWorkflowRequest {
     pub name: String,
     pub github_trigger_type: GitHubTriggerType,
+    pub steps: Vec<CreateWorkflowStepRequest>,
 }
+
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(rename_all = "snake_case")]
+#[schema(example = json!({
+    "step_order": 1,
+    "name": "Build",
+    "command": "flutter build"
+}))]
+pub struct CreateWorkflowStepRequest {
+    #[schema(minimum = 0, example = 1)]
+    pub step_order: i32,
+
+    #[schema(max_length = 255, example = "Build")]
+    pub name: String,
+
+    #[schema(max_length = 255, example = "flutter build")]
+    pub command: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct WorkflowWithSteps {
+    #[serde(flatten)]
+    pub workflow: Workflow,
+    pub steps: Vec<WorkflowStep>,
+}
+
 #[derive(Debug, serde::Deserialize, utoipa::ToSchema)]
 pub struct UpdateWorkflowRequest {
     pub name: Option<String>,
@@ -39,9 +66,9 @@ impl From<String> for GitHubTriggerType {
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(rename_all = "snake_case")]
-struct WorkflowStep {
+pub struct WorkflowStep {
     pub id: i32,
     pub workflow_id: i32,
     pub step_order: i32,
