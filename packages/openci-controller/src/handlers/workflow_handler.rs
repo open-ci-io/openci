@@ -25,7 +25,7 @@ pub async fn get_workflows(
         r#"
         SELECT id, name, created_at, updated_at, github_trigger_type
         FROM workflows
-        ORDER BY created_at DESC, id DESC
+        ORDER BY updated_at DESC, id DESC
         "#,
     )
     .fetch_all(&pool)
