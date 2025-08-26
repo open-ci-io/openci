@@ -1,7 +1,7 @@
 use dotenvy::dotenv;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use crate::services::setup_service::setup_initial_admin;
+use crate::services::setup_service::{setup_initial_admin, EnvConfigLoader};
 
 mod api;
 mod config;
@@ -27,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let pool = db::pool::create_pool(&config).await?;
 
-    setup_initial_admin(&pool).await?;
+    setup_initial_admin(&pool, &EnvConfigLoader).await?;
 
     let app = api::routes::create_routes(pool);
 

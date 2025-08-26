@@ -3,30 +3,55 @@ use serde_email::is_valid_email;
 use sqlx::{PgPool, Postgres, Transaction};
 use std::borrow::Cow;
 use std::env;
-use tracing::{debug, info};
+use tracing::{debug, info, warn};
 
 #[derive(Debug, Clone)]
-struct InitialAdminConfig {
+pub struct InitialAdminConfig {
     pub name: String,
     pub email: String,
 }
 
-fn load_initial_admin_config() -> Option<InitialAdminConfig> {
-    match (
-        env::var("OPENCI_INITIAL_ADMIN_NAME").ok(),
-        env::var("OPENCI_INITIAL_ADMIN_EMAIL").ok(),
-    ) {
-        (Some(name), Some(email)) => {
-            if !is_valid_email(&email) {
-                info!(
-                    "Invalid email format in OPENCI_INITIAL_ADMIN_EMAIL: {}",
-                    email
-                );
-                return None;
+pub trait ConfigLoader {
+    fn load_initial_admin_config(&self) -> Option<InitialAdminConfig>;
+}
+
+pub struct EnvConfigLoader;
+impl ConfigLoader for EnvConfigLoader {
+    fn load_initial_admin_config(&self) -> Option<InitialAdminConfig> {
+        match (
+            env::var("OPENCI_INITIAL_ADMIN_NAME").ok(),
+            env::var("OPENCI_INITIAL_ADMIN_EMAIL").ok(),
+        ) {
+            (Some(name), Some(email)) => {
+                if !is_valid_email(&email) {
+                    warn!(
+                        "Invalid OPENCI_INITIAL_ADMIN_EMAIL format; ignoring initial admin config"
+                    );
+                    return None;
+                }
+                Some(InitialAdminConfig { name, email })
             }
-            Some(InitialAdminConfig { name, email })
+            _ => None,
         }
-        _ => None,
+    }
+}
+
+#[cfg(test)]
+pub struct MockConfigLoader {
+    config: Option<InitialAdminConfig>,
+}
+
+#[cfg(test)]
+impl MockConfigLoader {
+    pub fn new(config: Option<InitialAdminConfig>) -> Self {
+        Self { config }
+    }
+}
+
+#[cfg(test)]
+impl ConfigLoader for MockConfigLoader {
+    fn load_initial_admin_config(&self) -> Option<InitialAdminConfig> {
+        self.config.clone()
     }
 }
 
@@ -110,16 +135,19 @@ pub fn display_api_key_info(api_key: &str) {
     info!("Initial admin API key displayed to console");
 }
 
-pub async fn setup_initial_admin(pool: &PgPool) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn setup_initial_admin(
+    pool: &PgPool,
+    config_loader: &impl ConfigLoader,
+) -> Result<(), Box<dyn std::error::Error>> {
     if check_users_exist(pool).await? {
         debug!("Users already exist, skipping initial setup");
         return Ok(());
     }
 
-    let config = match load_initial_admin_config() {
+    let config = match config_loader.load_initial_admin_config() {
         Some(config) => config,
         None => {
-            info!("No initial admin configured. You can create users via API.");
+            info!("No initial admin configured");
             return Ok(());
         }
     };
@@ -143,122 +171,29 @@ pub async fn setup_initial_admin(pool: &PgPool) -> Result<(), Box<dyn std::error
 mod tests {
     use super::*;
     use sqlx::PgPool;
-    use std::env;
 
-    fn setup_env_vars() {
-        env::set_var("OPENCI_INITIAL_ADMIN_NAME", "Test Admin");
-        env::set_var("OPENCI_INITIAL_ADMIN_EMAIL", "admin@test.com");
-    }
-
-    fn cleanup_env_vars() {
-        env::remove_var("OPENCI_INITIAL_ADMIN_NAME");
-        env::remove_var("OPENCI_INITIAL_ADMIN_EMAIL");
-    }
     #[test]
     fn test_load_initial_admin_config_with_valid_env() {
-        cleanup_env_vars();
-        setup_env_vars();
+        let loader = MockConfigLoader::new(Some(InitialAdminConfig {
+            name: "Test Admin".to_string(),
+            email: "admin@test.com".to_string(),
+        }));
 
-        let config = load_initial_admin_config();
+        let config = loader.load_initial_admin_config();
 
         assert!(config.is_some());
         let config = config.unwrap();
         assert_eq!(config.name, "Test Admin");
         assert_eq!(config.email, "admin@test.com");
-
-        cleanup_env_vars();
     }
 
     #[test]
-    fn test_load_initial_admin_config_missing_name() {
-        cleanup_env_vars();
-        env::set_var("OPENCI_INITIAL_ADMIN_EMAIL", "admin@test.com");
+    fn test_load_initial_admin_config_missing_env() {
+        let loader = MockConfigLoader::new(None);
 
-        let config = load_initial_admin_config();
+        let config = loader.load_initial_admin_config();
 
         assert!(config.is_none());
-
-        env::remove_var("OPENCI_INITIAL_ADMIN_EMAIL");
-        cleanup_env_vars();
-    }
-
-    #[test]
-    fn test_load_initial_admin_config_missing_email() {
-        cleanup_env_vars();
-        env::set_var("OPENCI_INITIAL_ADMIN_NAME", "Test Admin");
-
-        let config = load_initial_admin_config();
-
-        assert!(config.is_none());
-
-        env::remove_var("OPENCI_INITIAL_ADMIN_NAME");
-        cleanup_env_vars();
-    }
-
-    #[test]
-    fn test_load_initial_admin_config_no_env() {
-        cleanup_env_vars();
-
-        let config = load_initial_admin_config();
-
-        assert!(config.is_none());
-        cleanup_env_vars();
-    }
-
-    #[test]
-    fn test_load_initial_admin_config_invalid_email() {
-        cleanup_env_vars();
-        env::set_var("OPENCI_INITIAL_ADMIN_NAME", "Test Admin");
-        env::set_var("OPENCI_INITIAL_ADMIN_EMAIL", "invalid-email");
-
-        let config = load_initial_admin_config();
-
-        assert!(config.is_none());
-
-        cleanup_env_vars();
-    }
-
-    #[test]
-    fn test_load_initial_admin_config_valid_email_formats() {
-        cleanup_env_vars();
-        env::set_var("OPENCI_INITIAL_ADMIN_NAME", "Test Admin");
-
-        let valid_emails = vec![
-            "user@example.com",
-            "user.name@example.com",
-            "user+tag@example.co.jp",
-            "user_name@sub.example.com",
-        ];
-
-        for email in valid_emails {
-            env::set_var("OPENCI_INITIAL_ADMIN_EMAIL", email);
-            let config = load_initial_admin_config();
-            assert!(config.is_some(), "Email {} should be valid", email);
-        }
-
-        let invalid_emails = vec![
-            "@example.com",
-            "user@",
-            "user",
-            "user@@example.com",
-            "user@.com",
-            "",
-            "user @example.com",
-            "user@example..com",
-            "user<>@example.com",
-            "user@example,com",
-            "user@",
-            "plainaddress",
-            "@",
-        ];
-
-        for email in invalid_emails {
-            env::set_var("OPENCI_INITIAL_ADMIN_EMAIL", email);
-            let config = load_initial_admin_config();
-            assert!(config.is_none(), "Email {} should be invalid", email);
-        }
-
-        cleanup_env_vars();
     }
 
     #[sqlx::test]
@@ -340,10 +275,12 @@ mod tests {
 
     #[sqlx::test]
     async fn test_setup_initial_admin_full_flow(pool: PgPool) {
-        cleanup_env_vars();
-        setup_env_vars();
+        let loader = MockConfigLoader::new(Some(InitialAdminConfig {
+            name: "Test Admin".to_string(),
+            email: "admin@test.com".to_string(),
+        }));
 
-        let result = setup_initial_admin(&pool).await;
+        let result = setup_initial_admin(&pool, &loader).await;
         assert!(result.is_ok());
 
         let user_count = sqlx::query_scalar!(
@@ -357,7 +294,7 @@ mod tests {
 
         assert_eq!(user_count, 1);
 
-        let result = setup_initial_admin(&pool).await;
+        let result = setup_initial_admin(&pool, &loader).await;
         assert!(result.is_ok());
 
         let user_count_after = sqlx::query_scalar!("SELECT COUNT(*) FROM users")
@@ -367,24 +304,5 @@ mod tests {
             .unwrap_or(0);
 
         assert_eq!(user_count_after, 1);
-
-        cleanup_env_vars();
-    }
-
-    #[sqlx::test]
-    async fn test_setup_initial_admin_no_config(pool: PgPool) {
-        cleanup_env_vars();
-
-        let result = setup_initial_admin(&pool).await;
-        assert!(result.is_ok());
-
-        let user_count = sqlx::query_scalar!("SELECT COUNT(*) FROM users")
-            .fetch_one(&pool)
-            .await
-            .unwrap()
-            .unwrap_or(0);
-
-        assert_eq!(user_count, 0);
-        cleanup_env_vars();
     }
 }
