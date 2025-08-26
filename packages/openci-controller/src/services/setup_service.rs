@@ -36,25 +36,6 @@ impl ConfigLoader for EnvConfigLoader {
     }
 }
 
-#[cfg(test)]
-pub struct MockConfigLoader {
-    config: Option<InitialAdminConfig>,
-}
-
-#[cfg(test)]
-impl MockConfigLoader {
-    pub fn new(config: Option<InitialAdminConfig>) -> Self {
-        Self { config }
-    }
-}
-
-#[cfg(test)]
-impl ConfigLoader for MockConfigLoader {
-    fn load_initial_admin_config(&self) -> Option<InitialAdminConfig> {
-        self.config.clone()
-    }
-}
-
 async fn check_users_exist(pool: &PgPool) -> Result<bool, sqlx::Error> {
     sqlx::query_scalar::<_, bool>("SELECT EXISTS(SELECT 1 FROM users LIMIT 1)")
         .fetch_one(pool)
@@ -165,6 +146,25 @@ pub async fn setup_initial_admin(
     info!("Initial admin user and API key created successfully");
 
     Ok(())
+}
+
+#[cfg(test)]
+pub struct MockConfigLoader {
+    config: Option<InitialAdminConfig>,
+}
+
+#[cfg(test)]
+impl MockConfigLoader {
+    pub fn new(config: Option<InitialAdminConfig>) -> Self {
+        Self { config }
+    }
+}
+
+#[cfg(test)]
+impl ConfigLoader for MockConfigLoader {
+    fn load_initial_admin_config(&self) -> Option<InitialAdminConfig> {
+        self.config.clone()
+    }
 }
 
 #[cfg(test)]
