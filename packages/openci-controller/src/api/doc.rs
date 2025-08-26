@@ -5,6 +5,7 @@ use crate::models::workflow::CreateWorkflowRequest;
 use crate::models::workflow::GitHubTriggerType;
 use crate::models::workflow::UpdateWorkflowRequest;
 use crate::models::workflow::Workflow;
+use crate::models::workflow::WorkflowWithSteps;
 use crate::models::{
     api_key::{CreateApiKeyRequest, CreateApiKeyResponse},
     error_response::ErrorResponse,
@@ -35,6 +36,7 @@ use utoipa::OpenApi;
         CreateApiKeyResponse,
         GitHubTriggerType,
         Workflow,
+        WorkflowWithSteps,
         CreateWorkflowRequest,
         UpdateWorkflowRequest,
     )),

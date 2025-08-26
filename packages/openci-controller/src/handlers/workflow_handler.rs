@@ -45,7 +45,7 @@ pub async fn get_workflows(
     get,
     path = "/workflows/{workflow_id}",
     responses(
-        (status = 200, description = "Workflow retrieved successfully", body = Workflow),
+        (status = 200, description = "Workflow retrieved successfully", body = WorkflowWithSteps),
         (status = 404, description = "Specified workflow not found"),
         (status = 500, description = "Internal server error")
     ),
