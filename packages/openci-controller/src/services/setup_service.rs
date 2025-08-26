@@ -2,7 +2,7 @@ use crate::services::api_key_service;
 use sqlx::{PgPool, Postgres, Transaction};
 use std::borrow::Cow;
 use std::env;
-use tracing::{debug, info};
+use tracing::{debug, info, warn};
 use validator::ValidateEmail;
 
 #[derive(Debug, Clone)]
@@ -24,7 +24,9 @@ impl ConfigLoader for EnvConfigLoader {
         ) {
             (Some(name), Some(email)) => {
                 if !email.validate_email() {
-                    info!("Invalid email format: {}", email);
+                    warn!(
+                        "Invalid OPENCI_INITIAL_ADMIN_EMAIL format; ignoring initial admin config"
+                    );
                     return None;
                 }
                 Some(InitialAdminConfig { name, email })
