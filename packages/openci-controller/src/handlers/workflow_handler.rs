@@ -45,7 +45,7 @@ pub async fn get_workflows(
     get,
     path = "/workflows/{workflow_id}",
     responses(
-        (status = 200, description = "Workflow retrieved successfully", body = Workflow),
+        (status = 200, description = "Workflow retrieved successfully", body = WorkflowWithSteps),
         (status = 404, description = "Specified workflow not found"),
         (status = 500, description = "Internal server error")
     ),
@@ -57,14 +57,13 @@ pub async fn get_workflows(
 pub async fn get_workflow(
     State(pool): State<PgPool>,
     Path(workflow_id): Path<i32>,
-) -> Result<Json<Workflow>, (StatusCode, String)> {
+) -> Result<Json<WorkflowWithSteps>, (StatusCode, String)> {
     let workflow = sqlx::query_as!(
         Workflow,
         r#"
     SELECT id, name, created_at, updated_at, github_trigger_type
     FROM workflows
     WHERE id = $1
-    ORDER BY created_at DESC, id DESC
     "#,
         workflow_id
     )
@@ -81,7 +80,29 @@ pub async fn get_workflow(
         }
     })?;
 
-    Ok(Json(workflow))
+    let steps = sqlx::query_as!(
+        WorkflowStep,
+        r#"
+        SELECT id, workflow_id, step_order, name, command, created_at, updated_at
+        FROM workflow_steps
+        WHERE workflow_id = $1
+        ORDER BY step_order
+        "#,
+        workflow_id,
+    )
+    .fetch_all(&pool)
+    .await
+    .map_err(|e| {
+        error!("Database error: {}", e);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to fetch workflow steps".to_string(),
+        )
+    })?;
+
+    let workflow_with_steps = WorkflowWithSteps { workflow, steps };
+
+    Ok(Json(workflow_with_steps))
 }
 
 #[utoipa::path(
@@ -297,6 +318,8 @@ pub async fn delete_workflow(
 
 #[cfg(test)]
 mod tests {
+    use crate::models::workflow::CreateWorkflowStepRequest;
+
     use super::*;
 
     #[sqlx::test]
@@ -380,10 +403,15 @@ mod tests {
 
     #[sqlx::test]
     async fn test_get_workflow_by_workflow_id(pool: PgPool) {
+        let demo_step = CreateWorkflowStepRequest {
+            step_order: 0,
+            name: "Flutter Build".to_string(),
+            command: "echo \"Hello World\"".to_string(),
+        };
         let request = CreateWorkflowRequest {
             name: "workflow".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
-            steps: vec![],
+            steps: vec![demo_step],
         };
         let result = post_workflow(State(pool.clone()), Json(request)).await;
         assert!(result.is_ok());
@@ -391,12 +419,20 @@ mod tests {
 
         let workflow_result = get_workflow(State(pool), Path(workflow_id)).await;
         assert!(workflow_result.is_ok());
-        let workflow = workflow_result.unwrap().0;
+
+        let workflow_with_steps = workflow_result.unwrap().0;
+        let workflow = workflow_with_steps.workflow;
 
         assert_eq!(workflow.id, 1);
         assert_eq!(workflow.name, "workflow");
         assert_eq!(workflow.github_trigger_type, GitHubTriggerType::Push);
+
+        let step = &workflow_with_steps.steps[0];
+        assert_eq!(step.step_order, 0);
+        assert_eq!(step.command, "echo \"Hello World\"");
+        assert_eq!(step.name, "Flutter Build");
     }
+
     #[sqlx::test]
     async fn test_patch_workflow(pool: PgPool) {
         let request = CreateWorkflowRequest {
