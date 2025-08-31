@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::models::workflow::{
     CreateWorkflowRequest, GitHubTriggerType, UpdateWorkflowRequest, Workflow, WorkflowStep,
     WorkflowWithSteps,
@@ -12,20 +14,20 @@ use tracing::error;
     get,
     path = "/workflows",
     responses(
-        (status = 200, description = "Workflows retrieved successfully", body = Vec<Workflow>),
+        (status = 200, description = "Workflows retrieved successfully", body = Vec<WorkflowWithSteps>),
         (status = 500, description = "Internal server error")
     )
 )]
 #[tracing::instrument(skip(pool))]
 pub async fn get_workflows(
     State(pool): State<PgPool>,
-) -> Result<Json<Vec<Workflow>>, (StatusCode, String)> {
+) -> Result<Json<Vec<WorkflowWithSteps>>, (StatusCode, String)> {
     let workflows = sqlx::query_as!(
         Workflow,
         r#"
         SELECT id, name, created_at, updated_at, github_trigger_type
         FROM workflows
-        ORDER BY updated_at DESC, id DESC
+        ORDER BY updated_at DESC
         "#,
     )
     .fetch_all(&pool)
@@ -38,7 +40,50 @@ pub async fn get_workflows(
         )
     })?;
 
-    Ok(Json(workflows))
+    let workflow_ids: Vec<i32> = workflows.iter().map(|w| w.id).collect();
+
+    let steps = if !workflow_ids.is_empty() {
+        sqlx::query_as!(
+            WorkflowStep,
+            r#"
+            SELECT id, workflow_id, step_order, name, command, created_at, updated_at
+            FROM workflow_steps
+            WHERE workflow_id = ANY($1)
+            ORDER BY step_order
+            "#,
+            &workflow_ids[..]
+        )
+        .fetch_all(&pool)
+        .await
+        .map_err(|e| {
+            error!("Failed to fetch workflow steps: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to fetch workflow details".to_string(),
+            )
+        })?
+    } else {
+        vec![]
+    };
+
+    let mut steps_map: HashMap<i32, Vec<WorkflowStep>> = HashMap::new();
+
+    for step in steps {
+        steps_map.entry(step.workflow_id).or_default().push(step);
+    }
+
+    let workflows_with_steps: Vec<WorkflowWithSteps> = workflows
+        .into_iter()
+        .map(|workflow| {
+            let workflow_id = workflow.id;
+            WorkflowWithSteps {
+                workflow,
+                steps: steps_map.remove(&workflow_id).unwrap_or_default(),
+            }
+        })
+        .collect();
+
+    Ok(Json(workflows_with_steps))
 }
 
 #[utoipa::path(
@@ -382,23 +427,26 @@ mod tests {
         let get_result = get_workflows(State(pool)).await;
         assert!(get_result.is_ok());
 
-        let workflows = get_result.unwrap().0;
+        let workflows_with_steps_vec = get_result.unwrap().0;
 
-        assert_eq!(workflows.len(), 3);
+        assert_eq!(workflows_with_steps_vec.len(), 3);
 
-        assert_eq!(workflows[0].id, created_workflow3.workflow.id);
-        assert_eq!(workflows[0].name, "workflow-3");
-        assert_eq!(workflows[1].id, created_workflow2.workflow.id);
-        assert_eq!(workflows[1].name, "workflow-2");
-        assert_eq!(workflows[2].id, created_workflow1.workflow.id);
-        assert_eq!(workflows[2].name, "workflow-1");
+        let first_workflow = &workflows_with_steps_vec[0].workflow;
+        let second_workflow = &workflows_with_steps_vec[1].workflow;
+        let third_workflow = &workflows_with_steps_vec[2].workflow;
 
-        assert_eq!(workflows[0].github_trigger_type, GitHubTriggerType::Push);
+        assert_eq!(first_workflow.id, created_workflow3.workflow.id);
+        assert_eq!(first_workflow.name, "workflow-3");
+        assert_eq!(first_workflow.github_trigger_type, GitHubTriggerType::Push);
+        assert_eq!(second_workflow.id, created_workflow2.workflow.id);
+        assert_eq!(second_workflow.name, "workflow-2");
         assert_eq!(
-            workflows[1].github_trigger_type,
+            second_workflow.github_trigger_type,
             GitHubTriggerType::PullRequest
         );
-        assert_eq!(workflows[2].github_trigger_type, GitHubTriggerType::Push);
+        assert_eq!(third_workflow.id, created_workflow1.workflow.id);
+        assert_eq!(third_workflow.name, "workflow-1");
+        assert_eq!(third_workflow.github_trigger_type, GitHubTriggerType::Push);
     }
 
     #[sqlx::test]

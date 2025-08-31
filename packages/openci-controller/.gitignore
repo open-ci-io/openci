@@ -34,3 +34,6 @@ Thumbs.db
 *.zip
 
 .env
+
+# Claude Code configuration
+.claude/
