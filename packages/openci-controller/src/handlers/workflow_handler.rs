@@ -299,6 +299,62 @@ pub async fn patch_workflow(
         })?;
     }
 
+    let mut tx = pool.begin().await.map_err(|e| {
+        error!("Failed to begin transaction: {}", e);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Transaction error".to_string(),
+        )
+    })?;
+
+    if let Some(steps) = request.steps {
+        // WorkflowIdが合致するstepを全て削除して、再設定する必要ありか。
+        // 0. 該当するstepsをworkflow_stepsから削除
+        // 1. stepsをINSERT
+        // transactionで囲む
+
+        sqlx::query!(
+            "DELETE FROM workflow_steps WHERE workflow_id = $1",
+            workflow_id,
+        )
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| {
+            error!("Failed to delete workflow steps: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to delete workflow steps".to_string(),
+            )
+        })?;
+
+        let mut query = QueryBuilder::new(
+            "INSERT INTO workflow_steps (workflow_id, step_order, name, command) ",
+        );
+
+        query.push_values(steps.iter(), |mut b, step| {
+            b.push_bind(workflow_id)
+                .push_bind(&step.step_order)
+                .push_bind(&step.name)
+                .push_bind(&step.command);
+        });
+
+        query.build().execute(&mut *tx).await.map_err(|e| {
+            error!("Database error: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to create workflow steps".to_string(),
+            )
+        })?;
+    };
+
+    tx.commit().await.map_err(|e| {
+        error!("Failed to commit: {}", e);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to commit".to_string(),
+        )
+    })?;
+
     let workflow = sqlx::query_as!(
         Workflow,
         "SELECT id, name, created_at, updated_at, github_trigger_type FROM workflows WHERE id = $1",
@@ -496,6 +552,7 @@ mod tests {
         let patch_request = UpdateWorkflowRequest {
             name: Some("updated_workflow".to_string()),
             github_trigger_type: None,
+            steps: None,
         };
         let patch_result =
             patch_workflow(State(pool), Path(workflow_id), Json(patch_request)).await;
