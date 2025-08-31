@@ -358,12 +358,15 @@ pub async fn patch_workflow(
     )
     .fetch_one(&pool)
     .await
-    .map_err(|e| {
-        error!("Failed to fetch workflow: {}", e);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Failed to fetch workflow".to_string(),
-        )
+    .map_err(|e| match e {
+        sqlx::Error::RowNotFound => (StatusCode::NOT_FOUND, "Workflow not found".to_string()),
+        _ => {
+            error!("Failed to fetch workflow: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to fetch workflow".to_string(),
+            )
+        }
     })?;
 
     Ok(Json(workflow))
