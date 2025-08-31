@@ -9,6 +9,7 @@ use axum::Json;
 use axum::{extract::State, http::StatusCode};
 use sqlx::{PgPool, QueryBuilder};
 use tracing::error;
+use validator::Validate;
 
 #[utoipa::path(
     get,
@@ -262,6 +263,10 @@ pub async fn patch_workflow(
     Path(workflow_id): Path<i32>,
     Json(request): Json<UpdateWorkflowRequest>,
 ) -> Result<Json<Workflow>, (StatusCode, String)> {
+    request
+        .validate()
+        .map_err(|e| (StatusCode::BAD_REQUEST, format!("Validation error: {}", e)))?;
+
     let mut tx = pool.begin().await.map_err(|e| {
         error!("Failed to begin transaction: {}", e);
         (
