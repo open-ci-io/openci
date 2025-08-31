@@ -261,13 +261,20 @@ pub async fn patch_workflow(
     Path(workflow_id): Path<i32>,
     Json(request): Json<UpdateWorkflowRequest>,
 ) -> Result<Json<Workflow>, (StatusCode, String)> {
+    let mut tx = pool.begin().await.map_err(|e| {
+        error!("Failed to begin transaction: {}", e);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Transaction error".to_string(),
+        )
+    })?;
     if let Some(name) = request.name {
         sqlx::query!(
             "UPDATE workflows SET name = $1, updated_at = NOW() WHERE id = $2",
             name,
             workflow_id
         )
-        .execute(&pool)
+        .execute(&mut *tx)
         .await
         .map_err(|e| {
             error!("Failed to update name: {}", e);
@@ -288,7 +295,7 @@ pub async fn patch_workflow(
             trigger_str,
             workflow_id
         )
-        .execute(&pool)
+        .execute(&mut *tx)
         .await
         .map_err(|e| {
             error!("Failed to update github_trigger_type: {}", e);
@@ -298,14 +305,6 @@ pub async fn patch_workflow(
             )
         })?;
     }
-
-    let mut tx = pool.begin().await.map_err(|e| {
-        error!("Failed to begin transaction: {}", e);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Transaction error".to_string(),
-        )
-    })?;
 
     if let Some(steps) = request.steps {
         sqlx::query!(
