@@ -86,16 +86,6 @@ pub async fn get_workflows(
     Ok(Json(workflows_with_steps))
 }
 
-// pub struct WorkflowStep {
-//     pub id: i32,
-//     pub workflow_id: i32,
-//     pub step_order: i32,
-//     pub name: String,
-//     pub command: String,
-//     pub created_at: DateTime<Utc>,
-//     pub updated_at: DateTime<Utc>,
-// }
-
 #[utoipa::path(
     get,
     path = "/workflows/{workflow_id}",
