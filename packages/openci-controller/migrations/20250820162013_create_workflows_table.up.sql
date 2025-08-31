@@ -2,6 +2,7 @@ CREATE TABLE
     workflows (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
+        base_branch VARCHAR(255) NOT NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
         github_trigger_type VARCHAR(50) NOT NULL CHECK (github_trigger_type IN ('push', 'pull_request'))
