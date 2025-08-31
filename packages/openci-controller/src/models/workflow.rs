@@ -47,11 +47,13 @@ pub struct WorkflowWithSteps {
     pub steps: Vec<WorkflowStep>,
 }
 
-#[derive(Debug, serde::Deserialize, utoipa::ToSchema)]
+#[derive(Debug, serde::Deserialize, utoipa::ToSchema, validator::Validate)]
 pub struct UpdateWorkflowRequest {
     pub name: Option<String>,
     pub github_trigger_type: Option<GitHubTriggerType>,
     pub steps: Option<Vec<UpdateWorkflowStep>>,
+    #[validate(length(min = 1, max = 255))]
+    pub base_branch: Option<String>,
 }
 
 #[derive(Debug, serde::Deserialize, utoipa::ToSchema)]
