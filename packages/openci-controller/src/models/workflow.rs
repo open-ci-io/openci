@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 pub struct Workflow {
     pub id: i32,
     pub name: String,
+    pub base_branch: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub github_trigger_type: GitHubTriggerType,
@@ -18,6 +19,7 @@ pub struct CreateWorkflowRequest {
     pub name: String,
     pub github_trigger_type: GitHubTriggerType,
     pub steps: Vec<CreateWorkflowStepRequest>,
+    pub base_branch: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]

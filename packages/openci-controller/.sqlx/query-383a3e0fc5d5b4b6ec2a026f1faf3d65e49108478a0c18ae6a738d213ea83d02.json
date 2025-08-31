@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n          INSERT INTO workflows (name, github_trigger_type)\n          VALUES ($1, $2)\n          RETURNING *\n          ",
+  "query": "SELECT id, name, created_at, updated_at, github_trigger_type, base_branch FROM workflows WHERE id = $1",
   "describe": {
     "columns": [
       {
@@ -27,12 +27,16 @@
         "ordinal": 4,
         "name": "github_trigger_type",
         "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "base_branch",
+        "type_info": "Varchar"
       }
     ],
     "parameters": {
       "Left": [
-        "Varchar",
-        "Varchar"
+        "Int4"
       ]
     },
     "nullable": [
@@ -40,8 +44,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "950221f4329ad951637793a32ec778824a78de1a7dce10d87a581e24855b5d0b"
+  "hash": "383a3e0fc5d5b4b6ec2a026f1faf3d65e49108478a0c18ae6a738d213ea83d02"
 }

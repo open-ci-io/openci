@@ -25,7 +25,7 @@ pub async fn get_workflows(
     let workflows = sqlx::query_as!(
         Workflow,
         r#"
-        SELECT id, name, created_at, updated_at, github_trigger_type
+        SELECT id, name, created_at, updated_at, github_trigger_type, base_branch
         FROM workflows
         ORDER BY updated_at DESC
         "#,
@@ -106,7 +106,7 @@ pub async fn get_workflow(
     let workflow = sqlx::query_as!(
         Workflow,
         r#"
-    SELECT id, name, created_at, updated_at, github_trigger_type
+    SELECT id, name, created_at, updated_at, github_trigger_type, base_branch
     FROM workflows
     WHERE id = $1
     "#,
@@ -174,15 +174,16 @@ pub async fn post_workflow(
     let workflow = sqlx::query_as!(
         Workflow,
         r#"
-          INSERT INTO workflows (name, github_trigger_type)
-          VALUES ($1, $2)
+          INSERT INTO workflows (name, github_trigger_type, base_branch)
+          VALUES ($1, $2, $3)
           RETURNING *
           "#,
         request.name,
         match request.github_trigger_type {
             GitHubTriggerType::Push => "push",
             GitHubTriggerType::PullRequest => "pull_request",
-        }
+        },
+        request.base_branch,
     )
     .fetch_one(&mut *tx)
     .await
@@ -353,7 +354,7 @@ pub async fn patch_workflow(
 
     let workflow = sqlx::query_as!(
         Workflow,
-        "SELECT id, name, created_at, updated_at, github_trigger_type FROM workflows WHERE id = $1",
+        "SELECT id, name, created_at, updated_at, github_trigger_type, base_branch FROM workflows WHERE id = $1",
         workflow_id
     )
     .fetch_one(&pool)
@@ -428,6 +429,7 @@ mod tests {
             name: "test-workflow".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![],
+            base_branch: "develop".to_string(),
         };
 
         let result = post_workflow(State(pool), Json(request)).await;
@@ -437,6 +439,7 @@ mod tests {
         let workflow = response.workflow;
         assert_eq!(workflow.name, "test-workflow");
         assert_eq!(workflow.github_trigger_type, GitHubTriggerType::Push);
+        assert_eq!(workflow.base_branch, "develop");
         assert_eq!(response.steps.len(), 0);
     }
 
@@ -455,16 +458,19 @@ mod tests {
             name: "workflow-1".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![],
+            base_branch: "develop".to_string(),
         };
         let workflow2 = CreateWorkflowRequest {
             name: "workflow-2".to_string(),
             github_trigger_type: GitHubTriggerType::PullRequest,
             steps: vec![],
+            base_branch: "develop".to_string(),
         };
         let workflow3 = CreateWorkflowRequest {
             name: "workflow-3".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![],
+            base_branch: "develop".to_string(),
         };
 
         let result1 = post_workflow(State(pool.clone()), Json(workflow1)).await;
@@ -493,15 +499,20 @@ mod tests {
         assert_eq!(first_workflow.id, created_workflow3.workflow.id);
         assert_eq!(first_workflow.name, "workflow-3");
         assert_eq!(first_workflow.github_trigger_type, GitHubTriggerType::Push);
+        assert_eq!(first_workflow.base_branch, "develop");
+
         assert_eq!(second_workflow.id, created_workflow2.workflow.id);
         assert_eq!(second_workflow.name, "workflow-2");
         assert_eq!(
             second_workflow.github_trigger_type,
             GitHubTriggerType::PullRequest
         );
+        assert_eq!(second_workflow.base_branch, "develop");
+
         assert_eq!(third_workflow.id, created_workflow1.workflow.id);
         assert_eq!(third_workflow.name, "workflow-1");
         assert_eq!(third_workflow.github_trigger_type, GitHubTriggerType::Push);
+        assert_eq!(third_workflow.base_branch, "develop");
     }
 
     #[sqlx::test]
@@ -515,6 +526,7 @@ mod tests {
             name: "workflow".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![demo_step],
+            base_branch: "develop".to_string(),
         };
         let result = post_workflow(State(pool.clone()), Json(request)).await;
         assert!(result.is_ok());
@@ -529,6 +541,7 @@ mod tests {
         assert_eq!(workflow.id, 1);
         assert_eq!(workflow.name, "workflow");
         assert_eq!(workflow.github_trigger_type, GitHubTriggerType::Push);
+        assert_eq!(workflow.base_branch, "develop");
 
         let step = &workflow_with_steps.steps[0];
         assert_eq!(step.step_order, 0);
@@ -542,6 +555,7 @@ mod tests {
             name: "workflow".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![],
+            base_branch: "develop".to_string(),
         };
         let result = post_workflow(State(pool.clone()), Json(request)).await;
         assert!(result.is_ok());
@@ -565,6 +579,7 @@ mod tests {
             name: "workflow".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![],
+            base_branch: "develop".to_string(),
         };
         let result = post_workflow(State(pool.clone()), Json(request)).await;
         assert!(result.is_ok());
