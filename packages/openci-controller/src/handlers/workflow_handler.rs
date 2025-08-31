@@ -321,24 +321,26 @@ pub async fn patch_workflow(
             )
         })?;
 
-        let mut query = QueryBuilder::new(
-            "INSERT INTO workflow_steps (workflow_id, step_order, name, command) ",
-        );
+        if !steps.is_empty() {
+            let mut query = QueryBuilder::new(
+                "INSERT INTO workflow_steps (workflow_id, step_order, name, command) ",
+            );
 
-        query.push_values(steps.iter(), |mut b, step| {
-            b.push_bind(workflow_id)
-                .push_bind(&step.step_order)
-                .push_bind(&step.name)
-                .push_bind(&step.command);
-        });
+            query.push_values(steps.iter(), |mut b, step| {
+                b.push_bind(workflow_id)
+                    .push_bind(&step.step_order)
+                    .push_bind(&step.name)
+                    .push_bind(&step.command);
+            });
 
-        query.build().execute(&mut *tx).await.map_err(|e| {
-            error!("Database error: {}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to create workflow steps".to_string(),
-            )
-        })?;
+            query.build().execute(&mut *tx).await.map_err(|e| {
+                error!("Database error: {}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to create workflow steps".to_string(),
+                )
+            })?;
+        }
     };
 
     tx.commit().await.map_err(|e| {
