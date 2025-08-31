@@ -308,6 +308,13 @@ pub async fn patch_workflow(
     }
 
     if let Some(base_branch) = request.base_branch {
+        let base_branch = base_branch.trim();
+        if base_branch.is_empty() {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                "base_branch must not be empty".to_string(),
+            ));
+        }
         sqlx::query!(
             "UPDATE workflows SET base_branch = $1, updated_at = NOW() WHERE id = $2",
             base_branch,
