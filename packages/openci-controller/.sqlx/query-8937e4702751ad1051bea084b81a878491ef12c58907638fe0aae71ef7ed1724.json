@@ -1,44 +1,38 @@
 {
-  "db_name": "PostgreSQL",
-  "query": "\n        SELECT id, name, created_at, updated_at, github_trigger_type\n        FROM workflows\n        ORDER BY updated_at DESC\n        ",
-  "describe": {
-    "columns": [
-      {
-        "ordinal": 0,
-        "name": "id",
-        "type_info": "Int4"
-      },
-      {
-        "ordinal": 1,
-        "name": "name",
-        "type_info": "Varchar"
-      },
-      {
-        "ordinal": 2,
-        "name": "created_at",
-        "type_info": "Timestamptz"
-      },
-      {
-        "ordinal": 3,
-        "name": "updated_at",
-        "type_info": "Timestamptz"
-      },
-      {
-        "ordinal": 4,
-        "name": "github_trigger_type",
-        "type_info": "Varchar"
-      }
-    ],
-    "parameters": {
-      "Left": []
-    },
-    "nullable": [
-      false,
-      false,
-      false,
-      false,
-      false
-    ]
-  },
-  "hash": "8937e4702751ad1051bea084b81a878491ef12c58907638fe0aae71ef7ed1724"
+	"db_name": "PostgreSQL",
+	"query": "\n        SELECT id, name, created_at, updated_at, github_trigger_type\n        FROM workflows\n        ORDER BY updated_at DESC\n        ",
+	"describe": {
+		"columns": [
+			{
+				"ordinal": 0,
+				"name": "id",
+				"type_info": "Int4"
+			},
+			{
+				"ordinal": 1,
+				"name": "name",
+				"type_info": "Varchar"
+			},
+			{
+				"ordinal": 2,
+				"name": "created_at",
+				"type_info": "Timestamptz"
+			},
+			{
+				"ordinal": 3,
+				"name": "updated_at",
+				"type_info": "Timestamptz"
+			},
+			{
+				"ordinal": 4,
+				"name": "github_trigger_type",
+				"type_info": "Varchar"
+			}
+		],
+		"parameters": {
+			"Left": []
+		},
+		"nullable": [false, false, false, false, false]
+	},
+	"hash": "8937e4702751ad1051bea084b81a878491ef12c58907638fe0aae71ef7ed1724"
 }
