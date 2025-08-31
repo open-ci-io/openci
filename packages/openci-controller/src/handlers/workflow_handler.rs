@@ -308,11 +308,6 @@ pub async fn patch_workflow(
     })?;
 
     if let Some(steps) = request.steps {
-        // WorkflowIdが合致するstepを全て削除して、再設定する必要ありか。
-        // 0. 該当するstepsをworkflow_stepsから削除
-        // 1. stepsをINSERT
-        // transactionで囲む
-
         sqlx::query!(
             "DELETE FROM workflow_steps WHERE workflow_id = $1",
             workflow_id,
