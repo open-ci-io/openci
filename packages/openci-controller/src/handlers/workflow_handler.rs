@@ -261,13 +261,20 @@ pub async fn patch_workflow(
     Path(workflow_id): Path<i32>,
     Json(request): Json<UpdateWorkflowRequest>,
 ) -> Result<Json<Workflow>, (StatusCode, String)> {
+    let mut tx = pool.begin().await.map_err(|e| {
+        error!("Failed to begin transaction: {}", e);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Transaction error".to_string(),
+        )
+    })?;
     if let Some(name) = request.name {
         sqlx::query!(
             "UPDATE workflows SET name = $1, updated_at = NOW() WHERE id = $2",
             name,
             workflow_id
         )
-        .execute(&pool)
+        .execute(&mut *tx)
         .await
         .map_err(|e| {
             error!("Failed to update name: {}", e);
@@ -288,7 +295,7 @@ pub async fn patch_workflow(
             trigger_str,
             workflow_id
         )
-        .execute(&pool)
+        .execute(&mut *tx)
         .await
         .map_err(|e| {
             error!("Failed to update github_trigger_type: {}", e);
@@ -299,6 +306,51 @@ pub async fn patch_workflow(
         })?;
     }
 
+    if let Some(steps) = request.steps {
+        sqlx::query!(
+            "DELETE FROM workflow_steps WHERE workflow_id = $1",
+            workflow_id,
+        )
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| {
+            error!("Failed to delete workflow steps: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to delete workflow steps".to_string(),
+            )
+        })?;
+
+        if !steps.is_empty() {
+            let mut query = QueryBuilder::new(
+                "INSERT INTO workflow_steps (workflow_id, step_order, name, command) ",
+            );
+
+            query.push_values(steps.iter(), |mut b, step| {
+                b.push_bind(workflow_id)
+                    .push_bind(&step.step_order)
+                    .push_bind(&step.name)
+                    .push_bind(&step.command);
+            });
+
+            query.build().execute(&mut *tx).await.map_err(|e| {
+                error!("Database error: {}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to create workflow steps".to_string(),
+                )
+            })?;
+        }
+    };
+
+    tx.commit().await.map_err(|e| {
+        error!("Failed to commit: {}", e);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to commit".to_string(),
+        )
+    })?;
+
     let workflow = sqlx::query_as!(
         Workflow,
         "SELECT id, name, created_at, updated_at, github_trigger_type FROM workflows WHERE id = $1",
@@ -306,12 +358,15 @@ pub async fn patch_workflow(
     )
     .fetch_one(&pool)
     .await
-    .map_err(|e| {
-        error!("Failed to fetch workflow: {}", e);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Failed to fetch workflow".to_string(),
-        )
+    .map_err(|e| match e {
+        sqlx::Error::RowNotFound => (StatusCode::NOT_FOUND, "Workflow not found".to_string()),
+        _ => {
+            error!("Failed to fetch workflow: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to fetch workflow".to_string(),
+            )
+        }
     })?;
 
     Ok(Json(workflow))
@@ -496,6 +551,7 @@ mod tests {
         let patch_request = UpdateWorkflowRequest {
             name: Some("updated_workflow".to_string()),
             github_trigger_type: None,
+            steps: None,
         };
         let patch_result =
             patch_workflow(State(pool), Path(workflow_id), Json(patch_request)).await;

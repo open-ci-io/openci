@@ -1,6 +1,10 @@
 {
   "db_name": "PostgreSQL",
+<<<<<<<< HEAD:packages/openci-controller/.sqlx/query-8937e4702751ad1051bea084b81a878491ef12c58907638fe0aae71ef7ed1724.json
+  "query": "\n        SELECT id, name, created_at, updated_at, github_trigger_type\n        FROM workflows\n        ORDER BY updated_at DESC\n        ",
+========
   "query": "\n        SELECT id, name, created_at, updated_at, github_trigger_type\n        FROM workflows\n        ORDER BY updated_at DESC, id DESC\n        ",
+>>>>>>>> 33b520db87edb0e060d2615f79f9d6b13f5bf204:packages/openci-controller/.sqlx/query-3256ee2ac48599f1f60ec707f1388f31021714b0f8cf2426d08355f92be903ee.json
   "describe": {
     "columns": [
       {
@@ -40,5 +44,9 @@
       false
     ]
   },
+<<<<<<<< HEAD:packages/openci-controller/.sqlx/query-8937e4702751ad1051bea084b81a878491ef12c58907638fe0aae71ef7ed1724.json
+  "hash": "8937e4702751ad1051bea084b81a878491ef12c58907638fe0aae71ef7ed1724"
+========
   "hash": "3256ee2ac48599f1f60ec707f1388f31021714b0f8cf2426d08355f92be903ee"
+>>>>>>>> 33b520db87edb0e060d2615f79f9d6b13f5bf204:packages/openci-controller/.sqlx/query-3256ee2ac48599f1f60ec707f1388f31021714b0f8cf2426d08355f92be903ee.json
 }

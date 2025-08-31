@@ -49,6 +49,14 @@ pub struct WorkflowWithSteps {
 pub struct UpdateWorkflowRequest {
     pub name: Option<String>,
     pub github_trigger_type: Option<GitHubTriggerType>,
+    pub steps: Option<Vec<UpdateWorkflowStep>>,
+}
+
+#[derive(Debug, serde::Deserialize, utoipa::ToSchema)]
+pub struct UpdateWorkflowStep {
+    pub name: String,
+    pub step_order: i32,
+    pub command: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, sqlx::Type, PartialEq, utoipa::ToSchema)]
