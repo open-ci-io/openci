@@ -52,6 +52,7 @@ pub struct UpdateWorkflowRequest {
     pub name: Option<String>,
     pub github_trigger_type: Option<GitHubTriggerType>,
     pub steps: Option<Vec<UpdateWorkflowStep>>,
+    pub base_branch: Option<String>,
 }
 
 #[derive(Debug, serde::Deserialize, utoipa::ToSchema)]

@@ -307,6 +307,23 @@ pub async fn patch_workflow(
         })?;
     }
 
+    if let Some(base_branch) = request.base_branch {
+        sqlx::query!(
+            "UPDATE workflows SET base_branch = $1, updated_at = NOW() WHERE id = $2",
+            base_branch,
+            workflow_id
+        )
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| {
+            error!("Failed to update base_branch: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to update base_branch".to_string(),
+            )
+        })?;
+    }
+
     if let Some(steps) = request.steps {
         sqlx::query!(
             "DELETE FROM workflow_steps WHERE workflow_id = $1",
@@ -566,6 +583,7 @@ mod tests {
             name: Some("updated_workflow".to_string()),
             github_trigger_type: None,
             steps: None,
+            base_branch: None,
         };
         let patch_result =
             patch_workflow(State(pool), Path(workflow_id), Json(patch_request)).await;
