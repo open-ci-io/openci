@@ -8,7 +8,10 @@ use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use super::doc::ApiDoc;
-use crate::{handlers, middleware::auth::auth_middleware};
+use crate::{
+    handlers,
+    middleware::{auth::auth_middleware, github_webhook_auth::github_webhook_auth_middleware},
+};
 
 pub fn create_routes(pool: PgPool) -> Router {
     let authenticated_routes = Router::new()
@@ -41,6 +44,11 @@ pub fn create_routes(pool: PgPool) -> Router {
 
     Router::new()
         .route("/", get(|| async { "Hello, welcome to OpenCI!" }))
+        .route(
+            "/webhooks/github",
+            post(handlers::github_webhook_handler::post_github_webhook_handler)
+                .layer(middleware::from_fn(github_webhook_auth_middleware)),
+        )
         .merge(authenticated_routes)
         .merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .with_state(pool)
