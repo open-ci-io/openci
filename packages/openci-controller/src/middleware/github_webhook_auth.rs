@@ -12,10 +12,11 @@ pub async fn github_webhook_auth_middleware(
     mut request: Request,
     next: Next,
 ) -> Result<Response, (StatusCode, String)> {
+    const MAX_BODY_SIZE: usize = 1024 * 1024;
     let headers = request.headers().clone();
 
     let (parts, body) = request.into_parts();
-    let bytes = axum::body::to_bytes(body, usize::MAX)
+    let bytes = axum::body::to_bytes(body, MAX_BODY_SIZE)
         .await
         .map_err(|_| (StatusCode::BAD_REQUEST, "Failed to read body".to_string()))?;
 
