@@ -81,8 +81,12 @@ fn verify_hmac_signature(
     body: &Bytes,
     expected_signature: &[u8],
 ) -> Result<(), (StatusCode, String)> {
-    let mut mac =
-        Hmac::<Sha256>::new_from_slice(secret.as_bytes()).expect("HMAC can take key of any size");
+    let mut mac = Hmac::<Sha256>::new_from_slice(secret.as_bytes()).map_err(|_| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "HMAC init failed".to_string(),
+        )
+    })?;
     mac.update(body);
     mac.verify_slice(expected_signature)
         .map_err(|_| (StatusCode::UNAUTHORIZED, "Invalid signature".to_string()))
