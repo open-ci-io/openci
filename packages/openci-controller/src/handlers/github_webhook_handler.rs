@@ -65,7 +65,6 @@ mod tests {
 
     #[tokio::test]
     async fn test_unknown_event() {
-        // 未対応イベントは無視される
         let mut headers = HeaderMap::new();
         headers.insert("x-github-event", HeaderValue::from_static("star"));
 
@@ -75,7 +74,6 @@ mod tests {
 
     #[tokio::test]
     async fn test_invalid_header_encoding() {
-        // 不正なエンコーディングのヘッダー
         let mut headers = HeaderMap::new();
         headers.insert(
             "x-github-event",
