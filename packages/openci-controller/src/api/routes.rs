@@ -18,6 +18,10 @@ pub fn create_routes(pool: PgPool) -> Router {
             post(handlers::api_key_handler::create_api_key),
         )
         .route(
+            "/webhooks/github",
+            post(handlers::github_webhook_handler::post_github_webhook_handler),
+        )
+        .route(
             "/workflows",
             post(handlers::workflow_handler::post_workflow),
         )

@@ -30,6 +30,7 @@ use utoipa::OpenApi;
         workflow_handler::get_workflow,
         workflow_handler::patch_workflow,
         workflow_handler::delete_workflow,
+        github_webhook_handler::post_github_webhook_handler,
     ),
     components(schemas(
         User,
@@ -48,6 +49,7 @@ use utoipa::OpenApi;
         (name = "users", description = "User management endpoints"),
         (name = "api-keys", description = "API key management endpoints"),
         (name = "workflows", description = "Workflow management endpoints"),
+        (name = "webhooks", description = "GitHub webhook endpoints"),
     )
 )]
 pub struct ApiDoc;
