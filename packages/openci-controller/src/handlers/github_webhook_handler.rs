@@ -1,4 +1,8 @@
-use axum::http::{HeaderMap, StatusCode};
+use axum::{
+    body::Bytes,
+    http::{HeaderMap, StatusCode},
+};
+use octocrab::models::webhook_events::{WebhookEvent, WebhookEventType};
 
 #[utoipa::path(
       post,
@@ -12,8 +16,9 @@ use axum::http::{HeaderMap, StatusCode};
   )]
 pub async fn post_github_webhook_handler(
     headers: HeaderMap,
+    body: Bytes,
 ) -> Result<StatusCode, (StatusCode, String)> {
-    let event_type = headers
+    let event_header = headers
         .get("x-github-event")
         .and_then(|v| v.to_str().ok())
         .ok_or((
@@ -21,11 +26,19 @@ pub async fn post_github_webhook_handler(
             "Missing or invalid X-GitHub-Event header".to_string(),
         ))?;
 
-    match event_type {
-        "push" => {}
-        "pull_request" => {}
-        _ => return Ok(StatusCode::OK),
-    }
+    let event = WebhookEvent::try_from_header_and_body(event_header, &body).map_err(|e| {
+        (
+            StatusCode::BAD_REQUEST,
+            format!("Failed to parse webhook event: {}", e),
+        )
+    })?;
+
+    match event.kind {
+        WebhookEventType::Push => {}
+        WebhookEventType::PullRequest => {}
+        // ...
+        _ => {}
+    };
     Ok(StatusCode::OK)
 }
 
@@ -34,10 +47,15 @@ mod tests {
     use super::*;
     use axum::http::HeaderValue;
 
+    const PR_PAYLOAD: &str = include_str!("../../tests/fixtures/github/pr_opened.json");
+    const PUSH_PAYLOAD: &str = include_str!("../../tests/fixtures/github/push.json");
+    const STAR_PAYLOAD: &str = include_str!("../../tests/fixtures/github/star.json");
+
     #[tokio::test]
     async fn test_missing_event_header() {
         let headers = HeaderMap::new();
-        let result = post_github_webhook_handler(headers).await;
+        let body = Bytes::from("{}");
+        let result = post_github_webhook_handler(headers, body).await;
 
         assert!(result.is_err());
         let (status, msg) = result.unwrap_err();
@@ -50,7 +68,8 @@ mod tests {
         let mut headers = HeaderMap::new();
         headers.insert("x-github-event", HeaderValue::from_static("push"));
 
-        let result = post_github_webhook_handler(headers).await;
+        let body = Bytes::from(PUSH_PAYLOAD);
+        let result = post_github_webhook_handler(headers, body).await;
         assert_eq!(result.unwrap(), StatusCode::OK);
     }
 
@@ -59,7 +78,8 @@ mod tests {
         let mut headers = HeaderMap::new();
         headers.insert("x-github-event", HeaderValue::from_static("pull_request"));
 
-        let result = post_github_webhook_handler(headers).await;
+        let body = Bytes::from(PR_PAYLOAD);
+        let result = post_github_webhook_handler(headers, body).await;
         assert_eq!(result.unwrap(), StatusCode::OK);
     }
 
@@ -68,19 +88,38 @@ mod tests {
         let mut headers = HeaderMap::new();
         headers.insert("x-github-event", HeaderValue::from_static("star"));
 
-        let result = post_github_webhook_handler(headers).await;
+        let body = Bytes::from(STAR_PAYLOAD);
+
+        let result = post_github_webhook_handler(headers, body).await;
         assert_eq!(result.unwrap(), StatusCode::OK);
     }
 
     #[tokio::test]
     async fn test_invalid_header_encoding() {
         let mut headers = HeaderMap::new();
+        let body = Bytes::from("{}");
+
         headers.insert(
             "x-github-event",
             HeaderValue::from_bytes(b"\xFF\xFE").unwrap(),
         );
 
-        let result = post_github_webhook_handler(headers).await;
+        let result = post_github_webhook_handler(headers, body).await;
         assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_invalid_json_body() {
+        let mut headers = HeaderMap::new();
+        headers.insert("x-github-event", HeaderValue::from_static("push"));
+
+        // 不正なJSON
+        let body = Bytes::from("not json");
+
+        let result = post_github_webhook_handler(headers, body).await;
+        assert!(result.is_err());
+        let (status, msg) = result.unwrap_err();
+        assert_eq!(status, StatusCode::BAD_REQUEST);
+        assert!(msg.contains("Failed to parse"));
     }
 }
