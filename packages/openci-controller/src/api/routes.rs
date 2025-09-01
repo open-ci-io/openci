@@ -18,10 +18,6 @@ pub fn create_routes(pool: PgPool) -> Router {
             post(handlers::api_key_handler::create_api_key),
         )
         .route(
-            "/webhooks/github",
-            post(handlers::github_webhook_handler::post_github_webhook_handler),
-        )
-        .route(
             "/workflows",
             post(handlers::workflow_handler::post_workflow),
         )
@@ -45,6 +41,10 @@ pub fn create_routes(pool: PgPool) -> Router {
 
     Router::new()
         .route("/", get(|| async { "Hello, welcome to OpenCI!" }))
+        .route(
+            "/webhooks/github",
+            post(handlers::github_webhook_handler::post_github_webhook_handler),
+        )
         .merge(authenticated_routes)
         .merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .with_state(pool)
