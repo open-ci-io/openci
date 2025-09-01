@@ -36,6 +36,7 @@
 		"libpq",
 		"mockall",
 		"nonexistentkey",
+		"octocrab",
 		"openci",
 		"plainaddress",
 		"plpgsql",
