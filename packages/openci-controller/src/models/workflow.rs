@@ -68,7 +68,7 @@ pub struct UpdateWorkflowStep {
 }
 
 #[derive(Debug, Serialize, Deserialize, sqlx::Type, PartialEq, utoipa::ToSchema)]
-#[sqlx(type_name = "text", rename_all = "snake_case")]
+#[sqlx(type_name = "character varying", rename_all = "snake_case")]
 pub enum GitHubTriggerType {
     Push,
     PullRequest,
@@ -82,13 +82,22 @@ impl GitHubTriggerType {
     }
 }
 
+impl core::convert::TryFrom<&str> for GitHubTriggerType {
+    type Error = &'static str;
+
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
+        match s {
+            "push" => Ok(GitHubTriggerType::Push),
+            "pull_request" => Ok(GitHubTriggerType::PullRequest),
+            _ => Err("invalid GitHubTriggerType"),
+        }
+    }
+}
+
 impl From<String> for GitHubTriggerType {
     fn from(s: String) -> Self {
-        match s.as_str() {
-            "push" => GitHubTriggerType::Push,
-            "pull_request" => GitHubTriggerType::PullRequest,
-            _ => panic!("Invalid GitHubTriggerType: {}", s),
-        }
+        GitHubTriggerType::try_from(s.as_str())
+            .expect("Invalid GitHubTriggerType")
     }
 }
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]

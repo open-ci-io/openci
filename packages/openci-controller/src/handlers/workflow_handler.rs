@@ -95,7 +95,7 @@ pub async fn get_workflows_by_github_trigger_type(
     let workflows = sqlx::query_as!(
         Workflow,
         r#"
-        SELECT id, name, github_trigger_type as "github_trigger_type: _", base_branch, created_at, updated_at
+        SELECT id, name, created_at, updated_at, github_trigger_type as "github_trigger_type: GitHubTriggerType", base_branch
         FROM workflows
         WHERE github_trigger_type = $1
         "#,
@@ -484,7 +484,8 @@ mod tests {
         use super::*;
         use crate::models::workflow::{CreateWorkflowRequest, GitHubTriggerType};
 
-        async fn test_get_workflows_by_github_type_success(pool: PgPool) {
+        #[sqlx::test]
+        async fn sqlx_test_get_workflows_by_github_type_success(pool: PgPool) {
             let request = CreateWorkflowRequest {
                 name: "test-workflow".to_string(),
                 github_trigger_type: GitHubTriggerType::Push,
