@@ -31,15 +31,15 @@ pub async fn get_workflows(
         ORDER BY updated_at DESC
         "#,
     )
-    .fetch_all(&pool)
-    .await
-    .map_err(|e| {
-        error!("Database error: {}", e);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Failed to fetch workflows".to_string(),
-        )
-    })?;
+        .fetch_all(&pool)
+        .await
+        .map_err(|e| {
+            error!("Database error: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to fetch workflows".to_string(),
+            )
+        })?;
 
     let workflow_ids: Vec<i32> = workflows.iter().map(|w| w.id).collect();
 
@@ -54,15 +54,15 @@ pub async fn get_workflows(
             "#,
             &workflow_ids[..]
         )
-        .fetch_all(&pool)
-        .await
-        .map_err(|e| {
-            error!("Failed to fetch workflow steps: {}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to fetch workflow details".to_string(),
-            )
-        })?
+            .fetch_all(&pool)
+            .await
+            .map_err(|e| {
+                error!("Failed to fetch workflow steps: {}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to fetch workflow details".to_string(),
+                )
+            })?
     } else {
         vec![]
     };
@@ -85,6 +85,33 @@ pub async fn get_workflows(
         .collect();
 
     Ok(Json(workflows_with_steps))
+}
+
+#[tracing::instrument(skip(pool))]
+pub async fn get_workflows_by_github_trigger_type(
+    State(pool): State<PgPool>,
+    github_trigger_type: GitHubTriggerType,
+) -> Result<Json<Vec<Workflow>>, (StatusCode, String)> {
+    let workflows = sqlx::query_as!(
+        Workflow,
+        r#"
+        SELECT id, name, github_trigger_type as "github_trigger_type: _", base_branch, created_at, updated_at
+        FROM workflows
+        WHERE github_trigger_type = $1
+        "#,
+        github_trigger_type.as_str(),
+    )
+        .fetch_all(&pool)
+        .await
+        .map_err(|e| {
+            error!("Database error: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to fetch workflows".to_string(),
+            )
+        })?;
+
+    Ok(Json(workflows))
 }
 
 #[utoipa::path(
@@ -113,18 +140,18 @@ pub async fn get_workflow(
     "#,
         workflow_id
     )
-    .fetch_one(&pool)
-    .await
-    .map_err(|e| match e {
-        sqlx::Error::RowNotFound => (StatusCode::NOT_FOUND, "Workflow not found".to_string()),
-        _ => {
-            error!("Database error: {}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to fetch workflow".to_string(),
-            )
-        }
-    })?;
+        .fetch_one(&pool)
+        .await
+        .map_err(|e| match e {
+            sqlx::Error::RowNotFound => (StatusCode::NOT_FOUND, "Workflow not found".to_string()),
+            _ => {
+                error!("Database error: {}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to fetch workflow".to_string(),
+                )
+            }
+        })?;
 
     let steps = sqlx::query_as!(
         WorkflowStep,
@@ -136,15 +163,15 @@ pub async fn get_workflow(
         "#,
         workflow_id,
     )
-    .fetch_all(&pool)
-    .await
-    .map_err(|e| {
-        error!("Database error: {}", e);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Failed to fetch workflow steps".to_string(),
-        )
-    })?;
+        .fetch_all(&pool)
+        .await
+        .map_err(|e| {
+            error!("Database error: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to fetch workflow steps".to_string(),
+            )
+        })?;
 
     let workflow_with_steps = WorkflowWithSteps { workflow, steps };
 
@@ -186,15 +213,15 @@ pub async fn post_workflow(
         },
         request.base_branch,
     )
-    .fetch_one(&mut *tx)
-    .await
-    .map_err(|e| {
-        error!("Database error: {}", e);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Failed to create workflow".to_string(),
-        )
-    })?;
+        .fetch_one(&mut *tx)
+        .await
+        .map_err(|e| {
+            error!("Database error: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to create workflow".to_string(),
+            )
+        })?;
 
     let mut created_steps = Vec::new();
     if !request.steps.is_empty() {
@@ -223,15 +250,15 @@ pub async fn post_workflow(
   step_order",
             workflow.id
         )
-        .fetch_all(&mut *tx)
-        .await
-        .map_err(|e| {
-            error!("Failed to fetch created workflow steps: {}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to fetch created workflow steps".to_string(),
-            )
-        })?;
+            .fetch_all(&mut *tx)
+            .await
+            .map_err(|e| {
+                error!("Failed to fetch created workflow steps: {}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to fetch created workflow steps".to_string(),
+                )
+            })?;
     }
 
     tx.commit().await.map_err(|e| {
@@ -280,15 +307,15 @@ pub async fn patch_workflow(
             name,
             workflow_id
         )
-        .execute(&mut *tx)
-        .await
-        .map_err(|e| {
-            error!("Failed to update name: {}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to update workflow".to_string(),
-            )
-        })?;
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| {
+                error!("Failed to update name: {}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to update workflow".to_string(),
+                )
+            })?;
     }
 
     if let Some(github_trigger_type) = request.github_trigger_type {
@@ -301,15 +328,15 @@ pub async fn patch_workflow(
             trigger_str,
             workflow_id
         )
-        .execute(&mut *tx)
-        .await
-        .map_err(|e| {
-            error!("Failed to update github_trigger_type: {}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to update workflow".to_string(),
-            )
-        })?;
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| {
+                error!("Failed to update github_trigger_type: {}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to update workflow".to_string(),
+                )
+            })?;
     }
 
     if let Some(base_branch) = request.base_branch {
@@ -325,15 +352,15 @@ pub async fn patch_workflow(
             base_branch,
             workflow_id
         )
-        .execute(&mut *tx)
-        .await
-        .map_err(|e| {
-            error!("Failed to update base_branch: {}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to update base_branch".to_string(),
-            )
-        })?;
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| {
+                error!("Failed to update base_branch: {}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to update base_branch".to_string(),
+                )
+            })?;
     }
 
     if let Some(steps) = request.steps {
@@ -341,15 +368,15 @@ pub async fn patch_workflow(
             "DELETE FROM workflow_steps WHERE workflow_id = $1",
             workflow_id,
         )
-        .execute(&mut *tx)
-        .await
-        .map_err(|e| {
-            error!("Failed to delete workflow steps: {}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to delete workflow steps".to_string(),
-            )
-        })?;
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| {
+                error!("Failed to delete workflow steps: {}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to delete workflow steps".to_string(),
+                )
+            })?;
 
         if !steps.is_empty() {
             let mut query = QueryBuilder::new(
@@ -386,18 +413,18 @@ pub async fn patch_workflow(
         "SELECT id, name, created_at, updated_at, github_trigger_type, base_branch FROM workflows WHERE id = $1",
         workflow_id
     )
-    .fetch_one(&pool)
-    .await
-    .map_err(|e| match e {
-        sqlx::Error::RowNotFound => (StatusCode::NOT_FOUND, "Workflow not found".to_string()),
-        _ => {
-            error!("Failed to fetch workflow: {}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to fetch workflow".to_string(),
-            )
-        }
-    })?;
+        .fetch_one(&pool)
+        .await
+        .map_err(|e| match e {
+            sqlx::Error::RowNotFound => (StatusCode::NOT_FOUND, "Workflow not found".to_string()),
+            _ => {
+                error!("Failed to fetch workflow: {}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to fetch workflow".to_string(),
+                )
+            }
+        })?;
 
     Ok(Json(workflow))
 }
@@ -451,6 +478,31 @@ mod tests {
     use crate::models::workflow::CreateWorkflowStepRequest;
 
     use super::*;
+
+    #[cfg(test)]
+    mod get_workflows_by_github_trigger_type {
+        use super::*;
+        use crate::models::workflow::{CreateWorkflowRequest, GitHubTriggerType};
+
+        async fn test_get_workflows_by_github_type_success(pool: PgPool) {
+            let request = CreateWorkflowRequest {
+                name: "test-workflow".to_string(),
+                github_trigger_type: GitHubTriggerType::Push,
+                steps: vec![],
+                base_branch: "develop".to_string(),
+            };
+
+            let result = post_workflow(State(pool.clone()), Json(request)).await;
+            assert!(result.is_ok());
+
+            let workflows =
+                get_workflows_by_github_trigger_type(State(pool), GitHubTriggerType::Push).await;
+
+            let workflow_vec = &workflows.unwrap().0[0];
+
+            assert_eq!(workflow_vec.github_trigger_type, GitHubTriggerType::Push);
+        }
+    }
 
     #[sqlx::test]
     async fn test_post_workflow_push_trigger(pool: PgPool) {

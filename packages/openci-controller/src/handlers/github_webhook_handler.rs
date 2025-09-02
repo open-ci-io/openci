@@ -1,20 +1,26 @@
+use crate::handlers::workflow_handler::get_workflows_by_github_trigger_type;
+use crate::models::workflow::GitHubTriggerType;
+use axum::extract::State;
 use axum::{
     body::Bytes,
     http::{HeaderMap, StatusCode},
 };
 use octocrab::models::webhook_events::{WebhookEvent, WebhookEventType};
+use sqlx::PgPool;
+use tracing::error;
 
 #[utoipa::path(
-      post,
-      path = "/webhooks/github",
-      responses(
+    post,
+    path = "/webhooks/github",
+    responses(
           (status = 200, description = "Webhook processed successfully"),
           (status = 401, description = "Invalid signature"),
           (status = 500, description = "Internal server error")
-      ),
-      tag = "webhooks"
-  )]
+    ),
+    tag = "webhooks"
+)]
 pub async fn post_github_webhook_handler(
+    State(pool): State<PgPool>,
     headers: HeaderMap,
     body: Bytes,
 ) -> Result<StatusCode, (StatusCode, String)> {
@@ -33,12 +39,21 @@ pub async fn post_github_webhook_handler(
         )
     })?;
 
-    match event.kind {
-        WebhookEventType::Push => {}
-        WebhookEventType::PullRequest => {}
-        // ...
-        _ => {}
+    let trigger_type = match event.kind {
+        WebhookEventType::Push => GitHubTriggerType::Push,
+        WebhookEventType::PullRequest => GitHubTriggerType::PullRequest,
+        _ => return Ok(StatusCode::OK),
     };
+
+
+    let _workflows = get_workflows_by_github_trigger_type(State(pool), trigger_type).await.map_err(|e| {
+        error!("Database error: {}", e.1);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to fetch workflows".to_string(),
+        )
+    })?;
+
     Ok(StatusCode::OK)
 }
 
@@ -51,11 +66,11 @@ mod tests {
     const PUSH_PAYLOAD: &str = include_str!("../../tests/fixtures/github/push.json");
     const STAR_PAYLOAD: &str = include_str!("../../tests/fixtures/github/star.json");
 
-    #[tokio::test]
-    async fn test_missing_event_header() {
+    #[sqlx::test]
+    async fn test_missing_event_header(pool: PgPool) {
         let headers = HeaderMap::new();
         let body = Bytes::from("{}");
-        let result = post_github_webhook_handler(headers, body).await;
+        let result = post_github_webhook_handler(State(pool), headers, body).await;
 
         assert!(result.is_err());
         let (status, msg) = result.unwrap_err();
@@ -63,39 +78,39 @@ mod tests {
         assert!(msg.contains("X-GitHub-Event"));
     }
 
-    #[tokio::test]
-    async fn test_push_event() {
+    #[sqlx::test]
+    async fn test_push_event(pool: PgPool) {
         let mut headers = HeaderMap::new();
         headers.insert("x-github-event", HeaderValue::from_static("push"));
 
         let body = Bytes::from(PUSH_PAYLOAD);
-        let result = post_github_webhook_handler(headers, body).await;
+        let result = post_github_webhook_handler(State(pool), headers, body).await;
         assert_eq!(result.unwrap(), StatusCode::OK);
     }
 
-    #[tokio::test]
-    async fn test_pull_request_event() {
+    #[sqlx::test]
+    async fn test_pull_request_event(pool: PgPool) {
         let mut headers = HeaderMap::new();
         headers.insert("x-github-event", HeaderValue::from_static("pull_request"));
 
         let body = Bytes::from(PR_PAYLOAD);
-        let result = post_github_webhook_handler(headers, body).await;
+        let result = post_github_webhook_handler(State(pool), headers, body).await;
         assert_eq!(result.unwrap(), StatusCode::OK);
     }
 
-    #[tokio::test]
-    async fn test_unknown_event() {
+    #[sqlx::test]
+    async fn test_unknown_event(pool: PgPool) {
         let mut headers = HeaderMap::new();
         headers.insert("x-github-event", HeaderValue::from_static("star"));
 
         let body = Bytes::from(STAR_PAYLOAD);
 
-        let result = post_github_webhook_handler(headers, body).await;
+        let result = post_github_webhook_handler(State(pool), headers, body).await;
         assert_eq!(result.unwrap(), StatusCode::OK);
     }
 
-    #[tokio::test]
-    async fn test_invalid_header_encoding() {
+    #[sqlx::test]
+    async fn test_invalid_header_encoding(pool: PgPool) {
         let mut headers = HeaderMap::new();
         let body = Bytes::from("{}");
 
@@ -104,19 +119,18 @@ mod tests {
             HeaderValue::from_bytes(b"\xFF\xFE").unwrap(),
         );
 
-        let result = post_github_webhook_handler(headers, body).await;
+        let result = post_github_webhook_handler(State(pool), headers, body).await;
         assert!(result.is_err());
     }
 
-    #[tokio::test]
-    async fn test_invalid_json_body() {
+    #[sqlx::test]
+    async fn test_invalid_json_body(pool: PgPool) {
         let mut headers = HeaderMap::new();
         headers.insert("x-github-event", HeaderValue::from_static("push"));
 
-        // 不正なJSON
         let body = Bytes::from("not json");
 
-        let result = post_github_webhook_handler(headers, body).await;
+        let result = post_github_webhook_handler(State(pool), headers, body).await;
         assert!(result.is_err());
         let (status, msg) = result.unwrap_err();
         assert_eq!(status, StatusCode::BAD_REQUEST);

@@ -2,6 +2,10 @@ use chrono::{DateTime, Utc};
 use mockall::predicate::str;
 use serde::{Deserialize, Serialize};
 
+#[allow(unused_imports)]
+use serde_json::json;
+
+
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct Workflow {
@@ -69,6 +73,15 @@ pub enum GitHubTriggerType {
     Push,
     PullRequest,
 }
+impl GitHubTriggerType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            GitHubTriggerType::Push => "push",
+            GitHubTriggerType::PullRequest => "pull_request",
+        }
+    }
+}
+
 impl From<String> for GitHubTriggerType {
     fn from(s: String) -> Self {
         match s.as_str() {
