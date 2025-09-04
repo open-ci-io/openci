@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 
-struct BuildJob {
+pub struct BuildJob {
     pub id: i32,
     pub workflow_id: i32,
     pub repository_id: i32,
@@ -11,7 +11,7 @@ struct BuildJob {
     pub github_delivery_id: String,
 }
 
-enum BuildStatus {
+pub enum BuildStatus {
     Queued,
     Running,
     Success,
