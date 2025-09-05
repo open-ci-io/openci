@@ -54,7 +54,41 @@ pub async fn post_github_webhook_handler(
         )
     })?;
 
+
+    // Insert build jobs here
+
+
     Ok(StatusCode::OK)
+}
+
+pub async fn post_build_job(
+    workflow_id: i32,
+    repository_id: i32,
+    commit_sha: String,
+    github_delivery_id: String,
+    pool: PgPool,
+) -> Result<(), (StatusCode, String)> {
+    sqlx::query!(
+        r#"
+INSERT INTO build_jobs (workflow_id, repository_id, commit_sha, github_delivery_id)
+VALUES ($1, $2, $3, $4)
+"#,
+        workflow_id,
+        repository_id,
+        commit_sha,
+        github_delivery_id
+    )
+        .execute(&pool)
+        .await
+        .map_err(|e| {
+            error!("Failed to create build job: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to create build job".into(),
+            )
+        })?;
+
+    Ok(())
 }
 
 #[cfg(test)]
