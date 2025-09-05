@@ -26,7 +26,7 @@ pub async fn get_workflows(
     let workflows = sqlx::query_as!(
         Workflow,
         r#"
-        SELECT id, name, created_at, updated_at, github_trigger_type, base_branch
+        SELECT id, name, created_at, updated_at, github_trigger_type as "github_trigger_type: GitHubTriggerType", base_branch, github_repository_id
         FROM workflows
         ORDER BY updated_at DESC
         "#,
@@ -95,7 +95,7 @@ pub async fn get_workflows_by_github_trigger_type(
     let workflows = sqlx::query_as!(
         Workflow,
         r#"
-        SELECT id, name, created_at, updated_at, github_trigger_type as "github_trigger_type: GitHubTriggerType", base_branch
+        SELECT id, name, created_at, updated_at, github_trigger_type as "github_trigger_type: GitHubTriggerType", base_branch, github_repository_id
         FROM workflows
         WHERE github_trigger_type = $1
         "#,
@@ -134,7 +134,7 @@ pub async fn get_workflow(
     let workflow = sqlx::query_as!(
         Workflow,
         r#"
-    SELECT id, name, created_at, updated_at, github_trigger_type, base_branch
+    SELECT id, name, created_at, updated_at, github_trigger_type, base_branch, github_repository_id
     FROM workflows
     WHERE id = $1
     "#,
@@ -202,8 +202,8 @@ pub async fn post_workflow(
     let workflow = sqlx::query_as!(
         Workflow,
         r#"
-          INSERT INTO workflows (name, github_trigger_type, base_branch)
-          VALUES ($1, $2, $3)
+          INSERT INTO workflows (name, github_trigger_type, base_branch, github_repository_id)
+          VALUES ($1, $2, $3, $4)
           RETURNING *
           "#,
         request.name,
@@ -212,6 +212,7 @@ pub async fn post_workflow(
             GitHubTriggerType::PullRequest => "pull_request",
         },
         request.base_branch,
+        request.github_repository_id,
     )
         .fetch_one(&mut *tx)
         .await
@@ -410,7 +411,16 @@ pub async fn patch_workflow(
 
     let workflow = sqlx::query_as!(
         Workflow,
-        "SELECT id, name, created_at, updated_at, github_trigger_type, base_branch FROM workflows WHERE id = $1",
+        r#"
+        SELECT id,
+               name,
+               created_at,
+               updated_at,
+               github_trigger_type as "github_trigger_type: GitHubTriggerType",
+               base_branch,
+               github_repository_id
+        FROM workflows WHERE id = $1
+        "#,
         workflow_id
     )
         .fetch_one(&pool)
@@ -491,6 +501,7 @@ mod tests {
                 github_trigger_type: GitHubTriggerType::Push,
                 steps: vec![],
                 base_branch: "develop".to_string(),
+                github_repository_id: 1,
             };
 
             let result = post_workflow(State(pool.clone()), Json(request)).await;
@@ -512,6 +523,7 @@ mod tests {
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![],
             base_branch: "develop".to_string(),
+            github_repository_id: 1,
         };
 
         let result = post_workflow(State(pool), Json(request)).await;
@@ -541,18 +553,21 @@ mod tests {
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![],
             base_branch: "develop".to_string(),
+            github_repository_id: 1,
         };
         let workflow2 = CreateWorkflowRequest {
             name: "workflow-2".to_string(),
             github_trigger_type: GitHubTriggerType::PullRequest,
             steps: vec![],
             base_branch: "develop".to_string(),
+            github_repository_id: 1,
         };
         let workflow3 = CreateWorkflowRequest {
             name: "workflow-3".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![],
             base_branch: "develop".to_string(),
+            github_repository_id: 1,
         };
 
         let result1 = post_workflow(State(pool.clone()), Json(workflow1)).await;
@@ -609,6 +624,7 @@ mod tests {
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![demo_step],
             base_branch: "develop".to_string(),
+            github_repository_id: 1,
         };
         let result = post_workflow(State(pool.clone()), Json(request)).await;
         assert!(result.is_ok());
@@ -638,6 +654,7 @@ mod tests {
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![],
             base_branch: "develop".to_string(),
+            github_repository_id: 1,
         };
         let result = post_workflow(State(pool.clone()), Json(request)).await;
         assert!(result.is_ok());
@@ -649,6 +666,7 @@ mod tests {
             github_trigger_type: None,
             steps: None,
             base_branch: None,
+            github_repository_id: None,
         };
         let patch_result =
             patch_workflow(State(pool), Path(workflow_id), Json(patch_request)).await;
@@ -663,6 +681,7 @@ mod tests {
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![],
             base_branch: "develop".to_string(),
+            github_repository_id: 1,
         };
         let result = post_workflow(State(pool.clone()), Json(request)).await;
         assert!(result.is_ok());
