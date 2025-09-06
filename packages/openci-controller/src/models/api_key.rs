@@ -24,6 +24,9 @@ pub struct CreateApiKeyRequest {
 pub struct CreateApiKeyResponse {
     pub id: i32,
     pub name: String,
+    /// WARNING: Contains the actual API key in plain text.
+    /// This is only returned once during creation and should never be logged.
+    /// The client must store this securely as it cannot be retrieved again.
     pub api_key: String,
     pub prefix: String,
     pub created_at: DateTime<Utc>,
