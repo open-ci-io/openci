@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use utoipa::ToSchema;
 use validator::Validate;
-
 #[derive(Serialize, FromRow, ToSchema)]
 pub struct ApiKey {
     pub id: i32,
