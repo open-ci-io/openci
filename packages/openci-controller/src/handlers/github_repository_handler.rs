@@ -4,6 +4,9 @@ use sqlx::PgPool;
 use tracing::error;
 
 pub async fn post_github_repository(external_id: i64, pool: &PgPool) -> Result<StatusCode, (StatusCode, String)> {
+    if external_id < 0 {
+        return Err((StatusCode::BAD_REQUEST, "external_id must be positive".to_string()));
+    }
     sqlx::query!(r#"
 INSERT INTO github_repositories (external_id) VALUES ($1)
 "#, external_id).execute(pool).await.map_err(|e| {
@@ -14,10 +17,14 @@ INSERT INTO github_repositories (external_id) VALUES ($1)
         )
     })?;
 
-    Ok(StatusCode::OK)
+
+    Ok(StatusCode::CREATED)
 }
 
 pub async fn get_github_repository_by_external_id(external_id: i64, pool: &PgPool) -> Result<GitHubRepository, (StatusCode, String)> {
+    if external_id < 0 {
+        return Err((StatusCode::BAD_REQUEST, "external_id must be positive".to_string()));
+    }
     let result = sqlx::query_as!(
         GitHubRepository,
         r#"
