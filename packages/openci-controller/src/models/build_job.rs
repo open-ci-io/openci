@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 
+#[allow(dead_code)]
 pub struct BuildJob {
     pub id: i32,
     pub workflow_id: i32,
@@ -11,6 +12,7 @@ pub struct BuildJob {
     pub github_delivery_id: String,
 }
 
+#[allow(dead_code)]
 pub enum BuildStatus {
     Queued,
     Running,
