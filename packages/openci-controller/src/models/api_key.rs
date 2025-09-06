@@ -5,6 +5,7 @@ use utoipa::ToSchema;
 use validator::Validate;
 
 #[derive(Serialize, FromRow, ToSchema)]
+#[allow(dead_code)]
 pub struct ApiKey {
     pub id: i32,
     pub user_id: i32,
