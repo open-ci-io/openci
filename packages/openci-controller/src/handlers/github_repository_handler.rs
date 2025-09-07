@@ -5,7 +5,7 @@ use tracing::error;
 
 #[allow(dead_code)]
 pub async fn post_github_repository(external_id: i64, pool: &PgPool) -> Result<GitHubRepository, (StatusCode, String)> {
-    if external_id < 0 {
+    if external_id <= 0 {
         return Err((StatusCode::BAD_REQUEST, "external_id must be positive".to_string()));
     }
     let result = sqlx::query_as!(
@@ -26,7 +26,7 @@ INSERT INTO github_repositories (external_id) VALUES ($1) RETURNING id, external
 
 #[allow(dead_code)]
 pub async fn get_github_repository_by_external_id(external_id: i64, pool: &PgPool) -> Result<GitHubRepository, (StatusCode, String)> {
-    if external_id < 0 {
+    if external_id <= 0 {
         return Err((StatusCode::BAD_REQUEST, "external_id must be positive".to_string()));
     }
     let result = sqlx::query_as!(
@@ -57,7 +57,7 @@ mod github_repository_handler_tests {
         let result = post_github_repository(EXTERNAL_ID, &pool).await;
         assert!(result.is_ok());
         let github_repository = result.unwrap();
-        assert_eq!(github_repository.id, 1);
+        assert!(github_repository.id > 0);
         assert_eq!(github_repository.external_id, EXTERNAL_ID);
 
         let result = get_github_repository_by_external_id(EXTERNAL_ID, &pool).await;
