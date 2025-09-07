@@ -55,7 +55,7 @@ mod github_repository_handler_tests {
         let result = post_github_repository(external_id, &pool).await;
         assert!(result.is_ok());
         let status_code = result.unwrap();
-        assert_eq!(status_code, StatusCode::OK);
+        assert_eq!(status_code, StatusCode::CREATED);
 
         let result = get_github_repository_by_external_id(external_id, &pool).await;
         assert!(result.is_ok());
