@@ -27,11 +27,20 @@ pub async fn github_webhook_auth_middleware(
 }
 
 fn verify_github_signature(headers: &HeaderMap, body: &Bytes) -> Result<(), (StatusCode, String)> {
-    let github_signature = extract_github_signature(headers)?;
-    let webhook_secret = get_webhook_secret()?;
-    let sig_bytes = parse_sha256_signature(github_signature)?;
-    verify_hmac_signature(&webhook_secret, body, &sig_bytes)
+    let webhook_secret = extract_github_signature(headers)?;
+    verify_github_signature_with_secret(headers, body, &webhook_secret)
 }
+
+fn verify_github_signature_with_secret(
+    headers: &HeaderMap,
+    body: &Bytes,
+    secret: &str,
+) -> Result<(), (StatusCode, String)> {
+    let github_signature = extract_github_signature(headers)?;
+    let sig_bytes = parse_sha256_signature(github_signature)?;
+    verify_hmac_signature(secret, body, &sig_bytes)
+}
+
 
 fn extract_github_signature(headers: &HeaderMap) -> Result<&str, (StatusCode, String)> {
     headers
@@ -108,7 +117,6 @@ mod tests {
     }
 
     mod extract_github_signature {
-
         use axum::http::HeaderValue;
 
         const GITHUB_WEBHOOK_HEADER: &str = "x-hub-signature-256";
@@ -347,47 +355,40 @@ mod tests {
     mod verify_github_signature {
         use super::*;
         use axum::http::HeaderValue;
-        use serial_test::serial;
-        use std::env;
+
+        const TEST_SECRET: &str = "test_secret";
+        const TEST_BODY: &str = "test_body";
+        const DIFFERENT_BODY: &str = "different_body";
+        const TEST_HEADER_KEY: &str = "x-hub-signature-256";
 
         #[test]
-        #[serial]
         fn test_verify_github_signature_success() {
-            env::set_var("GITHUB_WEBHOOK_SECRET", "test_secret");
-
-            let body = Bytes::from("test_body");
+            let body = Bytes::from(TEST_BODY);
             let mut headers = HeaderMap::new();
 
-            let signature = calculate_test_signature("test_secret", &body);
+            let signature = calculate_test_signature(TEST_SECRET, &body);
             headers.insert(
-                "x-hub-signature-256",
+                TEST_HEADER_KEY,
                 HeaderValue::from_str(&signature).unwrap(),
             );
 
-            let result = verify_github_signature(&headers, &body);
+            let result = verify_github_signature_with_secret(&headers, &body, TEST_SECRET);
             assert!(result.is_ok());
-
-            env::remove_var("GITHUB_WEBHOOK_SECRET");
         }
 
         #[test]
-        #[serial]
         fn test_verify_github_signature_wrong_signature() {
-            env::set_var("GITHUB_WEBHOOK_SECRET", "test_secret");
-
-            let body = Bytes::from("test_body");
+            let body = Bytes::from(TEST_BODY);
             let mut headers = HeaderMap::new();
 
-            let signature = calculate_test_signature("test_secret", &Bytes::from("different_body"));
+            let signature = calculate_test_signature(TEST_SECRET, &Bytes::from(DIFFERENT_BODY));
             headers.insert(
-                "x-hub-signature-256",
+                TEST_HEADER_KEY,
                 HeaderValue::from_str(&signature).unwrap(),
             );
 
             let result = verify_github_signature(&headers, &body);
             assert!(result.is_err());
-
-            env::remove_var("GITHUB_WEBHOOK_SECRET");
         }
     }
 }
