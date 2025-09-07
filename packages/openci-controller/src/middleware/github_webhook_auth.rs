@@ -27,7 +27,7 @@ pub async fn github_webhook_auth_middleware(
 }
 
 fn verify_github_signature(headers: &HeaderMap, body: &Bytes) -> Result<(), (StatusCode, String)> {
-    let webhook_secret = extract_github_signature(headers)?;
+    let webhook_secret = get_webhook_secret()?;
     verify_github_signature_with_secret(headers, body, &webhook_secret)
 }
 
