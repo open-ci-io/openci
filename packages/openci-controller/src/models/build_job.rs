@@ -4,7 +4,6 @@ use chrono::{DateTime, Utc};
 pub struct BuildJob {
     pub id: i32,
     pub workflow_id: i32,
-    pub repository_id: i32,
     pub status: BuildStatus,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
