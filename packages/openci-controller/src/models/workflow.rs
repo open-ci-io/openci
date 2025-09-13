@@ -60,7 +60,7 @@ pub struct UpdateWorkflowRequest {
     pub steps: Option<Vec<UpdateWorkflowStep>>,
     #[validate(length(min = 1, max = 255))]
     pub base_branch: Option<String>,
-    pub github_repository_id: Option<i32>,
+    #[allow(dead_code)] pub github_repository_id: Option<i32>,
 }
 
 #[derive(Debug, serde::Deserialize, utoipa::ToSchema)]

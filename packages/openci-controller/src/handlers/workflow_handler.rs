@@ -528,12 +528,13 @@ mod tests {
 
     #[sqlx::test]
     async fn test_post_workflow_push_trigger(pool: PgPool) {
+        let github_repository_id = post_github_repository_data(pool.clone()).await;
         let request = CreateWorkflowRequest {
             name: "test-workflow".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![],
             base_branch: "develop".to_string(),
-            github_repository_id: 1,
+            github_repository_id,
         };
 
         let result = post_workflow(State(pool), Json(request)).await;
@@ -630,12 +631,14 @@ mod tests {
             name: "Flutter Build".to_string(),
             command: "echo \"Hello World\"".to_string(),
         };
+
+        let github_repository_id = post_github_repository_data(pool.clone()).await;
         let request = CreateWorkflowRequest {
             name: "workflow".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![demo_step],
             base_branch: "develop".to_string(),
-            github_repository_id: 1,
+            github_repository_id,
         };
         let result = post_workflow(State(pool.clone()), Json(request)).await;
         assert!(result.is_ok());
@@ -660,12 +663,14 @@ mod tests {
 
     #[sqlx::test]
     async fn test_patch_workflow(pool: PgPool) {
+        let github_repository_id = post_github_repository_data(pool.clone()).await;
+
         let request = CreateWorkflowRequest {
             name: "workflow".to_string(),
             github_trigger_type: GitHubTriggerType::Push,
             steps: vec![],
             base_branch: "develop".to_string(),
-            github_repository_id: 1,
+            github_repository_id,
         };
         let result = post_workflow(State(pool.clone()), Json(request)).await;
         assert!(result.is_ok());
