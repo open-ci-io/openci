@@ -84,20 +84,22 @@ pub async fn post_github_webhook_handler(
         GitHubTriggerType::Push => &json_body["after"],
     };
 
-    post_build_job(
-        _workflows[0].id,
-        commit_sha.to_string(),
-        github_delivery_id,
-        &pool,
-    )
-    .await
-    .map_err(|e| {
-        error!("Failed to create build job: {}", e.1);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Failed to create build job".to_string(),
+    for w in _workflows.0.iter() {
+        post_build_job(
+            w.id,
+            commit_sha.to_string(),
+            github_delivery_id.clone(),
+            &pool,
         )
-    })?;
+        .await
+        .map_err(|e| {
+            error!("Failed to create build job: {}", e.1);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to create build job".to_string(),
+            )
+        })?;
+    }
 
     // Insert build jobs here
 
