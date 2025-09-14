@@ -45,7 +45,7 @@ pub async fn post_github_webhook_handler(
         _ => return Ok(StatusCode::OK),
     };
 
-    let workflows_json = get_workflows_by_github_trigger_type(State(&pool), &trigger_type)
+    let workflows = get_workflows_by_github_trigger_type(State(&pool), &trigger_type)
         .await
         .map_err(|e| {
             error!("Database error: {}", e.1);
@@ -54,8 +54,6 @@ pub async fn post_github_webhook_handler(
                 "Failed to fetch workflows".to_string(),
             )
         })?;
-
-    let workflows = workflows_json.0;
 
     if workflows.is_empty() {
         return Ok(StatusCode::OK);
