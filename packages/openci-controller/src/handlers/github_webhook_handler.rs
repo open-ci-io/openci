@@ -7,7 +7,6 @@ use axum::{
 };
 use octocrab::models::webhook_events::{WebhookEvent, WebhookEventType};
 use sqlx::PgPool;
-use tower_http::follow_redirect::policy::PolicyExt;
 use tracing::{error};
 
 #[utoipa::path(
@@ -71,7 +70,7 @@ pub async fn post_github_webhook_handler(
         )
     })?.to_string();
 
-    let json_body: serde_json::Value = serde_json::from_slice(&body).map_err(|e| (StatusCode::BAD_REQUEST, format!("Invalid JSON: {}", e)))?;;
+    let json_body: serde_json::Value = serde_json::from_slice(&body).map_err(|e| (StatusCode::BAD_REQUEST, format!("Invalid JSON: {}", e)))?;
 
     let commit_sha = match trigger_type {
         GitHubTriggerType::PullRequest => &json_body["pull_request"]["head"]["sha"],
