@@ -1,4 +1,7 @@
-.PHONY: all clean test down up-dev full-up-dev up-prod ensure-env build rebuild db-schema
+.PHONY: all clean test down up-dev full-up-dev up-prod ensure-env build rebuild db-schema ensure-sqlx add-migration-files
+
+# Ensure Cargo bin is in PATH for sqlx/cargo-sqlx
+export PATH := $(HOME)/.cargo/bin:$(PATH)
 
 all: build
 
@@ -70,6 +73,7 @@ ensure-env:
 up-dev: ensure-env
 	docker-compose up postgres -d
 	sleep 2
+	$(MAKE) ensure-sqlx
 	@set -a; . ./.env; set +a; sqlx migrate run
 	@set -a; . ./.env; set +a; cargo sqlx prepare
 	@set -a; . ./.env; set +a; cargo run
@@ -77,6 +81,7 @@ up-dev: ensure-env
 full-up-dev: ensure-env
 	docker-compose up postgres -d
 	sleep 2
+	$(MAKE) ensure-sqlx
 	@set -a; . ./.env; set +a; sqlx migrate run
 	docker-compose up openci-controller -d
 	@echo "🚀 OpenCI Controller started"
@@ -105,5 +110,19 @@ up-prod: ensure-env build
 	docker-compose -f docker-compose.yml up openci-controller -d
 	@echo "🚀 OpenCI Controller started in production mode"
 
-add-migration-files:
+add-migration-files: ensure-sqlx
 	sqlx migrate add
+
+ensure-sqlx:
+	@command -v cargo >/dev/null 2>&1 || { \
+		echo "❌ cargo not found. Please install Rust toolchain (https://rustup.rs)."; \
+		exit 1; \
+	}
+	@command -v sqlx >/dev/null 2>&1 || command -v cargo-sqlx >/dev/null 2>&1 || { \
+		echo "⬇️  Installing sqlx-cli (features: postgres,rustls)..."; \
+		cargo install sqlx-cli --no-default-features --features postgres,rustls || { \
+			echo "❌ Failed to install sqlx-cli"; \
+			exit 1; \
+		}; \
+	}
+	@echo "✅ sqlx-cli is available"
