@@ -80,9 +80,13 @@ pub async fn post_github_webhook_handler(
         .map_err(|e| (StatusCode::BAD_REQUEST, format!("Invalid JSON: {}", e)))?;
 
     let commit_sha = match trigger_type {
-        GitHubTriggerType::PullRequest => &json_body["pull_request"]["head"]["sha"],
-        GitHubTriggerType::Push => &json_body["after"],
-    };
+        GitHubTriggerType::PullRequest => json_body["pull_request"]["head"]["sha"].as_str(),
+        GitHubTriggerType::Push => json_body["after"].as_str(),
+    }
+    .ok_or((
+        StatusCode::BAD_REQUEST,
+        "Missing or invalid commit SHA".to_string(),
+    ))?;
 
     for w in workflows.iter() {
         post_build_job(
