@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id, name, created_at, updated_at, github_trigger_type as \"github_trigger_type: GitHubTriggerType\", base_branch\n        FROM workflows\n        WHERE github_trigger_type = $1\n        ",
+  "query": "\n        SELECT id, name, created_at, updated_at, github_trigger_type as \"github_trigger_type: GitHubTriggerType\", github_repository_id, base_branch\n        FROM workflows\n        ORDER BY updated_at DESC\n        ",
   "describe": {
     "columns": [
       {
@@ -30,16 +30,20 @@
       },
       {
         "ordinal": 5,
+        "name": "github_repository_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
         "name": "base_branch",
         "type_info": "Varchar"
       }
     ],
     "parameters": {
-      "Left": [
-        "Text"
-      ]
+      "Left": []
     },
     "nullable": [
+      false,
       false,
       false,
       false,
@@ -48,5 +52,5 @@
       false
     ]
   },
-  "hash": "fff53190c899d02ea035eb98f4aa32722c96e96fc01087bbe910f4e2ece192d3"
+  "hash": "dcc1dff1173b4a413de0a574ba62f6661fa582c506287cb2ebb54a21f87e9780"
 }

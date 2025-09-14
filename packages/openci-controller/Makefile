@@ -12,9 +12,7 @@ clean: down
 	@echo "✅ Cleanup complete"
 
 test: ensure-env
-	@echo "🧪 Running tests..."
-	@set -a; . ./.env; set +a; cargo test
-	@echo "✅ Tests passed"
+	@set -a; . ./.env; set +a; cargo nextest run
 
 down: 
 	docker-compose down -v

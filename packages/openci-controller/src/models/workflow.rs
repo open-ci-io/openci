@@ -15,6 +15,7 @@ pub struct Workflow {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub github_trigger_type: GitHubTriggerType,
+    pub github_repository_id: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
@@ -24,6 +25,7 @@ pub struct CreateWorkflowRequest {
     pub github_trigger_type: GitHubTriggerType,
     pub steps: Vec<CreateWorkflowStepRequest>,
     pub base_branch: String,
+    pub github_repository_id: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
@@ -58,6 +60,7 @@ pub struct UpdateWorkflowRequest {
     pub steps: Option<Vec<UpdateWorkflowStep>>,
     #[validate(length(min = 1, max = 255))]
     pub base_branch: Option<String>,
+    #[allow(dead_code)] pub github_repository_id: Option<i32>,
 }
 
 #[derive(Debug, serde::Deserialize, utoipa::ToSchema)]

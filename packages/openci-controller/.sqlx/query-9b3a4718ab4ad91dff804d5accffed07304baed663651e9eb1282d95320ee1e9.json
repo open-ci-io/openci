@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id, name, created_at, updated_at, github_trigger_type, base_branch\n        FROM workflows\n        ORDER BY updated_at DESC\n        ",
+  "query": "\n          INSERT INTO workflows (name, github_trigger_type, github_repository_id, base_branch)\n          VALUES ($1, $2, $3, $4)\n          RETURNING *\n          ",
   "describe": {
     "columns": [
       {
@@ -15,29 +15,40 @@
       },
       {
         "ordinal": 2,
+        "name": "base_branch",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
         "name": "created_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 3,
+        "ordinal": 4,
         "name": "updated_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "github_trigger_type",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 5,
-        "name": "base_branch",
-        "type_info": "Varchar"
+        "ordinal": 6,
+        "name": "github_repository_id",
+        "type_info": "Int4"
       }
     ],
     "parameters": {
-      "Left": []
+      "Left": [
+        "Varchar",
+        "Varchar",
+        "Int4",
+        "Varchar"
+      ]
     },
     "nullable": [
+      false,
       false,
       false,
       false,
@@ -46,5 +57,5 @@
       false
     ]
   },
-  "hash": "2f32222a6833f1f9dd7b649f14575110a772bbb311d41cdf04f59f10e8719c71"
+  "hash": "9b3a4718ab4ad91dff804d5accffed07304baed663651e9eb1282d95320ee1e9"
 }

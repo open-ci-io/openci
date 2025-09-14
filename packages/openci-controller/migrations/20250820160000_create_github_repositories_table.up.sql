@@ -4,4 +4,3 @@ CREATE TABLE
     id          SERIAL PRIMARY KEY,
     external_id BIGINT NOT NULL UNIQUE
 );
-
