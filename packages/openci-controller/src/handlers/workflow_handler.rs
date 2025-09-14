@@ -89,8 +89,8 @@ pub async fn get_workflows(
 
 #[tracing::instrument(skip(pool))]
 pub async fn get_workflows_by_github_trigger_type(
-    State(pool): State<PgPool>,
-    github_trigger_type: GitHubTriggerType,
+    State(pool): State<&PgPool>,
+    github_trigger_type: &GitHubTriggerType,
 ) -> Result<Json<Vec<Workflow>>, (StatusCode, String)> {
     let workflows = sqlx::query_as!(
         Workflow,
@@ -101,7 +101,7 @@ pub async fn get_workflows_by_github_trigger_type(
         "#,
         github_trigger_type.as_str(),
     )
-        .fetch_all(&pool)
+        .fetch_all(pool)
         .await
         .map_err(|e| {
             error!("Database error: {}", e);
@@ -518,7 +518,7 @@ mod tests {
             assert!(result.is_ok());
 
             let workflows =
-                get_workflows_by_github_trigger_type(State(pool), GitHubTriggerType::Push).await;
+                get_workflows_by_github_trigger_type(State(&pool), &GitHubTriggerType::Push).await;
 
             let workflow_vec = &workflows.unwrap().0[0];
 

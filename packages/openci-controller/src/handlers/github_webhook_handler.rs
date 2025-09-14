@@ -7,7 +7,8 @@ use axum::{
 };
 use octocrab::models::webhook_events::{WebhookEvent, WebhookEventType};
 use sqlx::PgPool;
-use tracing::error;
+use tower_http::follow_redirect::policy::PolicyExt;
+use tracing::{error};
 
 #[utoipa::path(
     post,
@@ -46,11 +47,42 @@ pub async fn post_github_webhook_handler(
     };
 
 
-    let _workflows = get_workflows_by_github_trigger_type(State(pool), trigger_type).await.map_err(|e| {
+    let _workflows = get_workflows_by_github_trigger_type(State(&pool), &trigger_type).await.map_err(|e| {
         error!("Database error: {}", e.1);
         (
             StatusCode::INTERNAL_SERVER_ERROR,
             "Failed to fetch workflows".to_string(),
+        )
+    })?;
+
+    if _workflows.len() == 0 {
+        return Ok(StatusCode::OK);
+    }
+
+    let github_delivery_id = headers.get("x-github-delivery").ok_or_else(|| {
+        (
+            StatusCode::BAD_REQUEST,
+            "Missing or invalid X-GitHub-Delivery header".to_string(),
+        )
+    })?.to_str().map_err(|e| {
+        (
+            StatusCode::BAD_REQUEST,
+            format!("Failed to parse X-GitHub-Delivery header: {}", e),
+        )
+    })?.to_string();
+
+    let json_body: serde_json::Value = serde_json::from_slice(&body).map_err(|e| (StatusCode::BAD_REQUEST, format!("Invalid JSON: {}", e)))?;;
+
+    let commit_sha = match trigger_type {
+        GitHubTriggerType::PullRequest => &json_body["pull_request"]["head"]["sha"],
+        GitHubTriggerType::Push => &json_body["after"],
+    };
+
+    post_build_job(_workflows[0].id, commit_sha.to_string(), github_delivery_id, &pool).await.map_err(|e| {
+        error!("Failed to create build job: {}", e.1);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to create build job".to_string(),
         )
     })?;
 
@@ -63,22 +95,20 @@ pub async fn post_github_webhook_handler(
 
 pub async fn post_build_job(
     workflow_id: i32,
-    repository_id: i32,
     commit_sha: String,
     github_delivery_id: String,
-    pool: PgPool,
+    pool: &PgPool,
 ) -> Result<(), (StatusCode, String)> {
     sqlx::query!(
         r#"
-INSERT INTO build_jobs (workflow_id, repository_id, commit_sha, github_delivery_id)
-VALUES ($1, $2, $3, $4)
+INSERT INTO build_jobs (workflow_id, commit_sha, github_delivery_id)
+VALUES ($1, $2, $3)
 "#,
         workflow_id,
-        repository_id,
         commit_sha,
         github_delivery_id
     )
-        .execute(&pool)
+        .execute(pool)
         .await
         .map_err(|e| {
             error!("Failed to create build job: {}", e);
