@@ -247,8 +247,12 @@ pub async fn post_workflow(
 
         created_steps = sqlx::query_as!(
             WorkflowStep,
-            "SELECT * FROM workflow_steps WHERE workflow_id = $1 ORDER BY
-  step_order",
+            r#"
+            SELECT id, workflow_id, step_order, name, command, created_at, updated_at
+            FROM workflow_steps
+            WHERE workflow_id = $1
+            ORDER BY step_order
+            "#,
             workflow.id
         )
         .fetch_all(&mut *tx)
