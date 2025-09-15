@@ -12,7 +12,7 @@ clean: down
 	@echo "✅ Cleanup complete"
 
 test: ensure-env
-	@set -a; . ./.env; set +a; cargo nextest run
+	@set -a; . ./.env; set +a; cargo llvm-cov nextest
 
 down: 
 	docker-compose down -v
