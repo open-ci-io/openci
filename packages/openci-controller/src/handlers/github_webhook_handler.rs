@@ -9,6 +9,7 @@ use octocrab::models::webhook_events::{WebhookEvent, WebhookEventType};
 use serde_json::Value;
 use sqlx::PgPool;
 use tracing::error;
+use uuid::Uuid;
 
 #[utoipa::path(
     post,
@@ -63,7 +64,7 @@ pub async fn post_github_webhook_handler(
 
     let commit_sha = commit_sha(trigger_type, &json_body)?;
 
-    post_build_jobs(&workflows, commit_sha, &github_delivery_id, &pool).await?;
+    post_build_jobs(&workflows, commit_sha, github_delivery_id, &pool).await?;
 
     Ok(StatusCode::OK)
 }
@@ -110,10 +111,12 @@ async fn post_build_jobs(
 fn github_delivery_id(headers: &HeaderMap) -> Result<&str, (StatusCode, String)> {
     const HDR_DELIVERY: &str = "x-github-delivery";
 
-    let value = headers.get(HDR_DELIVERY).ok_or((
-        StatusCode::BAD_REQUEST,
-        "Missing or invalid X-GitHub-Delivery header".to_string(),
-    ))?;
+    let value = headers.get(HDR_DELIVERY).ok_or_else(|| {
+        (
+            StatusCode::BAD_REQUEST,
+            "Missing or invalid X-GitHub-Delivery header".to_string(),
+        )
+    })?;
 
     let s = value.to_str().map_err(|e| {
         (
@@ -122,7 +125,7 @@ fn github_delivery_id(headers: &HeaderMap) -> Result<&str, (StatusCode, String)>
         )
     })?;
 
-    if !is_uuid_hyphenated_hex(s) {
+    if Uuid::parse_str(s).is_err() {
         return Err((
             StatusCode::BAD_REQUEST,
             "Missing or invalid X-GitHub-Delivery header".to_string(),
@@ -130,30 +133,6 @@ fn github_delivery_id(headers: &HeaderMap) -> Result<&str, (StatusCode, String)>
     }
 
     Ok(s)
-}
-
-fn is_uuid_hyphenated_hex(s: &str) -> bool {
-    if s.len() != 36 {
-        return false;
-    }
-    let bytes = s.as_bytes();
-    const H: [usize; 4] = [8, 13, 18, 23];
-    for &i in &H {
-        if bytes[i] != b'-' {
-            return false;
-        }
-    }
-    for (i, &b) in bytes.iter().enumerate() {
-        if H.contains(&i) {
-            continue;
-        }
-        let is_hex =
-            (b'0'..=b'9').contains(&b) || (b'a'..=b'f').contains(&b) || (b'A'..=b'F').contains(&b);
-        if !is_hex {
-            return false;
-        }
-    }
-    true
 }
 
 pub async fn post_build_job(
@@ -339,48 +318,6 @@ mod tests {
                 github_delivery_id(&h).unwrap_err().0,
                 StatusCode::BAD_REQUEST
             );
-        }
-    }
-
-    mod test_is_uuid_hyphenated_hex {
-        use super::is_uuid_hyphenated_hex;
-
-        #[test]
-        fn valid_lowercase() {
-            assert!(is_uuid_hyphenated_hex(
-                "123e4567-e89b-12d3-a456-426614174000"
-            ));
-        }
-
-        #[test]
-        fn valid_uppercase() {
-            assert!(is_uuid_hyphenated_hex(
-                "ABCDEFAB-1234-ABCD-9ABC-ABCDEFABCDEF"
-            ));
-        }
-
-        #[test]
-        fn wrong_length() {
-            assert!(!is_uuid_hyphenated_hex("123e4567-e89b-12d3-a456-42661417"));
-        }
-
-        #[test]
-        fn missing_hyphens() {
-            assert!(!is_uuid_hyphenated_hex("123e4567e89b12d3a456426614174000"));
-        }
-
-        #[test]
-        fn wrong_hyphen_positions() {
-            assert!(!is_uuid_hyphenated_hex(
-                "123e4567e-89b1-2d3a-4564-266141740000"
-            ));
-        }
-
-        #[test]
-        fn invalid_hex_char() {
-            assert!(!is_uuid_hyphenated_hex(
-                "123e4567-e89b-12d3-a456-42661417400g"
-            ));
         }
     }
 
