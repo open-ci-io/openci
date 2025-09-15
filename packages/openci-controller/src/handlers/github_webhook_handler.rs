@@ -155,6 +155,45 @@ mod tests {
     const PUSH_PAYLOAD: &str = include_str!("../../tests/fixtures/github/push.json");
     const STAR_PAYLOAD: &str = include_str!("../../tests/fixtures/github/star.json");
 
+    mod test_commit_sha {
+        use crate::handlers::github_webhook_handler::commit_sha;
+        use crate::models::workflow::GitHubTriggerType;
+        use axum::http::StatusCode;
+        use serde_json::json;
+
+        const DEMO_COMMIT_SHA: &str = "abc123";
+
+        #[test]
+        fn test_commit_sha_push_ok() {
+            let v = json!({ "after": DEMO_COMMIT_SHA });
+            let sha = commit_sha(GitHubTriggerType::Push, &v).unwrap();
+            assert_eq!(sha, DEMO_COMMIT_SHA);
+        }
+
+        #[test]
+        fn test_commit_sha_push_failed() {
+            let v = json!({});
+            let err = commit_sha(GitHubTriggerType::Push, &v).unwrap_err();
+            assert_eq!(err.0, StatusCode::BAD_REQUEST);
+        }
+
+        #[test]
+        fn test_commit_sha_pr_ok() {
+            let v = json!({"pull_request":{
+                "head": {"sha":DEMO_COMMIT_SHA}
+            }});
+            let sha = commit_sha(GitHubTriggerType::PullRequest, &v).unwrap();
+            assert_eq!(sha, DEMO_COMMIT_SHA);
+        }
+
+        #[test]
+        fn test_commit_sha_pr_failed() {
+            let v = json!({});
+            let err = commit_sha(GitHubTriggerType::PullRequest, &v).unwrap_err();
+            assert_eq!(err.0, StatusCode::BAD_REQUEST);
+        }
+    }
+
     #[sqlx::test]
     async fn test_missing_event_header(pool: PgPool) {
         let headers = HeaderMap::new();
