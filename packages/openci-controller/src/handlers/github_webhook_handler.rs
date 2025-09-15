@@ -321,6 +321,109 @@ mod tests {
         }
     }
 
+    mod test_post_github_webhook_handler {
+        use super::*;
+        use crate::handlers::github_repository_handler::post_github_repository;
+        use crate::handlers::workflow_handler::post_workflow;
+        use crate::models::workflow::{CreateWorkflowRequest, GitHubTriggerType};
+        use axum::Json;
+
+        fn new_delivery_id() -> HeaderValue {
+            HeaderValue::from_str(&Uuid::new_v4().to_string()).unwrap()
+        }
+
+        #[sqlx::test]
+        async fn push_event_creates_build_job(pool: PgPool) {
+            let repo = post_github_repository(1001, &pool).await.unwrap();
+            let req = CreateWorkflowRequest {
+                name: "wf-push".into(),
+                github_trigger_type: GitHubTriggerType::Push,
+                steps: vec![],
+                base_branch: "main".into(),
+                github_repository_id: repo.id,
+            };
+            let _ = post_workflow(State(pool.clone()), Json(req)).await.unwrap();
+
+            let mut headers = HeaderMap::new();
+            headers.insert("x-github-event", HeaderValue::from_static("push"));
+            let delivery = new_delivery_id();
+            headers.insert("x-github-delivery", delivery.clone());
+
+            let body = Bytes::from(PUSH_PAYLOAD);
+            let res = post_github_webhook_handler(State(pool.clone()), headers, body).await;
+            assert_eq!(res.unwrap(), StatusCode::OK);
+
+            let row = sqlx::query!(
+                "SELECT count(*) as count FROM build_jobs WHERE github_delivery_id = $1",
+                delivery.to_str().unwrap()
+            )
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+            assert_eq!(row.count.unwrap_or(0), 1);
+        }
+
+        #[sqlx::test]
+        async fn pull_request_event_creates_build_job(pool: PgPool) {
+            let repo = post_github_repository(2002, &pool).await.unwrap();
+            let req = CreateWorkflowRequest {
+                name: "wf-pr".into(),
+                github_trigger_type: GitHubTriggerType::PullRequest,
+                steps: vec![],
+                base_branch: "main".into(),
+                github_repository_id: repo.id,
+            };
+            let _ = post_workflow(State(pool.clone()), Json(req)).await.unwrap();
+
+            let mut headers = HeaderMap::new();
+            headers.insert("x-github-event", HeaderValue::from_static("pull_request"));
+            let delivery = new_delivery_id();
+            headers.insert("x-github-delivery", delivery.clone());
+
+            let body = Bytes::from(PR_PAYLOAD);
+            let res = post_github_webhook_handler(State(pool.clone()), headers, body).await;
+            assert_eq!(res.unwrap(), StatusCode::OK);
+
+            let row = sqlx::query!(
+                "SELECT count(*) as count FROM build_jobs WHERE github_delivery_id = $1",
+                delivery.to_str().unwrap()
+            )
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+            assert_eq!(row.count.unwrap_or(0), 1);
+        }
+
+        #[sqlx::test]
+        async fn duplicate_delivery_id_returns_error(pool: PgPool) {
+            let repo = post_github_repository(3003, &pool).await.unwrap();
+            let req = CreateWorkflowRequest {
+                name: "wf-push-dup".into(),
+                github_trigger_type: GitHubTriggerType::Push,
+                steps: vec![],
+                base_branch: "main".into(),
+                github_repository_id: repo.id,
+            };
+            let _ = post_workflow(State(pool.clone()), Json(req)).await.unwrap();
+
+            let mut headers = HeaderMap::new();
+            headers.insert("x-github-event", HeaderValue::from_static("push"));
+            let delivery = new_delivery_id();
+            headers.insert("x-github-delivery", delivery.clone());
+            let body = Bytes::from(PUSH_PAYLOAD);
+
+            let ok =
+                post_github_webhook_handler(State(pool.clone()), headers.clone(), body.clone())
+                    .await;
+            assert_eq!(ok.unwrap(), StatusCode::OK);
+
+            let err = post_github_webhook_handler(State(pool.clone()), headers, body).await;
+            assert!(err.is_err());
+            let (st, _msg) = err.err().unwrap();
+            assert_eq!(st, StatusCode::INTERNAL_SERVER_ERROR);
+        }
+    }
+
     #[sqlx::test]
     async fn test_missing_event_header(pool: PgPool) {
         let headers = HeaderMap::new();
