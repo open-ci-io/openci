@@ -9,6 +9,7 @@ use octocrab::models::webhook_events::{WebhookEvent, WebhookEventType};
 use serde_json::Value;
 use sqlx::PgPool;
 use tracing::error;
+use uuid::Uuid;
 
 #[utoipa::path(
     post,
@@ -63,7 +64,7 @@ pub async fn post_github_webhook_handler(
 
     let commit_sha = commit_sha(trigger_type, &json_body)?;
 
-    post_build_jobs(&workflows, commit_sha, &github_delivery_id, &pool).await?;
+    post_build_jobs(&workflows, commit_sha, github_delivery_id, &pool).await?;
 
     Ok(StatusCode::OK)
 }
@@ -110,16 +111,28 @@ async fn post_build_jobs(
 fn github_delivery_id(headers: &HeaderMap) -> Result<&str, (StatusCode, String)> {
     const HDR_DELIVERY: &str = "x-github-delivery";
 
-    let value = headers.get(HDR_DELIVERY).ok_or((
-        StatusCode::BAD_REQUEST,
-        "Missing or invalid X-GitHub-Delivery header".to_string(),
-    ))?;
-    value.to_str().map_err(|e| {
+    let value = headers.get(HDR_DELIVERY).ok_or_else(|| {
+        (
+            StatusCode::BAD_REQUEST,
+            "Missing or invalid X-GitHub-Delivery header".to_string(),
+        )
+    })?;
+
+    let s = value.to_str().map_err(|e| {
         (
             StatusCode::BAD_REQUEST,
             format!("Failed to parse X-GitHub-Delivery header: {}", e),
         )
-    })
+    })?;
+
+    if Uuid::parse_str(s).is_err() {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "Missing or invalid X-GitHub-Delivery header".to_string(),
+        ));
+    }
+
+    Ok(s)
 }
 
 pub async fn post_build_job(
@@ -247,6 +260,64 @@ mod tests {
                 assert_eq!(sha.len(), 40);
                 assert!(sha.chars().all(|c| c.is_ascii_hexdigit()));
             }
+        }
+    }
+
+    mod test_github_delivery_id {
+        use crate::handlers::github_webhook_handler::github_delivery_id;
+        use axum::http::{HeaderMap, HeaderValue, StatusCode};
+
+        const HDR: &str = "x-github-delivery";
+
+        #[test]
+        fn ok_uuid() {
+            let mut h = HeaderMap::new();
+            let v = "123e4567-e89b-12d3-a456-426614174000";
+            h.insert(HDR, HeaderValue::from_static(v));
+            assert_eq!(github_delivery_id(&h).unwrap(), v);
+        }
+
+        #[test]
+        fn missing() {
+            let h = HeaderMap::new();
+            let (st, _) = github_delivery_id(&h).unwrap_err();
+            assert_eq!(st, StatusCode::BAD_REQUEST);
+        }
+
+        #[test]
+        fn non_utf8() {
+            let mut h = HeaderMap::new();
+            h.insert(HDR, HeaderValue::from_bytes(b"\xFF\xFE").unwrap());
+            let (st, _) = github_delivery_id(&h).unwrap_err();
+            assert_eq!(st, StatusCode::BAD_REQUEST);
+        }
+
+        #[test]
+        fn empty_or_whitespace() {
+            let mut h = HeaderMap::new();
+            h.insert(HDR, HeaderValue::from_static(""));
+            assert_eq!(
+                github_delivery_id(&h).unwrap_err().0,
+                StatusCode::BAD_REQUEST
+            );
+
+            let mut h2 = HeaderMap::new();
+            h2.insert(HDR, HeaderValue::from_static("   "));
+            assert_eq!(
+                github_delivery_id(&h2).unwrap_err().0,
+                StatusCode::BAD_REQUEST
+            );
+        }
+
+        #[test]
+        fn too_long() {
+            let mut h = HeaderMap::new();
+            let long = "a".repeat(65);
+            h.insert(HDR, HeaderValue::from_str(&long).unwrap());
+            assert_eq!(
+                github_delivery_id(&h).unwrap_err().0,
+                StatusCode::BAD_REQUEST
+            );
         }
     }
 
