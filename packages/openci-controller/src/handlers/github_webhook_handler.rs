@@ -172,6 +172,155 @@ mod tests {
     const PUSH_PAYLOAD: &str = include_str!("../../tests/fixtures/github/push.json");
     const STAR_PAYLOAD: &str = include_str!("../../tests/fixtures/github/star.json");
 
+    mod post_build_job {
+        use crate::handlers::github_repository_handler::post_github_repository;
+        use crate::handlers::workflow_handler::post_workflow;
+        use crate::models::workflow::{CreateWorkflowRequest, GitHubTriggerType};
+        use axum::http::StatusCode;
+        use axum::{extract::State, Json};
+        use sqlx::PgPool;
+
+        #[sqlx::test]
+        async fn test_post_build_job_inserts_one(pool: PgPool) {
+            let repo = post_github_repository(1001, &pool).await.unwrap();
+            let req = CreateWorkflowRequest {
+                name: "w1".into(),
+                github_trigger_type: GitHubTriggerType::Push,
+                steps: vec![],
+                base_branch: "develop".into(),
+                github_repository_id: repo.id,
+            };
+            let w = post_workflow(State(pool.clone()), Json(req))
+                .await
+                .unwrap()
+                .0
+                .workflow;
+
+            let commit_sha = "0123456789abcdef0123456789abcdef01234567";
+            let delivery = "delivery-ok";
+
+            super::post_build_job(w.id, commit_sha.into(), delivery.into(), &pool)
+                .await
+                .unwrap();
+
+            let row = sqlx::query!(
+            "SELECT workflow_id, commit_sha, github_delivery_id, status FROM build_jobs WHERE workflow_id=$1 AND github_delivery_id=$2",
+            w.id, delivery
+        )
+                .fetch_one(&pool)
+                .await
+                .unwrap();
+
+            assert_eq!(row.workflow_id, w.id);
+            assert_eq!(row.commit_sha, commit_sha);
+            assert_eq!(row.github_delivery_id, delivery);
+            assert_eq!(row.status, "queued");
+        }
+
+        #[sqlx::test]
+        async fn test_post_build_job_duplicate_conflict(pool: PgPool) {
+            let repo = post_github_repository(1002, &pool).await.unwrap();
+            let req = CreateWorkflowRequest {
+                name: "wdup".into(),
+                github_trigger_type: GitHubTriggerType::Push,
+                steps: vec![],
+                base_branch: "develop".into(),
+                github_repository_id: repo.id,
+            };
+            let w = post_workflow(State(pool.clone()), Json(req))
+                .await
+                .unwrap()
+                .0
+                .workflow;
+
+            let commit_sha = "0123456789abcdef0123456789abcdef01234567";
+            let delivery = "delivery-dup";
+
+            super::post_build_job(w.id, commit_sha.into(), delivery.into(), &pool)
+                .await
+                .unwrap();
+
+            let err = super::post_build_job(w.id, commit_sha.into(), delivery.into(), &pool)
+                .await
+                .unwrap_err();
+            assert_eq!(err.0, StatusCode::INTERNAL_SERVER_ERROR);
+            assert!(err.1.contains("Failed to create build job"));
+        }
+
+        #[sqlx::test]
+        async fn test_post_build_job_fk_violation(pool: PgPool) {
+            let commit_sha = "0123456789abcdef0123456789abcdef01234567";
+            let delivery = "delivery-fk";
+            let res =
+                super::post_build_job(9_999_999, commit_sha.into(), delivery.into(), &pool).await;
+            assert!(res.is_err());
+            let (status, msg) = res.unwrap_err();
+            assert_eq!(status, StatusCode::INTERNAL_SERVER_ERROR);
+            assert!(msg.contains("Failed to create build job"));
+        }
+    }
+
+    mod post_build_jobs {
+        use crate::handlers::github_repository_handler::post_github_repository;
+        use crate::handlers::workflow_handler::post_workflow;
+        use crate::models::workflow::{CreateWorkflowRequest, GitHubTriggerType};
+        use axum::{extract::State, Json};
+        use sqlx::PgPool;
+
+        #[sqlx::test]
+        async fn test_post_build_jobs_inserts_multiple(pool: PgPool) {
+            let repo = post_github_repository(2001, &pool).await.unwrap();
+
+            let req1 = CreateWorkflowRequest {
+                name: "w1".into(),
+                github_trigger_type: GitHubTriggerType::Push,
+                steps: vec![],
+                base_branch: "develop".into(),
+                github_repository_id: repo.id,
+            };
+            let w1 = post_workflow(State(pool.clone()), Json(req1))
+                .await
+                .unwrap()
+                .0
+                .workflow;
+
+            let req2 = CreateWorkflowRequest {
+                name: "w2".into(),
+                github_trigger_type: GitHubTriggerType::Push,
+                steps: vec![],
+                base_branch: "develop".into(),
+                github_repository_id: repo.id,
+            };
+            let w2 = post_workflow(State(pool.clone()), Json(req2))
+                .await
+                .unwrap()
+                .0
+                .workflow;
+
+            let workflows = vec![w1, w2];
+            let commit_sha = "0123456789abcdef0123456789abcdef01234567";
+            let delivery = "delivery-multi-ok";
+
+            super::post_build_jobs(&workflows, commit_sha, delivery, &pool)
+                .await
+                .unwrap();
+
+            let rows = sqlx::query!(
+    "SELECT workflow_id, commit_sha, github_delivery_id FROM build_jobs WHERE github_delivery_id = $1 ORDER BY workflow_id",
+    delivery
+    )
+            .fetch_all(&pool)
+            .await
+            .unwrap();
+
+            assert_eq!(rows.len(), 2);
+            assert_eq!(rows[0].commit_sha, commit_sha);
+            assert_eq!(rows[0].github_delivery_id, delivery);
+            assert_eq!(rows[1].commit_sha, commit_sha);
+            assert_eq!(rows[1].github_delivery_id, delivery);
+        }
+    }
+
     mod test_commit_sha {
         use crate::handlers::github_webhook_handler::commit_sha;
         use crate::models::workflow::GitHubTriggerType;
