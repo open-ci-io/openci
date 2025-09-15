@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM workflow_steps WHERE workflow_id = $1 ORDER BY \n  step_order",
+  "query": "\n            SELECT id, workflow_id, step_order, name, command, created_at, updated_at\n            FROM workflow_steps\n            WHERE workflow_id = $1\n            ORDER BY step_order\n            ",
   "describe": {
     "columns": [
       {
@@ -54,5 +54,5 @@
       false
     ]
   },
-  "hash": "71cdddeba0ec904f38c3467257de7e8c0ec4a0db48f303f7b4989e399b75f9e1"
+  "hash": "c816ea1625020ef6ca71cd09d9170b348de3a8add401d09259ef8409f64955f8"
 }
