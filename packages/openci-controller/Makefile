@@ -12,6 +12,9 @@ clean: down
 	@echo "✅ Cleanup complete"
 
 test: ensure-env
+	@set -a; . ./.env; set +a; cargo nextest run
+
+test-with-codecov: ensure-env
 	@set -a; . ./.env; set +a; cargo llvm-cov nextest
 
 down: 
