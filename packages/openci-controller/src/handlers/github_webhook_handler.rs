@@ -1,11 +1,12 @@
 use crate::handlers::workflow_handler::get_workflows_by_github_trigger_type;
-use crate::models::workflow::GitHubTriggerType;
+use crate::models::workflow::{GitHubTriggerType, Workflow};
 use axum::extract::State;
 use axum::{
     body::Bytes,
     http::{HeaderMap, StatusCode},
 };
 use octocrab::models::webhook_events::{WebhookEvent, WebhookEventType};
+use serde_json::Value;
 use sqlx::PgPool;
 use tracing::error;
 
@@ -45,16 +46,104 @@ pub async fn post_github_webhook_handler(
         _ => return Ok(StatusCode::OK),
     };
 
+    let workflows = get_workflows_by_github_trigger_type(State(&pool), &trigger_type).await?;
 
-    let _workflows = get_workflows_by_github_trigger_type(State(pool), trigger_type).await.map_err(|e| {
-        error!("Database error: {}", e.1);
+    if workflows.is_empty() {
+        return Ok(StatusCode::OK);
+    }
+
+    let github_delivery_id = github_delivery_id(&headers)?;
+
+    let json_body: serde_json::Value = serde_json::from_slice(&body)
+        .map_err(|e| (StatusCode::BAD_REQUEST, format!("Invalid JSON: {}", e)))?;
+
+    let commit_sha = commit_sha(trigger_type, &json_body)?;
+
+    post_build_jobs(&workflows, commit_sha, &github_delivery_id, &pool).await?;
+
+    Ok(StatusCode::OK)
+}
+
+fn commit_sha(trigger_type: GitHubTriggerType, json: &Value) -> Result<&str, (StatusCode, String)> {
+    let commit_sha = match trigger_type {
+        GitHubTriggerType::PullRequest => json["pull_request"]["head"]["sha"].as_str(),
+        GitHubTriggerType::Push => json["after"].as_str(),
+    }
+    .ok_or((
+        StatusCode::BAD_REQUEST,
+        "Missing or invalid commit SHA".to_string(),
+    ))?;
+
+    Ok(commit_sha)
+}
+
+async fn post_build_jobs(
+    workflows: &Vec<Workflow>,
+    commit_sha: &str,
+    github_delivery_id: &str,
+    pool: &PgPool,
+) -> Result<(), (StatusCode, String)> {
+    for w in workflows.iter() {
+        post_build_job(
+            w.id,
+            commit_sha.to_string(),
+            github_delivery_id.to_string(),
+            pool,
+        )
+        .await
+        .map_err(|e| {
+            error!("Failed to create build job: {}", e.1);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to create build job".to_string(),
+            )
+        })?;
+    }
+
+    Ok(())
+}
+
+fn github_delivery_id(headers: &HeaderMap) -> Result<&str, (StatusCode, String)> {
+    const HDR_DELIVERY: &str = "x-github-delivery";
+
+    let value = headers.get(HDR_DELIVERY).ok_or((
+        StatusCode::BAD_REQUEST,
+        "Missing or invalid X-GitHub-Delivery header".to_string(),
+    ))?;
+    value.to_str().map_err(|e| {
+        (
+            StatusCode::BAD_REQUEST,
+            format!("Failed to parse X-GitHub-Delivery header: {}", e),
+        )
+    })
+}
+
+pub async fn post_build_job(
+    workflow_id: i32,
+    commit_sha: String,
+    github_delivery_id: String,
+    pool: &PgPool,
+) -> Result<(), (StatusCode, String)> {
+    sqlx::query!(
+        r#"
+INSERT INTO build_jobs (workflow_id, commit_sha, github_delivery_id)
+VALUES ($1, $2, $3)
+"#,
+        workflow_id,
+        commit_sha,
+        github_delivery_id
+    )
+    .execute(pool)
+    .await
+    .map_err(|e| {
+        error!("Failed to create build job: {}", e);
         (
             StatusCode::INTERNAL_SERVER_ERROR,
-            "Failed to fetch workflows".to_string(),
+            "Failed to create build job".into(),
         )
     })?;
 
-    Ok(StatusCode::OK)
+    Ok(())
 }
 
 #[cfg(test)]
