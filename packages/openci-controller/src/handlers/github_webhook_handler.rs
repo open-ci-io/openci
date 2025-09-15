@@ -54,7 +54,7 @@ pub async fn post_github_webhook_handler(
 
     let github_delivery_id = github_delivery_id(&headers)?;
 
-    let json_body: serde_json::Value = serde_json::from_slice(&body)
+    let json_body: Value = serde_json::from_slice(&body)
         .map_err(|e| (StatusCode::BAD_REQUEST, format!("Invalid JSON: {}", e)))?;
 
     let commit_sha = commit_sha(trigger_type, &json_body)?;
@@ -159,38 +159,87 @@ mod tests {
         use crate::handlers::github_webhook_handler::commit_sha;
         use crate::models::workflow::GitHubTriggerType;
         use axum::http::StatusCode;
-        use serde_json::json;
+        use serde_json::{json, Value};
 
-        const DEMO_COMMIT_SHA: &str = "abc123";
+        const DEMO_COMMIT_SHA: &str = "0123456789abcdef0123456789abcdef01234567";
+        const WRONG_TYPE_COMMIT_SHA: i32 = 1234567890;
+        const ERROR_MSG: &str = "Missing or invalid commit SHA";
 
-        #[test]
-        fn test_commit_sha_push_ok() {
-            let v = json!({ "after": DEMO_COMMIT_SHA });
-            let sha = commit_sha(GitHubTriggerType::Push, &v).unwrap();
-            assert_eq!(sha, DEMO_COMMIT_SHA);
+        mod push {
+            use super::*;
+            use crate::handlers::github_webhook_handler::tests::PUSH_PAYLOAD;
+            #[test]
+            fn test_commit_sha_push_ok() {
+                let v = json!({ "after": DEMO_COMMIT_SHA });
+                let sha = commit_sha(GitHubTriggerType::Push, &v).unwrap();
+                assert_eq!(sha, DEMO_COMMIT_SHA);
+            }
+
+            #[test]
+            fn test_commit_sha_push_wrong_type() {
+                let v = json!({ "after": WRONG_TYPE_COMMIT_SHA });
+                let err = commit_sha(GitHubTriggerType::Push, &v).unwrap_err();
+                assert_eq!(err.0, StatusCode::BAD_REQUEST);
+            }
+
+            #[test]
+            fn test_commit_sha_push_failed() {
+                let v = json!({});
+                let (status, msg) = commit_sha(GitHubTriggerType::Push, &v).unwrap_err();
+                assert_eq!(status, StatusCode::BAD_REQUEST);
+                assert!(msg.contains(ERROR_MSG));
+            }
+
+            #[test]
+            fn test_commit_sha_push_fixture_ok() {
+                let v: Value = serde_json::from_str(PUSH_PAYLOAD).unwrap();
+                let sha = commit_sha(GitHubTriggerType::Push, &v).unwrap();
+                assert_eq!(sha.len(), 40);
+                assert!(sha.chars().all(|c| c.is_ascii_hexdigit()));
+            }
         }
 
-        #[test]
-        fn test_commit_sha_push_failed() {
-            let v = json!({});
-            let err = commit_sha(GitHubTriggerType::Push, &v).unwrap_err();
-            assert_eq!(err.0, StatusCode::BAD_REQUEST);
-        }
+        mod pull_request {
+            use super::*;
+            use crate::handlers::github_webhook_handler::tests::PR_PAYLOAD;
 
-        #[test]
-        fn test_commit_sha_pr_ok() {
-            let v = json!({"pull_request":{
-                "head": {"sha":DEMO_COMMIT_SHA}
-            }});
-            let sha = commit_sha(GitHubTriggerType::PullRequest, &v).unwrap();
-            assert_eq!(sha, DEMO_COMMIT_SHA);
-        }
+            #[test]
+            fn test_commit_sha_pr_ok() {
+                let v = json!({"pull_request":{
+                    "head": {"sha":DEMO_COMMIT_SHA}
+                }});
+                let sha = commit_sha(GitHubTriggerType::PullRequest, &v).unwrap();
+                assert_eq!(sha, DEMO_COMMIT_SHA);
+            }
+            #[test]
+            fn test_commit_sha_pr_missing_sha() {
+                let v = json!({"pull_request": { "head": {} }});
+                let err = commit_sha(GitHubTriggerType::PullRequest, &v).unwrap_err();
+                assert_eq!(err.0, StatusCode::BAD_REQUEST);
+            }
 
-        #[test]
-        fn test_commit_sha_pr_failed() {
-            let v = json!({});
-            let err = commit_sha(GitHubTriggerType::PullRequest, &v).unwrap_err();
-            assert_eq!(err.0, StatusCode::BAD_REQUEST);
+            #[test]
+            fn test_commit_sha_pr_wrong_type() {
+                let v = json!({"pull_request": { "head": { "sha": WRONG_TYPE_COMMIT_SHA } }});
+                let err = commit_sha(GitHubTriggerType::PullRequest, &v).unwrap_err();
+                assert_eq!(err.0, StatusCode::BAD_REQUEST);
+            }
+
+            #[test]
+            fn test_commit_sha_pr_failed() {
+                let v = json!({});
+                let (status, msg) = commit_sha(GitHubTriggerType::PullRequest, &v).unwrap_err();
+                assert_eq!(status, StatusCode::BAD_REQUEST);
+                assert!(msg.contains(ERROR_MSG));
+            }
+
+            #[test]
+            fn test_commit_sha_pr_fixture_ok() {
+                let v: Value = serde_json::from_str(PR_PAYLOAD).unwrap();
+                let sha = commit_sha(GitHubTriggerType::PullRequest, &v).unwrap();
+                assert_eq!(sha.len(), 40);
+                assert!(sha.chars().all(|c| c.is_ascii_hexdigit()));
+            }
         }
     }
 
