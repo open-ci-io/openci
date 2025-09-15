@@ -54,8 +54,12 @@ pub async fn post_github_webhook_handler(
 
     let github_delivery_id = github_delivery_id(&headers)?;
 
-    let json_body: Value = serde_json::from_slice(&body)
-        .map_err(|e| (StatusCode::BAD_REQUEST, format!("Invalid JSON: {}", e)))?;
+    let json_body: Value = serde_json::from_slice(&body).map_err(|e| {
+        (
+            StatusCode::BAD_REQUEST,
+            format!("Failed to parse JSON body: {}", e),
+        )
+    })?;
 
     let commit_sha = commit_sha(trigger_type, &json_body)?;
 
@@ -178,8 +182,9 @@ mod tests {
             #[test]
             fn test_commit_sha_push_wrong_type() {
                 let v = json!({ "after": WRONG_TYPE_COMMIT_SHA });
-                let err = commit_sha(GitHubTriggerType::Push, &v).unwrap_err();
-                assert_eq!(err.0, StatusCode::BAD_REQUEST);
+                let (status, msg) = commit_sha(GitHubTriggerType::Push, &v).unwrap_err();
+                assert_eq!(status, StatusCode::BAD_REQUEST);
+                assert!(msg.contains(ERROR_MSG));
             }
 
             #[test]
@@ -214,15 +219,17 @@ mod tests {
             #[test]
             fn test_commit_sha_pr_missing_sha() {
                 let v = json!({"pull_request": { "head": {} }});
-                let err = commit_sha(GitHubTriggerType::PullRequest, &v).unwrap_err();
-                assert_eq!(err.0, StatusCode::BAD_REQUEST);
+                let (status, msg) = commit_sha(GitHubTriggerType::PullRequest, &v).unwrap_err();
+                assert_eq!(status, StatusCode::BAD_REQUEST);
+                assert!(msg.contains(ERROR_MSG));
             }
 
             #[test]
             fn test_commit_sha_pr_wrong_type() {
                 let v = json!({"pull_request": { "head": { "sha": WRONG_TYPE_COMMIT_SHA } }});
-                let err = commit_sha(GitHubTriggerType::PullRequest, &v).unwrap_err();
-                assert_eq!(err.0, StatusCode::BAD_REQUEST);
+                let (status, msg) = commit_sha(GitHubTriggerType::PullRequest, &v).unwrap_err();
+                assert_eq!(status, StatusCode::BAD_REQUEST);
+                assert!(msg.contains(ERROR_MSG));
             }
 
             #[test]
