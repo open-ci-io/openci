@@ -114,12 +114,46 @@ fn github_delivery_id(headers: &HeaderMap) -> Result<&str, (StatusCode, String)>
         StatusCode::BAD_REQUEST,
         "Missing or invalid X-GitHub-Delivery header".to_string(),
     ))?;
-    value.to_str().map_err(|e| {
+
+    let s = value.to_str().map_err(|e| {
         (
             StatusCode::BAD_REQUEST,
             format!("Failed to parse X-GitHub-Delivery header: {}", e),
         )
-    })
+    })?;
+
+    if !is_uuid_hyphenated_hex(s) {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "Missing or invalid X-GitHub-Delivery header".to_string(),
+        ));
+    }
+
+    Ok(s)
+}
+
+fn is_uuid_hyphenated_hex(s: &str) -> bool {
+    if s.len() != 36 {
+        return false;
+    }
+    let bytes = s.as_bytes();
+    const H: [usize; 4] = [8, 13, 18, 23];
+    for &i in &H {
+        if bytes[i] != b'-' {
+            return false;
+        }
+    }
+    for (i, &b) in bytes.iter().enumerate() {
+        if H.contains(&i) {
+            continue;
+        }
+        let is_hex =
+            (b'0'..=b'9').contains(&b) || (b'a'..=b'f').contains(&b) || (b'A'..=b'F').contains(&b);
+        if !is_hex {
+            return false;
+        }
+    }
+    true
 }
 
 pub async fn post_build_job(
@@ -247,6 +281,106 @@ mod tests {
                 assert_eq!(sha.len(), 40);
                 assert!(sha.chars().all(|c| c.is_ascii_hexdigit()));
             }
+        }
+    }
+
+    mod test_github_delivery_id {
+        use crate::handlers::github_webhook_handler::github_delivery_id;
+        use axum::http::{HeaderMap, HeaderValue, StatusCode};
+
+        const HDR: &str = "x-github-delivery";
+
+        #[test]
+        fn ok_uuid() {
+            let mut h = HeaderMap::new();
+            let v = "123e4567-e89b-12d3-a456-426614174000";
+            h.insert(HDR, HeaderValue::from_static(v));
+            assert_eq!(github_delivery_id(&h).unwrap(), v);
+        }
+
+        #[test]
+        fn missing() {
+            let h = HeaderMap::new();
+            let (st, _) = github_delivery_id(&h).unwrap_err();
+            assert_eq!(st, StatusCode::BAD_REQUEST);
+        }
+
+        #[test]
+        fn non_utf8() {
+            let mut h = HeaderMap::new();
+            h.insert(HDR, HeaderValue::from_bytes(b"\xFF\xFE").unwrap());
+            let (st, _) = github_delivery_id(&h).unwrap_err();
+            assert_eq!(st, StatusCode::BAD_REQUEST);
+        }
+
+        #[test]
+        fn empty_or_whitespace() {
+            let mut h = HeaderMap::new();
+            h.insert(HDR, HeaderValue::from_static(""));
+            assert_eq!(
+                github_delivery_id(&h).unwrap_err().0,
+                StatusCode::BAD_REQUEST
+            );
+
+            let mut h2 = HeaderMap::new();
+            h2.insert(HDR, HeaderValue::from_static("   "));
+            assert_eq!(
+                github_delivery_id(&h2).unwrap_err().0,
+                StatusCode::BAD_REQUEST
+            );
+        }
+
+        #[test]
+        fn too_long() {
+            let mut h = HeaderMap::new();
+            let long = "a".repeat(65);
+            h.insert(HDR, HeaderValue::from_str(&long).unwrap());
+            assert_eq!(
+                github_delivery_id(&h).unwrap_err().0,
+                StatusCode::BAD_REQUEST
+            );
+        }
+    }
+
+    mod test_is_uuid_hyphenated_hex {
+        use super::is_uuid_hyphenated_hex;
+
+        #[test]
+        fn valid_lowercase() {
+            assert!(is_uuid_hyphenated_hex(
+                "123e4567-e89b-12d3-a456-426614174000"
+            ));
+        }
+
+        #[test]
+        fn valid_uppercase() {
+            assert!(is_uuid_hyphenated_hex(
+                "ABCDEFAB-1234-ABCD-9ABC-ABCDEFABCDEF"
+            ));
+        }
+
+        #[test]
+        fn wrong_length() {
+            assert!(!is_uuid_hyphenated_hex("123e4567-e89b-12d3-a456-42661417"));
+        }
+
+        #[test]
+        fn missing_hyphens() {
+            assert!(!is_uuid_hyphenated_hex("123e4567e89b12d3a456426614174000"));
+        }
+
+        #[test]
+        fn wrong_hyphen_positions() {
+            assert!(!is_uuid_hyphenated_hex(
+                "123e4567e-89b1-2d3a-4564-266141740000"
+            ));
+        }
+
+        #[test]
+        fn invalid_hex_char() {
+            assert!(!is_uuid_hyphenated_hex(
+                "123e4567-e89b-12d3-a456-42661417400g"
+            ));
         }
     }
 
