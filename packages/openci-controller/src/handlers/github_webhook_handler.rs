@@ -134,12 +134,12 @@ pub async fn get_build_job(
 
 #[utoipa::path(
     get,
-    path = "/build-jobs/",
+    path = "/build-jobs",
     responses(
-          (status = 200, description = "Get Build Jobs successfully"),
-          (status = 404, description = "Build job not found"),
-          (status = 500, description = "Internal Server Error")
+          (status = 200, description = "List build jobs successfully"),
+          (status = 500, description = "Internal server error")
     ),
+     tag = "build-jobs"
 )]
 pub async fn get_build_jobs(
     State(pool): State<PgPool>,
@@ -162,13 +162,10 @@ pub async fn get_build_jobs(
     .await
     .map_err(|e| {
         error!("Failed to get build jobs: {}", e);
-        match e {
-            Error::RowNotFound => (StatusCode::NOT_FOUND, "Failed to find build jobs".into()),
-            _ => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to get build jobs".into(),
-            ),
-        }
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to get build jobs".into(),
+        )
     })?;
 
     Ok(Json(result))
@@ -318,14 +315,23 @@ mod tests {
 
             assert_eq!(jobs.len(), 2);
 
-            let mut deliveries: Vec<String> =
-                jobs.iter().map(|job| job.github_delivery_id.clone()).collect();
+            let mut deliveries: Vec<String> = jobs
+                .iter()
+                .map(|job| job.github_delivery_id.clone())
+                .collect();
             deliveries.sort();
-            assert_eq!(deliveries, vec![delivery_one.to_string(), delivery_two.to_string()]);
+            assert_eq!(
+                deliveries,
+                vec![delivery_one.to_string(), delivery_two.to_string()]
+            );
 
-            let mut commit_shas: Vec<String> = jobs.iter().map(|job| job.commit_sha.clone()).collect();
+            let mut commit_shas: Vec<String> =
+                jobs.iter().map(|job| job.commit_sha.clone()).collect();
             commit_shas.sort();
-            assert_eq!(commit_shas, vec![commit_sha_one.to_string(), commit_sha_two.to_string()]);
+            assert_eq!(
+                commit_shas,
+                vec![commit_sha_one.to_string(), commit_sha_two.to_string()]
+            );
         }
     }
 

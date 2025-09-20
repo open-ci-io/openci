@@ -16,11 +16,11 @@ use crate::{
 pub fn create_routes(pool: PgPool) -> Router {
     let authenticated_routes = Router::new()
         .route(
-            "/build_jobs/{build_job_id}",
+            "/build-jobs/{build_job_id}",
             get(handlers::github_webhook_handler::get_build_job),
         )
         .route(
-            "/build_jobs",
+            "/build-jobs",
             get(handlers::github_webhook_handler::get_build_jobs),
         )
         .route("/users", get(handlers::user_handler::get_users))
