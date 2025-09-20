@@ -19,36 +19,4 @@
 	"files.watcherExclude": {
 		"**/.fvm": true
 	},
-	"rust-analyzer.linkedProjects": [
-		"packages/openci-worker/Cargo.toml",
-		"packages/openci-controller/Cargo.toml"
-	],
-	"cSpell.words": [
-		"Bitrise",
-		"CHANGEME",
-		"chrono",
-		"Codemagic",
-		"dotenv",
-		"dotenvy",
-		"hexdigit",
-		"Hmac",
-		"jsonwebtoken",
-		"libpq",
-		"mockall",
-		"nonexistentkey",
-		"octocrab",
-		"openci",
-		"plainaddress",
-		"plpgsql",
-		"rngs",
-		"serde",
-		"sqlx",
-		"thiserror",
-		"urandom",
-		"utoipa",
-		"validkey"
-	],
-	"rust-analyzer.inlayHints.typeHints.enable": false,
-	"rust-analyzer.inlayHints.parameterHints.enable": false,
-	"rust-analyzer.inlayHints.chainingHints.enable": false
 }
