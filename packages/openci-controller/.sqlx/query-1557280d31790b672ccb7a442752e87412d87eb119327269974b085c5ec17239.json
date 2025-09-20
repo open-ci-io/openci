@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n      SELECT\n          id,\n          workflow_id,\n          status as \"status: BuildStatus\",\n          created_at,\n          updated_at,\n          commit_sha,\n          github_delivery_id\n      FROM build_jobs\n      WHERE id = $1\n      ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "workflow_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "status: BuildStatus",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "commit_sha",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "github_delivery_id",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "1557280d31790b672ccb7a442752e87412d87eb119327269974b085c5ec17239"
+}

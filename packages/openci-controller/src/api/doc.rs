@@ -31,6 +31,7 @@ use utoipa::OpenApi;
         workflow_handler::get_workflow,
         workflow_handler::patch_workflow,
         workflow_handler::delete_workflow,
+        github_webhook_handler::get_build_job,
         github_webhook_handler::post_github_webhook_handler,
     ),
     components(schemas(
@@ -47,6 +48,7 @@ use utoipa::OpenApi;
         UpdateWorkflowRequest,
     )),
     tags(
+        (name = "build-jobs", description = "Build jobs endpoints"),
         (name = "users", description = "User management endpoints"),
         (name = "api-keys", description = "API key management endpoints"),
         (name = "workflows", description = "Workflow management endpoints"),
