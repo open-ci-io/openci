@@ -71,7 +71,10 @@
         "rust-analyzer.linkedProjects": [
             "packages/openci-controller/Cargo.toml",
             "packages/openci-worker/Cargo.toml"
-        ]
+        ],
+        "[toml]": {
+            "editor.defaultFormatter": "tamasfe.even-better-toml"
+        }
     },
     "tasks": {
         "version": "2.0.0",
