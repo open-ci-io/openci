@@ -1,4 +1,5 @@
 use crate::handlers::api_key_handler;
+use crate::handlers::build_job_handler;
 use crate::handlers::github_webhook_handler;
 use crate::handlers::user_handler;
 use crate::handlers::workflow_handler;
@@ -31,8 +32,8 @@ use utoipa::OpenApi;
         workflow_handler::get_workflow,
         workflow_handler::patch_workflow,
         workflow_handler::delete_workflow,
-        github_webhook_handler::get_build_job,
-        github_webhook_handler::get_build_jobs,
+        build_job_handler::get_build_job,
+        build_job_handler::get_build_jobs,
         github_webhook_handler::post_github_webhook_handler,
     ),
     components(schemas(

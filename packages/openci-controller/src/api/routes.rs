@@ -17,11 +17,11 @@ pub fn create_routes(pool: PgPool) -> Router {
     let authenticated_routes = Router::new()
         .route(
             "/build-jobs/{build_job_id}",
-            get(handlers::github_webhook_handler::get_build_job),
+            get(handlers::build_job_handler::get_build_job),
         )
         .route(
             "/build-jobs",
-            get(handlers::github_webhook_handler::get_build_jobs),
+            get(handlers::build_job_handler::get_build_jobs),
         )
         .route("/users", get(handlers::user_handler::get_users))
         .route(
