@@ -32,6 +32,7 @@ use utoipa::OpenApi;
         workflow_handler::patch_workflow,
         workflow_handler::delete_workflow,
         github_webhook_handler::get_build_job,
+        github_webhook_handler::get_build_jobs,
         github_webhook_handler::post_github_webhook_handler,
     ),
     components(schemas(
