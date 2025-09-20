@@ -1,6 +1,6 @@
 CREATE TABLE
-    github_repositories
+github_repositories
 (
-    id          SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     external_id BIGINT NOT NULL UNIQUE
 );

@@ -25,16 +25,17 @@ pub async fn get_build_job(
     let result = sqlx::query_as!(
         BuildJob,
         r#"
-      SELECT
-          id,
-          workflow_id,
-          status as "status: BuildStatus",
-          created_at,
-          updated_at,
-          commit_sha,
-          github_delivery_id
-      FROM build_jobs
-      WHERE id = $1
+SELECT
+    id,
+    workflow_id,
+    status as "status: BuildStatus",
+    created_at,
+    updated_at,
+    commit_sha,
+    github_delivery_id
+FROM
+    build_jobs
+WHERE id = $1
       "#,
         build_job_id,
     )
@@ -69,15 +70,16 @@ pub async fn get_build_jobs(
     let result = sqlx::query_as!(
         BuildJob,
         r#"
-    SELECT
-          id,
-          workflow_id,
-          status as "status: BuildStatus",
-          created_at,
-          updated_at,
-          commit_sha,
-          github_delivery_id
-    FROM build_jobs
+SELECT
+    id,
+    workflow_id,
+    status as "status: BuildStatus",
+    created_at,
+    updated_at,
+    commit_sha,
+    github_delivery_id
+FROM
+    build_jobs
     "#,
     )
     .fetch_all(&pool)

@@ -37,9 +37,13 @@ impl ConfigLoader for EnvConfigLoader {
 }
 
 async fn check_users_exist(pool: &PgPool) -> Result<bool, sqlx::Error> {
-    sqlx::query_scalar::<_, bool>("SELECT EXISTS(SELECT 1 FROM users LIMIT 1)")
-        .fetch_one(pool)
-        .await
+    sqlx::query_scalar::<_, bool>(
+        r#"
+SELECT EXISTS(SELECT 1 FROM users LIMIT 1)
+    "#,
+    )
+    .fetch_one(pool)
+    .await
 }
 
 async fn create_admin_user_tx(

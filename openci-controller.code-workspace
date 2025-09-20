@@ -11,6 +11,19 @@
         "editor.codeActionsOnSave": {
             "source.organizeImports": "always"
         },
+        "sqlfluff.dialect": "postgres",
+        "sqlfluff.linter.lintEntireProject": true,
+        "rust-analyzer.check.overrideCommand": [
+            "cargo",
+            "dylint",
+            "--all",
+            "--",
+            "--all-targets",
+            "--message-format=json"
+        ],
+        "rust-analyzer.cargo.extraEnv": {
+            "DYLINT_LIBRARY_PATH": "/Users/masahiroaoki/Developer/cargo-sqruff/target/release/"
+        },
         "files.exclude": {
             "target": true
         },
@@ -59,6 +72,7 @@
             "serayuzgur",
             "serde",
             "simonsiefke",
+            "sqlfluff",
             "sqlx",
             "tamasfe",
             "thiserror",
@@ -74,6 +88,9 @@
         ],
         "[toml]": {
             "editor.defaultFormatter": "tamasfe.even-better-toml"
+        },
+        "[sql]": {
+            "editor.defaultFormatter": "dorzey.vscode-sqlfluff"
         }
     },
     "tasks": {
