@@ -1,0 +1,125 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "rust-analyzer.cargo.targetDir": "target",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "rust-lang.rust-analyzer",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "always"
+        },
+        "files.exclude": {
+            "target": true
+        },
+        "search.exclude": {
+            "target": true
+        },
+        "terminal.integrated.cwd": "${workspaceFolder}"
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "dev-startup",
+                "dependsOrder": "sequence",
+                "dependsOn": [
+                    "make down",
+                    "make up-dev"
+                ],
+                "runOptions": {
+                    "runOn": "folderOpen",
+                    "instanceLimit": 1
+                },
+                "problemMatcher": []
+            },
+            {
+                "label": "make up-dev",
+                "type": "shell",
+                "command": "make up-dev",
+                "options": {
+                    "cwd": "${workspaceFolder}/packages/openci-controller",
+                    "env": {
+                        "RUST_LOG": "info",
+                    },
+                },
+                "group": "build",
+                "problemMatcher": [
+                    "$rustc"
+                ],
+                "presentation": {
+                    "reveal": "always",
+                    "panel": "dedicated",
+                    "clear": false
+                }
+            },
+            {
+                "label": "make test",
+                "type": "shell",
+                "command": "make test",
+                "options": {
+                    "cwd": "${workspaceFolder}/packages/openci-controller",
+                    "env": {
+                        "RUST_LOG": "info",
+                    }
+                },
+                "group": "build",
+                "problemMatcher": [
+                    "$rustc"
+                ]
+            },
+            {
+                "label": "make down",
+                "type": "shell",
+                "command": "make down",
+                "options": {
+                    "cwd": "${workspaceFolder}/packages/openci-controller",
+                    "env": {
+                        "RUST_LOG": "info",
+                    }
+                },
+                "group": "build",
+                "problemMatcher": [
+                    "$rustc"
+                ]
+            },
+        ],
+    },
+    "extensions": {
+        "recommendations": [
+            "aaron-bond.better-comments",
+            "biomejs.biome",
+            "bradlc.vscode-tailwindcss",
+            "cweijan.dbclient-jdbc",
+            "cweijan.vscode-postgresql-client2",
+            "dart-code.dart-code",
+            "dart-code.flutter",
+            "dbaeumer.vscode-eslint",
+            "dotjoshjohnson.xml",
+            "fill-labs.dependi",
+            "foxundermoon.shell-format",
+            "github.copilot",
+            "github.copilot-chat",
+            "inferrinizzard.prettier-sql-vscode",
+            "jeroen-meijer.pubspec-assist",
+            "mikestead.dotenv",
+            "ms-python.debugpy",
+            "ms-python.python",
+            "ms-python.vscode-pylance",
+            "ms-python.vscode-python-envs",
+            "mthuong.vscode-flutter-freezed-helper",
+            "plibither8.remove-comments",
+            "redhat.vscode-yaml",
+            "robert-brunhage.flutter-riverpod-snippets",
+            "rust-lang.rust-analyzer",
+            "simonsiefke.svg-preview",
+            "streetsidesoftware.code-spell-checker",
+            "tamasfe.even-better-toml",
+            "unifiedjs.vscode-mdx",
+            "vadimcn.vscode-lldb",
+            "zhuangtongfa.material-theme"
+        ]
+    }
+}
