@@ -11,6 +11,7 @@ use axum::{
 };
 use octocrab::models::webhook_events::{WebhookEvent, WebhookEventType};
 use serde_json::Value;
+use sqlx::Error;
 use sqlx::PgPool;
 use tracing::error;
 use uuid::Uuid;
@@ -118,13 +119,54 @@ pub async fn get_build_job(
     .fetch_one(&pool)
     .await
     .map_err(|e| {
-        use sqlx::Error;
-        error!("Failed to get build job: {}", e);
+        error!("Failed to get a build job: {}", e);
         match e {
             Error::RowNotFound => (StatusCode::NOT_FOUND, "Failed to find a build job".into()),
             _ => (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to get build job".into(),
+                "Failed to get a build job".into(),
+            ),
+        }
+    })?;
+
+    Ok(Json(result))
+}
+
+#[utoipa::path(
+    get,
+    path = "/build-jobs/",
+    responses(
+          (status = 200, description = "Get Build Jobs successfully"),
+          (status = 404, description = "Build job not found"),
+          (status = 500, description = "Internal Server Error")
+    ),
+)]
+pub async fn get_build_jobs(
+    State(pool): State<PgPool>,
+) -> Result<Json<Vec<BuildJob>>, (StatusCode, String)> {
+    let result = sqlx::query_as!(
+        BuildJob,
+        r#"
+    SELECT
+          id,
+          workflow_id,
+          status as "status: BuildStatus",
+          created_at,
+          updated_at,
+          commit_sha,
+          github_delivery_id
+    FROM build_jobs
+    "#,
+    )
+    .fetch_all(&pool)
+    .await
+    .map_err(|e| {
+        error!("Failed to get build jobs: {}", e);
+        match e {
+            Error::RowNotFound => (StatusCode::NOT_FOUND, "Failed to find build jobs".into()),
+            _ => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to get build jobs".into(),
             ),
         }
     })?;
@@ -221,6 +263,71 @@ mod tests {
     const PR_PAYLOAD: &str = include_str!("../../tests/fixtures/github/pr_opened.json");
     const PUSH_PAYLOAD: &str = include_str!("../../tests/fixtures/github/push.json");
     const STAR_PAYLOAD: &str = include_str!("../../tests/fixtures/github/star.json");
+
+    mod get_build_jobs {
+        use super::*;
+        use crate::handlers::github_repository_handler::post_github_repository;
+        use crate::handlers::workflow_handler::post_workflow;
+        use crate::models::workflow::{CreateWorkflowRequest, GitHubTriggerType};
+        use axum::{extract::State, Json};
+        use sqlx::PgPool;
+
+        #[sqlx::test]
+        async fn test_get_build_jobs_ok(pool: PgPool) {
+            let repo = post_github_repository(50_001, &pool).await.unwrap();
+
+            let workflow = post_workflow(
+                State(pool.clone()),
+                Json(CreateWorkflowRequest {
+                    name: "get-jobs-ok".into(),
+                    github_trigger_type: GitHubTriggerType::Push,
+                    steps: vec![],
+                    base_branch: "main".into(),
+                    github_repository_id: repo.id,
+                }),
+            )
+            .await
+            .unwrap()
+            .0
+            .workflow;
+
+            let commit_sha_one = "0123456789abcdef0123456789abcdef01234567";
+            let commit_sha_two = "fedcba9876543210fedcba9876543210fedcba98";
+            let delivery_one = "delivery-list-1";
+            let delivery_two = "delivery-list-2";
+
+            super::post_build_job(
+                workflow.id,
+                commit_sha_one.into(),
+                delivery_one.into(),
+                &pool,
+            )
+            .await
+            .unwrap();
+
+            super::post_build_job(
+                workflow.id,
+                commit_sha_two.into(),
+                delivery_two.into(),
+                &pool,
+            )
+            .await
+            .unwrap();
+
+            let jobs = get_build_jobs(State(pool.clone())).await.unwrap().0;
+
+            assert_eq!(jobs.len(), 2);
+
+            let mut deliveries: Vec<String> =
+                jobs.iter().map(|job| job.github_delivery_id.clone()).collect();
+            deliveries.sort();
+            assert_eq!(deliveries, vec![delivery_one.to_string(), delivery_two.to_string()]);
+
+            let mut commit_shas: Vec<String> = jobs.iter().map(|job| job.commit_sha.clone()).collect();
+            commit_shas.sort();
+            assert_eq!(commit_shas, vec![commit_sha_one.to_string(), commit_sha_two.to_string()]);
+        }
+    }
 
     mod get_build_job {
         use super::*;

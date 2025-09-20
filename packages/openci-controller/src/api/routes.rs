@@ -19,6 +19,10 @@ pub fn create_routes(pool: PgPool) -> Router {
             "/build_jobs/{build_job_id}",
             get(handlers::github_webhook_handler::get_build_job),
         )
+        .route(
+            "/build_jobs",
+            get(handlers::github_webhook_handler::get_build_jobs),
+        )
         .route("/users", get(handlers::user_handler::get_users))
         .route(
             "/users/{user_id}/api-keys",
