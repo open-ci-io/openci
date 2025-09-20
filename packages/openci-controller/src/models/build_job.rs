@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
+use serde::Serialize;
 
-#[allow(dead_code)]
+#[derive(Serialize, Debug)]
 pub struct BuildJob {
     pub id: i32,
     pub workflow_id: i32,
@@ -11,7 +12,8 @@ pub struct BuildJob {
     pub github_delivery_id: String,
 }
 
-#[allow(dead_code)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, sqlx::Type)]
+#[sqlx(type_name = "build_status", rename_all = "snake_case")]
 pub enum BuildStatus {
     Queued,
     Running,

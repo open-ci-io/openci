@@ -1,6 +1,10 @@
 use crate::handlers::workflow_handler::get_workflows_by_github_trigger_type;
+use crate::models::build_job::BuildJob;
+use crate::models::build_job::BuildStatus;
 use crate::models::workflow::{GitHubTriggerType, Workflow};
+use axum::extract::Path;
 use axum::extract::State;
+use axum::Json;
 use axum::{
     body::Bytes,
     http::{HeaderMap, StatusCode},
@@ -80,6 +84,45 @@ fn commit_sha(trigger_type: GitHubTriggerType, json: &Value) -> Result<&str, (St
     ))?;
 
     Ok(commit_sha)
+}
+
+#[utoipa::path(
+    get,
+    path = "/build-jobs/{build_job_id}",
+    responses(
+          (status = 200, description = "Get a Build Job successfully"),
+          (status = 404, description = "Build job not found"),
+    ),
+    params(("build_job_id" = i32, Path, description = "Build job ID")),
+)]
+pub async fn get_build_job(
+    Path(build_job_id): Path<i32>,
+    State(pool): State<PgPool>,
+) -> Result<Json<BuildJob>, (StatusCode, String)> {
+    let result = sqlx::query_as!(
+        BuildJob,
+        r#"
+      SELECT
+          id,
+          workflow_id,
+          status as "status: BuildStatus",
+          created_at,
+          updated_at,
+          commit_sha,
+          github_delivery_id
+      FROM build_jobs
+      WHERE id = $1
+      "#,
+        build_job_id,
+    )
+    .fetch_one(&pool)
+    .await
+    .map_err(|e| {
+        error!("Failed to get build job: {}", e);
+        (StatusCode::NOT_FOUND, "Failed to get build job".into())
+    })?;
+
+    Ok(Json(result))
 }
 
 async fn post_build_jobs(
@@ -171,6 +214,76 @@ mod tests {
     const PR_PAYLOAD: &str = include_str!("../../tests/fixtures/github/pr_opened.json");
     const PUSH_PAYLOAD: &str = include_str!("../../tests/fixtures/github/push.json");
     const STAR_PAYLOAD: &str = include_str!("../../tests/fixtures/github/star.json");
+
+    mod get_build_job {
+        use super::*;
+        use crate::handlers::github_repository_handler::post_github_repository;
+        use crate::handlers::workflow_handler::post_workflow;
+        use crate::models::workflow::{CreateWorkflowRequest, GitHubTriggerType};
+        use axum::{
+            extract::{Path, State},
+            http::StatusCode,
+            Json,
+        };
+        use sqlx::PgPool;
+
+        #[sqlx::test]
+        async fn test_get_build_job_ok(pool: PgPool) {
+            const EXTERNAL_ID: i64 = 1;
+            let repo = post_github_repository(EXTERNAL_ID, &pool).await.unwrap();
+            let workflow = post_workflow(
+                State(pool.clone()),
+                Json(CreateWorkflowRequest {
+                    name: "get-job-ok".into(),
+                    github_trigger_type: GitHubTriggerType::Push,
+                    steps: vec![],
+                    base_branch: "develop".into(),
+                    github_repository_id: repo.id,
+                }),
+            )
+            .await
+            .unwrap()
+            .0
+            .workflow;
+
+            let commit_sha = "0123456789abcdef0123456789abcdef01234567";
+            let delivery = "delivery-get-ok";
+
+            super::post_build_job(workflow.id, commit_sha.into(), delivery.into(), &pool)
+                .await
+                .unwrap();
+
+            let build_job_id = sqlx::query!(
+                "SELECT id FROM build_jobs WHERE workflow_id = $1 AND github_delivery_id = $2",
+                workflow.id,
+                delivery
+            )
+            .fetch_one(&pool)
+            .await
+            .unwrap()
+            .id;
+
+            let job = get_build_job(Path(build_job_id), State(pool.clone()))
+                .await
+                .unwrap()
+                .0;
+
+            assert_eq!(job.id, build_job_id);
+            assert_eq!(job.workflow_id, workflow.id);
+            assert_eq!(job.commit_sha, commit_sha);
+            assert_eq!(job.github_delivery_id, delivery);
+            assert_eq!(job.status, BuildStatus::Queued);
+        }
+
+        #[sqlx::test]
+        async fn test_get_build_job_not_found(pool: PgPool) {
+            let err = get_build_job(Path(9_999_999), State(pool))
+                .await
+                .unwrap_err();
+            assert_eq!(err.0, StatusCode::NOT_FOUND);
+            assert!(err.1.contains("Failed to get build job"));
+        }
+    }
 
     mod post_build_job {
         use crate::handlers::github_repository_handler::post_github_repository;

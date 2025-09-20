@@ -32,3 +32,4 @@ serde-email = "3.2.0"
 serial_test = "3.2.0"
 octocrab = "0.45.0"
 uuid = { version = "1.18.1", features = ["v4"] }
+cargo-llvm-cov = "0.6.19"

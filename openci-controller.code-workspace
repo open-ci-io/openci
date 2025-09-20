@@ -67,6 +67,10 @@
             "utoipa",
             "vadimcn",
             "validkey"
+        ],
+        "rust-analyzer.linkedProjects": [
+            "packages/openci-controller/Cargo.toml",
+            "packages/openci-worker/Cargo.toml"
         ]
     },
     "tasks": {
