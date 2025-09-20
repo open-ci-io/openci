@@ -15,16 +15,20 @@ use tracing::error;
 pub async fn get_users(
     State(pool): State<PgPool>,
 ) -> Result<Json<Vec<User>>, (StatusCode, String)> {
-    let users = sqlx::query_as::<_, User>("SELECT * FROM users")
-        .fetch_all(&pool)
-        .await
-        .map_err(|e| {
-            error!("Failed to fetch users: {}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to fetch users".to_string(),
-            )
-        })?;
+    let users = sqlx::query_as::<_, User>(
+        r#"
+SELECT * FROM users
+    "#,
+    )
+    .fetch_all(&pool)
+    .await
+    .map_err(|e| {
+        error!("Failed to fetch users: {}", e);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to fetch users".to_string(),
+        )
+    })?;
 
     Ok(Json(users))
 }

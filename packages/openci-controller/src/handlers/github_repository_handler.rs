@@ -4,15 +4,26 @@ use sqlx::PgPool;
 use tracing::error;
 
 #[allow(dead_code)]
-pub async fn post_github_repository(external_id: i64, pool: &PgPool) -> Result<GitHubRepository, (StatusCode, String)> {
+pub async fn post_github_repository(
+    external_id: i64,
+    pool: &PgPool,
+) -> Result<GitHubRepository, (StatusCode, String)> {
     if external_id <= 0 {
-        return Err((StatusCode::BAD_REQUEST, "external_id must be positive".to_string()));
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "external_id must be positive".to_string(),
+        ));
     }
     let result = sqlx::query_as!(
         GitHubRepository,
         r#"
 INSERT INTO github_repositories (external_id) VALUES ($1) RETURNING id, external_id
-"#, external_id).fetch_one(pool).await.map_err(|e| {
+"#,
+        external_id
+    )
+    .fetch_one(pool)
+    .await
+    .map_err(|e| {
         error!("Failed to insert github repository: {}", e);
         (
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -20,14 +31,19 @@ INSERT INTO github_repositories (external_id) VALUES ($1) RETURNING id, external
         )
     })?;
 
-
     Ok(result)
 }
 
 #[allow(dead_code)]
-pub async fn get_github_repository_by_external_id(external_id: i64, pool: &PgPool) -> Result<GitHubRepository, (StatusCode, String)> {
+pub async fn get_github_repository_by_external_id(
+    external_id: i64,
+    pool: &PgPool,
+) -> Result<GitHubRepository, (StatusCode, String)> {
     if external_id <= 0 {
-        return Err((StatusCode::BAD_REQUEST, "external_id must be positive".to_string()));
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "external_id must be positive".to_string(),
+        ));
     }
     let result = sqlx::query_as!(
         GitHubRepository,
@@ -35,7 +51,10 @@ pub async fn get_github_repository_by_external_id(external_id: i64, pool: &PgPoo
 SELECT id, external_id FROM github_repositories WHERE external_id = $1
 "#,
         external_id
-    ).fetch_one(pool).await.map_err(|e| {
+    )
+    .fetch_one(pool)
+    .await
+    .map_err(|e| {
         error!("Failed to fetch github repository: {}", e);
         (
             StatusCode::INTERNAL_SERVER_ERROR,
