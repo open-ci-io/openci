@@ -118,8 +118,15 @@ pub async fn get_build_job(
     .fetch_one(&pool)
     .await
     .map_err(|e| {
+        use sqlx::Error;
         error!("Failed to get build job: {}", e);
-        (StatusCode::NOT_FOUND, "Failed to get build job".into())
+        match e {
+            Error::RowNotFound => (StatusCode::NOT_FOUND, "Failed to find a build job".into()),
+            _ => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to get build job".into(),
+            ),
+        }
     })?;
 
     Ok(Json(result))
@@ -277,11 +284,9 @@ mod tests {
 
         #[sqlx::test]
         async fn test_get_build_job_not_found(pool: PgPool) {
-            let err = get_build_job(Path(9_999_999), State(pool))
-                .await
-                .unwrap_err();
+            let err = get_build_job(Path(99999), State(pool)).await.unwrap_err();
             assert_eq!(err.0, StatusCode::NOT_FOUND);
-            assert!(err.1.contains("Failed to get build job"));
+            assert!(err.1.contains("Failed to find a build job"));
         }
     }
 
