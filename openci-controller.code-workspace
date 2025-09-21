@@ -21,9 +21,6 @@
             "--all-targets",
             "--message-format=json"
         ],
-        "[dockercompose]": {
-            "editor.defaultFormatter": "ms-azuretools.vscode-docker"
-        },
         "rust-analyzer.cargo.extraEnv": {
             "DYLINT_LIBRARY_PATH": "/Users/masahiroaoki/Developer/cargo-sqruff/target/release/"
         },
@@ -58,6 +55,7 @@
             "jeroen",
             "jsonwebtoken",
             "libpq",
+            "mafreud",
             "meijer",
             "mikestead",
             "mockall",
