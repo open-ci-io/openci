@@ -4,6 +4,7 @@
 export PATH := $(HOME)/.cargo/bin:$(PATH)
 
 ENV_FILE ?= .env.dev
+DOCKER_COMPOSE := docker compose
 
 all: build
 
@@ -14,18 +15,18 @@ clean: down
 	@echo "✅ Cleanup complete" 
 
 run_db_and_migrate: ensure-env
-	@set -a; . ./$(ENV_FILE); set +a; docker compose up postgres -d 
-	@set -a; . ./$(ENV_FILE); set +a; docker compose run --rm openci-controller sqlx migrate run
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up postgres -d
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller sqlx migrate run
 
 test: ensure-env
-	@set -a; . ./$(ENV_FILE); set +a; cargo nextest run
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo nextest run
 
 test-with-codecov: ensure-env
-	@set -a; . ./$(ENV_FILE); set +a; cargo llvm-cov nextest
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo llvm-cov nextest
 
 
 down: 
-	@set -a; . ./$(ENV_FILE); set +a; docker-compose down -v
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) down -v
 	@echo "🛑 OpenCI Controller stopped"
 
 ensure-env:
@@ -34,45 +35,45 @@ ensure-env:
 		exit 1; \
 	fi
 
+
 up-dev: ensure-env
-	@set -a; . ./$(ENV_FILE); set +a; docker-compose up postgres -d
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up postgres -d
 	sleep 2
 	$(MAKE) ensure-sqlx
-	@set -a; . ./$(ENV_FILE); set +a; sqlx migrate run
-	@set -a; . ./$(ENV_FILE); set +a; cargo sqlx prepare
-	@set -a; . ./$(ENV_FILE); set +a; cargo run
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller sqlx migrate run
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo sqlx prepare
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo run
 
 full-up-dev: ensure-env
-	@set -a; . ./$(ENV_FILE); set +a; docker-compose up postgres -d
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up postgres -d
 	sleep 2
 	$(MAKE) ensure-sqlx
-	@set -a; . ./$(ENV_FILE); set +a; sqlx migrate run
-	@set -a; . ./$(ENV_FILE); set +a; docker-compose up openci-controller -d
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller sqlx migrate run
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up openci-controller -d
 	@echo "🚀 OpenCI Controller started"
 
 build:
-	@set -a; . ./$(ENV_FILE); set +a; docker-compose -f docker-compose.yml build openci-controller
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml build openci-controller
 	@echo "🔨 OpenCI Controller image built"
 
 rebuild:
-	@set -a; . ./$(ENV_FILE); set +a; docker-compose -f docker-compose.yml build --no-cache openci-controller
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml build --no-cache openci-controller
 	@echo "🔨 OpenCI Controller image rebuilt (no cache)"
 
 db-schema: ensure-env
 	@echo "🔄 Generating database schema file (schema.sql)..."
-	@docker-compose ps --services --filter "status=running" | grep -q "^postgres$$" \
+	@$(DOCKER_COMPOSE) --env-file $(ENV_FILE) ps --services --filter "status=running" | grep -q "^postgres$$" \
 		|| { echo "❌ postgres container is not running. Did you run \`make up-dev\`?"; exit 1; }
-	@set -a; . ./$(ENV_FILE); set +a; \
-	docker-compose -f docker-compose.yml -f docker-compose.override.yml exec -T postgres pg_dump -s -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" > schema.sql
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml -f docker-compose.override.yml exec -T postgres pg_dump -s -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" > schema.sql
 	@echo "✅ schema.sql has been successfully generated."
 
 up-prod: ENV_FILE = .env.prod
 up-prod: ensure-env build
-	@set -a; . ./$(ENV_FILE); set +a; docker-compose -f docker-compose.yml up postgres -d
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml up postgres -d
 	sleep 5 
 	# Run migrations inside the container
-	@set -a; . ./$(ENV_FILE); set +a; docker-compose -f docker-compose.yml run --rm openci-controller sqlx migrate run
-	@set -a; . ./$(ENV_FILE); set +a; docker-compose -f docker-compose.yml up openci-controller -d
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml run --rm openci-controller sqlx migrate run
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml up openci-controller -d
 	@echo "🚀 OpenCI Controller started in production mode"
 
 add-migration-files: ensure-sqlx
