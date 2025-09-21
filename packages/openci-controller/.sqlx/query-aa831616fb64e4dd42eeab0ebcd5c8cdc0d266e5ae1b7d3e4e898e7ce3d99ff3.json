@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n      SELECT\n          id,\n          workflow_id,\n          status as \"status: BuildStatus\",\n          created_at,\n          updated_at,\n          commit_sha,\n          github_delivery_id\n      FROM build_jobs\n      WHERE id = $1\n      ",
+  "query": "\nSELECT\n    id,\n    workflow_id,\n    status as \"status: BuildStatus\",\n    created_at,\n    updated_at,\n    commit_sha,\n    github_delivery_id\nFROM\n    build_jobs\nWHERE id = $1\n      ",
   "describe": {
     "columns": [
       {
@@ -54,5 +54,5 @@
       false
     ]
   },
-  "hash": "1557280d31790b672ccb7a442752e87412d87eb119327269974b085c5ec17239"
+  "hash": "aa831616fb64e4dd42eeab0ebcd5c8cdc0d266e5ae1b7d3e4e898e7ce3d99ff3"
 }
