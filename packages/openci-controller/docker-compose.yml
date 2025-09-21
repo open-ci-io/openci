@@ -33,7 +33,7 @@ services:
       - ACME_AGREE=true
       - ACME_EMAIL=m.aoki@open-ci.io
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./${CADDYFILE:?CADDYFILE must be set}:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
     ports:

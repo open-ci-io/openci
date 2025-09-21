@@ -1,0 +1,4 @@
+https://{$PUBLIC_DOMAIN} {
+	encode gzip
+	reverse_proxy openci-controller:8080
+}

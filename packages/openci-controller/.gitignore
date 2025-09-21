@@ -33,7 +33,5 @@ Thumbs.db
 *.tar.gz
 *.zip
 
-.env
-
-# Claude Code configuration
-.claude/
+.env.dev
+.env.prod
