@@ -31,7 +31,8 @@ services:
       - openci-controller
     environment:
       - ACME_AGREE=true
-      - ACME_EMAIL=m.aoki@open-ci.io
+      - ACME_EMAIL=${ACME_EMAIL}
+      - PUBLIC_DOMAIN=${PUBLIC_DOMAIN}
     volumes:
       - ./${CADDYFILE:?CADDYFILE must be set}:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
