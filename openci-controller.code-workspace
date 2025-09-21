@@ -21,6 +21,9 @@
             "--all-targets",
             "--message-format=json"
         ],
+        "[dockercompose]": {
+            "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+        },
         "rust-analyzer.cargo.extraEnv": {
             "DYLINT_LIBRARY_PATH": "/Users/masahiroaoki/Developer/cargo-sqruff/target/release/"
         },
@@ -32,9 +35,11 @@
         },
         "terminal.integrated.cwd": "${workspaceFolder}",
         "cSpell.words": [
+            "aoki",
             "Bitrise",
             "bradlc",
             "brunhage",
+            "Caddyfile",
             "CHANGEME",
             "chrono",
             "Codemagic",
@@ -91,6 +96,12 @@
         },
         "[sql]": {
             "editor.defaultFormatter": "dorzey.vscode-sqlfluff"
+        },
+        "[dockerfile]": {
+            "editor.defaultFormatter": "ms-azuretools.vscode-containers"
+        },
+        "[caddyfile]": {
+            "editor.defaultFormatter": "matthewpi.caddyfile-support"
         }
     },
     "tasks": {

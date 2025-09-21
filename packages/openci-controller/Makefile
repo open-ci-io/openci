@@ -9,7 +9,13 @@ clean: down
 	@echo "🧹 Cleaning up project..."
 	rm -rf target
 	rm -f schema.sql
-	@echo "✅ Cleanup complete"
+	@echo "✅ Cleanup complete" 
+
+run_db_and_migrate:
+	docker compose up postgres -d 
+	docker compose run --rm openci-controller sqlx migrate run
+
+
 
 test: ensure-env
 	@set -a; . ./.env; set +a; cargo nextest run

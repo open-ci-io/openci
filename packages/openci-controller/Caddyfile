@@ -1,0 +1,5 @@
+https://localhost:{$OPENCI_PORT} {
+	tls internal
+	encode gzip
+	reverse_proxy openci-controller:8080
+}

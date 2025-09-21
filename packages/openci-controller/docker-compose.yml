@@ -19,15 +19,33 @@ services:
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       RUST_LOG: ${RUST_LOG}
-    ports:
-      - "${OPENCI_PORT}:8080"
     depends_on:
       - postgres
     networks:
       - openci-network
 
+  caddy:
+    image: caddy:2-alpine
+    container_name: openci-caddy
+    depends_on:
+      - openci-controller
+    environment:
+      - ACME_AGREE=true
+      - ACME_EMAIL=m.aoki@open-ci.io
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "${OPENCI_PORT}:443"
+      - "80:80"
+    networks:
+      - openci-network
+
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:
 
 networks:
   openci-network:
