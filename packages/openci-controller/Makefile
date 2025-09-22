@@ -42,8 +42,9 @@ up-dev: ensure-env
 	$(MAKE) ensure-sqlx
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller sqlx migrate run
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo sqlx prepare
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo run
-
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up -d openci-controller caddy
+	@echo "ℹ️  Use '$(DOCKER_COMPOSE) --env-file $(ENV_FILE) logs -f openci-controller' to view runtime logs and initial API key output"
+	
 full-up-dev: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up postgres -d
 	sleep 2
