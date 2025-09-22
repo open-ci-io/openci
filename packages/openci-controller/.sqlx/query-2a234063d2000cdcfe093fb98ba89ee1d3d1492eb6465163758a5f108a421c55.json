@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT workflow_id, commit_sha, github_delivery_id FROM build_jobs WHERE github_delivery_id = $1 ORDER BY workflow_id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "workflow_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "commit_sha",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "github_delivery_id",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "2a234063d2000cdcfe093fb98ba89ee1d3d1492eb6465163758a5f108a421c55"
+}
