@@ -19,6 +19,8 @@ services:
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       RUST_LOG: ${RUST_LOG}
+      OPENCI_INITIAL_ADMIN_NAME: ${OPENCI_INITIAL_ADMIN_NAME}
+      OPENCI_INITIAL_ADMIN_EMAIL: ${OPENCI_INITIAL_ADMIN_EMAIL}
     depends_on:
       - postgres
     networks:
