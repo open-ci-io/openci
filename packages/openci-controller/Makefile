@@ -19,7 +19,16 @@ run_db_and_migrate: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller sqlx migrate run
 
 test: ensure-env
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo nextest run
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo nextest r
+
+test_local:
+	@set -a; . $(ENV_FILE); set +a; cargo nextest run
+
+test_local_with_codecov:
+	@set -a; . $(ENV_FILE); set +a; cargo llvm-cov nextest
+
+preview-container:
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) logs -f openci-controller
 
 test-with-codecov: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo llvm-cov nextest
