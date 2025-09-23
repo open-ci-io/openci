@@ -34,7 +34,7 @@ up-dev: ensure-env run_db_and_migrate
 	$(DC) run --rm $(OPENCI_CONTROLLER) cargo sqlx prepare
 	$(DC) up -d $(OPENCI_CONTROLLER) caddy
 	@printf 'Use "$(BRIGHT_GREEN)%s --env-file %s --file %s logs -f %s$(RESET)" to view runtime logs and initial API key output\n' \
-	"$(DOCKER_COMPOSE)" "$(ENV_FILE)" "$(DOCKER_COMPOSE_YAML)" "$(OPENCI_CONTROLLER)"
+	"$(DC)" "$(OPENCI_CONTROLLER)"
 
 up-prod: ENV_FILE = .env.prod
 up-prod: ENV = prod
