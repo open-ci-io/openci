@@ -21,7 +21,8 @@ run_db_and_migrate: ensure-env
 
 up-dev: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up postgres -d
-	sleep 2
+	@# Wait until Postgres becomes ready
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml exec -T postgres sh -c 'until pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -h localhost; do sleep 1; done'
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm $(CONTROLLER) sqlx migrate run
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm $(CONTROLLER) cargo sqlx prepare
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up -d $(CONTROLLER) caddy
@@ -42,7 +43,7 @@ preview-container:
 
 down: 
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) down -v
-	@printf '$(BRIGHT_GREEN)Successfully down all containers!$(RESET)'
+	@printf '$(BRIGHT_GREEN)Successfully down all containers!$(RESET)\n'
 
 db-schema: ensure-env
 	@echo "🔄 Generating database schema file (schema.sql)..."
