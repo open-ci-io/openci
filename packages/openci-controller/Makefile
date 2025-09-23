@@ -8,6 +8,7 @@ DOCKER_COMPOSE := docker compose
 CONTROLLER := openci-controller
 BRIGHT_GREEN := \033[92m
 RESET := \033[0m
+DOCKER_COMPOSE_YAML := docker-compose.yml
 
 ensure-env:
 	@if [ ! -f $(ENV_FILE) ]; then \
@@ -21,8 +22,7 @@ run_db_and_migrate: ensure-env
 
 up-dev: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up postgres -d
-	@# Wait until Postgres becomes ready
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml exec -T postgres sh -c 'until pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -h localhost; do sleep 1; done'
+	$(WAIT_FOR_POSTGRES)
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm $(CONTROLLER) sqlx migrate run
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm $(CONTROLLER) cargo sqlx prepare
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up -d $(CONTROLLER) caddy
@@ -31,11 +31,10 @@ up-dev: ensure-env
 
 up-prod: ENV_FILE = .env.prod
 up-prod: ensure-env
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml up postgres -d
-	sleep 5 
-	# Run migrations inside the container
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml run --rm $(CONTROLLER) sqlx migrate run
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml up $(CONTROLLER) caddy -d
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f $(DOCKER_COMPOSE_YAML) up -d postgres
+	$(WAIT_FOR_POSTGRES)
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f $(DOCKER_COMPOSE_YAML) run --rm $(CONTROLLER) sqlx migrate run
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f $(DOCKER_COMPOSE_YAML) up -d $(CONTROLLER) caddy
 	@echo "🚀 OpenCI Controller started in production mode"
 
 preview-container:
@@ -49,7 +48,7 @@ db-schema: ensure-env
 	@echo "🔄 Generating database schema file (schema.sql)..."
 	@$(DOCKER_COMPOSE) --env-file $(ENV_FILE) ps --services --filter "status=running" | grep -q "^postgres$$" \
 		|| { echo "❌ postgres container is not running. Did you run \`make up-dev\`?"; exit 1; }
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml -f docker-compose.override.yml exec -T postgres pg_dump -s -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" > schema.sql
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f $(DOCKER_COMPOSE_YAML) -f docker-compose.override.yml exec -T postgres pg_dump -s -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" > schema.sql
 	@echo "✅ schema.sql has been successfully generated."
 
 test: ensure-env
@@ -63,3 +62,10 @@ test_local:
 
 test_local_with_codecov:
 	@set -a; . $(ENV_FILE); set +a; cargo llvm-cov nextest
+
+
+define WAIT_FOR_POSTGRES
+	 $(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f $(DOCKER_COMPOSE_YAML) exec -T postgres \
+	 		sh -c 'until pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -h localhost; do sleep 1; done'
+endef
+
