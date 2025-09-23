@@ -38,7 +38,7 @@ up-prod: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) --file $(DOCKER_COMPOSE_YAML) up -d $(CONTROLLER) caddy
 	@echo "🚀 OpenCI Controller started in production mode"
 
-preview-container:
+preview-container: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) --file $(DOCKER_COMPOSE_YAML) logs -f $(CONTROLLER)
 
 down: 
@@ -53,7 +53,7 @@ db-schema: ensure-env
 	@echo "✅ schema.sql has been successfully generated."
 
 test: ensure-env
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) --file $(DOCKER_COMPOSE_YAML) run --rm $(CONTROLLER) cargo nextest r
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) --file $(DOCKER_COMPOSE_YAML) run --rm $(CONTROLLER) cargo nextest run
 
 test-with-codecov: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) --file $(DOCKER_COMPOSE_YAML) run --rm $(CONTROLLER) cargo llvm-cov nextest
