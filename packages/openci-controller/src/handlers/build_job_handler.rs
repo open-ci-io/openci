@@ -39,18 +39,18 @@ WHERE id = $1
       "#,
         build_job_id,
     )
-    .fetch_one(&pool)
-    .await
-    .map_err(|e| {
-        error!("Failed to get a build job: {}", e);
-        match e {
-            Error::RowNotFound => (StatusCode::NOT_FOUND, "Failed to find a build job".into()),
-            _ => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to get a build job".into(),
-            ),
-        }
-    })?;
+        .fetch_one(&pool)
+        .await
+        .map_err(|e| {
+            error!("Failed to get a build job: {}", e);
+            match e {
+                Error::RowNotFound => (StatusCode::NOT_FOUND, "Failed to find a build job".into()),
+                _ => (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to get a build job".into(),
+                ),
+            }
+        })?;
 
     Ok(Json(result))
 }
@@ -62,7 +62,7 @@ WHERE id = $1
           (status = 200, description = "List build jobs successfully"),
           (status = 500, description = "Internal server error")
     ),
-     tag = "build-jobs"
+    tag = "build-jobs"
 )]
 pub async fn get_build_jobs(
     State(pool): State<PgPool>,
@@ -82,15 +82,15 @@ FROM
     build_jobs
     "#,
     )
-    .fetch_all(&pool)
-    .await
-    .map_err(|e| {
-        error!("Failed to get build jobs: {}", e);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Failed to get build jobs".into(),
-        )
-    })?;
+        .fetch_all(&pool)
+        .await
+        .map_err(|e| {
+            error!("Failed to get build jobs: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to get build jobs".into(),
+            )
+        })?;
 
     Ok(Json(result))
 }
@@ -110,15 +110,15 @@ VALUES ($1, $2, $3)
         commit_sha,
         github_delivery_id
     )
-    .execute(pool)
-    .await
-    .map_err(|e| {
-        error!("Failed to create build job: {}", e);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Failed to create build job".into(),
-        )
-    })?;
+        .execute(pool)
+        .await
+        .map_err(|e| {
+            error!("Failed to create build job: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to create build job".into(),
+            )
+        })?;
 
     Ok(())
 }
@@ -136,14 +136,14 @@ pub async fn post_build_jobs(
             github_delivery_id.to_string(),
             pool,
         )
-        .await
-        .map_err(|e| {
-            error!("Failed to create build job: {}", e.1);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to create build job".to_string(),
-            )
-        })?;
+            .await
+            .map_err(|e| {
+                error!("Failed to create build job: {}", e.1);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to create build job".to_string(),
+                )
+            })?;
     }
 
     Ok(())
@@ -175,13 +175,13 @@ mod tests {
                     github_repository_id: repo.id,
                 }),
             )
-            .await
-            .unwrap()
-            .0
-            .workflow;
+                .await
+                .unwrap()
+                .0
+                .workflow;
 
             let commit_sha_one = "0123456789abcdef0123456789abcdef01234567";
-            let commit_sha_two = "fedcba9876543210fedcba9876543210fedcba98";
+            let commit_sha_two = "abcdef9876543210abcdef9876543210abcdef98";
             let delivery_one = "delivery-list-1";
             let delivery_two = "delivery-list-2";
 
@@ -191,8 +191,8 @@ mod tests {
                 delivery_one.into(),
                 &pool,
             )
-            .await
-            .unwrap();
+                .await
+                .unwrap();
 
             post_build_job(
                 workflow.id,
@@ -200,8 +200,8 @@ mod tests {
                 delivery_two.into(),
                 &pool,
             )
-            .await
-            .unwrap();
+                .await
+                .unwrap();
 
             let jobs = get_build_jobs(State(pool.clone())).await.unwrap().0;
 
@@ -217,11 +217,11 @@ mod tests {
                 vec![delivery_one.to_string(), delivery_two.to_string()]
             );
 
-            let mut commit_shas: Vec<String> =
+            let mut commit_sha_vec: Vec<String> =
                 jobs.iter().map(|job| job.commit_sha.clone()).collect();
-            commit_shas.sort();
+            commit_sha_vec.sort();
             assert_eq!(
-                commit_shas,
+                commit_sha_vec,
                 vec![commit_sha_one.to_string(), commit_sha_two.to_string()]
             );
         }
@@ -254,15 +254,15 @@ mod tests {
                     github_repository_id: repo.id,
                 }),
             )
-            .await
-            .unwrap()
-            .0
-            .workflow;
+                .await
+                .unwrap()
+                .0
+                .workflow;
 
             let commit_sha = "0123456789abcdef0123456789abcdef01234567";
             let delivery = "delivery-get-ok";
 
-            super::post_build_job(workflow.id, commit_sha.into(), delivery.into(), &pool)
+            post_build_job(workflow.id, commit_sha.into(), delivery.into(), &pool)
                 .await
                 .unwrap();
 
@@ -271,10 +271,10 @@ mod tests {
                 workflow.id,
                 delivery
             )
-            .fetch_one(&pool)
-            .await
-            .unwrap()
-            .id;
+                .fetch_one(&pool)
+                .await
+                .unwrap()
+                .id;
 
             let job = get_build_job(Path(build_job_id), State(pool.clone()))
                 .await
@@ -434,9 +434,9 @@ mod tests {
     "SELECT workflow_id, commit_sha, github_delivery_id FROM build_jobs WHERE github_delivery_id = $1 ORDER BY workflow_id",
     delivery
     )
-            .fetch_all(&pool)
-            .await
-            .unwrap();
+                .fetch_all(&pool)
+                .await
+                .unwrap();
 
             assert_eq!(rows.len(), 2);
             assert_eq!(rows[0].commit_sha, commit_sha);
