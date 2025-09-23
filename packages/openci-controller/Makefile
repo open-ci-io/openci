@@ -59,6 +59,6 @@ up-prod: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml up postgres -d
 	sleep 5 
 	# Run migrations inside the container
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml run --rm openci-controller sqlx migrate run
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml up openci-controller caddy -d
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml run --rm $(CONTROLLER) sqlx migrate run
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml up $(CONTROLLER) caddy -d
 	@echo "🚀 OpenCI Controller started in production mode"
