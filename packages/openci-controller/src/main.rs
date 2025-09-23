@@ -15,6 +15,16 @@ mod services;
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
+    dotenvy::from_filename(".env").ok();
+
+    let _sentry = sentry::init((
+        std::env::var("SENTRY_DSN")?,
+        sentry::ClientOptions {
+            release: sentry::release_name!(),
+            send_default_pii: true,
+            ..Default::default()
+        },
+    ));
 
     tracing_subscriber::registry()
         .with(

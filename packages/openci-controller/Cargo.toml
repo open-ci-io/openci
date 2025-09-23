@@ -13,6 +13,7 @@ hmac = "0.12.1"
 mockall = "0.13.1"
 octocrab = "0.45.0"
 rand = "0.9.2"
+sentry = "0.42.0"
 serde = { version = "1.0", features = ["derive"] }
 serde-email = "3.2.0"
 serde_json = "1.0.145"
