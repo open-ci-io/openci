@@ -37,11 +37,12 @@ up-dev: ensure-env run_db_and_migrate
 	"$(DOCKER_COMPOSE)" "$(ENV_FILE)" "$(DOCKER_COMPOSE_YAML)" "$(OPENCI_CONTROLLER)"
 
 up-prod: ENV_FILE = .env.prod
+up-prod: ENV = prod
 up-prod: ensure-env
-	$(DC) up -d postgres
+	$(DC_BASE) up -d postgres
 	$(WAIT_FOR_POSTGRES)
-	$(DC) run --rm $(OPENCI_CONTROLLER) sqlx migrate run
-	$(DC) up -d $(OPENCI_CONTROLLER) caddy
+	$(DC_BASE) run --rm $(OPENCI_CONTROLLER) sqlx migrate run
+	$(DC_BASE) up -d $(OPENCI_CONTROLLER) caddy
 	@echo "🚀 OpenCI Controller started in production mode"
 
 preview-container: ensure-env
@@ -55,7 +56,7 @@ db-schema: ensure-env
 	@echo "🔄 Generating database schema file (schema.sql)..."
 	@$(DC) ps --services --filter "status=running" | grep -q "^postgres$$" \
 		|| { echo "❌ postgres container is not running. Did you run \`make up-dev\`?"; exit 1; }
-	$(DC) --file $(DOCKER_COMPOSE_OVERRIDES_YAML) exec -T postgres pg_dump -s -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" > schema.sql
+	$(DC) exec -T postgres pg_dump -s -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" > schema.sql
 	@echo "✅ schema.sql has been successfully generated."
 
 test: ensure-env

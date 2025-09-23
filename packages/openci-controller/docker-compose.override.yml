@@ -1,7 +1,7 @@
 services:
   postgres:
     ports:
-      - "${POSTGRES_PORT:-55334}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-55334}:5432"
 
   openci-controller:
     volumes:
