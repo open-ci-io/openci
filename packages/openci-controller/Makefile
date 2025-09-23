@@ -40,7 +40,6 @@ ensure-env:
 up-dev: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up postgres -d
 	sleep 2
-	$(MAKE) ensure-sqlx
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm $(CONTROLLER) sqlx migrate run
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm $(CONTROLLER) cargo sqlx prepare
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up -d $(CONTROLLER) caddy
