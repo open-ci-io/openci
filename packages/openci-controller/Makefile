@@ -18,6 +18,7 @@ ensure-env:
 
 run_db_and_migrate: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) --file $(DOCKER_COMPOSE_YAML) up -d postgres
+	$(WAIT_FOR_POSTGRES)
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) --file $(DOCKER_COMPOSE_YAML) run --rm $(CONTROLLER) sqlx migrate run
 
 up-dev: ensure-env
