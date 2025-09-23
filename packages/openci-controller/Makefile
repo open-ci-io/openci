@@ -9,7 +9,7 @@ CONTROLLER := openci-controller
 BRIGHT_GREEN := \033[92m
 RESET := \033[0m
 DOCKER_COMPOSE_YAML := docker-compose.yml
-DC := $(DOCKER_COMPOSE) --env-file $(ENV_FILE) --file $(DOCKER_COMPOSE_YAML)
+DC = $(DOCKER_COMPOSE) --env-file $(ENV_FILE) --file $(DOCKER_COMPOSE_YAML)
 
 ensure-env:
 	@if [ ! -f $(ENV_FILE) ]; then \
