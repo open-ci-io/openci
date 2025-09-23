@@ -22,10 +22,7 @@ run_db_and_migrate: ensure-env
 	$(WAIT_FOR_POSTGRES)
 	$(DC) run --rm $(CONTROLLER) sqlx migrate run
 
-up-dev: ensure-env
-	$(DC) up -d postgres
-	$(WAIT_FOR_POSTGRES)
-	$(DC) run --rm $(CONTROLLER) sqlx migrate run
+up-dev: ensure-env run_db_and_migrate
 	$(DC) run --rm $(CONTROLLER) cargo sqlx prepare
 	$(DC) up -d $(CONTROLLER) caddy
 	@printf '$(BRIGHT_GREEN)Use "%s --env-file %s --file %s logs -f %s" to view runtime logs and initial API key output$(RESET)\n' \
