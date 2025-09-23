@@ -1,42 +1,15 @@
-.PHONY: all clean test down up-dev full-up-dev up-prod ensure-env build rebuild db-schema ensure-sqlx add-migration-files
+.PHONY: ensure-env run_db_and_migrate up-dev up-prod preview-container down \
+	db-schema test test-with-codecov test_local test_local_with_codecov
 
-# Ensure Cargo bin is in PATH for sqlx/cargo-sqlx
 export PATH := $(HOME)/.cargo/bin:$(PATH)
 
 ENV_FILE ?= .env.dev
 DOCKER_COMPOSE := docker compose
-
-all: build
-
-clean: down
-	@echo "🧹 Cleaning up project..."
-	rm -rf target
-	rm -f schema.sql
-	@echo "✅ Cleanup complete" 
-
-run_db_and_migrate: ensure-env
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up postgres -d
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller sqlx migrate run
-
-test: ensure-env
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo nextest r
-
-test_local:
-	@set -a; . $(ENV_FILE); set +a; cargo nextest run
-
-test_local_with_codecov:
-	@set -a; . $(ENV_FILE); set +a; cargo llvm-cov nextest
-
-preview-container:
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) logs -f openci-controller
-
-test-with-codecov: ensure-env
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo llvm-cov nextest
-
-
-down: 
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) down -v
-	@echo "🛑 OpenCI Controller stopped"
+CONTROLLER := openci-controller
+BRIGHT_GREEN := \033[92m
+RESET := \033[0m
+DOCKER_COMPOSE_YAML := docker-compose.yml
+DC = $(DOCKER_COMPOSE) --env-file $(ENV_FILE) --file $(DOCKER_COMPOSE_YAML)
 
 ensure-env:
 	@if [ ! -f $(ENV_FILE) ]; then \
@@ -44,61 +17,53 @@ ensure-env:
 		exit 1; \
 	fi
 
+run_db_and_migrate: ensure-env
+	$(DC) up -d postgres
+	$(WAIT_FOR_POSTGRES)
+	$(DC) run --rm $(CONTROLLER) sqlx migrate run
 
-up-dev: ensure-env
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up postgres -d
-	sleep 2
-	$(MAKE) ensure-sqlx
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller sqlx migrate run
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo sqlx prepare
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up -d openci-controller caddy
-	@echo "ℹ️  Use '$(DOCKER_COMPOSE) --env-file $(ENV_FILE) logs -f openci-controller' to view runtime logs and initial API key output"
-	
-full-up-dev: ensure-env
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up postgres -d
-	sleep 2
-	$(MAKE) ensure-sqlx
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller sqlx migrate run
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up openci-controller -d
-	@echo "🚀 OpenCI Controller started"
+up-dev: ensure-env run_db_and_migrate
+	$(DC) run --rm $(CONTROLLER) cargo sqlx prepare
+	$(DC) up -d $(CONTROLLER) caddy
+	@printf '$(BRIGHT_GREEN)Use "%s --env-file %s --file %s logs -f %s" to view runtime logs and initial API key output$(RESET)\n' \
+	"$(DOCKER_COMPOSE)" "$(ENV_FILE)" "$(DOCKER_COMPOSE_YAML)" "$(CONTROLLER)"
 
-build:
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml build openci-controller
-	@echo "🔨 OpenCI Controller image built"
+up-prod: ENV_FILE = .env.prod
+up-prod: ensure-env
+	$(DC) up -d postgres
+	$(WAIT_FOR_POSTGRES)
+	$(DC) run --rm $(CONTROLLER) sqlx migrate run
+	$(DC) up -d $(CONTROLLER) caddy
+	@echo "🚀 OpenCI Controller started in production mode"
 
-rebuild:
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml build --no-cache openci-controller
-	@echo "🔨 OpenCI Controller image rebuilt (no cache)"
+preview-container: ensure-env
+	$(DC) logs -f $(CONTROLLER)
+
+down: 
+	$(DC) down -v
+	@printf '$(BRIGHT_GREEN)Successfully down all containers!$(RESET)\n'
 
 db-schema: ensure-env
 	@echo "🔄 Generating database schema file (schema.sql)..."
-	@$(DOCKER_COMPOSE) --env-file $(ENV_FILE) ps --services --filter "status=running" | grep -q "^postgres$$" \
+	@$(DC) ps --services --filter "status=running" | grep -q "^postgres$$" \
 		|| { echo "❌ postgres container is not running. Did you run \`make up-dev\`?"; exit 1; }
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml -f docker-compose.override.yml exec -T postgres pg_dump -s -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" > schema.sql
+	$(DC) --file docker-compose.override.yml exec -T postgres pg_dump -s -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" > schema.sql
 	@echo "✅ schema.sql has been successfully generated."
 
-up-prod: ENV_FILE = .env.prod
-up-prod: ensure-env build
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml up postgres -d
-	sleep 5 
-	# Run migrations inside the container
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml run --rm openci-controller sqlx migrate run
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml up openci-controller caddy -d
-	@echo "🚀 OpenCI Controller started in production mode"
+test: ensure-env
+	$(DC) run --rm $(CONTROLLER) cargo nextest run
 
-add-migration-files: ensure-sqlx
-	sqlx migrate add
+test-with-codecov: ensure-env
+	$(DC) run --rm $(CONTROLLER) cargo llvm-cov nextest
 
-ensure-sqlx:
-	@command -v cargo >/dev/null 2>&1 || { \
-		echo "❌ cargo not found. Please install Rust toolchain (https://rustup.rs)."; \
-		exit 1; \
-	}
-	@command -v sqlx >/dev/null 2>&1 || command -v cargo-sqlx >/dev/null 2>&1 || { \
-		echo "⬇️  Installing sqlx-cli (features: postgres,rustls)..."; \
-		cargo install sqlx-cli --no-default-features --features postgres,rustls || { \
-			echo "❌ Failed to install sqlx-cli"; \
-			exit 1; \
-		}; \
-	}
-	@echo "✅ sqlx-cli is available"
+test_local:
+	@set -a; . $(ENV_FILE); set +a; cargo nextest run
+
+test_local_with_codecov:
+	@set -a; . $(ENV_FILE); set +a; cargo llvm-cov nextest
+
+
+define WAIT_FOR_POSTGRES
+	 $(DC) exec -T postgres \
+	 		sh -c 'until pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -h localhost; do sleep 1; done'
+endef
