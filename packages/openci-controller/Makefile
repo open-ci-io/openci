@@ -1,25 +1,18 @@
 .PHONY: all clean test down up-dev full-up-dev up-prod ensure-env build rebuild db-schema ensure-sqlx add-migration-files
 
-# Ensure Cargo bin is in PATH for sqlx/cargo-sqlx
 export PATH := $(HOME)/.cargo/bin:$(PATH)
 
 ENV_FILE ?= .env.dev
 DOCKER_COMPOSE := docker compose
-
-all: build
-
-clean: down
-	@echo "🧹 Cleaning up project..."
-	rm -rf target
-	rm -f schema.sql
-	@echo "✅ Cleanup complete" 
+CONTROLLER := openci-controller
+BRIGHT_GREEN := \033[92m
 
 run_db_and_migrate: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up postgres -d
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller sqlx migrate run
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm $(CONTROLLER) sqlx migrate run
 
 test: ensure-env
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo nextest r
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm $(CONTROLLER) cargo nextest r
 
 test_local:
 	@set -a; . $(ENV_FILE); set +a; cargo nextest run
@@ -28,15 +21,14 @@ test_local_with_codecov:
 	@set -a; . $(ENV_FILE); set +a; cargo llvm-cov nextest
 
 preview-container:
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) logs -f openci-controller
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) logs -f $(CONTROLLER)
 
 test-with-codecov: ensure-env
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo llvm-cov nextest
-
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm $(CONTROLLER) cargo llvm-cov nextest
 
 down: 
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) down -v
-	@echo "🛑 OpenCI Controller stopped"
+	@printf '$(BRIGHT_GREEN)Successfully down all containers!$(RESET)'
 
 ensure-env:
 	@if [ ! -f $(ENV_FILE) ]; then \
@@ -49,26 +41,12 @@ up-dev: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up postgres -d
 	sleep 2
 	$(MAKE) ensure-sqlx
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller sqlx migrate run
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller cargo sqlx prepare
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up -d openci-controller caddy
-	@echo "ℹ️  Use '$(DOCKER_COMPOSE) --env-file $(ENV_FILE) logs -f openci-controller' to view runtime logs and initial API key output"
-	
-full-up-dev: ensure-env
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up postgres -d
-	sleep 2
-	$(MAKE) ensure-sqlx
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm openci-controller sqlx migrate run
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up openci-controller -d
-	@echo "🚀 OpenCI Controller started"
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm $(CONTROLLER) sqlx migrate run
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) run --rm $(CONTROLLER) cargo sqlx prepare
+	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) up -d $(CONTROLLER) caddy
+	@printf '$(BRIGHT_GREEN)Use "%s --env-file %s logs -f %s" to view runtime logs and initial API key output$(RESET)\n' \
+	"$(DOCKER_COMPOSE)" "$(ENV_FILE)" "$(CONTROLLER)"
 
-build:
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml build openci-controller
-	@echo "🔨 OpenCI Controller image built"
-
-rebuild:
-	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml build --no-cache openci-controller
-	@echo "🔨 OpenCI Controller image rebuilt (no cache)"
 
 db-schema: ensure-env
 	@echo "🔄 Generating database schema file (schema.sql)..."
@@ -78,27 +56,10 @@ db-schema: ensure-env
 	@echo "✅ schema.sql has been successfully generated."
 
 up-prod: ENV_FILE = .env.prod
-up-prod: ensure-env build
+up-prod: ensure-env
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml up postgres -d
 	sleep 5 
 	# Run migrations inside the container
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml run --rm openci-controller sqlx migrate run
 	$(DOCKER_COMPOSE) --env-file $(ENV_FILE) -f docker-compose.yml up openci-controller caddy -d
 	@echo "🚀 OpenCI Controller started in production mode"
-
-add-migration-files: ensure-sqlx
-	sqlx migrate add
-
-ensure-sqlx:
-	@command -v cargo >/dev/null 2>&1 || { \
-		echo "❌ cargo not found. Please install Rust toolchain (https://rustup.rs)."; \
-		exit 1; \
-	}
-	@command -v sqlx >/dev/null 2>&1 || command -v cargo-sqlx >/dev/null 2>&1 || { \
-		echo "⬇️  Installing sqlx-cli (features: postgres,rustls)..."; \
-		cargo install sqlx-cli --no-default-features --features postgres,rustls || { \
-			echo "❌ Failed to install sqlx-cli"; \
-			exit 1; \
-		}; \
-	}
-	@echo "✅ sqlx-cli is available"
