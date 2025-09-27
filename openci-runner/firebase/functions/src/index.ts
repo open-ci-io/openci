@@ -1,7 +1,15 @@
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+import { logger } from "firebase-functions";
+import { onRequest } from "firebase-functions/https";
+import { defineSecret } from "firebase-functions/params";
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+const firebaseServiceAccount = defineSecret("FB_SERVICE_ACCOUNT");
+
+export const helloWorld = onRequest(
+	{ secrets: [firebaseServiceAccount] },
+	(req, res) => {
+		const serviceAccountJson = JSON.parse(firebaseServiceAccount.value());
+		serviceAccountJson;
+		logger.info("Hello logs!", { structuredData: true });
+		res.send("Hello from Firebase!");
+	},
+);
