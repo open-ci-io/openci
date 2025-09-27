@@ -105,69 +105,69 @@
     "tasks": {
         "version": "2.0.0",
         "tasks": [
-            {
-                "label": "dev-startup",
-                "dependsOrder": "sequence",
-                "dependsOn": [
-                    "make down",
-                    "make up-dev"
-                ],
-                "runOptions": {
-                    "runOn": "folderOpen",
-                    "instanceLimit": 1
-                },
-                "problemMatcher": []
-            },
-            {
-                "label": "make up-dev",
-                "type": "shell",
-                "command": "make up-dev",
-                "options": {
-                    "cwd": "${workspaceFolder}/packages/openci-controller",
-                    "env": {
-                        "RUST_LOG": "info",
-                    },
-                },
-                "group": "build",
-                "problemMatcher": [
-                    "$rustc"
-                ],
-                "presentation": {
-                    "reveal": "always",
-                    "panel": "dedicated",
-                    "clear": false
-                }
-            },
-            {
-                "label": "make test",
-                "type": "shell",
-                "command": "make test",
-                "options": {
-                    "cwd": "${workspaceFolder}/packages/openci-controller",
-                    "env": {
-                        "RUST_LOG": "info",
-                    }
-                },
-                "group": "build",
-                "problemMatcher": [
-                    "$rustc"
-                ]
-            },
-            {
-                "label": "make down",
-                "type": "shell",
-                "command": "make down",
-                "options": {
-                    "cwd": "${workspaceFolder}/packages/openci-controller",
-                    "env": {
-                        "RUST_LOG": "info",
-                    }
-                },
-                "group": "build",
-                "problemMatcher": [
-                    "$rustc"
-                ]
-            },
+            // {
+            //     "label": "dev-startup",
+            //     "dependsOrder": "sequence",
+            //     "dependsOn": [
+            //         "make down",
+            //         "make up-dev"
+            //     ],
+            //     "runOptions": {
+            //         "runOn": "folderOpen",
+            //         "instanceLimit": 1
+            //     },
+            //     "problemMatcher": []
+            // },
+            // {
+            //     "label": "make up-dev",
+            //     "type": "shell",
+            //     "command": "make up-dev",
+            //     "options": {
+            //         "cwd": "${workspaceFolder}/packages/openci-controller",
+            //         "env": {
+            //             "RUST_LOG": "info",
+            //         },
+            //     },
+            //     "group": "build",
+            //     "problemMatcher": [
+            //         "$rustc"
+            //     ],
+            //     "presentation": {
+            //         "reveal": "always",
+            //         "panel": "dedicated",
+            //         "clear": false
+            //     }
+            // },
+            // {
+            //     "label": "make test",
+            //     "type": "shell",
+            //     "command": "make test",
+            //     "options": {
+            //         "cwd": "${workspaceFolder}/packages/openci-controller",
+            //         "env": {
+            //             "RUST_LOG": "info",
+            //         }
+            //     },
+            //     "group": "build",
+            //     "problemMatcher": [
+            //         "$rustc"
+            //     ]
+            // },
+            // {
+            //     "label": "make down",
+            //     "type": "shell",
+            //     "command": "make down",
+            //     "options": {
+            //         "cwd": "${workspaceFolder}/packages/openci-controller",
+            //         "env": {
+            //             "RUST_LOG": "info",
+            //         }
+            //     },
+            //     "group": "build",
+            //     "problemMatcher": [
+            //         "$rustc"
+            //     ]
+            // },
         ],
     },
     "extensions": {
