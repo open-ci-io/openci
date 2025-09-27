@@ -3,8 +3,8 @@
 ## Project Structure & Module Organization
 - `packages/openci-controller/` hosts the Axum API; keep handlers in `src/handlers`, services in `src/services`, SQLx migrations in `migrations/`, fixtures for seeded data, and integration tests in `tests/`.
 - `packages/openci-worker/` exposes the runner CLI in `src/main.rs` and supporting modules; place worker-specific configs under `configs/` if needed.
-- `github-apps/` contains the GitHub App service with `src/` for webhook handlers, `test/` for Vitest suites, and deployment settings in `app.yml`.
-- `apps/docs/` ships the documentation site; edit MDX in `apps/docs/pages/` and shared UI assets under `apps/docs/components/`. Shared tooling (e.g., `biome.jsonc`, `Makefile`, `README.md`) lives at the repo root.
+- `github-apps/` contains the GitHub App service with `src/` for webhook handlers, `test/` for Vitest suites, and deployment settings in `app.yml`.This github app is needed for providing 3rd party runner for GitHub Actions.
+- `apps/docs/` ships the documentation site; edit MDX in `apps/docs/pages/` and shared UI assets under `apps/docs/components/`. Shared tooling (e.g., `biome.jsonc`, `Makefile`, `README.md`) lives at the repo root. 
 
 ## Build, Test, and Development Commands
 - `cargo build --workspace` compiles controller and worker crates together.
