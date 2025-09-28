@@ -1,16 +1,16 @@
-name: GitHub Apps Tests
+name: Firebase Functions Tests
 
 on:
   push:
     branches: [main, develop]
     paths:
-      - "openci-runner/github-apps/**"
-      - ".github/workflows/github-apps-tests.yml"
+      - "openci-runner/firebase/functions/**"
+      - ".github/workflows/firebase-functions-tests.yml"
   pull_request:
     branches: [main, develop]
     paths:
-      - "openci-runner/github-apps/**"
-      - ".github/workflows/github-apps-tests.yml"
+      - "openci-runner/firebase/functions/**"
+      - ".github/workflows/firebase-functions-tests.yml"
 
 jobs:
   test:
@@ -22,7 +22,7 @@ jobs:
         node-version: [20, 22]
     defaults:
       run:
-        working-directory: openci-runner/github-apps
+        working-directory: openci-runner/firebase/functions
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
