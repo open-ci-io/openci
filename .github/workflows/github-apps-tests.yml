@@ -3,12 +3,23 @@ name: GitHub Apps Tests
 on:
   push:
     branches: [main, develop]
+    paths:
+      - "openci-runner/github-apps/**"
+      - ".github/workflows/github-apps-tests.yml"
   pull_request:
     branches: [main, develop]
+    paths:
+      - "openci-runner/github-apps/**"
+      - ".github/workflows/github-apps-tests.yml"
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        node-version: [20, 22]
     defaults:
       run:
         working-directory: openci-runner/github-apps
@@ -19,7 +30,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
         run: npm ci
