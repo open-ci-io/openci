@@ -66,4 +66,4 @@ jobs:
         run: npm ci
 
       - name: Deploy Functions
-        run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }} --force
+        run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }}
