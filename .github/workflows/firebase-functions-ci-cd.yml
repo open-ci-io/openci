@@ -49,7 +49,7 @@ jobs:
       contents: read
     defaults:
       run:
-        working-directory: openci-runner/firebase/functions
+        working-directory: openci-runner/firebase
     steps:
       - uses: actions/checkout@v4
 
@@ -60,6 +60,10 @@ jobs:
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.FIREBASE_SA_KEY }}
+
+      - name: Install dependencies
+        working-directory: functions
+        run: npm ci
 
       - name: Deploy Functions
         run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }}
