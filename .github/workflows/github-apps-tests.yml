@@ -2,16 +2,6 @@ name: GitHub Apps Tests
 
 on:
   workflow_call: {}
-  push:
-    branches: [main, develop]
-    paths:
-      - "openci-runner/github-apps/**"
-      - ".github/workflows/github-apps-tests.yml"
-  pull_request:
-    branches: [main, develop]
-    paths:
-      - "openci-runner/github-apps/**"
-      - ".github/workflows/github-apps-tests.yml"
 
 jobs:
   test:
