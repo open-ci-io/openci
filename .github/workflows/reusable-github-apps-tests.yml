@@ -1,0 +1,30 @@
+name: Reusable GitHub Apps Tests
+
+on:
+  workflow_call: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        node-version: [20, 22]
+    defaults:
+      run:
+        working-directory: openci-runner/github-apps
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
