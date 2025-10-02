@@ -3,7 +3,7 @@ import { logger } from "firebase-functions";
 import { defineInt, defineSecret } from "firebase-functions/params";
 import { onRequest } from "firebase-functions/v2/https";
 import { type ApplicationFunction, Probot } from "probot";
-import githubApp from "../../../github-apps/src";
+import githubApp from "../../../github-apps/lib/index.js";
 
 const firebaseServiceAccount = defineSecret("FB_SERVICE_ACCOUNT");
 

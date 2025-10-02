@@ -27,5 +27,6 @@
 		"typescript": "^5.9.3",
 		"vitest": "^3.2.4"
 	},
+	"type": "module",
 	"private": true
 }
