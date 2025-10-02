@@ -21,9 +21,8 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          ls -a
-          pwd
           cd ../../github-apps && npm ci
+          pwd
 
       - uses: google-github-actions/auth@v2
         with:
@@ -31,6 +30,7 @@ jobs:
 
       - name: Dry-run check via Emulator on PRs
         run: |
+          pwd
           npx firebase-tools emulators:exec \
             --only functions \
             --project ${{ secrets.FIREBASE_PROJECT_ID }} \
