@@ -39,4 +39,4 @@ jobs:
       - name: Dry-run check via Emulator on PRs
         working-directory: openci-runner/firebase
         run: |
-          npx firebase-tools emulators:exec --non-interactive "echo"
+          npx firebase-tools emulators:exec --only functions --project ${{secrets.FIREBASE_PROJECT_ID}} --non-interactive -- node -e "console.log('emulator ready')"
