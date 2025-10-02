@@ -7,6 +7,10 @@ vi.mock("firebase-functions/params", () => ({
 		name,
 		value: () => JSON.stringify({ projectId: "demo-project" }),
 	}),
+	defineInt: (name: string) => ({
+		name,
+		value: () => 123,
+	}),
 }));
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
