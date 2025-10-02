@@ -1,6 +1,6 @@
-import type { Probot } from "probot";
+import type { ApplicationFunction, Probot } from "probot";
 
-const githubApp = (app: Probot) => {
+const githubApp: ApplicationFunction = (app: Probot, _options) => {
 	app.log.info("OpenCI GitHub App loaded");
 
 	app.on("issues.opened", async (context) => {

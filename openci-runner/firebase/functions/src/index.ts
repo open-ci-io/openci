@@ -26,7 +26,7 @@ const createProbot = ({
 	privateKey,
 	webhookSecret,
 }: {
-	appId: string;
+	appId: number;
 	privateKey: string;
 	webhookSecret: string;
 }) => {
@@ -66,7 +66,7 @@ export const githubWebhook = onRequest(
 			}
 
 			const probot = createProbot({
-				appId: githubAppId.value().toString(),
+				appId: githubAppId.value(),
 				privateKey: githubPrivateKey.value(),
 				webhookSecret: githubWebhookSecret.value(),
 			});
