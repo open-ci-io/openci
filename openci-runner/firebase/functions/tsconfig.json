@@ -8,10 +8,17 @@
     "outDir": "lib",
     "sourceMap": true,
     "strict": true,
-    "target": "es2017"
+    "target": "es2022",
+    "skipLibCheck": true
   },
   "compileOnSave": true,
   "include": [
     "src"
+  ],
+  "lib": [
+    "ES2023"
+  ],
+  "types": [
+    "node"
   ]
 }
