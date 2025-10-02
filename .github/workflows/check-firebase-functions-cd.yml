@@ -39,4 +39,4 @@ jobs:
       - name: Dry-run check via Emulator on PRs
         working-directory: openci-runner/firebase
         run: |
-          npx firebase-tools emulators:exec "echo"
+          npx firebase-tools emulators:exec --non-interactive "echo"
