@@ -79,15 +79,19 @@ export const githubWebhook = onRequest(
 				res.status(400).send("Missing GitHub webhook headers");
 				return;
 			}
-
-			const payload =
-				req.rawBody?.toString("utf8") ?? JSON.stringify(req.body ?? {});
+			const payloadObject =
+				typeof req.body === "object" && req.body !== null
+					? req.body
+					: (JSON.parse(req.rawBody?.toString("utf8") ?? "{}") as Record<
+							string,
+							unknown
+						>);
 
 			await probot.webhooks.verifyAndReceive({
 				id: deliveryId,
 				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 				name: eventName as any,
-				payload,
+				payload: payloadObject,
 				signature,
 			});
 
