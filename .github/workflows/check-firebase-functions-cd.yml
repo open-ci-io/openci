@@ -25,10 +25,10 @@ jobs:
           pwd
 
       - name: Build firebase-functions
-        run: npm --prefix openci-runner/firebase/functions run build
+        run: npm run build
 
       - name: Build github-apps
-        run: npm --prefix openci-runner/github-apps run build
+        run: npm --prefix ../../github-apps run build
 
       - uses: google-github-actions/auth@v2
         with:
