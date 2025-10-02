@@ -69,7 +69,6 @@ jobs:
             FB_SERVICE_ACCOUNT:projects/openci-runner/secrets/FB_SERVICE_ACCOUNT/versions/latest
             GITHUB_PRIVATE_KEY:projects/openci-runner/secrets/GITHUB_PRIVATE_KEY/versions/latest
             GITHUB_WEBHOOK_SECRET:projects/openci-runner/secrets/GITHUB_WEBHOOK_SECRET/versions/latest
-            GITHUB_APP_ID:projects/openci-runner/secrets/GITHUB_APP_ID/versions/latest
 
       - name: Write .env.local from Secret Manager
         working-directory: openci-runner/firebase/functions
@@ -78,7 +77,7 @@ jobs:
           FB_SERVICE_ACCOUNT=${{ steps.secrets.outputs.FB_SERVICE_ACCOUNT }}
           GITHUB_PRIVATE_KEY=${{ steps.secrets.outputs.GITHUB_PRIVATE_KEY }}
           GITHUB_WEBHOOK_SECRET=${{ steps.secrets.outputs.GITHUB_WEBHOOK_SECRET }}
-          GITHUB_APP_ID=${{ steps.secrets.outputs.GITHUB_APP_ID }}
+          GITHUB_APP_ID=${{ secrets.GH_APP_ID }}
           EOF
 
       - name: Install github-apps dependencies
