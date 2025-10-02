@@ -71,9 +71,11 @@ jobs:
         run: npm run build
 
       - name: Install firebase-functions dependencies
+        working-directory: openci-runner/firebase/functions
         run: npm ci
 
       - name: Build firebase-functions
+        working-directory: openci-runner/firebase/functions
         run: npm run build
 
       - name: Deploy Functions
