@@ -34,6 +34,9 @@ jobs:
           cd ../../github-apps && npm run build && cd -
           pwd
           ls -a
+          cd ..
+          pwd
+          ls -a
           npx firebase-tools emulators:exec \
             --only functions \
             --project ${{ secrets.FIREBASE_PROJECT_ID }} \
