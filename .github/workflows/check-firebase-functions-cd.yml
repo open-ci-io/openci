@@ -31,3 +31,10 @@ jobs:
 
       - name: Build firebase-functions
         run: npm run build
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SA_KEY }}
+
+      - name: Deploy
+        run: npx firebase-tools emulators:exec --only functions "echo"
