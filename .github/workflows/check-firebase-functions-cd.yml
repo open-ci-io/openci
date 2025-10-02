@@ -24,19 +24,16 @@ jobs:
           cd ../../github-apps && npm ci
           pwd
 
-      - name: Build firebase-functions
-        run: |
-          npm run build
-      - name: Build github-apps
-        run: |
-          cd ../../github-apps && npm run build
-
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.FIREBASE_SA_KEY }}
 
       - name: Dry-run check via Emulator on PRs
         run: |
+          npm run build
+          cd ../../github-apps && npm run build && cd -
+          pwd
+          ls -a
           npx firebase-tools emulators:exec \
             --only functions \
             --project ${{ secrets.FIREBASE_PROJECT_ID }} \
