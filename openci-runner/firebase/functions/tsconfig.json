@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "module": "NodeNext",
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "moduleResolution": "nodenext",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
@@ -9,8 +9,10 @@
     "sourceMap": true,
     "strict": true,
     "target": "es2022",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true
   },
+  "rootDir": "src",
   "compileOnSave": true,
   "include": [
     "src"
