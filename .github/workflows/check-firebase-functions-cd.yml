@@ -39,5 +39,4 @@ jobs:
           ls -a
           npx firebase-tools emulators:exec \
             --only functions \
-            --project ${{ secrets.FIREBASE_PROJECT_ID }} \
-            "npm run build"
+            --project ${{ secrets.FIREBASE_PROJECT_ID }}
