@@ -56,4 +56,4 @@ jobs:
 
       - name: Deploy
         working-directory: openci-runner/firebase
-        run: firebase emulators:exec --only functions "echo ok" --inspect-functions
+        run: firebase emulators:exec --only functions "echo ok"
