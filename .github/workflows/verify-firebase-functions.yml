@@ -18,6 +18,7 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install dependencies for firebase-functions
       - run: npm ci
 
       - name: Install dependencies for github-apps
