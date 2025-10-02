@@ -33,7 +33,7 @@ jobs:
           pwd
           ls -a
           npm run build
-          npx firebase-tools -v emulators:exec \
+          npx firebase-tools emulators:exec \
             --only functions \
             --project ${{ secrets.FIREBASE_PROJECT_ID }} \
             "npm run build"
