@@ -1,0 +1,32 @@
+name: Verify Firebase Functions
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  firebase:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: openci-runner/firebase/functions
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SA_KEY }}
+
+      - name: Dry-run check via Emulator on PRs
+        run: |
+          npx firebase-tools emulators:exec \
+            --only functions \
+            --project ${{ secrets.FIREBASE_PROJECT_ID }} \
+            "npm run build"
