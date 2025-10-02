@@ -70,10 +70,10 @@ jobs:
             GITHUB_PRIVATE_KEY:projects/openci-runner/secrets/GITHUB_PRIVATE_KEY/versions/latest
             GITHUB_WEBHOOK_SECRET:projects/openci-runner/secrets/GITHUB_WEBHOOK_SECRET/versions/latest
 
-      - name: Write .env.local from Secret Manager
+      - name: Write .env files from Secret Manager
         working-directory: openci-runner/firebase/functions
         run: |
-          cat <<EOF > .env.local
+          cat <<EOF > .env.${{ secrets.FIREBASE_PROJECT_ID }}
           FB_SERVICE_ACCOUNT=${{ steps.secrets.outputs.FB_SERVICE_ACCOUNT }}
           GITHUB_PRIVATE_KEY=${{ steps.secrets.outputs.GITHUB_PRIVATE_KEY }}
           GITHUB_WEBHOOK_SECRET=${{ steps.secrets.outputs.GITHUB_WEBHOOK_SECRET }}
