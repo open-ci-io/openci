@@ -62,9 +62,19 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SA_KEY }}
 
-      - name: Install dependencies
-        working-directory: openci-runner/firebase/functions
+      - name: Install github-apps dependencies
+        working-directory: openci-runner/github-apps
         run: npm ci
+
+      - name: Build github-apps
+        working-directory: openci-runner/github-apps
+        run: npm run build
+
+      - name: Install firebase-functions dependencies
+        run: npm ci
+
+      - name: Build firebase-functions
+        run: npm run build
 
       - name: Deploy Functions
         run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }}
