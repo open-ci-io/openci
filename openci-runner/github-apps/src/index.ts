@@ -8,7 +8,7 @@ const githubApp = (app: Probot) => {
 			body: "Thanks for opening this issue!",
 		});
 
-		await context.octokit.issues.createComment(issueComment);
+		await context.octokit.rest.issues.createComment(issueComment);
 	});
 };
 
