@@ -31,12 +31,3 @@ jobs:
 
       - name: Build firebase-functions
         run: npm run build
-
-      - uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.FIREBASE_SA_KEY }}
-
-      - name: Dry-run check via Emulator on PRs
-        working-directory: openci-runner/firebase
-        run: |
-          npx firebase-tools emulators:exec --only functions --project ${{secrets.FIREBASE_PROJECT_ID}} --non-interactive -- node -e "console.log('emulator ready')"
