@@ -44,5 +44,4 @@ jobs:
           npx firebase-tools emulators:exec \
             --only functions \
             --project ${{ secrets.FIREBASE_PROJECT_ID }} \
-            -- \
-            node -e "console.log('emulator ready')"
+            "echo"
