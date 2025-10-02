@@ -31,6 +31,8 @@ jobs:
       - name: Dry-run check via Emulator on PRs
         run: |
           pwd
+          ls -a
+          npm run build
           npx firebase-tools emulators:exec \
             --only functions \
             --project ${{ secrets.FIREBASE_PROJECT_ID }} \
