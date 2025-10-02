@@ -21,7 +21,7 @@
 	},
 	"devDependencies": {
 		"@types/supertest": "^6.0.3",
-		"@types/node": "^22.5.0",
+		"@types/node": "^24.6.2",
 		"firebase-functions-test": "^3.1.0",
 		"supertest": "^7.0.0",
 		"typescript": "^5.9.3",
