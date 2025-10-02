@@ -36,6 +36,9 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SA_KEY }}
 
+      - name: Install firebase tools
+        run: npm install -g firebase-tools
+
       - name: Deploy
         working-directory: openci-runner/firebase
         env:
@@ -43,4 +46,4 @@ jobs:
           GITHUB_PRIVATE_KEY: "dummy"
           GITHUB_WEBHOOK_SECRET: "dummy"
           GITHUB_APP_ID: "1"
-        run: npx firebase-tools emulators:exec --only functions "echo ok"
+        run: firebase emulators:exec --only functions "echo ok"
