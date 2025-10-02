@@ -6,7 +6,11 @@
 	"author": "mafreud",
 	"license": "ISC",
 	"homepage": "https://github.com//",
-	"keywords": ["probot", "github", "probot-app"],
+	"keywords": [
+		"probot",
+		"github",
+		"probot-app"
+	],
 	"scripts": {
 		"build": "tsc",
 		"start": "probot run ./lib/index.js",
@@ -16,11 +20,12 @@
 		"probot": "^14.0.2"
 	},
 	"devDependencies": {
+		"@types/ioredis": "^4.28.10",
 		"@types/node": "^24.6.2",
 		"nock": "^15.0.0",
 		"smee-client": "^4.3.1",
-		"vitest": "^3.2.4",
-		"typescript": "^5.9.3"
+		"typescript": "^5.9.3",
+		"vitest": "^3.2.4"
 	},
 	"overrides": {
 		"@types/pg": "8.15.1"
