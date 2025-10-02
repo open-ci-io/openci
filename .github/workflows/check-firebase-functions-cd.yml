@@ -46,4 +46,4 @@ jobs:
           GITHUB_PRIVATE_KEY: "dummy"
           GITHUB_WEBHOOK_SECRET: "dummy"
           GITHUB_APP_ID: "1"
-        run: firebase emulators:exec --only functions "echo ok"
+        run: firebase emulators:exec --only functions "echo ok" --inspect-functions
