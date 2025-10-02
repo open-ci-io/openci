@@ -18,17 +18,17 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Install dependencies
-        run: |
-          npm ci
-          cd ../../github-apps && npm ci
-          pwd
-
       - name: Build firebase-functions
         run: npm run build
 
       - name: Build github-apps
         run: npm --prefix ../../github-apps run build
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd ../../github-apps && npm ci
+          pwd
 
       - uses: google-github-actions/auth@v2
         with:
