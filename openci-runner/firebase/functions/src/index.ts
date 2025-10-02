@@ -58,9 +58,12 @@ export const githubWebhook = onRequest(
 		}
 
 		try {
-			initializeApp({
-				credential: cert(firebaseServiceAccount.value()),
-			});
+			const admin = await import("firebase-admin");
+			if (admin.apps.length === 0) {
+				initializeApp({
+					credential: cert(firebaseServiceAccount.value()),
+				});
+			}
 
 			const probot = createProbot({
 				appId: githubAppId.value().toString(),
