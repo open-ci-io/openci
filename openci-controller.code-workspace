@@ -21,9 +21,9 @@
             "--all-targets",
             "--message-format=json"
         ],
-        "rust-analyzer.cargo.extraEnv": {
-            "DYLINT_LIBRARY_PATH": "/Users/masahiroaoki/Developer/cargo-sqruff/target/release/"
-        },
+        // "rust-analyzer.cargo.extraEnv": {
+        //     "DYLINT_LIBRARY_PATH": "/Users/masahiroaoki/Developer/cargo-sqruff/target/release/"
+        // },
         "files.exclude": {
             "target": true
         },
