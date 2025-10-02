@@ -22,6 +22,7 @@ jobs:
         run: |
           npm ci
           ls -a
+          pwd
           cd ../github-apps && npm ci
 
       - uses: google-github-actions/auth@v2
