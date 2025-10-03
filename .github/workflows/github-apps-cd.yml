@@ -13,7 +13,33 @@ jobs:
   firebase-functions-tests:
     uses: ./.github/workflows/reusable-firebase-functions-ci.yml
 
-  deploy-firebase-functions:
+  deploy-firebase-functions-dev:
+    if: github.event_name == 'pull_request'
+    needs: [github-apps-tests, firebase-functions-tests]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: openci-runner/firebase
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SA_KEY_FOR_PREVIEW_FUNCTIONS }}
+
+      - name: Install dependencies
+        working-directory: openci-runner/firebase/functions
+        run: npm ci
+
+      - name: Deploy Functions (dev)
+        run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID_FOR_PREVIEW_FUNCTIONS }}
+
+  deploy-firebase-functions-production:
+    if: github.event_name == 'push'
     needs: [github-apps-tests, firebase-functions-tests]
     runs-on: ubuntu-latest
     defaults:
@@ -34,5 +60,5 @@ jobs:
         working-directory: openci-runner/firebase/functions
         run: npm ci
 
-      - name: Deploy Functions
-        run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }}
+      - name: Deploy Functions (Production)
+        run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT }}
