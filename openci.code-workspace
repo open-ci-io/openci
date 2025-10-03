@@ -11,6 +11,9 @@
         "editor.codeActionsOnSave": {
             "source.organizeImports": "always"
         },
+        "[github-actions-workflow]": {
+            "editor.defaultFormatter": "redhat.vscode-yaml"
+        },
         "sqlfluff.dialect": "postgres",
         "sqlfluff.linter.lintEntireProject": true,
         "rust-analyzer.check.overrideCommand": [

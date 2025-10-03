@@ -69,6 +69,13 @@ jobs:
             GITHUB_PRIVATE_KEY:projects/${{ secrets.FIREBASE_PROJECT_ID }}/secrets/GITHUB_PRIVATE_KEY/versions/latest
             GITHUB_WEBHOOK_SECRET:projects/${{ secrets.FIREBASE_PROJECT_ID }}/secrets/GITHUB_WEBHOOK_SECRET/versions/latest
 
+      - name: Create an dotenv file
+        working-directory: openci-runner/firebase/functions
+        run: |
+          touch .env
+          echo GITHUB_APP_ID = ${{secrets.GH_APP_ID}} >> .env
+          echo "cat .env"
+
       - name: Install github-apps dependencies
         working-directory: openci-runner/github-apps
         run: npm ci
