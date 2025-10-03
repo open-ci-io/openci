@@ -1,7 +1,7 @@
 name: Reusable GitHub Apps Tests
 
 on:
-  workflow_call:
+  workflow_call: {}
 
 jobs:
   test:
