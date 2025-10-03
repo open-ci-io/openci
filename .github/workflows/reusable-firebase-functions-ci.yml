@@ -1,4 +1,4 @@
-name: Reusable GitHub Apps Tests
+name: Firebase Functions Tests
 
 on:
   workflow_call:
@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: openci-runner/github-apps
+        working-directory: openci-runner/firebase/functions
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
