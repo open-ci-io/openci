@@ -74,6 +74,7 @@
             "rngs",
             "rustc",
             "rustls",
+            "secretmanager",
             "serayuzgur",
             "serde",
             "simonsiefke",
