@@ -4,7 +4,7 @@ import { defineSecret } from "firebase-functions/params";
 
 const firebaseServiceAccount = defineSecret("FB_SERVICE_ACCOUNT");
 
-export const helloWorld = onRequest(
+export const githubWebhook = onRequest(
 	{ secrets: [firebaseServiceAccount] },
 	(req, res) => {
 		const serviceAccountJson = JSON.parse(firebaseServiceAccount.value());

@@ -3,14 +3,8 @@ name: Firebase Functions Tests
 on:
   push:
     branches: [main, develop]
-    paths:
-      - "openci-runner/firebase/functions/**"
-      - ".github/workflows/firebase-functions-ci-cd.yml"
   pull_request:
     branches: [main, develop]
-    paths:
-      - "openci-runner/firebase/functions/**"
-      - ".github/workflows/firebase-functions-ci-cd.yml"
 
 jobs:
   github-apps-tests:
@@ -18,11 +12,6 @@ jobs:
 
   firebase-functions-tests:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    strategy:
-      matrix:
-        node-version: [20, 22]
     defaults:
       run:
         working-directory: openci-runner/firebase/functions
@@ -33,7 +22,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: .nvmrc
 
       - name: Install dependencies
         run: npm ci
@@ -42,11 +31,8 @@ jobs:
         run: npm test
 
   deploy-firebase-functions:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     needs: [github-apps-tests, firebase-functions-tests]
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     defaults:
       run:
         working-directory: openci-runner/firebase
@@ -55,7 +41,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
 
       - uses: google-github-actions/auth@v2
         with:
