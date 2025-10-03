@@ -9,3 +9,4 @@ typings/
 node_modules/
 *.local
 service_account.json
+service_account_dev.json

@@ -60,5 +60,5 @@ jobs:
         working-directory: openci-runner/firebase/functions
         run: npm ci
 
-      - name: Deploy Functions (dev)
+      - name: Deploy Functions (Production)
         run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT }}
