@@ -3,17 +3,9 @@ name: GitHub Apps Tests
 on:
   push:
     branches: [main, develop]
-    paths:
-      - "openci-runner/github-apps/**"
-      - ".github/workflows/github-apps-tests.yml"
-      - ".github/workflows/reusable-github-apps-tests.yml"
   pull_request:
     branches: [main, develop]
-    paths:
-      - "openci-runner/github-apps/**"
-      - ".github/workflows/github-apps-tests.yml"
-      - ".github/workflows/reusable-github-apps-tests.yml"
 
 jobs:
-  call-tests:
+  tests:
     uses: ./.github/workflows/reusable-github-apps-tests.yml

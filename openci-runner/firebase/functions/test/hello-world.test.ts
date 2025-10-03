@@ -14,7 +14,7 @@ let helloWorld: (req: any, res: any) => unknown;
 
 beforeAll(async () => {
 	const mod = await import("../src/index");
-	helloWorld = mod.helloWorld;
+	helloWorld = mod.githubWebhook;
 });
 
 describe("helloWorld", () => {
