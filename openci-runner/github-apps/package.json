@@ -13,17 +13,18 @@
 		"test": "vitest"
 	},
 	"dependencies": {
-		"probot": "^13.4.5"
+		"probot": "^14.0.2"
 	},
 	"devDependencies": {
-		"@types/node": "^20.0.0",
-		"nock": "^14.0.5",
-		"smee-client": "^2.0.0",
-		"vitest": "^2.0.0",
-		"typescript": "^5.8.3"
-	},
-	"overrides": {
-		"@types/pg": "8.15.1"
+		"@types/node": "^24.6.2",
+		"@vitest/coverage-v8": "^3.2.4",
+		"@vitest/ui": "^3.2.4",
+		"@vitest/utils": "^3.2.4",
+		"nock": "^14.0.10",
+		"smee-client": "^4.3.1",
+		"typescript": "^5.9.3",
+		"vite": "^7.1.9",
+		"vitest": "^3.2.4"
 	},
 	"engines": {
 		"node": "^22.0.0"

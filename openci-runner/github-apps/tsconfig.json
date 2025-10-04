@@ -15,7 +15,9 @@
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "Node16",
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    // TODO(someone): remove this
+    "skipLibCheck": true,
   },
   "include": [
     "src/"
