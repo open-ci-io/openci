@@ -2,10 +2,10 @@
 	"name": "github-apps",
 	"version": "1.0.0",
 	"private": true,
-	"description": "A OpenCI Runner App",
-	"author": "mafreud",
+	"description": "An OpenCI Runner App",
+	"author": "OpenCI inc",
 	"license": "ISC",
-	"homepage": "https://github.com//",
+	"homepage": "https://openci.run",
 	"keywords": ["probot", "github", "probot-app"],
 	"scripts": {
 		"build": "tsc",
@@ -26,7 +26,7 @@
 		"@types/pg": "8.15.1"
 	},
 	"engines": {
-		"node": ">= 18"
+		"node": "^22.0.0"
 	},
 	"type": "module"
 }

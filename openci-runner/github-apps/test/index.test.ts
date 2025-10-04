@@ -12,7 +12,7 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest";
 // Requiring our app implementation
 import myProbotApp from "../src/index.js";
 
-const issueCreatedBody = { body: "Thanks for opening this issue!" };
+const issueCreatedBody = { body: "Hello, World!" };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
