@@ -1,4 +1,5 @@
 # Welcome to OpenCI
+[![Deploy GitHub Apps](https://github.com/open-ci-io/openci/actions/workflows/github-apps-cd.yml/badge.svg)](https://github.com/open-ci-io/openci/actions/workflows/github-apps-cd.yml)
 
 ## Goals of OpenCI
 
