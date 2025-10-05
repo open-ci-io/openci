@@ -18,8 +18,6 @@
     "forceConsistentCasingInFileNames": true,
     // TODO(someone): remove this
     "skipLibCheck": true,
-    "noEmit": true,
-    "allowImportingTsExtensions": true
   },
   "include": [
     "src/"

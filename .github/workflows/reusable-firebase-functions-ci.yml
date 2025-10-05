@@ -23,6 +23,8 @@ jobs:
         run: |
           npm ci
           npm run build
+          ls -a
+          pwd
 
       - name: Install dependencies
         run: npm ci
