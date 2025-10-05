@@ -9,14 +9,14 @@ on:
 jobs:
   deploy-firebase-functions-dev:
     if: github.event_name == 'pull_request'
-    uses: .github/workflows/reusable-deploy-firebase-functions.yml
+    uses: ./.github/workflows/reusable-deploy-firebase-functions.yml
     secrets:
       gha_service_account: ${{ secrets.GHA_SERVICE_ACCOUNT_PREVIEW_FUNCS }}
       firebase_project_id: ${{ secrets.FIREBASE_PROJECT_ID_FOR_PREVIEW_FUNCTIONS }}
 
   deploy-firebase-functions-production:
     if: github.event_name == 'push'
-    uses: .github/workflows/reusable-deploy-firebase-functions.yml
+    uses: ./.github/workflows/reusable-deploy-firebase-functions.yml
     secrets:
       gha_service_account: ${{ secrets.GHA_SERVICE_ACCOUNT }}
       firebase_project_id: ${{ secrets.FIREBASE_PROJECT_ID }}
