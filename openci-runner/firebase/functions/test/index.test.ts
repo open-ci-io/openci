@@ -10,7 +10,7 @@ import nock from "nock";
 import { Probot, ProbotOctokit } from "probot";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 // Requiring our app implementation
-import myProbotApp from "../src/index.js";
+import { appFn } from "../lib/probot/index.js";
 
 const issueCreatedBody = { body: "Hello, World!" };
 
@@ -41,7 +41,7 @@ describe("My Probot app", () => {
 			}),
 		});
 		// Load our app into probot
-		probot.load(myProbotApp);
+		probot.load(appFn);
 	});
 
 	test("creates a comment when an issue is opened", async () => {
