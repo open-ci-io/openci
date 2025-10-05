@@ -7,8 +7,5 @@
                 "noUnusedImports": "error"
             }
         }
-    },
-    "organizeImports": {
-        "enabled": true
     }
 }
