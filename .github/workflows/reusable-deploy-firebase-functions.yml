@@ -1,0 +1,37 @@
+on:
+  workflow_call:
+    secrets:
+      gha_service_account:
+        required: true
+      firebase_project_id:
+        required: true
+
+jobs:
+  ci_and_deploy_firebase_functions:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: openci-runner/firebase/functions
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.gha_service_account }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: tsc
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      - name: Deploy Functions (dev)
+        working-directory: openci-runner/firebase
+        run: npx firebase-tools deploy --only functions --project ${{ secrets.firebase_project_id }}
