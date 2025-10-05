@@ -9,3 +9,5 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 		);
 	});
 };
+
+export default appFn;

@@ -5,7 +5,7 @@
 		"build:watch": "tsc --watch",
 		"serve": "npm run build && firebase emulators:start --only functions",
 		"shell": "npm run build && firebase functions:shell",
-		"start": "npm run shell",
+		"start": "probot run ./lib/probot/index.js",
 		"deploy": "firebase deploy --only functions",
 		"logs": "firebase functions:log",
 		"test": "vitest run"
@@ -23,6 +23,7 @@
 	"devDependencies": {
 		"@types/supertest": "^6.0.3",
 		"firebase-functions-test": "^3.1.0",
+		"smee-client": "^4.3.1",
 		"supertest": "^7.0.0",
 		"typescript": "^4.9.0",
 		"vitest": "^1.6.0"
