@@ -29,7 +29,7 @@ jobs:
 
       - uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.FIREBASE_SA_KEY_FOR_PREVIEW_FUNCTIONS }}
+          credentials_json: ${{ secrets.GHA_SERVICE_ACCOUNT_PREVIEW_FUNCS }}
 
       - name: Install dependencies for GitHub apps
         working-directory: openci-runner/github-apps
