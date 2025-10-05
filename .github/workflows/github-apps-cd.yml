@@ -31,6 +31,12 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SA_KEY_FOR_PREVIEW_FUNCTIONS }}
 
+      - name: Install dependencies for GitHub apps
+        working-directory: openci-runner/github-apps
+        run: |
+          npm ci
+          npm run build
+
       - name: Install dependencies
         working-directory: openci-runner/firebase/functions
         run: npm ci
