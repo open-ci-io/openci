@@ -54,7 +54,7 @@ jobs:
 
       - uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.FIREBASE_SA_KEY }}
+          credentials_json: ${{ secrets.GHA_SERVICE_ACCOUNT }}
 
       - name: Install dependencies
         working-directory: openci-runner/firebase/functions
