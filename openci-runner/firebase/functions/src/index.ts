@@ -35,8 +35,6 @@ export const githubWebhook = onRequest(
 	(req, res) => {
 		const serviceAccountJson = JSON.parse(firebaseServiceAccount.value());
 		serviceAccountJson;
-		const ghaAppId = JSON.parse(githubAppId.value());
-		ghaAppId;
 
 	createNodeMiddleware(appFn, {
 	probot: createProbot({
