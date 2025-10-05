@@ -36,6 +36,8 @@ jobs:
         run: |
           npm ci
           npm run build
+          pwd
+          ls -a
 
       - name: Install dependencies
         working-directory: openci-runner/firebase/functions
