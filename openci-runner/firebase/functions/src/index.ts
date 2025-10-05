@@ -1,19 +1,36 @@
-import { logger } from "firebase-functions";
 import { onRequest } from "firebase-functions/https";
 import { defineSecret } from "firebase-functions/params";
 import { createNodeMiddleware, createProbot } from "probot";
 
-import app from "../../../github-apps/src/index";
+import { logger } from "firebase-functions";
+import { appFn } from "../../../github-apps/lib/index.js";
 
 const firebaseServiceAccount = defineSecret("FB_SERVICE_ACCOUNT");
 
-export const probotApp = createNodeMiddleware(app, {
-	probot: createProbot(),
+const githubAppId = defineSecret("GITHUB_APP_ID");
+const githubPrivateKey = defineSecret("GITHUB_PRIVATE_KEY");
+const githubWebhookSecret = defineSecret("GITHUB_WEBHOOK_SECRET");
+
+export const probotApp = createNodeMiddleware(appFn, {
+	probot: createProbot({
+		overrides: {
+			appId: 123,
+			privateKey: githubPrivateKey.value(),
+			secret: githubWebhookSecret.value(),
+		},
+	}),
 	webhooksPath: "/",
 });
 
 export const githubWebhook = onRequest(
-	{ secrets: [firebaseServiceAccount] },
+	{
+		secrets: [
+			firebaseServiceAccount,
+			githubAppId,
+			githubPrivateKey,
+			githubWebhookSecret,
+		],
+	},
 	(req, res) => {
 		const serviceAccountJson = JSON.parse(firebaseServiceAccount.value());
 		serviceAccountJson;

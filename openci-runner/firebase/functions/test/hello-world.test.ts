@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 vi.mock("firebase-functions/params", () => ({
 	defineSecret: (name: string) => ({
 		name,
-		value: () => JSON.stringify({ projectId: "demo-project" }),
+		value: () => JSON.stringify({ projectId: "demo-project", appId: 123 }),
 	}),
 }));
 

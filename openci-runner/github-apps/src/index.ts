@@ -1,6 +1,6 @@
-import type { Probot } from "probot";
+import type { ApplicationFunction, Probot } from "probot";
 
-export default (app: Probot) => {
+export const appFn: ApplicationFunction = (app: Probot) => {
 	app.log.info("Yay! The app was loaded!");
 
 	app.on("issues.opened", async (context) => {
