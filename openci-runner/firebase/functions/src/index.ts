@@ -4,7 +4,7 @@ import { defineSecret } from "firebase-functions/params";
 import { logger } from "firebase-functions";
 import { createNodeMiddleware, createProbot } from "probot";
 
-import { appFn } from "../../../github-apps/lib/index.js";
+import { appFn } from "../probot/index.js";
 
 const firebaseServiceAccount = defineSecret("FB_SERVICE_ACCOUNT");
 const githubAppId = defineSecret("GITHUB_APP_ID");

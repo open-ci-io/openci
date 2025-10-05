@@ -14,6 +14,7 @@
   },
   "compileOnSave": true,
   "include": [
-    "src"
+    "src",
+    "probot"
   ]
 }

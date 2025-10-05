@@ -7,15 +7,8 @@ on:
     branches: [main, develop]
 
 jobs:
-  github-apps-tests:
-    uses: ./.github/workflows/reusable-github-apps-ci.yml
-
-  firebase-functions-tests:
-    uses: ./.github/workflows/reusable-firebase-functions-ci.yml
-
   deploy-firebase-functions-dev:
     if: github.event_name == 'pull_request'
-    needs: [github-apps-tests, firebase-functions-tests]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -31,25 +24,23 @@ jobs:
         with:
           credentials_json: ${{ secrets.GHA_SERVICE_ACCOUNT_PREVIEW_FUNCS }}
 
-      - name: Install dependencies for GitHub apps
-        working-directory: openci-runner/github-apps
-        run: |
-          npm ci
-          npm run build
-          pwd
-          ls -a
-          cd lib && ls -a
-
       - name: Install dependencies
         working-directory: openci-runner/firebase/functions
         run: npm ci
+
+      - name: Test
+        working-directory: openci-runner/firebase/functions
+        run: npm test
+
+      - name: tsc
+        working-directory: openci-runner/firebase/functions
+        run: npm run build
 
       - name: Deploy Functions (dev)
         run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID_FOR_PREVIEW_FUNCTIONS }}
 
   deploy-firebase-functions-production:
     if: github.event_name == 'push'
-    needs: [github-apps-tests, firebase-functions-tests]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -68,6 +59,14 @@ jobs:
       - name: Install dependencies
         working-directory: openci-runner/firebase/functions
         run: npm ci
+
+      - name: Test
+        working-directory: openci-runner/firebase/functions
+        run: npm test
+
+      - name: tsc
+        working-directory: openci-runner/firebase/functions
+        run: npm run build
 
       - name: Deploy Functions (Production)
         run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }}

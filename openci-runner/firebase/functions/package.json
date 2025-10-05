@@ -13,10 +13,11 @@
 	"engines": {
 		"node": "22"
 	},
-	"main": "lib/index.js",
+	"main": "lib/src/index.js",
 	"dependencies": {
 		"firebase-admin": "^12.6.0",
 		"firebase-functions": "^6.0.1",
+		"nock": "^14.0.10",
 		"probot": "^14.0.2"
 	},
 	"devDependencies": {

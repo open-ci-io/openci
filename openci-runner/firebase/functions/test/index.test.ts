@@ -10,7 +10,7 @@ import nock from "nock";
 import { Probot, ProbotOctokit } from "probot";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 // Requiring our app implementation
-import { appFn } from "../src/index.js";
+import { appFn } from "../lib/probot/index.js";
 
 const issueCreatedBody = { body: "Hello, World!" };
 
