@@ -28,13 +28,13 @@ jobs:
         working-directory: openci-runner/firebase/functions
         run: npm ci
 
-      - name: Test
-        working-directory: openci-runner/firebase/functions
-        run: npm test
-
       - name: tsc
         working-directory: openci-runner/firebase/functions
         run: npm run build
+
+      - name: Test
+        working-directory: openci-runner/firebase/functions
+        run: npm test
 
       - name: Deploy Functions (dev)
         run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID_FOR_PREVIEW_FUNCTIONS }}
@@ -60,13 +60,13 @@ jobs:
         working-directory: openci-runner/firebase/functions
         run: npm ci
 
-      - name: Test
-        working-directory: openci-runner/firebase/functions
-        run: npm test
-
       - name: tsc
         working-directory: openci-runner/firebase/functions
         run: npm run build
+
+      - name: Test
+        working-directory: openci-runner/firebase/functions
+        run: npm test
 
       - name: Deploy Functions (Production)
         run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }}
