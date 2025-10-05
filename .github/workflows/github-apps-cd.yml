@@ -9,64 +9,14 @@ on:
 jobs:
   deploy-firebase-functions-dev:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: openci-runner/firebase
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-
-      - uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GHA_SERVICE_ACCOUNT_PREVIEW_FUNCS }}
-
-      - name: Install dependencies
-        working-directory: openci-runner/firebase/functions
-        run: npm ci
-
-      - name: tsc
-        working-directory: openci-runner/firebase/functions
-        run: npm run build
-
-      - name: Test
-        working-directory: openci-runner/firebase/functions
-        run: npm test
-
-      - name: Deploy Functions (dev)
-        run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID_FOR_PREVIEW_FUNCTIONS }}
+    uses: ./.github/workflows/reusable-deploy-firebase-functions.yml
+    secrets:
+      gha_service_account: ${{ secrets.GHA_SERVICE_ACCOUNT_PREVIEW_FUNCS }}
+      firebase_project_id: ${{ secrets.FIREBASE_PROJECT_ID_FOR_PREVIEW_FUNCTIONS }}
 
   deploy-firebase-functions-production:
     if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: openci-runner/firebase
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-
-      - uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GHA_SERVICE_ACCOUNT }}
-
-      - name: Install dependencies
-        working-directory: openci-runner/firebase/functions
-        run: npm ci
-
-      - name: tsc
-        working-directory: openci-runner/firebase/functions
-        run: npm run build
-
-      - name: Test
-        working-directory: openci-runner/firebase/functions
-        run: npm test
-
-      - name: Deploy Functions (Production)
-        run: npx firebase-tools deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }}
+    uses: ./.github/workflows/reusable-deploy-firebase-functions.yml
+    secrets:
+      gha_service_account: ${{ secrets.GHA_SERVICE_ACCOUNT }}
+      firebase_project_id: ${{ secrets.FIREBASE_PROJECT_ID }}
