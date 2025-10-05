@@ -14,7 +14,7 @@ const githubWebhookSecret = defineSecret("GITHUB_WEBHOOK_SECRET");
 export const probotApp = createNodeMiddleware(appFn, {
 	probot: createProbot({
 		overrides: {
-			appId: 123,
+			appId: githubAppId.value(),
 			privateKey: githubPrivateKey.value(),
 			secret: githubWebhookSecret.value(),
 		},
