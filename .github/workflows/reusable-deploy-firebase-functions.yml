@@ -8,7 +8,7 @@ on:
 
 jobs:
   ci_and_deploy_firebase_functions:
-    runs-on: ubuntu-latest
+    runs-on: openci-runner-beta
     defaults:
       run:
         working-directory: openci-runner/firebase/functions
