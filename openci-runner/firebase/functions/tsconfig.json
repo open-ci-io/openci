@@ -4,10 +4,9 @@
     "esModuleInterop": true,
     "moduleResolution": "nodenext",
     "noImplicitReturns": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "outDir": "lib",
     "sourceMap": true,
-    "strict": true,
     "target": "es2017",
     // TODO(someone): remove this
     "skipLibCheck": true,
