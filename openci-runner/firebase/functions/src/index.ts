@@ -12,7 +12,14 @@ const hetznerSshPrivateKey = defineSecret("HETZNER_SSH_PRIVATE_KEY");
 
 export const githubWebhook = onRequest(
 	{
-		secrets: [githubAppId, githubPrivateKey, githubWebhookSecret],
+		secrets: [
+			githubAppId,
+			githubPrivateKey,
+			githubWebhookSecret,
+			hetznerApiKey,
+			hetznerSshPassphrase,
+			hetznerSshPrivateKey,
+		],
 	},
 	async (req, res) => {
 		const probot = await createNodeMiddleware(appFn, {
