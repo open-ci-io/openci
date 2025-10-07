@@ -82,6 +82,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 				retryCount++;
 			}
 		}
+		return;
 	});
 
 	app.on("workflow_job.completed", async (context) => {
@@ -100,6 +101,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 
 		await deleteServer(runnerId, process.env.HETZNER_API_KEY);
 		console.log("Finish cleaning up");
+		return;
 	});
 };
 
