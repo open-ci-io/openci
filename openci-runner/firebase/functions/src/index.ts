@@ -20,7 +20,7 @@ export const githubWebhook = onRequest(
 			hetznerSshPassphrase,
 			hetznerSshPrivateKey,
 		],
-		cpu: 16,
+		cpu: 8,
 		memory: "16GiB",
 	},
 	async (req, res) => {
