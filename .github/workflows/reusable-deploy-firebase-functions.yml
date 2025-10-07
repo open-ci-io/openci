@@ -32,6 +32,6 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Deploy Functions (dev)
+      - name: Deploy Functions
         working-directory: openci-runner/firebase
         run: npx firebase-tools deploy --only functions --project ${{ secrets.firebase_project_id }}
