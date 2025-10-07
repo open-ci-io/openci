@@ -8,7 +8,10 @@ on:
 
 jobs:
   ci_and_deploy_firebase_functions:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        runner: [ubuntu-latest, openci-runner-beta]
+    runs-on: ${{ matrix.runner }}
     defaults:
       run:
         working-directory: openci-runner/firebase/functions
@@ -32,6 +35,6 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Deploy Functions (dev)
+      - name: Deploy Functions
         working-directory: openci-runner/firebase
         run: npx firebase-tools deploy --only functions --project ${{ secrets.firebase_project_id }}

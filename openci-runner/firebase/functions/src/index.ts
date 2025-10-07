@@ -1,16 +1,27 @@
 import { onRequest } from "firebase-functions/https";
 import { defineSecret } from "firebase-functions/params";
 import { createNodeMiddleware, createProbot } from "probot";
-
 import { appFn } from "../probot/index.js";
 
 const githubAppId = defineSecret("GITHUB_APP_ID");
 const githubPrivateKey = defineSecret("GITHUB_PRIVATE_KEY");
 const githubWebhookSecret = defineSecret("GITHUB_WEBHOOK_SECRET");
+const hetznerApiKey = defineSecret("HETZNER_API_KEY");
+const hetznerSshPassphrase = defineSecret("HETZNER_SSH_PASSPHRASE");
+const hetznerSshPrivateKey = defineSecret("HETZNER_SSH_PRIVATE_KEY");
 
 export const githubWebhook = onRequest(
 	{
-		secrets: [githubAppId, githubPrivateKey, githubWebhookSecret],
+		secrets: [
+			githubAppId,
+			githubPrivateKey,
+			githubWebhookSecret,
+			hetznerApiKey,
+			hetznerSshPassphrase,
+			hetznerSshPrivateKey,
+		],
+		memory: "16GiB",
+		cpu: 8,
 	},
 	async (req, res) => {
 		const probot = await createNodeMiddleware(appFn, {
@@ -20,13 +31,19 @@ export const githubWebhook = onRequest(
 					privateKey: githubPrivateKey.value(),
 					secret: githubWebhookSecret.value(),
 				},
+				env: {
+					HETZNER_API_KEY: hetznerApiKey.value(),
+					HETZNER_SSH_PASSPHRASE: hetznerSshPassphrase.value(),
+					HETZNER_SSH_PRIVATE_KEY: hetznerSshPrivateKey.value(),
+				},
 			}),
 			webhooksPath: "/",
 		});
 
-		probot(req, res, () => {
+		await probot(req, res, () => {
 			res.writeHead(404);
 			res.end();
 		});
+		return;
 	},
 );
