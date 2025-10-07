@@ -22,6 +22,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 	});
 
 	app.on("workflow_job.queued", async (context) => {
+		console.log("workflow_job.queued");
 		const { token } = (await context.octokit.auth({
 			type: "installation",
 		})) as OctokitToken;
@@ -84,6 +85,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 	});
 
 	app.on("workflow_job.completed", async (context) => {
+		console.log("workflow_job.completed");
 		if (!isJobRequired(context)) {
 			console.log("This workflow job doesn't use openci runner");
 			return;
