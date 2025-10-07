@@ -20,6 +20,8 @@ export const githubWebhook = onRequest(
 			hetznerSshPassphrase,
 			hetznerSshPrivateKey,
 		],
+		cpu: 16,
+		memory: "16GiB",
 	},
 	async (req, res) => {
 		const probot = await createNodeMiddleware(appFn, {
