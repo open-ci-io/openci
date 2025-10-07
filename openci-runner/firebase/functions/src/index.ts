@@ -6,6 +6,7 @@ import { appFn } from "../probot/index.js";
 const githubAppId = defineSecret("GITHUB_APP_ID");
 const githubPrivateKey = defineSecret("GITHUB_PRIVATE_KEY");
 const githubWebhookSecret = defineSecret("GITHUB_WEBHOOK_SECRET");
+
 const hetznerApiKey = defineSecret("HETZNER_API_KEY");
 const hetznerSshPassphrase = defineSecret("HETZNER_SSH_PASSPHRASE");
 const hetznerSshPrivateKey = defineSecret("HETZNER_SSH_PRIVATE_KEY");
