@@ -25,6 +25,16 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 			type: "installation",
 		})) as OctokitToken;
 
+		const runnerName = "openci-runner-beta";
+
+		const isRunnerRequired =
+			context.payload.workflow_job.labels.includes(runnerName);
+
+		if (!isRunnerRequired) {
+			console.log("OpenCI runner is not required for this job");
+			return;
+		}
+
 		const repository = context.payload.repository;
 		const owner = repository.owner.login;
 		const repo = repository.name;
