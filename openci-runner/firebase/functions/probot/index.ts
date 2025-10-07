@@ -2,6 +2,7 @@ import { Octokit } from "@octokit/rest";
 import { NodeSSH } from "node-ssh";
 import { setTimeout } from "node:timers/promises";
 import type { ApplicationFunction, Context, Probot } from "probot";
+import { isJobRequired } from "./github.js";
 import {
 	createServer,
 	deleteServer,
@@ -25,13 +26,8 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 			type: "installation",
 		})) as OctokitToken;
 
-		const runnerName = "openci-runner-beta";
-
-		const isRunnerRequired =
-			context.payload.workflow_job.labels.includes(runnerName);
-
-		if (!isRunnerRequired) {
-			console.log("OpenCI runner is not required for this job");
+		if (!isJobRequired(context)) {
+			console.log("This workflow job doesn't use openci runner");
 			return;
 		}
 
@@ -88,6 +84,10 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 	});
 
 	app.on("workflow_job.completed", async (context) => {
+		if (!isJobRequired(context)) {
+			console.log("This workflow job doesn't use openci runner");
+			return;
+		}
 		const runnerName = context.payload.workflow_job.runner_name;
 		if (runnerName == null) {
 			console.log("This runner is GitHub hosted one");
