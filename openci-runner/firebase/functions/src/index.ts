@@ -38,9 +38,10 @@ export const githubWebhook = onRequest(
 			webhooksPath: "/",
 		});
 
-		probot(req, res, () => {
+		await probot(req, res, () => {
 			res.writeHead(404);
 			res.end();
 		});
+		return;
 	},
 );
