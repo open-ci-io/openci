@@ -23,6 +23,14 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 
 	app.on("workflow_job.queued", async (context) => {
 		console.log("workflow_job.queued");
+
+		if (
+			!process.env.HETZNER_API_KEY ||
+			!process.env.HETZNER_SSH_PRIVATE_KEY ||
+			!process.env.HETZNER_SSH_PASSPHRASE
+		) {
+			throw new Error("Required environment variables are missing");
+		}
 		const { token } = (await context.octokit.auth({
 			type: "installation",
 		})) as OctokitToken;
@@ -82,11 +90,20 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 				retryCount++;
 			}
 		}
+
+		if (retryCount >= maxRetry) {
+			throw new Error(
+				`Failed to establish SSH connection. I did try my best. ${maxRetry}`,
+			);
+		}
 		return;
 	});
 
 	app.on("workflow_job.completed", async (context) => {
 		console.log("workflow_job.completed");
+		if (!process.env.HETZNER_API_KEY) {
+			throw new Error("Required environment variables are missing");
+		}
 		if (!isJobRequired(context)) {
 			console.log("This workflow job doesn't use openci runner");
 			return;
@@ -94,6 +111,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 		const runnerName = context.payload.workflow_job.runner_name;
 		if (runnerName == null) {
 			console.log("This runner is GitHub hosted one");
+			return;
 		}
 		const defaultRunnerName = "OpenCI ランナー ";
 		const runnerId = runnerName?.replace(defaultRunnerName, "");
