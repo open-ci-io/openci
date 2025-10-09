@@ -23,6 +23,7 @@ export const githubWebhook = onRequest(
 		],
 		memory: "16GiB",
 		cpu: 8,
+		timeoutSeconds: 300,
 	},
 	async (req, res) => {
 		const probot = await createNodeMiddleware(appFn, {
