@@ -5,24 +5,9 @@
         }
     ],
     "settings": {
-        "rust-analyzer.cargo.targetDir": "target",
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "rust-lang.rust-analyzer",
         "editor.codeActionsOnSave": {
             "source.organizeImports": "always"
-        },
-        "sqlfluff.dialect": "postgres",
-        "sqlfluff.linter.lintEntireProject": true,
-        "rust-analyzer.check.overrideCommand": [
-            "cargo",
-            "dylint",
-            "--all",
-            "--",
-            "--all-targets",
-            "--message-format=json"
-        ],
-        "rust-analyzer.cargo.extraEnv": {
-            "DYLINT_LIBRARY_PATH": "/Users/masahiroaoki/Developer/cargo-sqruff/target/release/"
         },
         "files.exclude": {
             "target": true
@@ -91,90 +76,9 @@
             "vadimcn",
             "validkey"
         ],
-        "rust-analyzer.linkedProjects": [
-            "packages/openci-controller/Cargo.toml",
-            "packages/openci-worker/Cargo.toml"
-        ],
-        "[toml]": {
-            "editor.defaultFormatter": "tamasfe.even-better-toml"
-        },
-        "[sql]": {
-            "editor.defaultFormatter": "dorzey.vscode-sqlfluff"
-        },
         "[dockerfile]": {
             "editor.defaultFormatter": "ms-azuretools.vscode-containers"
         },
-        "[caddyfile]": {
-            "editor.defaultFormatter": "matthewpi.caddyfile-support"
-        }
-    },
-    "tasks": {
-        "version": "2.0.0",
-        "tasks": [
-            // {
-            //     "label": "dev-startup",
-            //     "dependsOrder": "sequence",
-            //     "dependsOn": [
-            //         "make down",
-            //         "make up-dev"
-            //     ],
-            //     "runOptions": {
-            //         "runOn": "folderOpen",
-            //         "instanceLimit": 1
-            //     },
-            //     "problemMatcher": []
-            // },
-            // {
-            //     "label": "make up-dev",
-            //     "type": "shell",
-            //     "command": "make up-dev",
-            //     "options": {
-            //         "cwd": "${workspaceFolder}/packages/openci-controller",
-            //         "env": {
-            //             "RUST_LOG": "info",
-            //         },
-            //     },
-            //     "group": "build",
-            //     "problemMatcher": [
-            //         "$rustc"
-            //     ],
-            //     "presentation": {
-            //         "reveal": "always",
-            //         "panel": "dedicated",
-            //         "clear": false
-            //     }
-            // },
-            // {
-            //     "label": "make test",
-            //     "type": "shell",
-            //     "command": "make test",
-            //     "options": {
-            //         "cwd": "${workspaceFolder}/packages/openci-controller",
-            //         "env": {
-            //             "RUST_LOG": "info",
-            //         }
-            //     },
-            //     "group": "build",
-            //     "problemMatcher": [
-            //         "$rustc"
-            //     ]
-            // },
-            // {
-            //     "label": "make down",
-            //     "type": "shell",
-            //     "command": "make down",
-            //     "options": {
-            //         "cwd": "${workspaceFolder}/packages/openci-controller",
-            //         "env": {
-            //             "RUST_LOG": "info",
-            //         }
-            //     },
-            //     "group": "build",
-            //     "problemMatcher": [
-            //         "$rustc"
-            //     ]
-            // },
-        ],
     },
     "extensions": {
         "recommendations": [
