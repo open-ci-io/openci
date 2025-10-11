@@ -8,7 +8,10 @@ on:
 
 jobs:
   ci_and_deploy_firebase_functions:
-    runs-on: openci-runner-beta
+    strategy:
+      matrix:
+        runners: ["openci-runner-beta", "ubuntu-latest"]
+    runs-on: ${{ matrix.runners }}
     defaults:
       run:
         working-directory: openci-runner/firebase/functions
