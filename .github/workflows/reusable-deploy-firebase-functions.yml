@@ -30,7 +30,12 @@ jobs:
         run: npm run build
 
       - name: Test
-        run: npm test
+        run: npx vitest run --coverage
+
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Deploy Functions
         working-directory: openci-runner/firebase

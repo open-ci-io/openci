@@ -74,7 +74,8 @@
             "urandom",
             "utoipa",
             "vadimcn",
-            "validkey"
+            "validkey",
+            "vitest"
         ],
         "[dockerfile]": {
             "editor.defaultFormatter": "ms-azuretools.vscode-containers"
