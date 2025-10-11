@@ -4,6 +4,7 @@
 
 # OpenCI ランナー へようこそ
 [![Deploy GitHub Apps](https://github.com/open-ci-io/openci/actions/workflows/github-apps-cd.yml/badge.svg)](https://github.com/open-ci-io/openci/actions/workflows/github-apps-cd.yml)
+[![codecov](https://codecov.io/github/open-ci-io/openci/graph/badge.svg?token=RAJBUMJU3O)](https://codecov.io/github/open-ci-io/openci)
 
 OpenCIランナーは、GitHub Actionsの、より高速で低価格なランナーを提供するサービスです。
 
@@ -17,3 +18,6 @@ OSSで開発しておりますので、ご意見・ご要望がありました�
 
 ## 使い方
 [こちら](https://openci.craft.me/WRmKUOlz2MOsJE)を参照してください。
+
+## テストカバー状況
+<img src = "https://codecov.io/github/open-ci-io/openci/graphs/sunburst.svg" width = "120" />
