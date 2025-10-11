@@ -1,7 +1,12 @@
+import Sentry from "@sentry/google-cloud-serverless";
+
+Sentry.init({
+	dsn: "https://3910f63ab302d8927d9eb7b485697343@o4510069984657408.ingest.us.sentry.io/4510168562139136",
+	sendDefaultPii: true,
+});
+
 import { onRequest } from "firebase-functions/https";
 import { defineSecret } from "firebase-functions/params";
-import { createNodeMiddleware, createProbot } from "probot";
-import { appFn } from "../probot/index.js";
 
 const githubAppId = defineSecret("GITHUB_APP_ID");
 const githubPrivateKey = defineSecret("GITHUB_PRIVATE_KEY");
@@ -11,41 +16,44 @@ const hetznerApiKey = defineSecret("HETZNER_API_KEY");
 const hetznerSshPassphrase = defineSecret("HETZNER_SSH_PASSPHRASE");
 const hetznerSshPrivateKey = defineSecret("HETZNER_SSH_PRIVATE_KEY");
 
-export const githubWebhook = onRequest(
-	{
-		secrets: [
-			githubAppId,
-			githubPrivateKey,
-			githubWebhookSecret,
-			hetznerApiKey,
-			hetznerSshPassphrase,
-			hetznerSshPrivateKey,
-		],
-		memory: "16GiB",
-		cpu: 8,
-		timeoutSeconds: 300,
-	},
-	async (req, res) => {
-		const probot = await createNodeMiddleware(appFn, {
-			probot: createProbot({
-				overrides: {
-					appId: githubAppId.value(),
-					privateKey: githubPrivateKey.value(),
-					secret: githubWebhookSecret.value(),
-				},
-				env: {
-					HETZNER_API_KEY: hetznerApiKey.value(),
-					HETZNER_SSH_PASSPHRASE: hetznerSshPassphrase.value(),
-					HETZNER_SSH_PRIVATE_KEY: hetznerSshPrivateKey.value(),
-				},
-			}),
-			webhooksPath: "/",
-		});
+export const githubWebhook = Sentry.wrapHttpFunction((_, __) => {
+	onRequest(
+		{
+			secrets: [
+				githubAppId,
+				githubPrivateKey,
+				githubWebhookSecret,
+				hetznerApiKey,
+				hetznerSshPassphrase,
+				hetznerSshPrivateKey,
+			],
+			memory: "16GiB",
+			cpu: 8,
+			timeoutSeconds: 300,
+		},
+		async (_, __) => {
+			throw new Error("oh, hello there!");
+			// const probot = await createNodeMiddleware(appFn, {
+			// 	probot: createProbot({
+			// 		overrides: {
+			// 			appId: githubAppId.value(),
+			// 			privateKey: githubPrivateKey.value(),
+			// 			secret: githubWebhookSecret.value(),
+			// 		},
+			// 		env: {
+			// 			HETZNER_API_KEY: hetznerApiKey.value(),
+			// 			HETZNER_SSH_PASSPHRASE: hetznerSshPassphrase.value(),
+			// 			HETZNER_SSH_PRIVATE_KEY: hetznerSshPrivateKey.value(),
+			// 		},
+			// 	}),
+			// 	webhooksPath: "/",
+			// });
 
-		await probot(req, res, () => {
-			res.writeHead(404);
-			res.end();
-		});
-		return;
-	},
-);
+			// await probot(req, res, () => {
+			// 	res.writeHead(404);
+			// 	res.end();
+			// });
+			// return;
+		},
+	);
+});
