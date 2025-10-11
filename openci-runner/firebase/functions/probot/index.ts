@@ -23,7 +23,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 	});
 
 	app.on("workflow_job.queued", async (context) => {
-		console.info("workflow_job.queued");
+		console.info("workflow_job.queued has started");
 
 		if (
 			!process.env.HETZNER_API_KEY ||
@@ -102,7 +102,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 	});
 
 	app.on("workflow_job.completed", async (context) => {
-		console.log("workflow_job.completed event started");
+		console.info("workflow_job.completed event started");
 		if (!process.env.HETZNER_API_KEY) {
 			throw new Error("Required environment variables are missing");
 		}
