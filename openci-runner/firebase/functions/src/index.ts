@@ -1,4 +1,5 @@
 import { onRequest } from "firebase-functions/https";
+import { log } from "firebase-functions/logger";
 import { defineSecret } from "firebase-functions/params";
 import { createNodeMiddleware, createProbot } from "probot";
 import { appFn } from "../probot/index.js";
@@ -26,6 +27,7 @@ export const githubWebhook = onRequest(
 		timeoutSeconds: 300,
 	},
 	async (req, res) => {
+		log("githubWebhook has started");
 		const probot = await createNodeMiddleware(appFn, {
 			probot: createProbot({
 				overrides: {

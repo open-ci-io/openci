@@ -15,6 +15,7 @@ import {
 export const appFn: ApplicationFunction = (app: Probot) => {
 	app.log.info("Yay! The app was loaded!");
 
+	// This is for debugging.
 	app.on("issues.reopened", async (context: Context) => {
 		return context.octokit.rest.issues.createComment(
 			context.issue({ body: "Probot is working!" }),
@@ -22,7 +23,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 	});
 
 	app.on("workflow_job.queued", async (context) => {
-		console.log("workflow_job.queued");
+		console.info("workflow_job.queued");
 
 		if (
 			!process.env.HETZNER_API_KEY ||
@@ -45,16 +46,17 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 		const repo = repository.name;
 
 		const hetznerResponse = await createServer(process.env.HETZNER_API_KEY);
+		console.info("Runner server has been created");
 		while (true) {
 			const status = await getServerStatusById(
 				hetznerResponse.serverId,
 				process.env.HETZNER_API_KEY,
 			);
 			if (status === "running") {
-				console.log("Server is now running!");
+				console.info("Runner server is now running!");
 				break;
 			} else {
-				console.log("Waiting for the server init. Will try again in 1 second");
+				console.info("Waiting for the server init. Will try again in 1 second");
 				await setTimeout(1000);
 			}
 		}
@@ -62,7 +64,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 		const maxRetry = 10;
 		let retryCount = 0;
 		while (retryCount < maxRetry) {
-			console.log("retry:", retryCount);
+			console.info("retry:", retryCount);
 			try {
 				const sshResult = await ssh.connect({
 					host: hetznerResponse.ipv4,
@@ -82,7 +84,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 				);
 				await sshResult.execCommand("apt install tmux");
 				await sshResult.execCommand(initRunner(encodedJitConfig));
-				console.log("Successfully start openci runner");
+				console.info("Successfully start openci runner");
 				break;
 			} catch (e) {
 				console.log("error, will try again in 1 second", e);
@@ -100,7 +102,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 	});
 
 	app.on("workflow_job.completed", async (context) => {
-		console.log("workflow_job.completed");
+		console.log("workflow_job.completed event started");
 		if (!process.env.HETZNER_API_KEY) {
 			throw new Error("Required environment variables are missing");
 		}
@@ -115,10 +117,14 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 		}
 		const defaultRunnerName = "OpenCI ランナー ";
 		const runnerId = runnerName?.replace(defaultRunnerName, "");
-		console.log("runner id", runnerId);
+		console.info("runner id", runnerId);
 
-		await deleteServer(runnerId, process.env.HETZNER_API_KEY);
-		console.log("Finish cleaning up");
+		try {
+			await deleteServer(runnerId, process.env.HETZNER_API_KEY);
+			console.info("Successfully deleted runner");
+		} catch (e) {
+			console.error(`Failed to delete a runner: ${runnerId}`, "Error:", e);
+		}
 		return;
 	});
 };
