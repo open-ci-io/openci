@@ -12,6 +12,9 @@ import {
 	type OctokitToken,
 } from "./hetzner.js";
 
+const workflowJobQueued = "workflow_job.queued";
+const workflowJobCompleted = "workflow_job.completed";
+
 export const appFn: ApplicationFunction = (app: Probot) => {
 	app.log.info("Yay! The app was loaded!");
 
@@ -22,8 +25,8 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 		);
 	});
 
-	app.on("workflow_job.queued", async (context) => {
-		console.info("workflow_job.queued has started");
+	app.on(workflowJobQueued, async (context) => {
+		console.info(`${workflowJobQueued} has started`);
 
 		if (
 			!process.env.HETZNER_API_KEY ||
@@ -98,21 +101,22 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 				`Failed to establish SSH connection. I did try my best. ${maxRetry}`,
 			);
 		}
+		console.info(`${workflowJobQueued} has finished`);
 		return;
 	});
 
-	app.on("workflow_job.completed", async (context) => {
-		console.info("workflow_job.completed event started");
+	app.on(workflowJobCompleted, async (context) => {
+		console.info(`${workflowJobCompleted} event started`);
 		if (!process.env.HETZNER_API_KEY) {
 			throw new Error("Required environment variables are missing");
 		}
 		if (!isJobRequired(context)) {
-			console.log("This workflow job doesn't use openci runner");
+			console.log("This workflow job doesn't use openci runner. Stopping.");
 			return;
 		}
 		const runnerName = context.payload.workflow_job.runner_name;
 		if (runnerName == null) {
-			console.log("This runner is GitHub hosted one");
+			console.log("This runner is GitHub hosted one. Stopping");
 			return;
 		}
 		const defaultRunnerName = "OpenCI ランナー ";
@@ -125,6 +129,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 		} catch (e) {
 			console.error(`Failed to delete a runner: ${runnerId}`, "Error:", e);
 		}
+		console.info(`${workflowJobCompleted} event finished`);
 		return;
 	});
 };
