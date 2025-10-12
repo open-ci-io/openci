@@ -1,11 +1,25 @@
 {
+    "assist": {
+        "actions": {
+            "source": {
+                "useSortedKeys": "on"
+            }
+        },
+        "enabled": true
+    },
+    "files": {
+        "includes": [
+            "**",
+            "!**/node_modules"
+        ]
+    },
     "linter": {
         "enabled": true,
         "rules": {
-            "recommended": true,
             "correctness": {
                 "noUnusedImports": "error"
-            }
+            },
+            "recommended": true
         }
     }
 }

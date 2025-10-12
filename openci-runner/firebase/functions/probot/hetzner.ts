@@ -1,5 +1,3 @@
-import type { Octokit } from "@octokit/rest";
-
 const baseUrl = "https://api.hetzner.cloud/v1/servers";
 
 export interface OctokitToken {
@@ -8,10 +6,10 @@ export interface OctokitToken {
 
 export async function deleteServer(id: string, apiKey: string) {
 	await fetch(`${baseUrl}/${id}`, {
-		method: "DELETE",
 		headers: {
 			Authorization: `Bearer ${apiKey}`,
 		},
+		method: "DELETE",
 	});
 }
 
@@ -22,19 +20,19 @@ export type HetznerResponse = {
 
 export async function createServer(apiKey: string): Promise<HetznerResponse> {
 	const body = {
-		name: crypto.randomUUID(),
-		location: "fsn1",
-		server_type: "cpx41",
 		image: "ubuntu-24.04",
+		location: "fsn1",
+		name: crypto.randomUUID(),
+		server_type: "cpx41",
 		ssh_keys: ["openci-runner-probot"],
 	};
 
 	const response = await fetch(baseUrl, {
-		method: "POST",
+		body: JSON.stringify(body),
 		headers: {
 			Authorization: `Bearer ${apiKey}`,
 		},
-		body: JSON.stringify(body),
+		method: "POST",
 	});
 
 	const responseJson = await response.json();
@@ -45,8 +43,8 @@ export async function createServer(apiKey: string): Promise<HetznerResponse> {
 	const serverId = server.id;
 
 	return {
-		serverId: serverId,
 		ipv4: ipv4,
+		serverId: serverId,
 	};
 }
 
@@ -61,30 +59,6 @@ export async function getServerStatusById(
 	});
 	const jsonRes = await _response.json();
 	return jsonRes.server.status;
-}
-
-export async function getJitConfig(
-	octokit: Octokit,
-	owner: string,
-	repo: string,
-	serverId: number,
-): Promise<string> {
-	const jitConfigRes = await octokit.request(
-		`POST /repos/{owner}/{repo}/actions/runners/generate-jitconfig`,
-		{
-			owner: `${owner}`,
-			repo: `${repo}`,
-			name: `OpenCI ランナー ${serverId}`,
-			runner_group_id: 1,
-			labels: ["openci-runner-beta"],
-			work_folder: "_work",
-			headers: {
-				"X-GitHub-Api-Version": "2022-11-28",
-			},
-		},
-	);
-
-	return jitConfigRes.data.encoded_jit_config;
 }
 
 export function initRunner(runnerConfig: string): string {

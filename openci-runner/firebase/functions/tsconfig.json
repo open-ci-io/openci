@@ -1,17 +1,17 @@
 {
+  "compileOnSave": true,
   "compilerOptions": {
-    "module": "NodeNext",
     "esModuleInterop": true,
+    "module": "NodeNext",
     "moduleResolution": "nodenext",
     "noImplicitReturns": true,
     "noUnusedLocals": false,
     "outDir": "lib",
-    "sourceMap": true,
-    "target": "es2017",
     // TODO(someone): remove this
     "skipLibCheck": true,
+    "sourceMap": true,
+    "target": "es2017"
   },
-  "compileOnSave": true,
   "include": [
     "src",
     "probot"

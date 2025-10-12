@@ -1,86 +1,4 @@
 {
-    "folders": [
-        {
-            "path": "."
-        }
-    ],
-    "settings": {
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": "always"
-        },
-        "files.exclude": {
-            "target": true
-        },
-        "search.exclude": {
-            "target": true
-        },
-        "terminal.integrated.cwd": "${workspaceFolder}",
-        "cSpell.words": [
-            "aoki",
-            "Bitrise",
-            "bradlc",
-            "brunhage",
-            "Caddyfile",
-            "CHANGEME",
-            "chrono",
-            "Codemagic",
-            "cweijan",
-            "dbaeumer",
-            "dbclient",
-            "dependi",
-            "dotenv",
-            "dotenvy",
-            "dotjoshjohnson",
-            "foxundermoon",
-            "FUNCS",
-            "hexdigit",
-            "Hmac",
-            "inferrinizzard",
-            "jdbc",
-            "jeroen",
-            "jitconfig",
-            "jsonwebtoken",
-            "libpq",
-            "mafreud",
-            "meijer",
-            "mikestead",
-            "mockall",
-            "mthuong",
-            "nextest",
-            "nodenext",
-            "nonexistentkey",
-            "nvmrc",
-            "octocrab",
-            "openci",
-            "plainaddress",
-            "plibither",
-            "plpgsql",
-            "pubspec",
-            "riverpod",
-            "rngs",
-            "RUNASROOT",
-            "rustc",
-            "rustls",
-            "serayuzgur",
-            "serde",
-            "simonsiefke",
-            "smee",
-            "sqlfluff",
-            "sqlx",
-            "tamasfe",
-            "thiserror",
-            "unifiedjs",
-            "urandom",
-            "utoipa",
-            "vadimcn",
-            "validkey",
-            "vitest"
-        ],
-        "[dockerfile]": {
-            "editor.defaultFormatter": "ms-azuretools.vscode-containers"
-        },
-    },
     "extensions": {
         "recommendations": [
             "aaron-bond.better-comments",
@@ -108,7 +26,96 @@
             "streetsidesoftware.code-spell-checker",
             "tamasfe.even-better-toml",
             "unifiedjs.vscode-mdx",
-            "vadimcn.vscode-lldb",
+            "vadimcn.vscode-lldb"
         ]
+    },
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "[dockerfile]": {
+            "editor.defaultFormatter": "ms-azuretools.vscode-containers"
+        },
+        "cSpell.words": [
+            "aoki",
+            "Bitrise",
+            "bradlc",
+            "brunhage",
+            "Caddyfile",
+            "CHANGEME",
+            "chrono",
+            "Codemagic",
+            "cweijan",
+            "dbaeumer",
+            "dbclient",
+            "dependi",
+            "dotenv",
+            "dotenvy",
+            "dotjoshjohnson",
+            "eslintcache",
+            "firebaserc",
+            "foxundermoon",
+            "FUNCS",
+            "hexdigit",
+            "hiimbex",
+            "Hmac",
+            "inferrinizzard",
+            "jdbc",
+            "jeroen",
+            "jitconfig",
+            "jscoverage",
+            "jsonwebtoken",
+            "libpq",
+            "mafreud",
+            "meijer",
+            "mikestead",
+            "mockall",
+            "mthuong",
+            "nextest",
+            "nodenext",
+            "nonexistentkey",
+            "nvmrc",
+            "octocrab",
+            "openci",
+            "pids",
+            "plainaddress",
+            "plibither",
+            "plpgsql",
+            "predeploy",
+            "pubspec",
+            "riverpod",
+            "rngs",
+            "RUNASROOT",
+            "rustc",
+            "rustls",
+            "serayuzgur",
+            "serde",
+            "simonsiefke",
+            "smee",
+            "sqlfluff",
+            "sqlx",
+            "tamasfe",
+            "thiserror",
+            "unifiedjs",
+            "urandom",
+            "utoipa",
+            "vadimcn",
+            "validkey",
+            "vitest",
+            "wscript"
+        ],
+        "editor.codeActionsOnSave": {
+            "source.organizeImports.biome": "explicit"
+        },
+        "editor.formatOnSave": true,
+        "files.exclude": {
+            "target": true
+        },
+        "search.exclude": {
+            "target": true
+        },
+        "terminal.integrated.cwd": "${workspaceFolder}"
     }
 }
