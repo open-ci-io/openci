@@ -54,6 +54,8 @@
             "dotenv",
             "dotenvy",
             "dotjoshjohnson",
+            "eslintcache",
+            "firebaserc",
             "foxundermoon",
             "FUNCS",
             "hexdigit",
@@ -63,6 +65,7 @@
             "jdbc",
             "jeroen",
             "jitconfig",
+            "jscoverage",
             "jsonwebtoken",
             "libpq",
             "mafreud",
@@ -76,6 +79,7 @@
             "nvmrc",
             "octocrab",
             "openci",
+            "pids",
             "plainaddress",
             "plibither",
             "plpgsql",
@@ -99,7 +103,8 @@
             "utoipa",
             "vadimcn",
             "validkey",
-            "vitest"
+            "vitest",
+            "wscript"
         ],
         "editor.codeActionsOnSave": {
             "source.organizeImports.biome": "explicit"

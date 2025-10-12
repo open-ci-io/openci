@@ -7,6 +7,12 @@
         },
         "enabled": true
     },
+    "files": {
+        "includes": [
+            "**",
+            "!**/node_modules"
+        ]
+    },
     "linter": {
         "enabled": true,
         "rules": {
