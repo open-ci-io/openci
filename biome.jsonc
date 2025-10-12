@@ -9,11 +9,11 @@
     },
     "linter": {
         "enabled": true,
+        "recommended": true,
         "rules": {
             "correctness": {
                 "noUnusedImports": "error"
-            },
-            "recommended": true
+            }
         }
     }
 }
