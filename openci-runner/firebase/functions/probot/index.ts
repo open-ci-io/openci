@@ -1,12 +1,11 @@
+import { setTimeout } from "node:timers/promises";
 import { Octokit } from "@octokit/rest";
 import { NodeSSH } from "node-ssh";
-import { setTimeout } from "node:timers/promises";
 import type { ApplicationFunction, Context, Probot } from "probot";
-import { isJobRequired } from "./github.js";
+import { getJitConfig, isJobRequired } from "./github.js";
 import {
 	createServer,
 	deleteServer,
-	getJitConfig,
 	getServerStatusById,
 	initRunner,
 	type OctokitToken,
@@ -19,9 +18,9 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 	app.log.info("Yay! The app was loaded!");
 
 	// This is for debugging.
-	app.on("issues.reopened", async (context: Context) => {
+	app.on("issues.opened", async (context: Context) => {
 		return context.octokit.rest.issues.createComment(
-			context.issue({ body: "Probot is working!" }),
+			context.issue({ body: "Hello, World!" }),
 		);
 	});
 
@@ -71,9 +70,9 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 			try {
 				const sshResult = await ssh.connect({
 					host: hetznerResponse.ipv4,
-					username: "root",
-					privateKey: process.env.HETZNER_SSH_PRIVATE_KEY,
 					passphrase: process.env.HETZNER_SSH_PASSPHRASE,
+					privateKey: process.env.HETZNER_SSH_PRIVATE_KEY,
+					username: "root",
 				});
 
 				const octokit = new Octokit({

@@ -1,11 +1,19 @@
 {
+    "assist": {
+        "actions": {
+            "source": {
+                "useSortedKeys": "on"
+            }
+        },
+        "enabled": true
+    },
     "linter": {
         "enabled": true,
         "rules": {
-            "recommended": true,
             "correctness": {
                 "noUnusedImports": "error"
-            }
+            },
+            "recommended": true
         }
     }
 }

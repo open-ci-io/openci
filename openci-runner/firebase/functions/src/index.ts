@@ -14,6 +14,8 @@ const hetznerSshPrivateKey = defineSecret("HETZNER_SSH_PRIVATE_KEY");
 
 export const githubWebhook = onRequest(
 	{
+		cpu: 8,
+		memory: "16GiB",
 		secrets: [
 			githubAppId,
 			githubPrivateKey,
@@ -22,23 +24,21 @@ export const githubWebhook = onRequest(
 			hetznerSshPassphrase,
 			hetznerSshPrivateKey,
 		],
-		memory: "16GiB",
-		cpu: 8,
 		timeoutSeconds: 300,
 	},
 	async (req, res) => {
 		log("githubWebhook has started");
 		const probot = await createNodeMiddleware(appFn, {
 			probot: createProbot({
-				overrides: {
-					appId: githubAppId.value(),
-					privateKey: githubPrivateKey.value(),
-					secret: githubWebhookSecret.value(),
-				},
 				env: {
 					HETZNER_API_KEY: hetznerApiKey.value(),
 					HETZNER_SSH_PASSPHRASE: hetznerSshPassphrase.value(),
 					HETZNER_SSH_PRIVATE_KEY: hetznerSshPrivateKey.value(),
+				},
+				overrides: {
+					appId: githubAppId.value(),
+					privateKey: githubPrivateKey.value(),
+					secret: githubWebhookSecret.value(),
 				},
 			}),
 			webhooksPath: "/",
