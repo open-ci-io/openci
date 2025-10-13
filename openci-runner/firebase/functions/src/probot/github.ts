@@ -32,13 +32,13 @@ export async function getJitConfig(
 }
 
 export enum ActionsRunnerOS {
-	osx,
-	linux,
+	osx = "osx",
+	linux = "linux",
 }
 
 export enum ActionsRunnerArchitecture {
-	x64,
-	arm64,
+	x64 = "x64",
+	arm64 = "arm64",
 }
 
 const mkdir = "mkdir actions-runner";
@@ -48,7 +48,7 @@ function downloadRunnerScriptAndUnZip(
 	os: ActionsRunnerOS,
 	architecture: ActionsRunnerArchitecture,
 ) {
-	const fileName = `actions-runner-${os.toString()}-${architecture.toString()}-${scriptVersion}.tar.gz`;
+	const fileName = `actions-runner-${os}-${architecture}-${scriptVersion}.tar.gz`;
 	return `curl -o ${fileName} -L https://github.com/actions/runner/releases/download/v${scriptVersion}/${fileName} && tar xzf ./${fileName}`;
 }
 
