@@ -2,12 +2,19 @@ import { setTimeout } from "node:timers/promises";
 import { Octokit } from "@octokit/rest";
 import { NodeSSH } from "node-ssh";
 import type { ApplicationFunction, Context, Probot } from "probot";
-import { getJitConfig, isJobRequired } from "./github.js";
+import {
+	ActionsRunnerArchitecture,
+	ActionsRunnerOS,
+	getJitConfig,
+	initRunner,
+	isJobRequired,
+	startRunner,
+} from "./github.js";
 import {
 	createServer,
+	createServerSpec,
 	deleteServer,
 	getServerStatusById,
-	initRunner,
 	type OctokitToken,
 } from "./hetzner.js";
 
@@ -47,7 +54,11 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 		const owner = repository.owner.login;
 		const repo = repository.name;
 
-		const hetznerResponse = await createServer(process.env.HETZNER_API_KEY);
+		const serverSpec = createServerSpec();
+		const hetznerResponse = await createServer(
+			process.env.HETZNER_API_KEY,
+			serverSpec,
+		);
 		console.info("Runner server has been created");
 		while (true) {
 			const status = await getServerStatusById(
@@ -84,9 +95,35 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 					repo,
 					hetznerResponse.serverId,
 				);
-				await sshResult.execCommand("apt install tmux");
-				await sshResult.execCommand(initRunner(encodedJitConfig));
-				console.info("Successfully start openci runner");
+
+				const resTmux = await sshResult.execCommand("apt install tmux");
+				if (resTmux.code === 0) {
+					console.log("Successfully installed tmux");
+				} else {
+					throw Error("Failed to install tmux");
+				}
+
+				const resInitRunner = await sshResult.execCommand(
+					initRunner(
+						"2.328.0",
+						ActionsRunnerOS.linux,
+						ActionsRunnerArchitecture.x64,
+					),
+				);
+				if (resInitRunner.code === 0) {
+					console.log("Successfully initiated GHA Runner");
+				} else {
+					throw Error("Failed to initiate GHA Runner");
+				}
+
+				const startRunnerRes = await sshResult.execCommand(
+					startRunner(encodedJitConfig),
+				);
+				if (startRunnerRes.code === 0) {
+					console.log("Successfully start GHA Runner");
+				} else {
+					throw Error("Failed to start GHA Runner");
+				}
 				break;
 			} catch (e) {
 				console.log("error, will try again in 1 second", e);

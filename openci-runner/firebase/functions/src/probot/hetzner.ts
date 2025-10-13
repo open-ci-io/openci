@@ -4,6 +4,19 @@ export interface OctokitToken {
 	token: string;
 }
 
+export interface HetznerResponse {
+	serverId: number;
+	ipv4: string;
+}
+
+export interface HetznerServerSpec {
+	image: string;
+	location: string;
+	name: string;
+	server_type: string;
+	ssh_keys: [string];
+}
+
 export async function deleteServer(id: string, apiKey: string) {
 	await fetch(`${baseUrl}/${id}`, {
 		headers: {
@@ -13,22 +26,28 @@ export async function deleteServer(id: string, apiKey: string) {
 	});
 }
 
-export type HetznerResponse = {
-	serverId: number;
-	ipv4: string;
-};
-
-export async function createServer(apiKey: string): Promise<HetznerResponse> {
-	const body = {
-		image: "ubuntu-24.04",
-		location: "fsn1",
-		name: crypto.randomUUID(),
-		server_type: "cpx41",
-		ssh_keys: ["openci-runner-probot"],
+export function createServerSpec(
+	image: string = "ubuntu-24.04",
+	location: string = "fsn1",
+	name: string = crypto.randomUUID(),
+	serverType: string = "cpx41",
+	sshKeyName: string = "openci-runner-probot",
+): HetznerServerSpec {
+	return {
+		image: image,
+		location: location,
+		name: name,
+		server_type: serverType,
+		ssh_keys: [sshKeyName],
 	};
+}
 
+export async function createServer(
+	apiKey: string,
+	serverSpec: HetznerServerSpec,
+): Promise<HetznerResponse> {
 	const response = await fetch(baseUrl, {
-		body: JSON.stringify(body),
+		body: JSON.stringify(serverSpec),
 		headers: {
 			Authorization: `Bearer ${apiKey}`,
 		},
@@ -59,15 +78,4 @@ export async function getServerStatusById(
 	});
 	const jsonRes = await _response.json();
 	return jsonRes.server.status;
-}
-
-export function initRunner(runnerConfig: string): string {
-	const command = `
-mkdir actions-runner
-cd actions-runner
-curl -o actions-runner-linux-x64-2.328.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.328.0/actions-runner-linux-x64-2.328.0.tar.gz
-tar xzf ./actions-runner-linux-x64-2.328.0.tar.gz
-tmux new -d -s runner "RUNNER_ALLOW_RUNASROOT=true ./run.sh --jitconfig ${runnerConfig}"
-`;
-	return command;
 }

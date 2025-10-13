@@ -2,7 +2,7 @@ import { onRequest } from "firebase-functions/https";
 import { log } from "firebase-functions/logger";
 import { defineSecret } from "firebase-functions/params";
 import { createNodeMiddleware, createProbot } from "probot";
-import { appFn } from "../probot/index.js";
+import { appFn } from "./probot/index.js";
 
 const githubAppId = defineSecret("GITHUB_APP_ID");
 const githubPrivateKey = defineSecret("GITHUB_PRIVATE_KEY");
