@@ -18,7 +18,7 @@
 	"engines": {
 		"node": "22"
 	},
-	"main": "lib/src/index.js",
+	"main": "lib/index.js",
 	"name": "functions",
 	"private": true,
 	"scripts": {
