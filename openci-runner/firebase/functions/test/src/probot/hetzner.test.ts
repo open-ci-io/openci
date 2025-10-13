@@ -4,7 +4,7 @@ import {
 	createServerSpec,
 	deleteServer,
 	getServerStatusById,
-} from "../../../lib/probot/hetzner.js";
+} from "../../../src/probot/hetzner";
 
 describe("Hetzner", () => {
 	test("delete a server", async () => {
@@ -35,7 +35,7 @@ describe("Hetzner", () => {
 	});
 
 	test("get a server status", async () => {
-		const result = await getServerStatusById("id", "apiKey");
+		const result = await getServerStatusById(0, "apiKey");
 		expect(result).toBe("running");
 	});
 });

@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Probot } from "probot";
-import { afterEach, beforeEach, describe, test } from "vitest";
+import { beforeEach, describe, test } from "vitest";
 import { appFn } from "../../lib/probot/index.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -37,15 +37,4 @@ describe("Probot App", () => {
 			payload,
 		});
 	});
-
-	afterEach(() => {});
 });
-
-// export async function deleteServer(id: string, apiKey: string) {
-// 	await fetch(`${baseUrl}/${id}`, {
-// 		headers: {
-// 			Authorization: `Bearer ${apiKey}`,
-// 		},
-// 		method: "DELETE",
-// 	});
-// }

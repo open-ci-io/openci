@@ -7,25 +7,47 @@ export function isJobRequired(context: any): boolean {
 	return context.payload.workflow_job.labels.includes(runnerName);
 }
 
+const generateJitConfigPath =
+	"/repos/{owner}/{repo}/actions/runners/generate-jitconfig";
+
+type JitConfigRequest = {
+	headers: Record<string, string>;
+	labels: string[];
+	name: string;
+	owner: string;
+	repo: string;
+	runner_group_id: number;
+	work_folder: string;
+};
+
+export function jitConfigRequestBody(
+	owner: string,
+	repo: string,
+	serverId: number,
+): JitConfigRequest {
+	return {
+		headers: {
+			"X-GitHub-Api-Version": "2022-11-28",
+		},
+		labels: ["openci-runner-beta"],
+		name: `OpenCI ランナー ${serverId}`,
+		owner: `${owner}`,
+		repo: `${repo}`,
+		runner_group_id: 1,
+		work_folder: "_work",
+	};
+}
+
 export async function getJitConfig(
 	octokit: Octokit,
 	owner: string,
 	repo: string,
 	serverId: number,
 ): Promise<string> {
+	const body = jitConfigRequestBody(owner, repo, serverId);
 	const jitConfigRes = await octokit.request(
-		`POST /repos/{owner}/{repo}/actions/runners/generate-jitconfig`,
-		{
-			headers: {
-				"X-GitHub-Api-Version": "2022-11-28",
-			},
-			labels: ["openci-runner-beta"],
-			name: `OpenCI ランナー ${serverId}`,
-			owner: `${owner}`,
-			repo: `${repo}`,
-			runner_group_id: 1,
-			work_folder: "_work",
-		},
+		`POST ${generateJitConfigPath}`,
+		body,
 	);
 
 	return jitConfigRes.data.encoded_jit_config;
@@ -42,7 +64,9 @@ export enum ActionsRunnerArchitecture {
 }
 
 const mkdir = "mkdir actions-runner";
+
 const cdActionRunner = "cd actions-runner";
+
 function downloadRunnerScriptAndUnZip(
 	scriptVersion: string,
 	os: ActionsRunnerOS,
