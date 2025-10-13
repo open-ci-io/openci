@@ -53,7 +53,7 @@ function downloadRunnerScriptAndUnZip(
 }
 
 function runGHAScript(runnerConfig: string) {
-	`tmux new -d -s runner "RUNNER_ALLOW_RUNASROOT=true ./run.sh --jitconfig ${runnerConfig}"`;
+	return `tmux new -d -s runner "RUNNER_ALLOW_RUNASROOT=true ./run.sh --jitconfig ${runnerConfig}"`;
 }
 
 export function initRunner(
