@@ -96,7 +96,9 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 					hetznerResponse.serverId,
 				);
 
-				const resTmux = await sshResult.execCommand("apt install tmux");
+				const resTmux = await sshResult.execCommand(
+					"apt-get update -y && apt-get install -y tmux",
+				);
 				if (resTmux.code === 0) {
 					console.log("Successfully installed tmux");
 				} else {

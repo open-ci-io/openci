@@ -14,7 +14,7 @@ export interface HetznerServerSpec {
 	location: string;
 	name: string;
 	server_type: string;
-	ssh_keys: [string];
+	ssh_keys: string[];
 }
 
 export async function deleteServer(id: string, apiKey: string) {

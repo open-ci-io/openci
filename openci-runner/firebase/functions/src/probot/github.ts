@@ -76,7 +76,7 @@ function downloadRunnerScriptAndUnZip(
 	return `curl -o ${fileName} -L https://github.com/actions/runner/releases/download/v${scriptVersion}/${fileName} && tar xzf ./${fileName}`;
 }
 
-function runGHAScript(runnerConfig: string) {
+function runGHAScript(runnerConfig: string): string {
 	return `tmux new -d -s runner "RUNNER_ALLOW_RUNASROOT=true ./run.sh --jitconfig ${runnerConfig}"`;
 }
 
@@ -90,10 +90,10 @@ export function initRunner(
 		cdActionRunner,
 		downloadRunnerScriptAndUnZip(scriptVersion, os, architecture),
 	];
-	return command.join("&&");
+	return command.join(" && ");
 }
 
-export function startRunner(runnerConfig: string) {
+export function startRunner(runnerConfig: string): string {
 	const command = [cdActionRunner, runGHAScript(runnerConfig)];
-	return command.join("&&");
+	return command.join(" && ");
 }
