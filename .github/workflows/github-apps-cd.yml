@@ -11,8 +11,8 @@ jobs:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/reusable-deploy-firebase-functions.yml
     secrets:
-      gha_service_account: ${{ secrets.GHA_SERVICE_ACCOUNT_PREVIEW_FUNCS }}
-      firebase_project_id: ${{ secrets.FIREBASE_PROJECT_ID_FOR_PREVIEW_FUNCTIONS }}
+      gha_service_account: ${{ secrets.GHA_SERVICE_ACCOUNT_DEV }}
+      firebase_project_id: ${{ secrets.FIREBASE_PROJECT_ID_DEV }}
 
   deploy-firebase-functions-production:
     if: github.event_name == 'push'
