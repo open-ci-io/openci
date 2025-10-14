@@ -45,7 +45,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 			type: "installation",
 		})) as OctokitToken;
 
-		if (!isJobRequired(context)) {
+		if (!isJobRequired(context, env)) {
 			console.log("This workflow job doesn't use openci runner");
 			return;
 		}
@@ -117,10 +117,11 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 
 	app.on(workflowJobCompleted, async (context) => {
 		console.info(`${workflowJobCompleted} event started`);
-		if (!process.env.HETZNER_API_KEY) {
+		if (!process.env.HETZNER_API_KEY || !process.env.ENV) {
 			throw new Error("Required environment variables are missing");
 		}
-		if (!isJobRequired(context)) {
+		var env: Env = Env[process.env.ENV];
+		if (!isJobRequired(context, env)) {
 			console.log("This workflow job doesn't use openci runner. Stopping.");
 			return;
 		}

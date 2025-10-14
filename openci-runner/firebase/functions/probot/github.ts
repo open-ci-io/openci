@@ -10,8 +10,8 @@ function runnerName(env: Env) {
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: <Fill the type later>
-export function isJobRequired(context: any): boolean {
-	return context.payload.workflow_job.labels.includes(runnerName);
+export function isJobRequired(context: any, env: Env): boolean {
+	return context.payload.workflow_job.labels.includes(runnerName(env));
 }
 
 export async function getJitConfig(
