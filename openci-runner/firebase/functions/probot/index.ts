@@ -41,6 +41,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 			throw new Error("Required environment variables are missing");
 		}
 		var env: Env = Env[process.env.ENV];
+		console.info(`Env is ${env}`);
 		const { token } = (await context.octokit.auth({
 			type: "installation",
 		})) as OctokitToken;

@@ -4,8 +4,10 @@ import { Env } from "./index.js";
 function runnerName(env: Env) {
 	if (env === Env.dev) {
 		return "openci-runner-beta-dev";
-	} else {
+	} else if (env === Env.prod) {
 		return "openci-runner-beta";
+	} else {
+		throw Error("Invalid env");
 	}
 }
 
