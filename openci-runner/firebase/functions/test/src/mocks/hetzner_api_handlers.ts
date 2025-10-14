@@ -3,7 +3,7 @@ import { HttpResponse, http } from "msw";
 const baseUrl = "https://api.hetzner.cloud/v1/servers";
 
 export const hetznerApiHandlers = [
-	http.delete(`${baseUrl}/id`, () => {
+	http.delete<{ id: string }>(`${baseUrl}/:id`, () => {
 		return HttpResponse.json({});
 	}),
 
@@ -20,7 +20,7 @@ export const hetznerApiHandlers = [
 		});
 	}),
 
-	http.get(`${baseUrl}/id`, () => {
+	http.get<{ id: string }>(`${baseUrl}/:id`, () => {
 		return HttpResponse.json({
 			server: {
 				status: "running",
