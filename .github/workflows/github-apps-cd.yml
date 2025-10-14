@@ -8,11 +8,11 @@ on:
 
 jobs:
   deploy-firebase-functions-dev:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
     uses: ./.github/workflows/reusable-deploy-firebase-functions.yml
     secrets:
-      gha_service_account: ${{ secrets.GHA_SERVICE_ACCOUNT_PREVIEW_FUNCS }}
-      firebase_project_id: ${{ secrets.FIREBASE_PROJECT_ID_FOR_PREVIEW_FUNCTIONS }}
+      gha_service_account: ${{ secrets.GHA_SERVICE_ACCOUNT_DEV }}
+      firebase_project_id: ${{ secrets.FIREBASE_PROJECT_ID_DEV }}
 
   deploy-firebase-functions-production:
     if: github.event_name == 'push'
