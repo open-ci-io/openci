@@ -14,6 +14,11 @@ import {
 const workflowJobQueued = "workflow_job.queued";
 const workflowJobCompleted = "workflow_job.completed";
 
+export enum Env {
+	dev = "dev",
+	prod = "prod",
+}
+
 export const appFn: ApplicationFunction = (app: Probot) => {
 	app.log.info("Yay! The app was loaded!");
 
@@ -30,10 +35,12 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 		if (
 			!process.env.HETZNER_API_KEY ||
 			!process.env.HETZNER_SSH_PRIVATE_KEY ||
-			!process.env.HETZNER_SSH_PASSPHRASE
+			!process.env.HETZNER_SSH_PASSPHRASE ||
+			!process.env.ENV
 		) {
 			throw new Error("Required environment variables are missing");
 		}
+		var env: Env = Env[process.env.ENV];
 		const { token } = (await context.octokit.auth({
 			type: "installation",
 		})) as OctokitToken;
@@ -47,7 +54,10 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 		const owner = repository.owner.login;
 		const repo = repository.name;
 
-		const hetznerResponse = await createServer(process.env.HETZNER_API_KEY);
+		const hetznerResponse = await createServer(
+			process.env.HETZNER_API_KEY,
+			env,
+		);
 		console.info("Runner server has been created");
 		while (true) {
 			const status = await getServerStatusById(
@@ -83,6 +93,7 @@ export const appFn: ApplicationFunction = (app: Probot) => {
 					owner,
 					repo,
 					hetznerResponse.serverId,
+					env,
 				);
 				await sshResult.execCommand("apt install tmux");
 				await sshResult.execCommand(initRunner(encodedJitConfig));

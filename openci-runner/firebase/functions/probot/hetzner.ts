@@ -1,3 +1,5 @@
+import { Env } from "./index.js";
+
 const baseUrl = "https://api.hetzner.cloud/v1/servers";
 
 export interface OctokitToken {
@@ -18,13 +20,22 @@ export type HetznerResponse = {
 	ipv4: string;
 };
 
-export async function createServer(apiKey: string): Promise<HetznerResponse> {
+export async function createServer(
+	apiKey: string,
+	env: Env,
+): Promise<HetznerResponse> {
+	let sshKey: string;
+	if (env === Env.dev) {
+		sshKey = "openci-runner-dev";
+	} else {
+		sshKey = "openci-runner-probot";
+	}
 	const body = {
 		image: "ubuntu-24.04",
 		location: "fsn1",
 		name: crypto.randomUUID(),
 		server_type: "cpx41",
-		ssh_keys: ["openci-runner-probot"],
+		ssh_keys: [sshKey],
 	};
 
 	const response = await fetch(baseUrl, {
