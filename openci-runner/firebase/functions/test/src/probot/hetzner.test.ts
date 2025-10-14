@@ -31,7 +31,7 @@ describe("Hetzner", () => {
 		const serverSpec = createServerSpec();
 		const result = await createServer("api_key", serverSpec);
 		expect(result.ipv4).toBe("1.1.1.1");
-		expect(result.serverId).toBe("0");
+		expect(result.serverId).toBe(0);
 	});
 
 	test("get a server status", async () => {

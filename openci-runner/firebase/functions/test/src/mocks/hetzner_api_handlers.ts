@@ -10,7 +10,7 @@ export const hetznerApiHandlers = [
 	http.post(`${baseUrl}`, () => {
 		return HttpResponse.json({
 			server: {
-				id: "0",
+				id: 0,
 				public_net: {
 					ipv4: {
 						ip: "1.1.1.1",
