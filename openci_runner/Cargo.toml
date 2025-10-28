@@ -1,0 +1,15 @@
+[package]
+name = "openci_runner"
+version = "0.1.0"
+edition = "2021"
+authors = ["mafreud <freud427@gmail.com>"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+worker = { version = "0.6", features = ['http', 'axum'] }
+axum = { version = "0.8", default-features = false }
+tower-service = "0.3.3"
+hmac = "0.12.1"
+sha2 = "0.10.9"

@@ -1,0 +1,6 @@
+name = "openci_runner"
+main = "build/index.js"
+compatibility_date = "2025-10-20"
+
+[build]
+command = "cargo install -q worker-build && worker-build --release"
