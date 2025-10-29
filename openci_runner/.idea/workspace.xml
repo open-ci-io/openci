@@ -11,10 +11,10 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c1e1e98-66e1-423c-ba97-e8e119d392e1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../leptos/.idea/leptos.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../openci.code-workspace" beforeDir="false" afterPath="$PROJECT_DIR$/../openci.code-workspace" afterDir="false" />
+    <list default="true" id="0c1e1e98-66e1-423c-ba97-e8e119d392e1" name="Changes" comment="feat: initialize openci_runner project with essential files, dependencies, and webhook handling logic">
+      <change afterPath="$PROJECT_DIR$/src/github.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,6 +22,13 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:test" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
+  </component>
   <component name="FormatOnSaveOptions">
     <option name="myRunOnSave" value="true" />
   </component>
@@ -34,12 +41,22 @@
     &quot;assignee&quot;: &quot;mafreud&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/open-ci-io/openci.git&quot;,
-    &quot;accountId&quot;: &quot;d4b7552c-4574-44f0-a519-f2e1e78ba12a&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/open-ci-io/openci.git",
+    "accountId": "d4b7552c-4574-44f0-a519-f2e1e78ba12a"
+  },
+  "recentNewPullRequestHead": {
+    "server": {
+      "useHttp": false,
+      "host": "github.com",
+      "port": null,
+      "suffix": null
+    },
+    "owner": "open-ci-io",
+    "repository": "openci"
   }
-}</component>
+}]]></component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="jpNJNWWW" />
   </component>
@@ -50,6 +67,9 @@
   &quot;associatedIndex&quot;: 7
 }</component>
   <component name="ProjectId" id="34KtOqj6gC7pQffQAZaGJbSeRtc" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="autoscrollToSource" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -67,7 +87,7 @@
     "code.cleanup.on.save": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "OP-335",
+    "git-widget-placeholder": "#526 on OP-335",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "/Users/masahiroaoki/Developer/openci-inc/openci/openci_runner",
     "node.js.detected.package.eslint": "true",
@@ -119,12 +139,25 @@
       <updated>1760974061403</updated>
       <workItem from="1760974062454" duration="6774000" />
       <workItem from="1761400827996" duration="5647000" />
-      <workItem from="1761644426542" duration="13928000" />
+      <workItem from="1761644426542" duration="15311000" />
     </task>
+    <task id="LOCAL-00001" summary="feat: initialize openci_runner project with essential files, dependencies, and webhook handling logic">
+      <option name="closed" value="true" />
+      <created>1761665519574</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1761665519574</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="feat: initialize openci_runner project with essential files, dependencies, and webhook handling logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: initialize openci_runner project with essential files, dependencies, and webhook handling logic" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

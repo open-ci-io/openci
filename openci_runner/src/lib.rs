@@ -1,11 +1,12 @@
+mod github;
+
+use crate::github::verify_hmac_signature;
 use axum::extract::State;
 use axum::http::HeaderMap;
+use axum::routing::post;
 use axum::{routing::get, Router};
-use sha2::Sha256;
 use tower_service::Service;
 use worker::*;
-
-use hmac::{Hmac, Mac};
 
 #[derive(Clone)]
 pub struct AppState {
@@ -15,7 +16,7 @@ pub struct AppState {
 fn router(state: AppState) -> Router<()> {
     Router::new()
         .route("/", get(root))
-        .route("/github/webhook", get(github_webhook))
+        .route("/github/webhook", post(github_webhook))
         .with_state(state)
 }
 
@@ -55,64 +56,4 @@ pub async fn github_webhook(
     console_log!("is_valid_signature = {:?}", is_valid_signature);
 
     headers
-}
-
-type HmacSha256 = Hmac<Sha256>;
-
-fn verify_hmac_signature(signature: &[u8], secret: String, body: &[u8]) -> bool {
-    let mut mac = match HmacSha256::new_from_slice(secret.as_bytes()) {
-        Ok(mac) => mac,
-        Err(_) => return false,
-    };
-
-    mac.update(body);
-
-    mac.verify_slice(signature).is_ok()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn verify_signature_accepts_matching_payload() {
-        let secret = "demo_secret".to_string();
-        let payload = br#"{"hello":"world"}"#;
-
-        let mut mac = HmacSha256::new_from_slice(secret.as_bytes()).unwrap();
-        mac.update(payload);
-        let signature = mac.finalize().into_bytes();
-
-        assert!(verify_hmac_signature(&signature, secret.clone(), payload));
-    }
-
-    #[test]
-    fn verify_signature_rejects_tampered_payload() {
-        let secret = "demo_secret".to_string();
-        let payload = br#"{"hello":"world"}"#;
-
-        let mut mac = HmacSha256::new_from_slice(secret.as_bytes()).unwrap();
-        mac.update(payload);
-        let signature = mac.finalize().into_bytes();
-
-        let tampered_payload = br#"{"hello":"mars"}"#;
-        assert!(!verify_hmac_signature(
-            &signature,
-            secret.clone(),
-            tampered_payload
-        ));
-    }
-
-    #[test]
-    fn verify_signature_rejects_tampered_secret() {
-        let secret = "demo_secret".to_string();
-        let payload = br#"{"hello":"world"}"#;
-
-        let mut mac = HmacSha256::new_from_slice(secret.as_bytes()).unwrap();
-        mac.update(payload);
-        let signature = mac.finalize().into_bytes();
-
-        let tampered_secret = "fake_secret".to_string();
-        assert!(!verify_hmac_signature(&signature, tampered_secret, payload));
-    }
 }
