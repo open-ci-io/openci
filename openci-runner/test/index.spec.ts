@@ -15,6 +15,14 @@ const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 const createSignature = (payload: string, secret: string) =>
 	`sha256=${createHmac("sha256", secret).update(payload).digest("hex")}`;
 
+describe("ensure secrets", () => {
+	it("all secrets are set", () => {
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+		console.log(webhookSecret);
+		expect(webhookSecret).not.toBeNull();
+	});
+});
+
 describe("fetch", () => {
 	it("responds with 201 when signature is valid (unit style)", async () => {
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
