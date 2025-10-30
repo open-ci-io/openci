@@ -111,7 +111,7 @@
         },
         "editor.formatOnSave": true,
         "files.associations": {
-            "wrangler.json": "jsonc"
+            "**/wrangler.json*": "jsonc"
         },
         "files.exclude": {
             "target": true
