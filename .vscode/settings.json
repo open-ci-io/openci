@@ -1,22 +1,22 @@
 {
-	"editor.formatOnSave": true,
+	"dart.flutterSdkPath": ".fvm/versions/stable",
 	"editor.codeActionsOnSave": {
 		"source.fixAll": "explicit"
 	},
+	"editor.formatOnSave": true,
 	"eslint.workingDirectories": [
 		{
 			"mode": "auto"
 		}
 	],
-	"dart.flutterSdkPath": ".fvm/versions/stable",
 	"files.exclude": {
-		"**/*.g.dart": true,
-		"**/*.freezed.dart": true
-	},
-	"search.exclude": {
-		"**/.fvm": true
+		"**/*.freezed.dart": true,
+		"**/*.g.dart": true
 	},
 	"files.watcherExclude": {
 		"**/.fvm": true
 	},
+	"search.exclude": {
+		"**/.fvm": true
+	}
 }
