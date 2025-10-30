@@ -17,7 +17,7 @@ const createSignature = (payload: string, secret: string) =>
 
 describe("fetch", () => {
 	it("responds with 201 when signature is valid (unit style)", async () => {
-		const webhookSecret = env.GITHUB_APP_WEBHOOK_SECRET ?? "test-secret";
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
 		const body = JSON.stringify({ action: "ping" });
 		const signature = createSignature(body, webhookSecret);
 		const request = new IncomingRequest("http://example.com", {
@@ -40,7 +40,7 @@ describe("fetch", () => {
 	});
 
 	it("responds with 201 when signature is valid (integration style)", async () => {
-		const webhookSecret = env.GITHUB_APP_WEBHOOK_SECRET ?? "test-secret";
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
 		const body = JSON.stringify({ action: "ping" });
 		const signature = createSignature(body, webhookSecret);
 		const response = await SELF.fetch("https://example.com", {

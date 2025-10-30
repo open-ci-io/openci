@@ -15,7 +15,7 @@ import { Webhooks } from "@octokit/webhooks";
 
 export default {
 	async fetch(request, env, _): Promise<Response> {
-		const webhookSecret = env.GITHUB_APP_WEBHOOK_SECRET;
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
 		const headers = request.headers;
 		const signature = headers.get("x-hub-signature-256");
 		if (signature == null) {
