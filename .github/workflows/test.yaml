@@ -23,7 +23,7 @@ jobs:
       - name: Test
         run: npm run test
 
-      - name: Update codecov
+      - name: Upload results to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
