@@ -10,7 +10,8 @@
     "files": {
         "includes": [
             "**",
-            "!**/node_modules"
+            "!**/node_modules",
+            "!openci-runner/worker-configuration.d.ts"
         ]
     },
     "linter": {
