@@ -19,7 +19,7 @@ jobs:
 
       - name: Prepare CF secrets
         run: |
-          cat <<'EOF' > ./openci-runner/.env
+          cat <<'EOF' > .env
           GH_APP_WEBHOOK_SECRET=${{ secrets.GH_APP_WEBHOOK_SECRET }}
           EOF
 
