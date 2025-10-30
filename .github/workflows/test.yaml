@@ -1,0 +1,23 @@
+name: Test
+on:
+  pull_request:
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test
+        run: npm run test
+
+      - name: Update codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
