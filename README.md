@@ -3,7 +3,7 @@
 </p>
 
 # OpenCI ランナー へようこそ
-[![Deploy GitHub Apps](https://github.com/open-ci-io/openci/actions/workflows/github-apps-cd.yml/badge.svg)](https://github.com/open-ci-io/openci/actions/workflows/github-apps-cd.yml)
+[![Deploy GitHub Apps](https://github.com/open-ci-io/openci/actions/workflows/test.yaml/badge.svg)](https://github.com/open-ci-io/openci/actions/workflows/test.yaml)
 [![codecov](https://codecov.io/github/open-ci-io/openci/graph/badge.svg?token=RAJBUMJU3O)](https://codecov.io/github/open-ci-io/openci)
 
 
