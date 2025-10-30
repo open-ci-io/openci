@@ -6,7 +6,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"compatibility_date": "2025-10-29",
 	"main": "src/index.ts",
-	"name": "openci-runner",
+	"name": "little-shadow-dd23",
 	"observability": {
 		"enabled": true
 	}
