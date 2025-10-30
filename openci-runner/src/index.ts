@@ -11,8 +11,42 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { Webhooks } from "@octokit/webhooks";
+
 export default {
-	async fetch(_, __, ___): Promise<Response> {
-		return new Response("Hello World!");
+	async fetch(request, env, _): Promise<Response> {
+		const webhookSecret = env.GITHUB_APP_WEBHOOK_SECRET;
+		const headers = request.headers;
+		const signature = headers.get("x-hub-signature-256");
+		if (signature == null) {
+			return new Response("signature is null", { status: 401 });
+		}
+		const body = await request.text();
+
+		const isValid = await verifyGitHubWebhookSecret(
+			body,
+			signature,
+			webhookSecret,
+		);
+		if (!isValid) {
+			return new Response("Unauthorized", { status: 401 });
+		}
+
+		return new Response("Successfully created OpenCI runner", { status: 201 });
 	},
 } satisfies ExportedHandler<Env>;
+
+export async function verifyGitHubWebhookSecret(
+	body: string,
+	signature: string,
+	webhookSecret: string,
+): Promise<boolean> {
+	const webhooks = new Webhooks({
+		secret: webhookSecret,
+	});
+	if (!(await webhooks.verify(body, signature))) {
+		return false;
+	}
+
+	return true;
+}
