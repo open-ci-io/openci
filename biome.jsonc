@@ -1,26 +1,31 @@
 {
-    "assist": {
-        "actions": {
-            "source": {
-                "useSortedKeys": "on"
-            }
-        },
-        "enabled": true
-    },
-    "files": {
-        "includes": [
-            "**",
-            "!**/node_modules",
-            "!openci-runner/worker-configuration.d.ts"
-        ]
-    },
-    "linter": {
-        "enabled": true,
-        "rules": {
-            "correctness": {
-                "noUnusedImports": "error"
-            },
-            "recommended": true
-        }
-    }
+	"assist": {
+		"actions": {
+			"source": {
+				"useSortedKeys": "on"
+			}
+		},
+		"enabled": true
+	},
+	"files": {
+		"includes": [
+			"**",
+			"!**/node_modules",
+			"!openci-runner/worker-configuration.d.ts",
+			"!**/.wrangler",
+			"!**/coverage"
+		]
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"correctness": {
+				"noUnusedImports": "error"
+			},
+			"recommended": true,
+			"suspicious": {
+				"noConsole": "warn"
+			}
+		}
+	}
 }
