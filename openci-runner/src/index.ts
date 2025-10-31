@@ -3,6 +3,9 @@ import { verify } from "@octokit/webhooks-methods";
 export default {
 	async fetch(request, env, _): Promise<Response> {
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+		if (!webhookSecret) {
+			return new Response("Webhook secret not configured", { status: 500 });
+		}
 		const headers = request.headers;
 		const signature = headers.get("x-hub-signature-256");
 		if (signature == null) {
