@@ -15,8 +15,7 @@ const createSignature = (payload: string, secret: string) =>
 describe("ensure secrets", () => {
 	it("all secrets are set", () => {
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
-		console.log(webhookSecret);
-		expect(webhookSecret).not.toBeNull();
+		expect(webhookSecret).toBeTruthy();
 	});
 });
 
