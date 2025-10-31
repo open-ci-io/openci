@@ -1,125 +1,132 @@
 {
-    "extensions": {
-        "recommendations": [
-            "aaron-bond.better-comments",
-            "biomejs.biome",
-            "bradlc.vscode-tailwindcss",
-            "cweijan.dbclient-jdbc",
-            "cweijan.vscode-postgresql-client2",
-            "dart-code.dart-code",
-            "dart-code.flutter",
-            "dbaeumer.vscode-eslint",
-            "dotjoshjohnson.xml",
-            "fill-labs.dependi",
-            "foxundermoon.shell-format",
-            "github.copilot",
-            "github.copilot-chat",
-            "inferrinizzard.prettier-sql-vscode",
-            "jeroen-meijer.pubspec-assist",
-            "mikestead.dotenv",
-            "mthuong.vscode-flutter-freezed-helper",
-            "plibither8.remove-comments",
-            "redhat.vscode-yaml",
-            "robert-brunhage.flutter-riverpod-snippets",
-            "rust-lang.rust-analyzer",
-            "simonsiefke.svg-preview",
-            "streetsidesoftware.code-spell-checker",
-            "tamasfe.even-better-toml",
-            "unifiedjs.vscode-mdx",
-            "vadimcn.vscode-lldb"
-        ]
-    },
-    "folders": [
-        {
-            "path": "."
-        }
-    ],
-    "settings": {
-        "[dockerfile]": {
-            "editor.defaultFormatter": "ms-azuretools.vscode-containers"
-        },
-        "cSpell.words": [
-            "aoki",
-            "biomejs",
-            "Bitrise",
-            "bradlc",
-            "brunhage",
-            "Caddyfile",
-            "CHANGEME",
-            "chrono",
-            "Codemagic",
-            "cweijan",
-            "dbaeumer",
-            "dbclient",
-            "dependi",
-            "dotenv",
-            "dotenvy",
-            "dotjoshjohnson",
-            "eslintcache",
-            "firebaserc",
-            "foxundermoon",
-            "FUNCS",
-            "hexdigit",
-            "hiimbex",
-            "Hmac",
-            "inferrinizzard",
-            "jdbc",
-            "jeroen",
-            "jitconfig",
-            "jscoverage",
-            "jsonwebtoken",
-            "libpq",
-            "mafreud",
-            "meijer",
-            "mikestead",
-            "mockall",
-            "mthuong",
-            "nextest",
-            "nodenext",
-            "nonexistentkey",
-            "nvmrc",
-            "octocrab",
-            "openci",
-            "pids",
-            "plainaddress",
-            "plibither",
-            "plpgsql",
-            "predeploy",
-            "pubspec",
-            "riverpod",
-            "rngs",
-            "RUNASROOT",
-            "rustc",
-            "rustls",
-            "serayuzgur",
-            "serde",
-            "simonsiefke",
-            "smee",
-            "sqlfluff",
-            "sqlx",
-            "tamasfe",
-            "thiserror",
-            "unifiedjs",
-            "urandom",
-            "utoipa",
-            "vadimcn",
-            "validkey",
-            "vitest",
-            "wscript"
-        ],
-        "editor.codeActionsOnSave": {
-            "source.organizeImports.biome": "explicit"
-        },
-        "editor.formatOnSave": true,
-        "files.associations": {
-            "**/wrangler.json*": "jsonc"
-        },
-        "files.exclude": {
-            "target": true
-        },
-        "search.exclude": {
-            "target": true
-        },
-        "terminal.integrated.cwd": "${workspaceFolder}"
-    }
+	"extensions": {
+		"recommendations": [
+			"aaron-bond.better-comments",
+			"biomejs.biome",
+			"bradlc.vscode-tailwindcss",
+			"cweijan.dbclient-jdbc",
+			"cweijan.vscode-postgresql-client2",
+			"dart-code.dart-code",
+			"dart-code.flutter",
+			"dbaeumer.vscode-eslint",
+			"dotjoshjohnson.xml",
+			"fill-labs.dependi",
+			"foxundermoon.shell-format",
+			"github.copilot",
+			"github.copilot-chat",
+			"inferrinizzard.prettier-sql-vscode",
+			"jeroen-meijer.pubspec-assist",
+			"mikestead.dotenv",
+			"mthuong.vscode-flutter-freezed-helper",
+			"plibither8.remove-comments",
+			"redhat.vscode-yaml",
+			"robert-brunhage.flutter-riverpod-snippets",
+			"rust-lang.rust-analyzer",
+			"simonsiefke.svg-preview",
+			"streetsidesoftware.code-spell-checker",
+			"tamasfe.even-better-toml",
+			"unifiedjs.vscode-mdx",
+			"vadimcn.vscode-lldb"
+		]
+	},
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"[dockerfile]": {
+			"editor.defaultFormatter": "ms-azuretools.vscode-containers"
+		},
+		"[json]": {
+			"editor.defaultFormatter": "biomejs.biome"
+		},
+		"[jsonc]": {
+			"editor.defaultFormatter": "biomejs.biome"
+		},
+		"cSpell.words": [
+			"aoki",
+			"biomejs",
+			"Bitrise",
+			"bradlc",
+			"brunhage",
+			"Caddyfile",
+			"CHANGEME",
+			"chrono",
+			"Codemagic",
+			"cweijan",
+			"dbaeumer",
+			"dbclient",
+			"dependi",
+			"dotenv",
+			"dotenvy",
+			"dotjoshjohnson",
+			"eslintcache",
+			"firebaserc",
+			"foxundermoon",
+			"FUNCS",
+			"hexdigit",
+			"hiimbex",
+			"Hmac",
+			"inferrinizzard",
+			"jdbc",
+			"jeroen",
+			"jitconfig",
+			"jscoverage",
+			"jsonwebtoken",
+			"libpq",
+			"mafreud",
+			"meijer",
+			"mikestead",
+			"mockall",
+			"mthuong",
+			"nextest",
+			"nodenext",
+			"nonexistentkey",
+			"nvmrc",
+			"octocrab",
+			"openci",
+			"pids",
+			"plainaddress",
+			"plibither",
+			"plpgsql",
+			"predeploy",
+			"pubspec",
+			"riverpod",
+			"rngs",
+			"RUNASROOT",
+			"rustc",
+			"rustls",
+			"serayuzgur",
+			"serde",
+			"simonsiefke",
+			"smee",
+			"sqlfluff",
+			"sqlx",
+			"tamasfe",
+			"thiserror",
+			"unifiedjs",
+			"urandom",
+			"utoipa",
+			"vadimcn",
+			"validkey",
+			"vitest",
+			"wscript"
+		],
+		"editor.codeActionsOnSave": {
+			"source.organizeImports.biome": "explicit"
+		},
+		"editor.defaultFormatter": "biomejs.biome",
+		"editor.formatOnSave": true,
+		"files.associations": {
+			"**/wrangler.json*": "jsonc"
+		},
+		"files.exclude": {
+			"target": true
+		},
+		"search.exclude": {
+			"target": true
+		},
+		"terminal.integrated.cwd": "${workspaceFolder}"
+	}
 }
