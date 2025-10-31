@@ -6,7 +6,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"compatibility_date": "2025-10-29",
 	"main": "src/index.ts",
-	"name": "openci-runner",
+	"name": "openci-runner-dev",
 	"observability": {
 		"enabled": true
 	}
