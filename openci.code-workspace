@@ -38,6 +38,11 @@
         "[dockerfile]": {
             "editor.defaultFormatter": "ms-azuretools.vscode-containers"
         },
+        "cSpell.ignorePaths": [
+            "/openci-runner/worker-configuration.d.ts",
+            "**/package-lock.json",
+            "**/.gitignore"
+        ],
         "cSpell.words": [
             "aoki",
             "Bitrise",
