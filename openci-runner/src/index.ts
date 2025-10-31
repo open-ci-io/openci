@@ -19,7 +19,7 @@ export default {
 		const headers = request.headers;
 		const signature = headers.get("x-hub-signature-256");
 		if (signature == null) {
-			return new Response("signature is null", { status: 401 });
+			return new Response("Signature is null", { status: 401 });
 		}
 		const body = await request.text();
 
