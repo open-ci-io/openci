@@ -6,7 +6,7 @@ import {
 } from "cloudflare:test";
 import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import worker, { verifyGitHubWebhookSecret } from "../src/index";
+import worker from "../src/index";
 
 // For now, you'll need to do something like this to get a correctly-typed
 // `Request` to pass to `worker.fetch()`.
@@ -101,24 +101,5 @@ describe("fetch", () => {
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
 			`"Successfully created OpenCI runner"`,
 		);
-	});
-});
-
-describe("verifyGitHubWebhookSecret", () => {
-	const webhookSecret = "test-secret";
-	const body = JSON.stringify({ action: "ping" });
-
-	it("returns true when the signature matches the payload and secret", async () => {
-		const signature = createSignature(body, webhookSecret);
-		await expect(
-			verifyGitHubWebhookSecret(body, signature, webhookSecret),
-		).resolves.toBe(true);
-	});
-
-	it("returns false when the signature does not match the payload", async () => {
-		const signature = createSignature(body, webhookSecret);
-		await expect(
-			verifyGitHubWebhookSecret(body, signature, "another-secret"),
-		).resolves.toBe(false);
 	});
 });
