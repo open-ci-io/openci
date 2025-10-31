@@ -29,7 +29,6 @@
 			"vadimcn.vscode-lldb"
 		]
 	},
-
 	"folders": [
 		{
 			"path": "."
@@ -39,10 +38,16 @@
 		"[dockerfile]": {
 			"editor.defaultFormatter": "ms-azuretools.vscode-containers"
 		},
+		"[javascript]": {
+			"editor.defaultFormatter": "biomejs.biome"
+		},
 		"[json]": {
 			"editor.defaultFormatter": "biomejs.biome"
 		},
 		"[jsonc]": {
+			"editor.defaultFormatter": "biomejs.biome"
+		},
+		"[typescript]": {
 			"editor.defaultFormatter": "biomejs.biome"
 		},
 		"cSpell.ignorePaths": [
@@ -122,7 +127,6 @@
 		"editor.codeActionsOnSave": {
 			"source.organizeImports.biome": "explicit"
 		},
-		"editor.defaultFormatter": "biomejs.biome",
 		"editor.formatOnSave": true,
 		"files.associations": {
 			"**/wrangler.json*": "jsonc"
