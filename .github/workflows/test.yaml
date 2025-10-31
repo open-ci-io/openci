@@ -17,6 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Prepare CF secrets
+        run: |
+          cat <<'EOF' > .env
+          GH_APP_WEBHOOK_SECRET=${{ secrets.GH_APP_WEBHOOK_SECRET }}
+          EOF
+
       - name: Install dependencies
         run: npm ci
 
