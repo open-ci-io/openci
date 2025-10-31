@@ -29,6 +29,7 @@
 			"vadimcn.vscode-lldb"
 		]
 	},
+
 	"folders": [
 		{
 			"path": "."
@@ -44,6 +45,11 @@
 		"[jsonc]": {
 			"editor.defaultFormatter": "biomejs.biome"
 		},
+		"cSpell.ignorePaths": [
+			"/openci-runner/worker-configuration.d.ts",
+			"**/package-lock.json",
+			"**/.gitignore"
+		],
 		"cSpell.words": [
 			"aoki",
 			"biomejs",
