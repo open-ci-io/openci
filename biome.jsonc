@@ -20,7 +20,10 @@
             "correctness": {
                 "noUnusedImports": "error"
             },
-            "recommended": true
+            "recommended": true,
+            "suspicious": {
+                "noConsole": "warn"
+            }
         }
     }
 }
