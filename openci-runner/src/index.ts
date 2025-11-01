@@ -23,7 +23,8 @@ export default {
 
 		if ("workflow_job" in payload) {
 			if (payload.action === WorkflowJobAction.Queued) {
-				console.log("Queued", payload);
+				// ランナー用JITを作成
+				// ランナーサーバーのAPIを叩き、ランナーを作成 & 登録
 			}
 		}
 
