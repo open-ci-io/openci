@@ -22,19 +22,25 @@ export default {
 		const payload: WebhookEvent = JSON.parse(body);
 
 		if ("workflow_job" in payload) {
-			if (payload.action === WorkflowJobAction.Queued) {
-				// ランナー用JITを作成
-				// ランナーサーバーのAPIを叩き、ランナーを作成 & 登録
+			switch (payload.action) {
+				case WorkflowJobAction.Queued:
+					return new Response("Successfully created OpenCI runner", {
+						status: 201,
+					});
+				default:
+					return new Response(
+						"Workflow Job but status is not queued. Ignore this event",
+						{
+							status: 200,
+						},
+					);
 			}
 		}
 
-		return new Response("Successfully created OpenCI runner", { status: 201 });
+		return new Response("Event ignored", { status: 200 });
 	},
 } satisfies ExportedHandler<Env>;
 
 const WorkflowJobAction = {
-	Completed: "completed",
-	InProgress: "in_progress",
 	Queued: "queued",
-	Waiting: "waiting",
 } as const;
