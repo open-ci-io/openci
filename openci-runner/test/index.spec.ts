@@ -20,7 +20,7 @@ describe("ensure secrets", () => {
 });
 
 describe("fetch", () => {
-	it("responds with 201 when signature is valid", async () => {
+	it("responds with 200 for non-workflow_job events", async () => {
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
 		const body = JSON.stringify({ action: "ping" });
 		const signature = createSignature(body, webhookSecret);
