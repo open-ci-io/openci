@@ -20,7 +20,7 @@ describe("ensure secrets", () => {
 });
 
 describe("fetch", () => {
-	it("responds with 201 when signature is valid", async () => {
+	it("responds with 200 for non-workflow_job events", async () => {
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
 		const body = JSON.stringify({ action: "ping" });
 		const signature = createSignature(body, webhookSecret);
@@ -35,9 +35,9 @@ describe("fetch", () => {
 		const ctx = createExecutionContext();
 		const response = await worker.fetch(request, env, ctx);
 		await waitOnExecutionContext(ctx);
-		expect(response.status).toBe(201);
+		expect(response.status).toBe(200);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
-			`"Successfully created OpenCI runner"`,
+			`"Event ignored"`,
 		);
 	});
 
@@ -94,6 +94,48 @@ describe("fetch", () => {
 		expect(response.status).toBe(500);
 		await expect(response.text()).resolves.toBe(
 			"Webhook secret not configured",
+		);
+	});
+
+	it("return 201 when new runner is created", async () => {
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+		const body = JSON.stringify({ action: "queued", workflow_job: {} });
+		const signature = createSignature(body, webhookSecret);
+		const request = new IncomingRequest("http://example.com", {
+			body,
+			headers: {
+				"content-type": "application/json",
+				"x-hub-signature-256": signature,
+			},
+			method: "POST",
+		});
+		const ctx = createExecutionContext();
+		const response = await worker.fetch(request, env, ctx);
+		await waitOnExecutionContext(ctx);
+		expect(response.status).toBe(201);
+		await expect(response.text()).resolves.toMatchInlineSnapshot(
+			`"Successfully created OpenCI runner"`,
+		);
+	});
+
+	it("nothing to be processed", async () => {
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+		const body = JSON.stringify({ action: "ping", workflow_job: {} });
+		const signature = createSignature(body, webhookSecret);
+		const request = new IncomingRequest("http://example.com", {
+			body,
+			headers: {
+				"content-type": "application/json",
+				"x-hub-signature-256": signature,
+			},
+			method: "POST",
+		});
+		const ctx = createExecutionContext();
+		const response = await worker.fetch(request, env, ctx);
+		await waitOnExecutionContext(ctx);
+		expect(response.status).toBe(200);
+		await expect(response.text()).resolves.toMatchInlineSnapshot(
+			`"Workflow Job but status is not queued. Ignore this event"`,
 		);
 	});
 });

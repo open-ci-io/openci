@@ -1,13 +1,14 @@
 {
 	"dependencies": {
-		"@octokit/webhooks-methods": "^6.0.0"
+		"@octokit/webhooks-methods": "^6.0.0",
+		"@octokit/webhooks-types": "^7.6.1"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.8.19",
 		"@vitest/coverage-istanbul": "^3.2.4",
 		"typescript": "^5.5.2",
 		"vitest": "3.2.4",
-		"wrangler": "^4.45.2"
+		"wrangler": "^4.45.3"
 	},
 	"name": "openci-runner",
 	"private": true,
