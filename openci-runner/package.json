@@ -1,5 +1,7 @@
 {
 	"dependencies": {
+		"@octokit/app": "^16.1.2",
+		"@octokit/rest": "^22.0.1",
 		"@octokit/webhooks-methods": "^6.0.0",
 		"@octokit/webhooks-types": "^7.6.1"
 	},

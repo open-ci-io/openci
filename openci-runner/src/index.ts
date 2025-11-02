@@ -1,3 +1,5 @@
+import { App } from "@octokit/app";
+import { Octokit } from "@octokit/rest";
 import { verify } from "@octokit/webhooks-methods";
 import type { WebhookEvent } from "@octokit/webhooks-types";
 
@@ -23,10 +25,35 @@ export default {
 
 		if ("workflow_job" in payload) {
 			switch (payload.action) {
-				case WorkflowJobAction.Queued:
-					return new Response("Successfully created OpenCI runner", {
+				case WorkflowJobAction.Queued: {
+					const installationId = payload.installation?.id;
+					if (installationId === undefined) {
+						return new Response("Installation ID not found in payload", {
+							status: 400,
+						});
+					}
+					const app = new App({
+						appId: env.GH_APP_ID,
+						Octokit: Octokit,
+						privateKey: env.GH_APP_PRIVATE_KEY,
+					});
+
+					const octokit = await app.getInstallationOctokit(installationId);
+
+					const { data } =
+						await octokit.rest.actions.generateRunnerJitconfigForRepo({
+							labels: ["openci-runner-beta-dev"],
+							name: `OpenCIランナーβ(開発環境)-${Date.now()}`,
+							owner: payload.repository.owner.login,
+							repo: payload.repository.name,
+							runner_group_id: 1,
+							work_folder: "_work",
+						});
+
+					return new Response(`Successfully created OpenCI runner: ${data}`, {
 						status: 201,
 					});
+				}
 				default:
 					return new Response(
 						"Workflow Job but status is not queued. Ignore this event",
