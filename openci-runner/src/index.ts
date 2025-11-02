@@ -40,9 +40,11 @@ export default {
 
 					const octokit = await app.getInstallationOctokit(installationId);
 
+					const runnerLabel = "openci-runner-beta-dev";
+
 					const { data } =
 						await octokit.rest.actions.generateRunnerJitconfigForRepo({
-							labels: ["openci-runner-beta-dev"],
+							labels: [runnerLabel],
 							name: `OpenCIランナーβ(開発環境)-${Date.now()}`,
 							owner: payload.repository.owner.login,
 							repo: payload.repository.name,
