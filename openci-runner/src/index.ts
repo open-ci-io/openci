@@ -41,18 +41,22 @@ export default {
 					const octokit = await app.getInstallationOctokit(installationId);
 
 					const runnerLabel = "openci-runner-beta-dev";
+					const runnerName = "OpenCIランナーβ(開発環境)";
 
 					const { data } =
 						await octokit.rest.actions.generateRunnerJitconfigForRepo({
 							labels: [runnerLabel],
-							name: `OpenCIランナーβ(開発環境)-${Date.now()}`,
+							name: `${runnerName}-${Date.now()}`,
 							owner: payload.repository.owner.login,
 							repo: payload.repository.name,
 							runner_group_id: 1,
 							work_folder: "_work",
 						});
 
-					return new Response(`Successfully created OpenCI runner: ${data}`, {
+					// biome-ignore lint/correctness/noUnusedVariables: <Use this later>
+					const { encoded_jit_config } = data;
+
+					return new Response(`Successfully created OpenCI runner`, {
 						status: 201,
 					});
 				}
