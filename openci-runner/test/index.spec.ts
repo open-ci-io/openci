@@ -4,10 +4,34 @@ import {
 	waitOnExecutionContext,
 } from "cloudflare:test";
 import { createHmac } from "node:crypto";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import worker from "../src/index";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
+
+const mockGenerateJitConfig = vi.fn().mockResolvedValue({
+	data: {
+		encoded_jit_config: "mock-jit-config-base64",
+		runner: {
+			id: 1,
+			name: "test-runner",
+		},
+	},
+});
+
+vi.mock("@octokit/app", () => {
+	return {
+		App: vi.fn().mockImplementation(() => ({
+			getInstallationOctokit: vi.fn().mockResolvedValue({
+				rest: {
+					actions: {
+						generateRunnerJitconfigForRepo: mockGenerateJitConfig,
+					},
+				},
+			}),
+		})),
+	};
+});
 
 const createSignature = (payload: string, secret: string) =>
 	`sha256=${createHmac("sha256", secret).update(payload).digest("hex")}`;
@@ -99,7 +123,18 @@ describe("fetch", () => {
 
 	it("return 201 when new runner is created", async () => {
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
-		const body = JSON.stringify({ action: "queued", workflow_job: {} });
+		const body = JSON.stringify({
+			action: "queued",
+			installation: { id: 123456 },
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: ["self-hosted"],
+			},
+		});
 		const signature = createSignature(body, webhookSecret);
 		const request = new IncomingRequest("http://example.com", {
 			body,
@@ -136,6 +171,71 @@ describe("fetch", () => {
 		expect(response.status).toBe(200);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
 			`"Workflow Job but status is not queued. Ignore this event"`,
+		);
+	});
+
+	it("returns 400 when installationId is undefined", async () => {
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+		const body = JSON.stringify({
+			action: "queued",
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: ["self-hosted"],
+			},
+		});
+		const signature = createSignature(body, webhookSecret);
+		const request = new IncomingRequest("http://example.com", {
+			body,
+			headers: {
+				"content-type": "application/json",
+				"x-hub-signature-256": signature,
+			},
+			method: "POST",
+		});
+		const ctx = createExecutionContext();
+		const response = await worker.fetch(request, env, ctx);
+		await waitOnExecutionContext(ctx);
+		expect(response.status).toBe(400);
+		await expect(response.text()).resolves.toMatchInlineSnapshot(
+			`"Installation ID not found in payload"`,
+		);
+	});
+
+	it("returns 500 when GitHub API fails", async () => {
+		mockGenerateJitConfig.mockRejectedValueOnce(new Error("API Error"));
+
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+		const body = JSON.stringify({
+			action: "queued",
+			installation: { id: 123456 },
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: ["self-hosted"],
+			},
+		});
+		const signature = createSignature(body, webhookSecret);
+		const request = new IncomingRequest("http://example.com", {
+			body,
+			headers: {
+				"content-type": "application/json",
+				"x-hub-signature-256": signature,
+			},
+			method: "POST",
+		});
+		const ctx = createExecutionContext();
+		const response = await worker.fetch(request, env, ctx);
+		await waitOnExecutionContext(ctx);
+		expect(response.status).toBe(500);
+		await expect(response.text()).resolves.toMatchInlineSnapshot(
+			`"Failed to generate runner JIT config"`,
 		);
 	});
 });

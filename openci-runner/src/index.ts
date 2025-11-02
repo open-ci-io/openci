@@ -43,18 +43,25 @@ export default {
 					const runnerLabel = "openci-runner-beta-dev";
 					const runnerName = "OpenCIランナーβ(開発環境)";
 
-					const { data } =
-						await octokit.rest.actions.generateRunnerJitconfigForRepo({
-							labels: [runnerLabel],
-							name: `${runnerName}-${Date.now()}`,
-							owner: payload.repository.owner.login,
-							repo: payload.repository.name,
-							runner_group_id: 1,
-							work_folder: "_work",
-						});
+					try {
+						const { data } =
+							await octokit.rest.actions.generateRunnerJitconfigForRepo({
+								labels: [runnerLabel],
+								name: `${runnerName}-${Date.now()}`,
+								owner: payload.repository.owner.login,
+								repo: payload.repository.name,
+								runner_group_id: 1,
+								work_folder: "_work",
+							});
 
-					// biome-ignore lint/correctness/noUnusedVariables: <Use this later>
-					const { encoded_jit_config } = data;
+						// biome-ignore lint/correctness/noUnusedVariables: <Use this later>
+						const { encoded_jit_config } = data;
+					} catch (e) {
+						console.log("Failed to generate runner JIT config:", e);
+						return new Response("Failed to generate runner JIT config", {
+							status: 500,
+						});
+					}
 
 					return new Response(`Successfully created OpenCI runner`, {
 						status: 201,

@@ -22,10 +22,7 @@
 			"correctness": {
 				"noUnusedImports": "error"
 			},
-			"recommended": true,
-			"suspicious": {
-				"noConsole": "warn"
-			}
+			"recommended": true
 		}
 	}
 }
