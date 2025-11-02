@@ -4,7 +4,7 @@ import {
 	waitOnExecutionContext,
 } from "cloudflare:test";
 import { createHmac } from "node:crypto";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import worker from "../src/index";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
@@ -41,6 +41,10 @@ describe("ensure secrets", () => {
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
 		expect(webhookSecret).toBeTruthy();
 	});
+});
+
+afterEach(() => {
+	vi.clearAllMocks();
 });
 
 describe("fetch", () => {
@@ -236,6 +240,72 @@ describe("fetch", () => {
 		expect(response.status).toBe(500);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
 			`"Failed to generate runner JIT config"`,
+		);
+	});
+
+	it("returns 500 when GH_APP_ID not provided", async () => {
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+		const body = JSON.stringify({
+			action: "queued",
+			installation: { id: 123456 },
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: ["self-hosted"],
+			},
+		});
+		const signature = createSignature(body, webhookSecret);
+		const request = new IncomingRequest("http://example.com", {
+			body,
+			headers: {
+				"content-type": "application/json",
+				"x-hub-signature-256": signature,
+			},
+			method: "POST",
+		});
+		const ctx = createExecutionContext();
+		const envWithoutAppId = { ...env, GH_APP_ID: undefined };
+		const response = await worker.fetch(request, envWithoutAppId, ctx);
+		await waitOnExecutionContext(ctx);
+		expect(response.status).toBe(500);
+		await expect(response.text()).resolves.toMatchInlineSnapshot(
+			`"GH_APP_ID not provided"`,
+		);
+	});
+
+	it("returns 500 when GH_APP_ID not provided", async () => {
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+		const body = JSON.stringify({
+			action: "queued",
+			installation: { id: 123456 },
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: ["self-hosted"],
+			},
+		});
+		const signature = createSignature(body, webhookSecret);
+		const request = new IncomingRequest("http://example.com", {
+			body,
+			headers: {
+				"content-type": "application/json",
+				"x-hub-signature-256": signature,
+			},
+			method: "POST",
+		});
+		const ctx = createExecutionContext();
+		const envWithoutAppId = { ...env, GH_APP_PRIVATE_KEY: undefined };
+		const response = await worker.fetch(request, envWithoutAppId, ctx);
+		await waitOnExecutionContext(ctx);
+		expect(response.status).toBe(500);
+		await expect(response.text()).resolves.toMatchInlineSnapshot(
+			`"GH_APP_PRIVATE_KEY not provided"`,
 		);
 	});
 });

@@ -32,6 +32,16 @@ export default {
 							status: 400,
 						});
 					}
+					if (!env.GH_APP_ID) {
+						return new Response("GH_APP_ID not provided", {
+							status: 500,
+						});
+					}
+					if (!env.GH_APP_PRIVATE_KEY) {
+						return new Response("GH_APP_PRIVATE_KEY not provided", {
+							status: 500,
+						});
+					}
 					const app = new App({
 						appId: env.GH_APP_ID,
 						Octokit: Octokit,
