@@ -21,6 +21,8 @@ jobs:
         run: |
           cat <<'EOF' > .env
           GH_APP_WEBHOOK_SECRET=${{ secrets.GH_APP_WEBHOOK_SECRET }}
+          GH_APP_ID=${{ secrets.GH_APP_ID }}
+          GH_APP_PRIVATE_KEY=${{ secrets.GH_APP_PRIVATE_KEY }}
           EOF
 
       - name: Setup Biome
