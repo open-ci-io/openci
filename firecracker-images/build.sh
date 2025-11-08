@@ -169,6 +169,10 @@ customize_image() {
         --run-command 'echo "firecracker-runner" > /etc/hostname' \
         --run-command "sed -i '/UEFI/d' /etc/fstab" \
         --run-command "sed -i '/\/boot\/efi/d' /etc/fstab" \
+        --run-command 'systemctl disable systemd-networkd-wait-online.service' \
+        --run-command 'systemctl mask systemd-networkd-wait-online.service' \
+        --run-command 'systemctl disable snapd.seeded.service' \
+        --run-command 'systemctl mask snapd.seeded.service' \
         --root-password password:firecracker
 
     log_info "Customization completed"
