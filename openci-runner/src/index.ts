@@ -64,8 +64,18 @@ export default {
 								work_folder: "_work",
 							});
 
-						// biome-ignore lint/correctness/noUnusedVariables: <Use this later>
+						// biome-ignore lint/correctness/noUnusedVariables: <Use this later>っっ
 						const { encoded_jit_config } = data;
+
+						// generate cloud-init script
+						// 1. Download runner script
+						// 2. unzip it
+						// 3. install tmux
+						// mkdir actions-runner
+						// cd actions-runner
+						// curl -o actions-runner-linux-x64-2.328.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.328.0/actions-runner-linux-x64-2.328.0.tar.gz
+						// tar xzf ./actions-runner-linux-x64-2.328.0.tar.gz
+						// tmux new -d -s runner "RUNNER_ALLOW_RUNASROOT=true ./run.sh --jitconfig ${runnerConfig}"
 					} catch (e) {
 						console.log("Failed to generate runner JIT config:", e);
 						return new Response("Failed to generate runner JIT config", {

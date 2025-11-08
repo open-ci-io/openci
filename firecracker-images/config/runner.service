@@ -1,0 +1,16 @@
+[Unit]
+Description=GitHub Actions Runner
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/actions-runner
+ExecStart=/usr/local/bin/start-runner.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
