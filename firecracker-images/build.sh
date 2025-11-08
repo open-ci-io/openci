@@ -136,6 +136,7 @@ customize_image() {
     create_startup_script
 
     virt-customize -a "$TEMP_IMAGE" \
+        --network \
         --update \
         --install ruby-full,git,curl,wget,tmux,jq,sudo,openssh-server,ca-certificates,build-essential \
         --copy-in /tmp/setup-runner.sh:/tmp/ \
