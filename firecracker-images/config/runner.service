@@ -1,14 +1,14 @@
 [Unit]
 Description=GitHub Actions Runner
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
-Type=simple
+Type=oneshot
 User=root
-WorkingDirectory=/opt/actions-runner
+ExecStartPre=/opt/setup-runner.sh
 ExecStart=/usr/local/bin/start-runner.sh
-Restart=always
-RestartSec=10
+RemainAfterExit=yes
 StandardOutput=journal
 StandardError=journal
 

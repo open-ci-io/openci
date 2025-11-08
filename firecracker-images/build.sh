@@ -77,6 +77,24 @@ create_runner_setup_script() {
 #!/bin/bash
 set -e
 
+# Check if already setup
+if [ -f /opt/.runner-setup-complete ]; then
+    echo "Runner already setup, skipping"
+    exit 0
+fi
+
+echo "Installing required packages..."
+export DEBIAN_FRONTEND=noninteractive
+
+# Wait for network
+until ping -c1 archive.ubuntu.com &>/dev/null; do
+    echo "Waiting for network..."
+    sleep 2
+done
+
+apt-get update
+apt-get install -y ruby-full git curl wget tmux jq sudo build-essential
+
 RUNNER_VERSION="2.321.0"
 RUNNER_DIR="/opt/actions-runner"
 
@@ -95,6 +113,9 @@ rm actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz
 
 useradd -m -s /bin/bash runner || true
 chown -R runner:runner "$RUNNER_DIR"
+
+# Mark as complete
+touch /opt/.runner-setup-complete
 
 echo "Runner setup completed"
 EOF
@@ -135,25 +156,18 @@ customize_image() {
     create_runner_setup_script
     create_startup_script
 
+    # Note: Skipping --update and package installation during image build
+    # These will be handled at VM boot time via cloud-init or startup script
     virt-customize -a "$TEMP_IMAGE" \
-        --network \
-        --run-command 'echo "nameserver 8.8.8.8" > /etc/resolv.conf' \
-        --run-command 'echo "nameserver 1.1.1.1" >> /etc/resolv.conf' \
-        --update \
-        --install ruby-full,git,curl,wget,tmux,jq,sudo,openssh-server,ca-certificates,build-essential \
-        --copy-in /tmp/setup-runner.sh:/tmp/ \
-        --run /tmp/setup-runner.sh \
+        --copy-in /tmp/setup-runner.sh:/opt/ \
         --copy-in /tmp/start-runner.sh:/usr/local/bin/ \
         --copy-in config/runner.service:/etc/systemd/system/ \
+        --run-command 'chmod +x /opt/setup-runner.sh' \
+        --run-command 'chmod +x /usr/local/bin/start-runner.sh' \
         --run-command 'systemctl enable runner.service' \
         --run-command 'systemctl enable ssh' \
-        --run-command 'systemctl enable systemd-networkd' \
-        --run-command 'systemctl enable systemd-resolved' \
         --run-command 'echo "firecracker-runner" > /etc/hostname' \
-        --root-password password:firecracker \
-        --run-command 'apt-get clean' \
-        --run-command 'rm -rf /var/lib/apt/lists/*' \
-        --run-command 'rm -rf /tmp/*'
+        --root-password password:firecracker
 
     log_info "Customization completed"
 
