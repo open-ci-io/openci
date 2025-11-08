@@ -137,6 +137,8 @@ customize_image() {
 
     virt-customize -a "$TEMP_IMAGE" \
         --network \
+        --run-command 'echo "nameserver 8.8.8.8" > /etc/resolv.conf' \
+        --run-command 'echo "nameserver 1.1.1.1" >> /etc/resolv.conf' \
         --update \
         --install ruby-full,git,curl,wget,tmux,jq,sudo,openssh-server,ca-certificates,build-essential \
         --copy-in /tmp/setup-runner.sh:/tmp/ \
