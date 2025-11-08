@@ -167,6 +167,8 @@ customize_image() {
         --run-command 'systemctl enable runner.service' \
         --run-command 'systemctl enable ssh' \
         --run-command 'echo "firecracker-runner" > /etc/hostname' \
+        --run-command "sed -i '/UEFI/d' /etc/fstab" \
+        --run-command "sed -i '/\/boot\/efi/d' /etc/fstab" \
         --root-password password:firecracker
 
     log_info "Customization completed"
@@ -175,9 +177,9 @@ customize_image() {
     rm -f /tmp/setup-runner.sh /tmp/start-runner.sh
 }
 
-# Convert to EXT4
+# Convert to EXT4 and extract root partition
 convert_to_ext4() {
-    log_info "Converting to EXT4 format"
+    log_info "Converting to EXT4 format and extracting root partition"
 
     if [ -f "$IMAGE_NAME" ]; then
         log_warn "Output image $IMAGE_NAME already exists. Remove it? (y/n)"
@@ -190,8 +192,37 @@ convert_to_ext4() {
         fi
     fi
 
-    qemu-img convert -f qcow2 -O raw "$TEMP_IMAGE" "$IMAGE_NAME"
-    log_info "Conversion completed"
+    local TEMP_RAW="temp-raw.img"
+
+    # Convert qcow2 to raw
+    log_info "Converting qcow2 to raw format"
+    qemu-img convert -f qcow2 -O raw "$TEMP_IMAGE" "$TEMP_RAW"
+
+    # Get partition info (find Linux filesystem partition)
+    log_info "Extracting partition information"
+    local PART_INFO=$(fdisk -l "$TEMP_RAW" | grep "Linux filesystem" | head -1)
+    local START_SECTOR=$(echo "$PART_INFO" | awk '{print $2}')
+    local SECTORS=$(echo "$PART_INFO" | awk '{print $4}')
+
+    log_info "Found Linux partition: start=$START_SECTOR, sectors=$SECTORS"
+
+    # Extract the root partition only
+    log_info "Extracting root partition"
+    dd if="$TEMP_RAW" of="$IMAGE_NAME" bs=512 skip="$START_SECTOR" count="$SECTORS" status=progress
+
+    # Clean up temp raw image
+    rm -f "$TEMP_RAW"
+
+    # Check filesystem
+    log_info "Checking filesystem"
+    e2fsck -f -y "$IMAGE_NAME" || log_warn "Filesystem check completed with warnings"
+
+    # Resize to desired size
+    log_info "Resizing to $IMAGE_SIZE"
+    truncate -s "$IMAGE_SIZE" "$IMAGE_NAME"
+    resize2fs "$IMAGE_NAME"
+
+    log_info "Conversion and extraction completed"
 }
 
 # Cleanup temporary files
