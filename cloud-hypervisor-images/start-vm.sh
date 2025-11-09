@@ -80,7 +80,10 @@ check_prerequisites() {
 setup_network() {
     log_step "Setting up network"
 
-    TAP_NAME="ch-tap-${VM_NAME}"
+    # Generate short TAP name (max 15 chars for Linux interface names)
+    # Use first 6 chars of MD5 hash of VM name
+    HASH=$(echo -n "$VM_NAME" | md5sum | cut -c1-6)
+    TAP_NAME="chtap-${HASH}"
 
     # Check if TAP already exists
     if ip link show "$TAP_NAME" &>/dev/null; then
@@ -122,8 +125,8 @@ start_vm() {
 
     # Build network arguments
     NETWORK_ARGS=""
-    if ip link show "ch-tap-${VM_NAME}" &>/dev/null; then
-        NETWORK_ARGS="--net tap=ch-tap-${VM_NAME},mac=52:54:00:12:34:56"
+    if ip link show "$TAP_NAME" &>/dev/null; then
+        NETWORK_ARGS="--net tap=$TAP_NAME,mac=52:54:00:12:34:56"
     else
         NETWORK_ARGS="--net tap="
     fi
@@ -165,8 +168,8 @@ start_vm_background() {
 
     # Build network arguments
     NETWORK_ARGS=""
-    if ip link show "ch-tap-${VM_NAME}" &>/dev/null; then
-        NETWORK_ARGS="--net tap=ch-tap-${VM_NAME},mac=52:54:00:12:34:56"
+    if ip link show "$TAP_NAME" &>/dev/null; then
+        NETWORK_ARGS="--net tap=$TAP_NAME,mac=52:54:00:12:34:56"
     else
         NETWORK_ARGS="--net tap="
     fi
