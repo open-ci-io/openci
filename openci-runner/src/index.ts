@@ -5,10 +5,22 @@ import type { WebhookEvent } from "@octokit/webhooks-types";
 
 export default {
 	async fetch(request, env, _): Promise<Response> {
+		const baseUrl = env.INCUS_SERVER_URL;
+		const res = await fetch(`${baseUrl}/1.0/instances/test2`, {
+			headers: {
+				"CF-Access-Client-Id": env.CF_ACCESS_CLIENT_ID,
+				"CF-Access-Client-Secret": env.CF_ACCESS_CLIENT_SECRET,
+			},
+		});
+
+		const data = await res.json();
+		console.log("Incus API response:", data);
+
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
 		if (!webhookSecret) {
 			return new Response("Webhook secret not configured", { status: 500 });
 		}
+
 		const headers = request.headers;
 		const signature = headers.get("x-hub-signature-256");
 		if (signature == null) {
@@ -64,18 +76,51 @@ export default {
 								work_folder: "_work",
 							});
 
-						// biome-ignore lint/correctness/noUnusedVariables: <Use this later>っっ
+						// biome-ignore lint/correctness/noUnusedVariables: <Use this later>
 						const { encoded_jit_config } = data;
 
-						// generate cloud-init script
-						// 1. Download runner script
-						// 2. unzip it
-						// 3. install tmux
-						// mkdir actions-runner
-						// cd actions-runner
-						// curl -o actions-runner-linux-x64-2.328.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.328.0/actions-runner-linux-x64-2.328.0.tar.gz
-						// tar xzf ./actions-runner-linux-x64-2.328.0.tar.gz
-						// tmux new -d -s runner "RUNNER_ALLOW_RUNASROOT=true ./run.sh --jitconfig ${runnerConfig}"
+						// Incus APIを呼び出してVMを起動
+						const baseUrl = env.INCUS_SERVER_URL;
+						const res = await fetch(`${baseUrl}/1.0`, {
+							headers: {
+								"CF-Access-Client-Id": env.CF_ACCESS_CLIENT_ID,
+								"CF-Access-Client-Secret": env.CF_ACCESS_CLIENT_SECRET,
+							},
+						});
+
+						// // Stoppedなインスタンスを探す
+						// const instances = listData.metadata || [];
+						// const stoppedInstance = instances.find(
+						// 	(inst: { status: string }) => inst.status === "Stopped",
+						// );
+
+						// if (!stoppedInstance) {
+						// 	return new Response("No available VM found", { status: 503 });
+						// }
+
+						// console.log(`Selected VM: ${stoppedInstance.name}`);
+
+						// // VMを起動
+						// const startResponse = await fetch(
+						// 	`${incusUrl}/1.0/instances/${stoppedInstance.name}/state`,
+						// 	{
+						// 		body: JSON.stringify({
+						// 			action: "start",
+						// 			timeout: 30,
+						// 		}),
+						// 		headers: {
+						// 			Authorization: `Bearer ${incusToken}`,
+						// 			"Content-Type": "application/json",
+						// 		},
+						// 		method: "PUT",
+						// 	},
+						// );
+
+						// const startData = await startResponse.json();
+						// console.log("Start VM response:", startData);
+
+						// TODO: VMの起動完了を待つ
+						// TODO: GitHub Actionsランナーをセットアップ
 					} catch (e) {
 						console.log("Failed to generate runner JIT config:", e);
 						return new Response("Failed to generate runner JIT config", {
