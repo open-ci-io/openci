@@ -41,22 +41,26 @@ afterEach(() => {
 });
 
 describe("fetch", () => {
-	it.each(["GET", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"])(
-		"returns 405 for %s method",
-		async (method) => {
-			const request = new IncomingRequest("http://example.com", {
-				headers: {
-					"content-type": "application/json",
-				},
-				method: method,
-			});
-			const ctx = createExecutionContext();
-			const response = await worker.fetch(request, env, ctx);
-			await waitOnExecutionContext(ctx);
-			expect(response.status).toBe(405);
-			await expect(response.text()).resolves.toBe("Method Not Allowed");
-		},
-	);
+	it.each([
+		"GET",
+		"PUT",
+		"DELETE",
+		"PATCH",
+		"OPTIONS",
+		"HEAD",
+	])("returns 405 for %s method", async (method) => {
+		const request = new IncomingRequest("http://example.com", {
+			headers: {
+				"content-type": "application/json",
+			},
+			method: method,
+		});
+		const ctx = createExecutionContext();
+		const response = await worker.fetch(request, env, ctx);
+		await waitOnExecutionContext(ctx);
+		expect(response.status).toBe(405);
+		await expect(response.text()).resolves.toBe("Method Not Allowed");
+	});
 
 	it("responds with 200 for non-workflow_job events", async () => {
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
