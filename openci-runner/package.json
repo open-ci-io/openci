@@ -4,7 +4,9 @@
 		"@octokit/rest": "^22.0.1",
 		"@octokit/webhooks-methods": "^6.0.0",
 		"@octokit/webhooks-types": "^7.6.1",
-		"axios": "^1.13.2"
+		"axios": "^1.13.2",
+		"uuid": "^13.0.0",
+		"valibot": "^1.1.0"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.8.19",
