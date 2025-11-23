@@ -3,22 +3,13 @@ import { Octokit } from "@octokit/rest";
 import { verify } from "@octokit/webhooks-methods";
 import type { WebhookEvent } from "@octokit/webhooks-types";
 import { v4 as uuidv4 } from "uuid";
-
-type IncusInstancesResponse = {
-	metadata: IncusProperty[];
-};
-
-type IncusInstanceResponse = {
-	metadata: IncusProperty;
-};
-
-type IncusProperty = {
-	status: string;
-	name: string;
-};
+import type { IncusInstanceResponse, IncusInstancesResponse } from "./incus";
 
 export default {
 	async fetch(request, env, _): Promise<Response> {
+		if (request.method !== "POST") {
+			return new Response("Method not allowed", { status: 405 });
+		}
 		const baseUrl = env.INCUS_SERVER_URL;
 		const instanceUrl = `${baseUrl}/1.0/instances`;
 		const cloudflareAccessHeaders = {
