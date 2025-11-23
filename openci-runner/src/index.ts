@@ -6,7 +6,10 @@ import type { WebhookEvent } from "@octokit/webhooks-types";
 export default {
 	async fetch(request, env, _): Promise<Response> {
 		if (request.method !== "POST") {
-			return new Response("Method Not Allowed", { status: 405 });
+			return new Response("Method Not Allowed", {
+				headers: { Allow: "POST" },
+				status: 405,
+			});
 		}
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
 		if (!webhookSecret) {
