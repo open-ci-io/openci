@@ -290,7 +290,7 @@ describe("fetch", () => {
 		);
 	});
 
-	it("returns 500 when GH_APP_ID not provided", async () => {
+	it("returns 500 when GH_APP_PRIVATE_KEY not provided", async () => {
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
 		const body = JSON.stringify({
 			action: "queued",
@@ -314,8 +314,8 @@ describe("fetch", () => {
 			method: "POST",
 		});
 		const ctx = createExecutionContext();
-		const envWithoutAppId = { ...env, GH_APP_PRIVATE_KEY: undefined };
-		const response = await worker.fetch(request, envWithoutAppId, ctx);
+		const envWithoutGitHubPrivateKey = { ...env, GH_APP_PRIVATE_KEY: undefined };
+		const response = await worker.fetch(request, envWithoutGitHubPrivateKey, ctx);
 		await waitOnExecutionContext(ctx);
 		expect(response.status).toBe(500);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
