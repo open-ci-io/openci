@@ -36,18 +36,32 @@ vi.mock("@octokit/app", () => {
 const createSignature = (payload: string, secret: string) =>
 	`sha256=${createHmac("sha256", secret).update(payload).digest("hex")}`;
 
-describe("ensure secrets", () => {
-	it("all secrets are set", () => {
-		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
-		expect(webhookSecret).toBeTruthy();
-	});
-});
-
 afterEach(() => {
 	vi.clearAllMocks();
 });
 
 describe("fetch", () => {
+	it.each([
+		"GET",
+		"PUT",
+		"DELETE",
+		"PATCH",
+		"OPTIONS",
+		"HEAD",
+	])("returns 405 for %s method", async (method) => {
+		const request = new IncomingRequest("http://example.com", {
+			headers: {
+				"content-type": "application/json",
+			},
+			method: method,
+		});
+		const ctx = createExecutionContext();
+		const response = await worker.fetch(request, env, ctx);
+		await waitOnExecutionContext(ctx);
+		expect(response.status).toBe(405);
+		await expect(response.text()).resolves.toBe("Method Not Allowed");
+	});
+
 	it("responds with 200 for non-workflow_job events", async () => {
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
 		const body = JSON.stringify({ action: "ping" });
@@ -276,7 +290,7 @@ describe("fetch", () => {
 		);
 	});
 
-	it("returns 500 when GH_APP_ID not provided", async () => {
+	it("returns 500 when GH_APP_PRIVATE_KEY not provided", async () => {
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
 		const body = JSON.stringify({
 			action: "queued",
@@ -300,8 +314,15 @@ describe("fetch", () => {
 			method: "POST",
 		});
 		const ctx = createExecutionContext();
-		const envWithoutAppId = { ...env, GH_APP_PRIVATE_KEY: undefined };
-		const response = await worker.fetch(request, envWithoutAppId, ctx);
+		const envWithoutGitHubPrivateKey = {
+			...env,
+			GH_APP_PRIVATE_KEY: undefined,
+		};
+		const response = await worker.fetch(
+			request,
+			envWithoutGitHubPrivateKey,
+			ctx,
+		);
 		await waitOnExecutionContext(ctx);
 		expect(response.status).toBe(500);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(

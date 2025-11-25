@@ -125,6 +125,7 @@
 			"wscript"
 		],
 		"editor.codeActionsOnSave": {
+			"source.fixAll.biome": "explicit",
 			"source.organizeImports.biome": "explicit"
 		},
 		"editor.formatOnSave": true,
@@ -134,6 +135,7 @@
 		"files.exclude": {
 			"target": true
 		},
+		"postman.settings.dotenv-detection-notification-visibility": false,
 		"search.exclude": {
 			"target": true
 		},
