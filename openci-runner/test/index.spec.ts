@@ -5,6 +5,7 @@ import {
 } from "cloudflare:test";
 import { createHmac } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { fetchAvailableIncusInstances } from "../src/incus";
 import worker from "../src/index";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
@@ -38,6 +39,12 @@ const createSignature = (payload: string, secret: string) =>
 
 afterEach(() => {
 	vi.clearAllMocks();
+});
+
+vi.mock("../src/incus", () => {
+	return {
+		fetchAvailableIncusInstances: vi.fn(),
+	};
 });
 
 describe("fetch", () => {
@@ -140,6 +147,10 @@ describe("fetch", () => {
 	});
 
 	it("return 201 when new runner is created", async () => {
+		vi.mocked(fetchAvailableIncusInstances).mockResolvedValueOnce([
+			{ name: "vm-1", status: "Stopped" },
+		]);
+
 		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
 		const body = JSON.stringify({
 			action: "queued",
@@ -327,6 +338,144 @@ describe("fetch", () => {
 		expect(response.status).toBe(500);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
 			`"GH_APP_PRIVATE_KEY not provided"`,
+		);
+	});
+
+	it("returns 500 when CF_ACCESS_CLIENT_ID not provided", async () => {
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+		const body = JSON.stringify({
+			action: "queued",
+			installation: { id: 123456 },
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: ["self-hosted"],
+			},
+		});
+		const signature = createSignature(body, webhookSecret);
+		const request = new IncomingRequest("http://example.com", {
+			body,
+			headers: {
+				"content-type": "application/json",
+				"x-hub-signature-256": signature,
+			},
+			method: "POST",
+		});
+		const ctx = createExecutionContext();
+		const envWithoutCfClientId = { ...env, CF_ACCESS_CLIENT_ID: undefined };
+		const response = await worker.fetch(request, envWithoutCfClientId, ctx);
+		await waitOnExecutionContext(ctx);
+		expect(response.status).toBe(500);
+		await expect(response.text()).resolves.toBe(
+			"CF_ACCESS_CLIENT_ID not provided",
+		);
+	});
+
+	it("returns 500 when CF_ACCESS_CLIENT_SECRET not provided", async () => {
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+		const body = JSON.stringify({
+			action: "queued",
+			installation: { id: 123456 },
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: ["self-hosted"],
+			},
+		});
+		const signature = createSignature(body, webhookSecret);
+		const request = new IncomingRequest("http://example.com", {
+			body,
+			headers: {
+				"content-type": "application/json",
+				"x-hub-signature-256": signature,
+			},
+			method: "POST",
+		});
+		const ctx = createExecutionContext();
+		const envWithoutCfClientSecret = {
+			...env,
+			CF_ACCESS_CLIENT_SECRET: undefined,
+		};
+		const response = await worker.fetch(request, envWithoutCfClientSecret, ctx);
+		await waitOnExecutionContext(ctx);
+		expect(response.status).toBe(500);
+		await expect(response.text()).resolves.toBe(
+			"CF_ACCESS_CLIENT_SECRET not provided",
+		);
+	});
+
+	it("returns 500 when INCUS_SERVER_URL not provided", async () => {
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+		const body = JSON.stringify({
+			action: "queued",
+			installation: { id: 123456 },
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: ["self-hosted"],
+			},
+		});
+		const signature = createSignature(body, webhookSecret);
+		const request = new IncomingRequest("http://example.com", {
+			body,
+			headers: {
+				"content-type": "application/json",
+				"x-hub-signature-256": signature,
+			},
+			method: "POST",
+		});
+		const ctx = createExecutionContext();
+		const envWithoutIncusUrl = { ...env, INCUS_SERVER_URL: undefined };
+		const response = await worker.fetch(request, envWithoutIncusUrl, ctx);
+		await waitOnExecutionContext(ctx);
+		expect(response.status).toBe(500);
+		await expect(response.text()).resolves.toBe(
+			"INCUS_SERVER_URL not provided",
+		);
+	});
+
+	it("returns 500 when fetchAvailableIncusInstances fails", async () => {
+		vi.mocked(fetchAvailableIncusInstances).mockRejectedValueOnce(
+			new Error("Failed to connect to Incus server"),
+		);
+
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+		const body = JSON.stringify({
+			action: "queued",
+			installation: { id: 123456 },
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: ["self-hosted"],
+			},
+		});
+		const signature = createSignature(body, webhookSecret);
+		const request = new IncomingRequest("http://example.com", {
+			body,
+			headers: {
+				"content-type": "application/json",
+				"x-hub-signature-256": signature,
+			},
+			method: "POST",
+		});
+		const ctx = createExecutionContext();
+		const response = await worker.fetch(request, env, ctx);
+		await waitOnExecutionContext(ctx);
+		expect(response.status).toBe(500);
+		await expect(response.text()).resolves.toBe(
+			"Failed to fetch available Incus instances",
 		);
 	});
 });
