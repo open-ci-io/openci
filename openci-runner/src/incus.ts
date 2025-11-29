@@ -35,6 +35,12 @@ export async function _fetchIncusInstances(
 		headers: cloudflareAccessHeaders,
 	});
 
+	if (!recursionRes.ok) {
+		throw new Error(
+			`Failed to fetch Incus instances: ${recursionRes.status} ${recursionRes.statusText}`,
+		);
+	}
+
 	return IncusInstancesResponse.parse(await recursionRes.json());
 }
 

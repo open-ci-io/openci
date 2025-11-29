@@ -2,7 +2,7 @@ import { App } from "@octokit/app";
 import { Octokit } from "@octokit/rest";
 import { verify } from "@octokit/webhooks-methods";
 import type { WebhookEvent } from "@octokit/webhooks-types";
-import { fetchAvailableIncusInstances } from "./incus";
+import { fetchAvailableIncusInstances, type IncusProperty } from "./incus";
 
 export default {
 	async fetch(request, env, _): Promise<Response> {
@@ -84,13 +84,39 @@ export default {
 						console.log("Successfully generated GHA JIT config");
 
 						console.log("Started to search available Incus VMs");
+						if (!env.CF_ACCESS_CLIENT_ID) {
+							return new Response("CF_ACCESS_CLIENT_ID not provided", {
+								status: 500,
+							});
+						}
+						if (!env.CF_ACCESS_CLIENT_SECRET) {
+							return new Response("CF_ACCESS_CLIENT_SECRET not provided", {
+								status: 500,
+							});
+						}
+						if (!env.INCUS_SERVER_URL) {
+							return new Response("INCUS_SERVER_URL not provided", {
+								status: 500,
+							});
+						}
 						const incusEnv = {
 							cloudflare_access_client_id: env.CF_ACCESS_CLIENT_ID,
 							cloudflare_access_client_secret: env.CF_ACCESS_CLIENT_SECRET,
 							server_url: env.INCUS_SERVER_URL,
 						};
 
-						await fetchAvailableIncusInstances(incusEnv);
+						let availableInstances: IncusProperty[];
+						try {
+							availableInstances = await fetchAvailableIncusInstances(incusEnv);
+						} catch (e) {
+							console.log("Failed to fetch available Incus instances:", e);
+							return new Response("Failed to fetch available Incus instances", {
+								status: 500,
+							});
+						}
+						console.log(
+							`Found ${availableInstances.length} available Incus instances`,
+						);
 
 						return new Response(`Successfully created OpenCI runner`, {
 							status: 201,
