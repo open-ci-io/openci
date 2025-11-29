@@ -22,7 +22,7 @@
 		"dev": "wrangler dev",
 		"start": "wrangler dev",
 		"test": "vitest",
-		"test-with-coverage": "vitest run --coverage"
+		"test-with-codecov": "vitest run --coverage --reporter=junit --outputFile=test-report.junit.xml"
 	},
 	"version": "0.2.0"
 }
