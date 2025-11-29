@@ -5,8 +5,20 @@ import {
 } from "cloudflare:test";
 import { createHmac } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import z from "zod";
 import { fetchAvailableIncusInstances } from "../src/incus";
 import worker from "../src/index";
+
+const HttpMethod = z.enum([
+	"GET",
+	"POST",
+	"PUT",
+	"DELETE",
+	"PATCH",
+	"OPTIONS",
+	"HEAD",
+]);
+type HttpMethod = z.infer<typeof HttpMethod>;
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 
@@ -34,56 +46,68 @@ vi.mock("@octokit/app", () => {
 	};
 });
 
-const createSignature = (payload: string, secret: string) =>
-	`sha256=${createHmac("sha256", secret).update(payload).digest("hex")}`;
-
-afterEach(() => {
-	vi.clearAllMocks();
-});
-
 vi.mock("../src/incus", () => {
 	return {
 		fetchAvailableIncusInstances: vi.fn(),
 	};
 });
 
+const createSignature = (payload: string, secret: string) =>
+	`sha256=${createHmac("sha256", secret).update(payload).digest("hex")}`;
+
+function mockRequest(method: HttpMethod, body?: string, signature?: string) {
+	const headers: Record<string, string> = {
+		"content-type": "application/json",
+	};
+	if (signature) {
+		headers["x-hub-signature-256"] = signature;
+	}
+	return new IncomingRequest("http://example.com", {
+		body,
+		headers,
+		method,
+	});
+}
+
+async function runFetch(
+	method: HttpMethod,
+	body?: Record<string, unknown>,
+	needSignature: boolean = false,
+) {
+	const _body = JSON.stringify(body);
+	let signature: string | undefined;
+	if (needSignature) {
+		signature = createSignature(_body, webhookSecret);
+	}
+	const request = mockRequest(method, _body, signature);
+	const ctx = createExecutionContext();
+	const response = await worker.fetch(request, env, ctx);
+	await waitOnExecutionContext(ctx);
+	return response;
+}
+
+const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+
+afterEach(() => {
+	vi.clearAllMocks();
+});
+
 describe("fetch", () => {
-	it.each([
-		"GET",
-		"PUT",
-		"DELETE",
-		"PATCH",
-		"OPTIONS",
-		"HEAD",
-	])("returns 405 for %s method", async (method) => {
-		const request = new IncomingRequest("http://example.com", {
-			headers: {
-				"content-type": "application/json",
-			},
-			method: method,
-		});
-		const ctx = createExecutionContext();
-		const response = await worker.fetch(request, env, ctx);
-		await waitOnExecutionContext(ctx);
+	it.each(
+		HttpMethod.options.filter((e) => e !== HttpMethod.enum.POST),
+	)("returns 405 for %s method", async (method) => {
+		const response = await runFetch(method);
 		expect(response.status).toBe(405);
 		await expect(response.text()).resolves.toBe("Method Not Allowed");
 	});
 
 	it("responds with 200 for non-workflow_job events", async () => {
-		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
-		const body = JSON.stringify({ action: "ping" });
-		const signature = createSignature(body, webhookSecret);
-		const request = new IncomingRequest("http://example.com", {
-			body,
-			headers: {
-				"content-type": "application/json",
-				"x-hub-signature-256": signature,
-			},
-			method: "POST",
-		});
-		const ctx = createExecutionContext();
-		const response = await worker.fetch(request, env, ctx);
-		await waitOnExecutionContext(ctx);
+		const response = await runFetch(
+			HttpMethod.enum.POST,
+			{ action: "ping" },
+			true,
+		);
+
 		expect(response.status).toBe(200);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
 			`"Event ignored"`,
@@ -91,17 +115,7 @@ describe("fetch", () => {
 	});
 
 	it("Signature is missing", async () => {
-		const body = JSON.stringify({ action: "ping" });
-		const request = new IncomingRequest("http://example.com", {
-			body,
-			headers: {
-				"content-type": "application/json",
-			},
-			method: "POST",
-		});
-		const ctx = createExecutionContext();
-		const response = await worker.fetch(request, env, ctx);
-		await waitOnExecutionContext(ctx);
+		const response = await runFetch(HttpMethod.enum.POST, { action: "ping" });
 		expect(response.status).toBe(401);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
 			`"Signature is null"`,
@@ -111,14 +125,7 @@ describe("fetch", () => {
 	it("Webhook signature is not valid", async () => {
 		const body = JSON.stringify({ action: "ping" });
 		const invalidSignature = createSignature(body, "NOT_THE_REAL_SECRET");
-		const request = new IncomingRequest("http://example.com", {
-			body,
-			headers: {
-				"content-type": "application/json",
-				"x-hub-signature-256": invalidSignature,
-			},
-			method: "POST",
-		});
+		const request = mockRequest(HttpMethod.enum.POST, body, invalidSignature);
 		const ctx = createExecutionContext();
 		const response = await worker.fetch(request, env, ctx);
 		await waitOnExecutionContext(ctx);
@@ -133,31 +140,23 @@ describe("fetch", () => {
 			{ name: "vm-1", status: "Stopped" },
 		]);
 
-		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
-		const body = JSON.stringify({
-			action: "queued",
-			installation: { id: 123456 },
-			repository: {
-				name: "test-repo",
-				owner: { login: "test-owner" },
+		const response = await runFetch(
+			HttpMethod.enum.POST,
+			{
+				action: "queued",
+				installation: { id: 123456 },
+				repository: {
+					name: "test-repo",
+					owner: { login: "test-owner" },
+				},
+				workflow_job: {
+					id: 1,
+					labels: ["self-hosted"],
+				},
 			},
-			workflow_job: {
-				id: 1,
-				labels: ["self-hosted"],
-			},
-		});
-		const signature = createSignature(body, webhookSecret);
-		const request = new IncomingRequest("http://example.com", {
-			body,
-			headers: {
-				"content-type": "application/json",
-				"x-hub-signature-256": signature,
-			},
-			method: "POST",
-		});
-		const ctx = createExecutionContext();
-		const response = await worker.fetch(request, env, ctx);
-		await waitOnExecutionContext(ctx);
+			true,
+		);
+
 		expect(response.status).toBe(201);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
 			`"Successfully created OpenCI runner"`,
@@ -165,20 +164,11 @@ describe("fetch", () => {
 	});
 
 	it("nothing to be processed", async () => {
-		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
-		const body = JSON.stringify({ action: "ping", workflow_job: {} });
-		const signature = createSignature(body, webhookSecret);
-		const request = new IncomingRequest("http://example.com", {
-			body,
-			headers: {
-				"content-type": "application/json",
-				"x-hub-signature-256": signature,
-			},
-			method: "POST",
-		});
-		const ctx = createExecutionContext();
-		const response = await worker.fetch(request, env, ctx);
-		await waitOnExecutionContext(ctx);
+		const response = await runFetch(
+			HttpMethod.enum.POST,
+			{ action: "ping", workflow_job: {} },
+			true,
+		);
 		expect(response.status).toBe(200);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
 			`"Workflow Job but status is not queued. Ignore this event"`,
@@ -186,30 +176,22 @@ describe("fetch", () => {
 	});
 
 	it("returns 400 when installationId is undefined", async () => {
-		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
-		const body = JSON.stringify({
-			action: "queued",
-			repository: {
-				name: "test-repo",
-				owner: { login: "test-owner" },
+		const response = await runFetch(
+			HttpMethod.enum.POST,
+			{
+				action: "queued",
+				repository: {
+					name: "test-repo",
+					owner: { login: "test-owner" },
+				},
+				workflow_job: {
+					id: 1,
+					labels: ["self-hosted"],
+				},
 			},
-			workflow_job: {
-				id: 1,
-				labels: ["self-hosted"],
-			},
-		});
-		const signature = createSignature(body, webhookSecret);
-		const request = new IncomingRequest("http://example.com", {
-			body,
-			headers: {
-				"content-type": "application/json",
-				"x-hub-signature-256": signature,
-			},
-			method: "POST",
-		});
-		const ctx = createExecutionContext();
-		const response = await worker.fetch(request, env, ctx);
-		await waitOnExecutionContext(ctx);
+			true,
+		);
+
 		expect(response.status).toBe(400);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
 			`"Installation ID not found in payload"`,
@@ -219,31 +201,23 @@ describe("fetch", () => {
 	it("returns 500 when GitHub API fails", async () => {
 		mockGenerateJitConfig.mockRejectedValueOnce(new Error("API Error"));
 
-		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
-		const body = JSON.stringify({
-			action: "queued",
-			installation: { id: 123456 },
-			repository: {
-				name: "test-repo",
-				owner: { login: "test-owner" },
+		const response = await runFetch(
+			HttpMethod.enum.POST,
+			{
+				action: "queued",
+				installation: { id: 123456 },
+				repository: {
+					name: "test-repo",
+					owner: { login: "test-owner" },
+				},
+				workflow_job: {
+					id: 1,
+					labels: ["self-hosted"],
+				},
 			},
-			workflow_job: {
-				id: 1,
-				labels: ["self-hosted"],
-			},
-		});
-		const signature = createSignature(body, webhookSecret);
-		const request = new IncomingRequest("http://example.com", {
-			body,
-			headers: {
-				"content-type": "application/json",
-				"x-hub-signature-256": signature,
-			},
-			method: "POST",
-		});
-		const ctx = createExecutionContext();
-		const response = await worker.fetch(request, env, ctx);
-		await waitOnExecutionContext(ctx);
+			true,
+		);
+
 		expect(response.status).toBe(500);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
 			`"Failed to generate runner JIT config"`,
@@ -255,31 +229,23 @@ describe("fetch", () => {
 			new Error("Failed to connect to Incus server"),
 		);
 
-		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
-		const body = JSON.stringify({
-			action: "queued",
-			installation: { id: 123456 },
-			repository: {
-				name: "test-repo",
-				owner: { login: "test-owner" },
+		const response = await runFetch(
+			HttpMethod.enum.POST,
+			{
+				action: "queued",
+				installation: { id: 123456 },
+				repository: {
+					name: "test-repo",
+					owner: { login: "test-owner" },
+				},
+				workflow_job: {
+					id: 1,
+					labels: ["self-hosted"],
+				},
 			},
-			workflow_job: {
-				id: 1,
-				labels: ["self-hosted"],
-			},
-		});
-		const signature = createSignature(body, webhookSecret);
-		const request = new IncomingRequest("http://example.com", {
-			body,
-			headers: {
-				"content-type": "application/json",
-				"x-hub-signature-256": signature,
-			},
-			method: "POST",
-		});
-		const ctx = createExecutionContext();
-		const response = await worker.fetch(request, env, ctx);
-		await waitOnExecutionContext(ctx);
+			true,
+		);
+
 		expect(response.status).toBe(500);
 		await expect(response.text()).resolves.toBe(
 			"Failed to fetch available Incus instances",
