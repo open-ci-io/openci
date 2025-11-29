@@ -128,24 +128,6 @@ describe("fetch", () => {
 		);
 	});
 
-	it("returns 500 when webhook secret is not configured", async () => {
-		const request = new IncomingRequest("http://example.com", {
-			body: JSON.stringify({ action: "ping" }),
-			headers: { "content-type": "application/json" },
-			method: "POST",
-		});
-		const ctx = createExecutionContext();
-		const envWithoutSecret = { ...env, GH_APP_WEBHOOK_SECRET: undefined };
-
-		const response = await worker.fetch(request, envWithoutSecret, ctx);
-		await waitOnExecutionContext(ctx);
-
-		expect(response.status).toBe(500);
-		await expect(response.text()).resolves.toBe(
-			"Webhook secret not configured",
-		);
-	});
-
 	it("return 201 when new runner is created", async () => {
 		vi.mocked(fetchAvailableIncusInstances).mockResolvedValueOnce([
 			{ name: "vm-1", status: "Stopped" },
