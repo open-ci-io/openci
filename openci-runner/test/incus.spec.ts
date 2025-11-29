@@ -20,13 +20,13 @@ const mockMetadata = {
 	],
 };
 
-describe("fetchIncusInstances", () => {
-	const mockEnv = {
-		cloudflare_access_client_id: "test-client-id",
-		cloudflare_access_client_secret: "test-client-secret",
-		server_url: "https://incus.example.com",
-	};
+const mockEnv = {
+	cloudflare_access_client_id: "test-client-id",
+	cloudflare_access_client_secret: "test-client-secret",
+	server_url: "https://incus.example.com",
+};
 
+describe("fetchIncusInstances", () => {
 	it("fetches instances with correct headers", async () => {
 		mockFetch.mockResolvedValueOnce({
 			json: async () => mockMetadata,
@@ -100,12 +100,6 @@ describe("fetchIncusInstances", () => {
 });
 
 describe("fetch available(stop) incus instances", () => {
-	const mockEnv = {
-		cloudflare_access_client_id: "test-client-id",
-		cloudflare_access_client_secret: "test-client-secret",
-		server_url: "https://incus.example.com",
-	};
-
 	it("fetch stopped instances", async () => {
 		mockFetch.mockResolvedValueOnce({
 			json: async () => mockMetadata,
