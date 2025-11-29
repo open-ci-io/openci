@@ -77,7 +77,6 @@ async function runFetch(
 	const _body = JSON.stringify(body);
 	let signature: string | undefined;
 	if (needSignature) {
-		const _body = JSON.stringify(body);
 		signature = createSignature(_body, webhookSecret);
 	}
 	const request = mockRequest(method, _body, signature);
