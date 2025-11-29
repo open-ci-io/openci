@@ -250,6 +250,42 @@ describe("fetch", () => {
 		);
 	});
 
+	it("returns 500 when fetchAvailableIncusInstances fails", async () => {
+		vi.mocked(fetchAvailableIncusInstances).mockRejectedValueOnce(
+			new Error("Failed to connect to Incus server"),
+		);
+
+		const webhookSecret = env.GH_APP_WEBHOOK_SECRET;
+		const body = JSON.stringify({
+			action: "queued",
+			installation: { id: 123456 },
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: ["self-hosted"],
+			},
+		});
+		const signature = createSignature(body, webhookSecret);
+		const request = new IncomingRequest("http://example.com", {
+			body,
+			headers: {
+				"content-type": "application/json",
+				"x-hub-signature-256": signature,
+			},
+			method: "POST",
+		});
+		const ctx = createExecutionContext();
+		const response = await worker.fetch(request, env, ctx);
+		await waitOnExecutionContext(ctx);
+		expect(response.status).toBe(500);
+		await expect(response.text()).resolves.toBe(
+			"Failed to fetch available Incus instances",
+		);
+	});
+
 	it.each([
 		["GH_APP_WEBHOOK_SECRET", { GH_APP_WEBHOOK_SECRET: undefined }],
 		["GH_APP_ID", { GH_APP_ID: undefined }],
