@@ -6,7 +6,7 @@ import {
 import { createHmac } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import z from "zod";
-import { fetchAvailableIncusInstances } from "../src/incus";
+import { createInstance, fetchAvailableIncusInstances } from "../src/incus";
 import worker from "../src/index";
 
 const HttpMethod = z.enum([
@@ -48,6 +48,7 @@ vi.mock("@octokit/app", () => {
 
 vi.mock("../src/incus", () => {
 	return {
+		createInstance: vi.fn(),
 		fetchAvailableIncusInstances: vi.fn(),
 	};
 });
@@ -274,5 +275,71 @@ describe("fetch", () => {
 		await waitOnExecutionContext(ctx);
 		expect(response.status).toBe(500);
 		await expect(response.text()).resolves.toBe(`${envName} not provided`);
+	});
+
+	it("creates new instance when no available instances found", async () => {
+		vi.mocked(fetchAvailableIncusInstances).mockResolvedValueOnce([]);
+		vi.mocked(createInstance).mockResolvedValueOnce(undefined);
+
+		const response = await runFetch(
+			HttpMethod.enum.POST,
+			{
+				action: "queued",
+				installation: { id: 123456 },
+				repository: {
+					name: "test-repo",
+					owner: { login: "test-owner" },
+				},
+				workflow_job: {
+					id: 1,
+					labels: ["self-hosted"],
+				},
+			},
+			true,
+		);
+
+		expect(response.status).toBe(201);
+		await expect(response.text()).resolves.toBe(
+			"Successfully created OpenCI runner",
+		);
+		expect(createInstance).toHaveBeenCalledWith(
+			expect.objectContaining({
+				cloudflare_access_client_id: env.CF_ACCESS_CLIENT_ID,
+				cloudflare_access_client_secret: env.CF_ACCESS_CLIENT_SECRET,
+				server_url: env.INCUS_SERVER_URL,
+			}),
+			expect.stringMatching(/^openci-runner-\d+$/),
+			"openci-runner0",
+		);
+	});
+
+	it("returns 500 when createInstance fails", async () => {
+		vi.mocked(fetchAvailableIncusInstances).mockResolvedValueOnce([]);
+		vi.mocked(createInstance).mockRejectedValueOnce(
+			new Error("Failed to create instance"),
+		);
+
+		const response = await runFetch(
+			HttpMethod.enum.POST,
+			{
+				action: "queued",
+				installation: { id: 123456 },
+				repository: {
+					name: "test-repo",
+					owner: { login: "test-owner" },
+				},
+				workflow_job: {
+					id: 1,
+					labels: ["self-hosted"],
+				},
+			},
+			true,
+		);
+
+		expect(response.status).toBe(500);
+		await expect(response.text()).resolves.toBe(
+			"Failed to create Incus instance",
+		);
+		expect(createInstance).toHaveBeenCalledTimes(1);
 	});
 });
