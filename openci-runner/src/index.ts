@@ -2,7 +2,11 @@ import { App } from "@octokit/app";
 import { Octokit } from "@octokit/rest";
 import { verify } from "@octokit/webhooks-methods";
 import type { WebhookEvent } from "@octokit/webhooks-types";
-import { fetchAvailableIncusInstances, type IncusProperty } from "./incus";
+import {
+	createInstance,
+	fetchAvailableIncusInstances,
+	type IncusProperty,
+} from "./incus";
 
 const validateEnv = (env: Env): string | null => {
 	if (!env.GH_APP_WEBHOOK_SECRET) return "GH_APP_WEBHOOK_SECRET not provided";
@@ -101,6 +105,14 @@ export default {
 						return new Response("Failed to fetch available Incus instances", {
 							status: 500,
 						});
+					}
+					if (availableInstances.length === 0) {
+						await createInstance(
+							incusEnv,
+							`openci-runner-${Date.now()}`,
+							"openci-runner0",
+						);
+						console.log("No available Incus instances, created a new one");
 					}
 					console.log(
 						`Found ${availableInstances.length} available Incus instances`,
