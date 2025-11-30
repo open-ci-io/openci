@@ -2,7 +2,7 @@ import { App } from "@octokit/app";
 import { Octokit } from "@octokit/rest";
 import type { Context } from "hono";
 import { z } from "zod";
-import { createInstance, fetchAvailableIncusInstances } from "../incus";
+import { createInstance, fetchAvailableIncusInstances } from "../services/incus";
 
 const WorkflowJobPayloadSchema = z.object({
 	installation: z
