@@ -5,8 +5,8 @@ import {
 } from "cloudflare:test";
 import { createHmac } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fetchAvailableIncusInstances } from "../../src/services/incus";
 import worker from "../../src/index";
+import { fetchAvailableIncusInstances } from "../../src/services/incus";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 
