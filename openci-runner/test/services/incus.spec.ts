@@ -6,7 +6,7 @@ import {
 	fetchStatusOfOperation,
 	requestCreateInstance,
 	waitForOperation,
-} from "../src/incus";
+} from "../../src/services/incus";
 
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);
