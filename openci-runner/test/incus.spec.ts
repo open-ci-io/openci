@@ -403,6 +403,42 @@ describe("requestCreateInstance", () => {
 			requestCreateInstance(mockEnv, "existing-instance", "test-image"),
 		).rejects.toThrow("Failed to create Incus instance: 409 Conflict");
 	});
+
+	it("throws when operation path is empty string", async () => {
+		const invalidAsyncResponse = {
+			operation: "",
+			status: "Operation created",
+			status_code: 100,
+			type: "async",
+		};
+
+		vi.mocked(fetch).mockResolvedValue({
+			json: () => Promise.resolve(invalidAsyncResponse),
+			ok: true,
+		} as Response);
+
+		await expect(
+			requestCreateInstance(mockEnv, "test-instance", "test-image"),
+		).rejects.toThrow("Invalid operation path format: ");
+	});
+
+	it("throws when operation path ends with slash", async () => {
+		const invalidAsyncResponse = {
+			operation: "/1.0/operations/",
+			status: "Operation created",
+			status_code: 100,
+			type: "async",
+		};
+
+		vi.mocked(fetch).mockResolvedValue({
+			json: () => Promise.resolve(invalidAsyncResponse),
+			ok: true,
+		} as Response);
+
+		await expect(
+			requestCreateInstance(mockEnv, "test-instance", "test-image"),
+		).rejects.toThrow("Invalid operation path format: /1.0/operations/");
+	});
 });
 
 describe("createInstance", () => {
