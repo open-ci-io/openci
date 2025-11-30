@@ -21,6 +21,33 @@ type IncusEnv = {
 	server_url: string;
 };
 
+const IncusOperationStatus = z.enum([
+	"Pending",
+	"Running",
+	"Cancelling",
+	"Cancelled",
+	"Success",
+	"Failure",
+]);
+
+const IncusResponseType = z.enum(["sync", "async", "error"]);
+
+const IncusOperationMetadata = z.object({
+	class: z.string().optional(),
+	err: z.string().optional(),
+	id: z.string().optional(),
+	status: IncusOperationStatus.optional(),
+	status_code: z.number().optional(),
+});
+
+const IncusAsyncResponse = z.object({
+	metadata: IncusOperationMetadata.optional(),
+	operation: z.string().optional(),
+	status: z.string(),
+	status_code: z.number(),
+	type: IncusResponseType,
+});
+
 export async function _fetchIncusInstances(
 	envData: IncusEnv,
 ): Promise<IncusInstancesResponse> {
@@ -50,20 +77,6 @@ export async function fetchAvailableIncusInstances(
 	const res = await _fetchIncusInstances(envData);
 	return res.metadata.filter((e) => e.status === IncusStatus.enum.Stopped);
 }
-
-type IncusAsyncResponse = {
-	type: string;
-	status: string;
-	status_code: number;
-	operation: string;
-	metadata?: {
-		id?: string;
-		class?: string;
-		status?: string;
-		status_code?: number;
-		err?: string;
-	};
-};
 
 export async function createInstance(
 	envData: IncusEnv,
@@ -100,9 +113,9 @@ export async function createInstance(
 	}
 	console.log("Incus instance creation initiated");
 
-	const result = (await response.json()) as IncusAsyncResponse;
+	const result = IncusAsyncResponse.parse(await response.json());
 
-	if (result.type === "async" && result.operation) {
+	if (result.type === IncusResponseType.enum.async && result.operation) {
 		const operationId = result.operation.split("/").pop();
 		if (operationId) {
 			console.log(`Waiting for operation ${operationId} to complete...`);
@@ -132,28 +145,26 @@ async function waitForOperation(
 			headers: cloudflareAccessHeaders,
 		});
 
-		if (response.status === 404) {
-			console.log("Operation not found, assuming completed");
-			return;
-		}
-
 		if (!response.ok) {
 			throw new Error(
 				`Failed to check operation status: ${response.status} ${response.statusText}`,
 			);
 		}
 
-		const result = (await response.json()) as IncusAsyncResponse;
+		const result = IncusAsyncResponse.parse(await response.json());
 		const status = result.metadata?.status;
 		const statusCode = result.metadata?.status_code;
 
 		console.log(`Operation status: ${status} (code: ${statusCode})`);
 
-		if (status === "Success" || statusCode === 200) {
+		if (status === IncusOperationStatus.enum.Success || statusCode === 200) {
 			return;
 		}
 
-		if (status === "Failure" || (statusCode && statusCode >= 400)) {
+		if (
+			status === IncusOperationStatus.enum.Failure ||
+			(statusCode && statusCode >= 400)
+		) {
 			throw new Error(`Operation failed: ${result.metadata?.err}`);
 		}
 

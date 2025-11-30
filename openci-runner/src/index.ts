@@ -121,7 +121,14 @@ export default {
 		if (availableInstances.length === 0) {
 			console.log("Start to create new Incus instance");
 			instanceName = `openci-runner-${Date.now()}`;
-			await createInstance(incusEnv, instanceName, "openci-runner0");
+			try {
+				await createInstance(incusEnv, instanceName, "openci-runner0");
+			} catch (e) {
+				console.log("Failed to create Incus instance:", e);
+				return new Response("Failed to create Incus instance", {
+					status: 500,
+				});
+			}
 		}
 
 		return new Response(`Successfully created OpenCI runner`, {
