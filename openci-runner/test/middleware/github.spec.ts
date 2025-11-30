@@ -57,7 +57,6 @@ function mockRequest(method: HttpMethod, body?: string, signature?: string) {
 	if (signature) {
 		headers["x-hub-signature-256"] = signature;
 	}
-	// GET and HEAD methods cannot have a body per HTTP spec
 	const canHaveBody =
 		method !== HttpMethod.enum.GET && method !== HttpMethod.enum.HEAD;
 	return new IncomingRequest("http://example.com/webhook", {
@@ -82,7 +81,6 @@ describe("github middleware - signature verification", () => {
 		const response = await worker.fetch(request, env, ctx);
 		await waitOnExecutionContext(ctx);
 		expect(response.status).toBe(401);
-		// HEAD method returns empty body per HTTP spec
 		if (method !== HttpMethod.enum.HEAD) {
 			await expect(response.text()).resolves.toBe("Signature is null");
 		}
@@ -122,7 +120,6 @@ describe("github middleware - signature verification", () => {
 		const ctx = createExecutionContext();
 		const response = await worker.fetch(request, env, ctx);
 		await waitOnExecutionContext(ctx);
-		// Should pass signature check and return 200 (event ignored)
 		expect(response.status).toBe(200);
 	});
 });
