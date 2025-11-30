@@ -30,8 +30,6 @@ const IncusOperationStatus = z.enum([
 	"Failure",
 ]);
 
-const IncusResponseType = z.enum(["sync", "async", "error"]);
-
 const IncusOperationMetadata = z.object({
 	class: z.string().optional(),
 	err: z.string().optional(),
@@ -40,13 +38,29 @@ const IncusOperationMetadata = z.object({
 	status_code: z.number().optional(),
 });
 
-const IncusAsyncResponse = z.object({
-	metadata: IncusOperationMetadata.optional(),
-	operation: z.string().optional(),
-	status: z.string(),
-	status_code: z.number(),
-	type: IncusResponseType,
-});
+const IncusAsyncResponse = z.discriminatedUnion("type", [
+	z.object({
+		metadata: IncusOperationMetadata.optional(),
+		operation: z.string(),
+		status: z.string(),
+		status_code: z.number(),
+		type: z.literal("async"),
+	}),
+	z.object({
+		metadata: IncusOperationMetadata.optional(),
+		status: z.string(),
+		status_code: z.number(),
+		type: z.literal("sync"),
+	}),
+	z.object({
+		error: z.string(),
+		error_code: z.number(),
+		metadata: IncusOperationMetadata.optional(),
+		status: z.string(),
+		status_code: z.number(),
+		type: z.literal("error"),
+	}),
+]);
 
 export type IncusAsyncResponse = z.infer<typeof IncusAsyncResponse>;
 
@@ -116,8 +130,13 @@ export async function requestCreateInstance(
 
 	const result = IncusAsyncResponse.parse(await response.json());
 
-	if (result.type === IncusResponseType.enum.async && result.operation) {
-		return result.operation.split("/").pop();
+	if (result.type === "async") {
+		const parts = result.operation.split("/");
+		const operationId = parts[parts.length - 1];
+		if (!operationId) {
+			throw new Error(`Invalid operation path format: ${result.operation}`);
+		}
+		return operationId;
 	}
 
 	return undefined;
@@ -188,6 +207,7 @@ export async function waitForOperation(
 
 		if (
 			status === IncusOperationStatus.enum.Failure ||
+			status === IncusOperationStatus.enum.Cancelled ||
 			(statusCode && statusCode >= 400)
 		) {
 			throw new Error(`Operation failed: ${result.metadata?.err}`);
