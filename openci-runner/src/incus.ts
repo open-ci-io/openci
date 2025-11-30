@@ -48,6 +48,8 @@ const IncusAsyncResponse = z.object({
 	type: IncusResponseType,
 });
 
+export type IncusAsyncResponse = z.infer<typeof IncusAsyncResponse>;
+
 export async function _fetchIncusInstances(
 	envData: IncusEnv,
 ): Promise<IncusInstancesResponse> {
@@ -125,12 +127,10 @@ export async function createInstance(
 	}
 }
 
-async function waitForOperation(
+export async function fetchStatusOfOperation(
 	envData: IncusEnv,
 	operationId: string,
-	maxWaitMs = 5 * 60 * 1000,
-	intervalMs = 2000,
-): Promise<void> {
+): Promise<IncusAsyncResponse> {
 	const baseUrl = envData.server_url;
 	const operationUrl = `${baseUrl}/1.0/operations/${operationId}`;
 	const cloudflareAccessHeaders = {
@@ -138,20 +138,29 @@ async function waitForOperation(
 		"CF-Access-Client-Secret": envData.cloudflare_access_client_secret,
 	};
 
+	const response = await fetch(operationUrl, {
+		headers: cloudflareAccessHeaders,
+	});
+
+	if (!response.ok) {
+		throw new Error(
+			`Failed to check operation status: ${response.status} ${response.statusText}`,
+		);
+	}
+
+	return IncusAsyncResponse.parse(await response.json());
+}
+
+export async function waitForOperation(
+	envData: IncusEnv,
+	operationId: string,
+	maxWaitMs = 5 * 60 * 1000,
+	intervalMs = 2000,
+): Promise<void> {
 	const startTime = Date.now();
 
 	while (Date.now() - startTime < maxWaitMs) {
-		const response = await fetch(operationUrl, {
-			headers: cloudflareAccessHeaders,
-		});
-
-		if (!response.ok) {
-			throw new Error(
-				`Failed to check operation status: ${response.status} ${response.statusText}`,
-			);
-		}
-
-		const result = IncusAsyncResponse.parse(await response.json());
+		const result = await fetchStatusOfOperation(envData, operationId);
 		const status = result.metadata?.status;
 		const statusCode = result.metadata?.status_code;
 
