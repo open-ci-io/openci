@@ -47,92 +47,86 @@ export default {
 
 		const payload: WebhookEvent = JSON.parse(body);
 
-		if ("workflow_job" in payload) {
-			switch (payload.action) {
-				case WorkflowJobAction.Queued: {
-					const installationId = payload.installation?.id;
-					if (installationId === undefined) {
-						return new Response("Installation ID not found in payload", {
-							status: 400,
-						});
-					}
-
-					const app = new App({
-						appId: env.GH_APP_ID,
-						Octokit: Octokit,
-						privateKey: env.GH_APP_PRIVATE_KEY,
-					});
-
-					const octokit = await app.getInstallationOctokit(installationId);
-
-					const runnerLabel = "openci-runner-beta-dev";
-					const runnerName = "OpenCIランナーβ(開発環境)";
-
-					// biome-ignore lint/correctness/noUnusedVariables: <Use later>
-					let encodedJitConfig: string;
-					try {
-						const { data } =
-							await octokit.rest.actions.generateRunnerJitconfigForRepo({
-								labels: [runnerLabel],
-								name: `${runnerName}-${Date.now()}`,
-								owner: payload.repository.owner.login,
-								repo: payload.repository.name,
-								runner_group_id: 1,
-								work_folder: "_work",
-							});
-
-						encodedJitConfig = data.encoded_jit_config;
-					} catch (e) {
-						console.log("Failed to generate runner JIT config:", e);
-						return new Response("Failed to generate runner JIT config", {
-							status: 500,
-						});
-					}
-					console.log("Successfully generated GHA JIT config");
-
-					console.log("Started to search available Incus VMs");
-					const incusEnv = {
-						cloudflare_access_client_id: env.CF_ACCESS_CLIENT_ID,
-						cloudflare_access_client_secret: env.CF_ACCESS_CLIENT_SECRET,
-						server_url: env.INCUS_SERVER_URL,
-					};
-
-					let availableInstances: IncusProperty[];
-					try {
-						availableInstances = await fetchAvailableIncusInstances(incusEnv);
-					} catch (e) {
-						console.log("Failed to fetch available Incus instances:", e);
-						return new Response("Failed to fetch available Incus instances", {
-							status: 500,
-						});
-					}
-					if (availableInstances.length === 0) {
-						await createInstance(
-							incusEnv,
-							`openci-runner-${Date.now()}`,
-							"openci-runner0",
-						);
-						console.log("No available Incus instances, created a new one");
-					}
-					console.log(
-						`Found ${availableInstances.length} available Incus instances`,
-					);
-
-					return new Response(`Successfully created OpenCI runner`, {
-						status: 201,
-					});
-				}
-				default:
-					return new Response(
-						"Workflow Job but status is not queued. Ignore this event",
-						{
-							status: 200,
-						},
-					);
-			}
+		if (!("workflow_job" in payload)) {
+			return new Response("Event ignored", { status: 200 });
 		}
 
-		return new Response("Event ignored", { status: 200 });
+		if (payload.action !== WorkflowJobAction.Queued) {
+			return new Response(
+				"Workflow Job but status is not queued. Ignore this event",
+				{ status: 200 },
+			);
+		}
+
+		const installationId = payload.installation?.id;
+		if (installationId === undefined) {
+			return new Response("Installation ID not found in payload", {
+				status: 400,
+			});
+		}
+
+		const app = new App({
+			appId: env.GH_APP_ID,
+			Octokit: Octokit,
+			privateKey: env.GH_APP_PRIVATE_KEY,
+		});
+
+		const octokit = await app.getInstallationOctokit(installationId);
+
+		const runnerLabel = "openci-runner-beta-dev";
+		const runnerName = "OpenCIランナーβ(開発環境)";
+
+		// biome-ignore lint/correctness/noUnusedVariables: <Use later>
+		let encodedJitConfig: string;
+		try {
+			const { data } =
+				await octokit.rest.actions.generateRunnerJitconfigForRepo({
+					labels: [runnerLabel],
+					name: `${runnerName}-${Date.now()}`,
+					owner: payload.repository.owner.login,
+					repo: payload.repository.name,
+					runner_group_id: 1,
+					work_folder: "_work",
+				});
+
+			encodedJitConfig = data.encoded_jit_config;
+		} catch (e) {
+			console.log("Failed to generate runner JIT config:", e);
+			return new Response("Failed to generate runner JIT config", {
+				status: 500,
+			});
+		}
+		console.log("Successfully generated GHA JIT config");
+
+		console.log("Started to search available Incus VMs");
+		const incusEnv = {
+			cloudflare_access_client_id: env.CF_ACCESS_CLIENT_ID,
+			cloudflare_access_client_secret: env.CF_ACCESS_CLIENT_SECRET,
+			server_url: env.INCUS_SERVER_URL,
+		};
+
+		let availableInstances: IncusProperty[];
+		let instanceName: string;
+		try {
+			availableInstances = await fetchAvailableIncusInstances(incusEnv);
+			console.log(
+				`Found ${availableInstances.length} available Incus instances`,
+			);
+		} catch (e) {
+			console.log("Failed to fetch available Incus instances:", e);
+			return new Response("Failed to fetch available Incus instances", {
+				status: 500,
+			});
+		}
+		if (availableInstances.length === 0) {
+			console.log("Start to create new Incus instance");
+			instanceName = `openci-runner-${Date.now()}`;
+			await createInstance(incusEnv, instanceName, "openci-runner0");
+		}
+
+		return new Response(`Successfully created OpenCI runner`, {
+			status: 201,
+		});
 	},
 } satisfies ExportedHandler<Env>;
 

@@ -84,6 +84,7 @@ export async function createInstance(
 			alias: imageName,
 			type: "image",
 		},
+		type: "virtual-machine",
 	};
 
 	const response = await fetch(instanceUrl, {
@@ -97,23 +98,28 @@ export async function createInstance(
 			`Failed to create Incus instance: ${response.status} ${response.statusText}`,
 		);
 	}
+	console.log("Incus instance creation initiated");
 
 	const result = (await response.json()) as IncusAsyncResponse;
 
-	// 操作の完了を待つ
-	if (result.type === "async" && result.metadata?.id) {
-		await waitForOperation(envData, result.metadata.id);
+	if (result.type === "async" && result.operation) {
+		const operationId = result.operation.split("/").pop();
+		if (operationId) {
+			console.log(`Waiting for operation ${operationId} to complete...`);
+			await waitForOperation(envData, operationId);
+			console.log(`Operation ${operationId} completed successfully`);
+		}
 	}
 }
 
 async function waitForOperation(
 	envData: IncusEnv,
 	operationId: string,
-	maxWaitMs = 5 * 60 * 1000, // 5分
-	intervalMs = 2000, // 2秒間隔
+	maxWaitMs = 5 * 60 * 1000,
+	intervalMs = 2000,
 ): Promise<void> {
 	const baseUrl = envData.server_url;
-	const operationUrl = `${baseUrl}/1.0/operations/${operationId}/wait`;
+	const operationUrl = `${baseUrl}/1.0/operations/${operationId}`;
 	const cloudflareAccessHeaders = {
 		"CF-Access-Client-Id": envData.cloudflare_access_client_id,
 		"CF-Access-Client-Secret": envData.cloudflare_access_client_secret,
@@ -122,9 +128,14 @@ async function waitForOperation(
 	const startTime = Date.now();
 
 	while (Date.now() - startTime < maxWaitMs) {
-		const response = await fetch(`${operationUrl}?timeout=30`, {
+		const response = await fetch(operationUrl, {
 			headers: cloudflareAccessHeaders,
 		});
+
+		if (response.status === 404) {
+			console.log("Operation not found, assuming completed");
+			return;
+		}
 
 		if (!response.ok) {
 			throw new Error(
@@ -133,19 +144,19 @@ async function waitForOperation(
 		}
 
 		const result = (await response.json()) as IncusAsyncResponse;
+		const status = result.metadata?.status;
 		const statusCode = result.metadata?.status_code;
 
-		// 200 = Success
-		if (statusCode === 200) {
+		console.log(`Operation status: ${status} (code: ${statusCode})`);
+
+		if (status === "Success" || statusCode === 200) {
 			return;
 		}
 
-		// 400+ = Failure
-		if (statusCode && statusCode >= 400) {
+		if (status === "Failure" || (statusCode && statusCode >= 400)) {
 			throw new Error(`Operation failed: ${result.metadata?.err}`);
 		}
 
-		// 100-199 = Running/Pending の場合は再試行
 		await new Promise((resolve) => setTimeout(resolve, intervalMs));
 	}
 
