@@ -80,11 +80,11 @@ export async function fetchAvailableIncusInstances(
 	return res.metadata.filter((e) => e.status === IncusStatus.enum.Stopped);
 }
 
-export async function createInstance(
+export async function requestCreateInstance(
 	envData: IncusEnv,
 	instanceName: string,
 	imageName: string,
-): Promise<void> {
+): Promise<string | undefined> {
 	const baseUrl = envData.server_url;
 	const instanceUrl = `${baseUrl}/1.0/instances`;
 	const cloudflareAccessHeaders = {
@@ -113,17 +113,33 @@ export async function createInstance(
 			`Failed to create Incus instance: ${response.status} ${response.statusText}`,
 		);
 	}
-	console.log("Incus instance creation initiated");
 
 	const result = IncusAsyncResponse.parse(await response.json());
 
 	if (result.type === IncusResponseType.enum.async && result.operation) {
-		const operationId = result.operation.split("/").pop();
-		if (operationId) {
-			console.log(`Waiting for operation ${operationId} to complete...`);
-			await waitForOperation(envData, operationId);
-			console.log(`Operation ${operationId} completed successfully`);
-		}
+		return result.operation.split("/").pop();
+	}
+
+	return undefined;
+}
+
+export async function createInstance(
+	envData: IncusEnv,
+	instanceName: string,
+	imageName: string,
+): Promise<void> {
+	console.log("Incus instance creation initiated");
+
+	const operationId = await requestCreateInstance(
+		envData,
+		instanceName,
+		imageName,
+	);
+
+	if (operationId) {
+		console.log(`Waiting for operation ${operationId} to complete...`);
+		await waitForOperation(envData, operationId);
+		console.log(`Operation ${operationId} completed successfully`);
 	}
 }
 
