@@ -39,7 +39,9 @@ export async function fetchAvailableIncusInstances(
 	envData: IncusEnv,
 ): Promise<IncusProperty[]> {
 	const res = await _fetchIncusInstances(envData);
-	return res.metadata.filter((e) => e.status === IncusStatusSchema.enum.Stopped);
+	return res.metadata.filter(
+		(e) => e.status === IncusStatusSchema.enum.Stopped,
+	);
 }
 
 export async function requestCreateInstance(
@@ -150,7 +152,10 @@ export async function waitForOperation(
 
 		console.log(`Operation status: ${status} (code: ${statusCode})`);
 
-		if (status === IncusOperationStatusSchema.enum.Success || statusCode === 200) {
+		if (
+			status === IncusOperationStatusSchema.enum.Success ||
+			statusCode === 200
+		) {
 			return;
 		}
 
