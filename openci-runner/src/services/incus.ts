@@ -11,6 +11,9 @@ import {
 
 export type { IncusAsyncResponse, IncusInstancesResponse, IncusProperty };
 
+export const OPENCI_RUNNER_LABEL = "openci-runner-beta-dev";
+export const OPENCI_RUNNER_BASE_IMAGE = "openci-runner-0.0.4";
+
 export async function _fetchIncusInstances(
 	envData: IncusEnv,
 ): Promise<IncusInstancesResponse> {
@@ -124,10 +127,58 @@ export async function createInstance(
 	}
 }
 
+export async function stopInstance(
+	envData: IncusEnv,
+	instanceName: string,
+): Promise<void> {
+	console.log(`Stopping Incus instance: ${instanceName}`);
+
+	const baseUrl = envData.server_url;
+	const stateUrl = `${baseUrl}/1.0/instances/${instanceName}/state`;
+	const cloudflareAccessHeaders = {
+		"CF-Access-Client-Id": envData.cloudflare_access_client_id,
+		"CF-Access-Client-Secret": envData.cloudflare_access_client_secret,
+		"Content-Type": "application/json",
+	};
+
+	const requestBody = {
+		action: "stop",
+		force: true,
+	};
+
+	const response = await fetch(stateUrl, {
+		body: JSON.stringify(requestBody),
+		headers: cloudflareAccessHeaders,
+		method: "PUT",
+	});
+
+	if (!response.ok) {
+		throw new Error(
+			`Failed to stop Incus instance: ${response.status} ${response.statusText}`,
+		);
+	}
+
+	const result = IncusAsyncResponseSchema.parse(await response.json());
+
+	if (result.type === "async") {
+		const parts = result.operation.split("/");
+		const operationId = parts[parts.length - 1];
+		if (!operationId) {
+			throw new Error(`Invalid operation path format: ${result.operation}`);
+		}
+		console.log(`Waiting for stop operation ${operationId} to complete...`);
+		await waitForOperation(envData, operationId);
+		console.log(`Instance ${instanceName} stopped successfully`);
+	}
+}
+
 export async function deleteInstance(
 	envData: IncusEnv,
 	instanceName: string,
 ): Promise<void> {
+	// Stop the instance first (required before deletion)
+	await stopInstance(envData, instanceName);
+
 	console.log(`Deleting Incus instance: ${instanceName}`);
 
 	const baseUrl = envData.server_url;

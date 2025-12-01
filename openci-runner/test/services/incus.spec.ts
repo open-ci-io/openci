@@ -515,12 +515,24 @@ describe("createInstance", () => {
 });
 
 describe("deleteInstance", () => {
-	it("deletes instance and waits for operation to complete", async () => {
+	it("stops instance then deletes and waits for operations to complete", async () => {
 		vi.mocked(fetch)
+			// stopInstance: PUT state
 			.mockResolvedValueOnce({
 				json: () => Promise.resolve(asyncResponse),
 				ok: true,
 			} as Response)
+			// stopInstance: wait for operation
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve(mockSuccessResponse),
+				ok: true,
+			} as Response)
+			// deleteInstance: DELETE
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve(asyncResponse),
+				ok: true,
+			} as Response)
+			// deleteInstance: wait for operation
 			.mockResolvedValueOnce({
 				json: () => Promise.resolve(mockSuccessResponse),
 				ok: true,
@@ -530,6 +542,19 @@ describe("deleteInstance", () => {
 
 		expect(fetch).toHaveBeenNthCalledWith(
 			1,
+			"https://incus.example.com/1.0/instances/test-instance/state",
+			{
+				body: JSON.stringify({ action: "stop", force: true }),
+				headers: {
+					"CF-Access-Client-Id": "test-client-id",
+					"CF-Access-Client-Secret": "test-client-secret",
+					"Content-Type": "application/json",
+				},
+				method: "PUT",
+			},
+		);
+		expect(fetch).toHaveBeenNthCalledWith(
+			3,
 			"https://incus.example.com/1.0/instances/test-instance",
 			{
 				headers: {
@@ -541,7 +566,7 @@ describe("deleteInstance", () => {
 		);
 	});
 
-	it("throws when delete fails", async () => {
+	it("throws when stop fails", async () => {
 		vi.mocked(fetch).mockResolvedValueOnce({
 			ok: false,
 			status: 404,
@@ -549,22 +574,48 @@ describe("deleteInstance", () => {
 		} as Response);
 
 		await expect(deleteInstance(mockEnv, "test-instance")).rejects.toThrow(
+			"Failed to stop Incus instance: 404 Not Found",
+		);
+	});
+
+	it("throws when delete fails after successful stop", async () => {
+		vi.mocked(fetch)
+			// stopInstance: sync response (immediate success)
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve(syncResponse),
+				ok: true,
+			} as Response)
+			// deleteInstance: DELETE fails
+			.mockResolvedValueOnce({
+				ok: false,
+				status: 404,
+				statusText: "Not Found",
+			} as Response);
+
+		await expect(deleteInstance(mockEnv, "test-instance")).rejects.toThrow(
 			"Failed to delete Incus instance: 404 Not Found",
 		);
 	});
 
-	it("completes immediately for sync response", async () => {
-		vi.mocked(fetch).mockResolvedValueOnce({
-			json: () => Promise.resolve(syncResponse),
-			ok: true,
-		} as Response);
+	it("completes immediately when both stop and delete are sync responses", async () => {
+		vi.mocked(fetch)
+			// stopInstance: sync response
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve(syncResponse),
+				ok: true,
+			} as Response)
+			// deleteInstance: sync response
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve(syncResponse),
+				ok: true,
+			} as Response);
 
 		await deleteInstance(mockEnv, "test-instance");
 
-		expect(fetch).toHaveBeenCalledTimes(1);
+		expect(fetch).toHaveBeenCalledTimes(2);
 	});
 
-	it("throws when operation path is invalid", async () => {
+	it("throws when stop operation path is invalid", async () => {
 		vi.mocked(fetch).mockResolvedValueOnce({
 			json: () =>
 				Promise.resolve({

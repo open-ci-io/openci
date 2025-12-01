@@ -6,6 +6,8 @@ import {
 	deleteInstance,
 	execCommand,
 	fetchAvailableIncusInstances,
+	OPENCI_RUNNER_BASE_IMAGE,
+	OPENCI_RUNNER_LABEL,
 	waitForVMAgent,
 } from "../services/incus";
 import type { WorkflowJobPayload } from "../types/github.types";
@@ -28,11 +30,10 @@ async function generateRunnerJitConfig(
 	octokit: Octokit,
 	payload: WorkflowJobPayload,
 ) {
-	const runnerLabel = "openci-runner-beta-dev";
 	const runnerName = "OpenCIランナーβ(開発環境)";
 
 	const { data } = await octokit.rest.actions.generateRunnerJitconfigForRepo({
-		labels: [runnerLabel],
+		labels: [OPENCI_RUNNER_LABEL],
 		name: `${runnerName}-${Date.now()}`,
 		owner: payload.repository.owner.login,
 		repo: payload.repository.name,
@@ -59,7 +60,7 @@ async function getOrCreateIncusInstance(
 	// 次のissueでVMのWarm Poolを実装する https://github.com/open-ci-io/openci/issues/591
 	console.log("Start to create new Incus instance");
 	const instanceName = generateInstanceName(runId);
-	const imageName = "openci-runner-0.0.1";
+	const imageName = OPENCI_RUNNER_BASE_IMAGE;
 	await createInstance(incusEnv, instanceName, imageName);
 	return instanceName;
 }

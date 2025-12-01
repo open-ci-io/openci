@@ -6,11 +6,13 @@ import {
 import { createHmac } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import worker from "../../src/index";
-import { OPENCI_RUNNER_LABEL } from "../../src/routes/webhook";
+
 import {
 	createInstance,
 	deleteInstance,
 	fetchAvailableIncusInstances,
+	OPENCI_RUNNER_BASE_IMAGE,
+	OPENCI_RUNNER_LABEL,
 } from "../../src/services/incus";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
@@ -45,6 +47,8 @@ vi.mock("../../src/services/incus", () => {
 		deleteInstance: vi.fn(),
 		execCommand: vi.fn(),
 		fetchAvailableIncusInstances: vi.fn(),
+		OPENCI_RUNNER_BASE_IMAGE: "openci-runner-0.0.4",
+		OPENCI_RUNNER_LABEL: "openci-runner-beta-dev",
 		waitForVMAgent: vi.fn(),
 	};
 });
@@ -198,7 +202,7 @@ describe("workflow-job handler", () => {
 				server_url: env.INCUS_SERVER_URL,
 			}),
 			"openci-runner-12345",
-			"openci-runner-0.0.1",
+			OPENCI_RUNNER_BASE_IMAGE,
 		);
 	});
 
