@@ -4,12 +4,11 @@ import {
 	handleWorkflowJobQueued,
 } from "../handlers/workflow-job";
 import { verifySignature } from "../middleware/github";
+import { OPENCI_RUNNER_LABEL } from "../services/incus";
 
 const webhook = new Hono<{ Bindings: Env }>();
 
 webhook.use("*", verifySignature());
-
-export const OPENCI_RUNNER_LABEL = "openci-runner-beta-dev";
 
 webhook.post("/", async (c) => {
 	const payload = await c.req.json();

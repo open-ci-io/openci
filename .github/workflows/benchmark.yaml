@@ -1,0 +1,68 @@
+name: CPU Benchmark
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  benchmark:
+    strategy:
+      matrix:
+        runner: [ubuntu-latest, openci-runner-beta-dev]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    steps:
+      - name: CPU Info
+        run: |
+          echo "=== CPU Info ==="
+          nproc
+          cat /proc/cpuinfo | grep "model name" | head -1 || true
+
+      - name: Prime Number Calculation
+        run: |
+          echo "=== Prime Number Calculation (CPU intensive) ==="
+          time python3 -c "
+          import time
+          start = time.time()
+          count = 0
+          for n in range(2, 300000):
+              is_prime = True
+              for i in range(2, int(n**0.5) + 1):
+                  if n % i == 0:
+                      is_prime = False
+                      break
+              if is_prime:
+                  count += 1
+          print(f'Found {count} primes in {time.time() - start:.2f} seconds')
+          "
+
+      - name: Compression Benchmark
+        run: |
+          echo "=== Compression Benchmark (100MB) ==="
+          dd if=/dev/urandom of=/tmp/testfile bs=1M count=100 2>/dev/null
+          time gzip -k /tmp/testfile
+          rm /tmp/testfile /tmp/testfile.gz
+
+      - name: Multi-core Benchmark
+        run: |
+          echo "=== Multi-core Benchmark ==="
+          time sh -c '
+            for i in $(seq 1 $(nproc)); do
+              (
+                python3 -c "
+                count = 0
+                for n in range(2, 100000):
+                    is_prime = True
+                    for i in range(2, int(n**0.5) + 1):
+                        if n % i == 0:
+                            is_prime = False
+                            break
+                    if is_prime:
+                        count += 1
+                "
+              ) &
+            done
+            wait
+          '
+          echo "Completed with $(nproc) cores"

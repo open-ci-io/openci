@@ -11,6 +11,9 @@ import {
 
 export type { IncusAsyncResponse, IncusInstancesResponse, IncusProperty };
 
+export const OPENCI_RUNNER_LABEL = "openci-runner-beta-dev";
+export const OPENCI_RUNNER_BASE_IMAGE = "openci-runner-0.0.4";
+
 export async function _fetchIncusInstances(
 	envData: IncusEnv,
 ): Promise<IncusInstancesResponse> {

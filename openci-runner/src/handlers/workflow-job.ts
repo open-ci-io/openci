@@ -1,12 +1,13 @@
 import { App } from "@octokit/app";
 import { Octokit } from "@octokit/rest";
 import type { Context } from "hono";
-import { OPENCI_RUNNER_LABEL } from "../routes/webhook";
 import {
 	createInstance,
 	deleteInstance,
 	execCommand,
 	fetchAvailableIncusInstances,
+	OPENCI_RUNNER_BASE_IMAGE,
+	OPENCI_RUNNER_LABEL,
 	waitForVMAgent,
 } from "../services/incus";
 import type { WorkflowJobPayload } from "../types/github.types";
@@ -59,7 +60,7 @@ async function getOrCreateIncusInstance(
 	// 次のissueでVMのWarm Poolを実装する https://github.com/open-ci-io/openci/issues/591
 	console.log("Start to create new Incus instance");
 	const instanceName = generateInstanceName(runId);
-	const imageName = "openci-runner-0.0.4";
+	const imageName = OPENCI_RUNNER_BASE_IMAGE;
 	await createInstance(incusEnv, instanceName, imageName);
 	return instanceName;
 }
