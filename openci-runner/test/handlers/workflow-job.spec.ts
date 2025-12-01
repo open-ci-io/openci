@@ -89,7 +89,7 @@ describe("workflow-job handler", () => {
 			},
 			workflow_job: {
 				id: 1,
-				labels: ["self-hosted"],
+				labels: ["openci-runner-beta"],
 			},
 		});
 
@@ -108,7 +108,7 @@ describe("workflow-job handler", () => {
 			},
 			workflow_job: {
 				id: 1,
-				labels: ["self-hosted"],
+				labels: ["openci-runner-beta"],
 			},
 		});
 
@@ -130,7 +130,7 @@ describe("workflow-job handler", () => {
 			},
 			workflow_job: {
 				id: 1,
-				labels: ["self-hosted"],
+				labels: ["openci-runner-beta"],
 			},
 		});
 
@@ -154,7 +154,7 @@ describe("workflow-job handler", () => {
 			},
 			workflow_job: {
 				id: 1,
-				labels: ["self-hosted"],
+				labels: ["openci-runner-beta"],
 			},
 		});
 
@@ -175,7 +175,7 @@ describe("workflow-job handler", () => {
 			},
 			workflow_job: {
 				id: 1,
-				labels: ["self-hosted"],
+				labels: ["openci-runner-beta"],
 			},
 		});
 
@@ -209,7 +209,7 @@ describe("workflow-job handler", () => {
 			},
 			workflow_job: {
 				id: 1,
-				labels: ["self-hosted"],
+				labels: ["openci-runner-beta"],
 			},
 		});
 

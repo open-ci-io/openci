@@ -84,7 +84,7 @@ describe("webhook route", () => {
 		);
 	});
 
-	it("forwards queued workflow_job events to handler", async () => {
+	it("forwards queued workflow_job events to handler when openci-runner-beta label is present", async () => {
 		vi.mocked(fetchAvailableIncusInstances).mockResolvedValueOnce([
 			{ name: "vm-1", status: "Stopped" },
 		]);
@@ -98,13 +98,33 @@ describe("webhook route", () => {
 			},
 			workflow_job: {
 				id: 1,
-				labels: ["self-hosted"],
+				labels: ["openci-runner-beta"],
 			},
 		});
 
 		expect(response.status).toBe(201);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
 			`"Successfully created OpenCI runner"`,
+		);
+	});
+
+	it("ignores queued workflow_job events without openci-runner-beta label", async () => {
+		const response = await runFetch({
+			action: "queued",
+			installation: { id: 123456 },
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: ["self-hosted", "linux"],
+			},
+		});
+
+		expect(response.status).toBe(200);
+		await expect(response.text()).resolves.toMatchInlineSnapshot(
+			`"Workflow Job does not target OpenCI runner"`,
 		);
 	});
 });
