@@ -32,7 +32,9 @@ vi.mock("@octokit/app", () => {
 vi.mock("../../src/services/incus", () => {
 	return {
 		createInstance: vi.fn(),
+		execCommand: vi.fn(),
 		fetchAvailableIncusInstances: vi.fn(),
+		waitForVMAgent: vi.fn(),
 	};
 });
 

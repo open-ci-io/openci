@@ -40,7 +40,9 @@ vi.mock("@octokit/app", () => {
 vi.mock("../../src/services/incus", () => {
 	return {
 		createInstance: vi.fn(),
+		execCommand: vi.fn(),
 		fetchAvailableIncusInstances: vi.fn(),
+		waitForVMAgent: vi.fn(),
 	};
 });
 
@@ -188,7 +190,7 @@ describe("workflow-job handler", () => {
 				server_url: env.INCUS_SERVER_URL,
 			}),
 			expect.stringMatching(/^openci-runner-\d+$/),
-			"openci-runner0",
+			"openci-runner-0.0.1",
 		);
 	});
 
