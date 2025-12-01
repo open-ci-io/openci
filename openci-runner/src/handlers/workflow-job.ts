@@ -59,7 +59,7 @@ async function getOrCreateIncusInstance(
 	// 次のissueでVMのWarm Poolを実装する https://github.com/open-ci-io/openci/issues/591
 	console.log("Start to create new Incus instance");
 	const instanceName = generateInstanceName(runId);
-	const imageName = "openci-runner-0.0.1";
+	const imageName = "openci-runner-0.0.3";
 	await createInstance(incusEnv, instanceName, imageName);
 	return instanceName;
 }
@@ -103,7 +103,7 @@ export async function handleWorkflowJobQueued(
 				"-d",
 				"-s",
 				"runner",
-				`RUNNER_ALLOW_RUNASROOT=1 ./run.sh --jitconfig ${encodedJitConfig}`,
+				`PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin RUNNER_ALLOW_RUNASROOT=1 ./run.sh --jitconfig ${encodedJitConfig}`,
 			],
 			{ cwd: "/root/actions-runner" },
 		);

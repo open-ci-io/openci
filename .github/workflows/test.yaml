@@ -40,6 +40,9 @@ jobs:
         run: biome ci . --error-on-warnings
         working-directory: .
 
+      - name: Check PATH
+        run: echo $PATH
+
       - name: Install dependencies
         run: npm ci
 
