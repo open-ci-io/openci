@@ -6,8 +6,8 @@ import {
 import { createHmac } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import worker from "../../src/index";
-import { fetchAvailableIncusInstances } from "../../src/services/incus";
 import { OPENCI_RUNNER_LABEL } from "../../src/routes/webhook";
+import { fetchAvailableIncusInstances } from "../../src/services/incus";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 
