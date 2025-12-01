@@ -514,13 +514,13 @@ describe("createInstance", () => {
 });
 
 describe("waitForVMAgent", () => {
-	it("returns when VM agent is ready", async () => {
+	it("returns when VM agent is ready with default timeout values", async () => {
 		vi.mocked(fetch).mockResolvedValueOnce({
 			json: () => Promise.resolve({ metadata: { processes: 10 } }),
 			ok: true,
 		} as Response);
 
-		await waitForVMAgent(mockEnv, "test-instance", 10000, 100);
+		await waitForVMAgent(mockEnv, "test-instance");
 
 		expect(fetch).toHaveBeenCalledWith(
 			"https://incus.example.com/1.0/instances/test-instance/state",
