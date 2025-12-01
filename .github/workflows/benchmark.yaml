@@ -25,29 +25,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Build TypeScript Compiler (tsc)
         run: |
           echo "=== Building TypeScript from source ==="
           git clone --depth 1 https://github.com/microsoft/TypeScript.git
           cd TypeScript
-          time npm ci
-          time npm run build
-
-      - name: Build webpack
-        run: |
-          echo "=== Building webpack from source ==="
-          git clone --depth 1 https://github.com/webpack/webpack.git
-          cd webpack
-          time npm ci
-          time npm run build
-
-      - name: Build Vite
-        run: |
-          echo "=== Building Vite from source ==="
-          git clone --depth 1 https://github.com/vitejs/vite.git
-          cd vite
           time npm ci
           time npm run build
 
