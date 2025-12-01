@@ -6,7 +6,7 @@ const webhook = new Hono<{ Bindings: Env }>();
 
 webhook.use("*", verifySignature());
 
-const OPENCI_RUNNER_LABEL = "openci-runner-beta";
+export const OPENCI_RUNNER_LABEL = "openci-runner-beta";
 
 webhook.post("/", async (c) => {
 	const payload = await c.req.json();
