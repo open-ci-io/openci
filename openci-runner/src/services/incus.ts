@@ -1,68 +1,20 @@
-import z from "zod";
+import {
+	type IncusAsyncResponse,
+	IncusAsyncResponse as IncusAsyncResponseSchema,
+	type IncusInstancesResponse,
+	IncusInstancesResponse as IncusInstancesResponseSchema,
+	IncusOperationStatus,
+	type IncusProperty,
+	IncusStatus,
+} from "../types/incus.types";
 
-const IncusStatus = z.enum(["Running", "Stopped", "Frozen", "Error"]);
-
-const IncusProperty = z.object({
-	name: z.string(),
-	status: IncusStatus,
-});
-
-export type IncusProperty = z.infer<typeof IncusProperty>;
-
-export const IncusInstancesResponse = z.object({
-	metadata: z.array(IncusProperty),
-});
-
-export type IncusInstancesResponse = z.infer<typeof IncusInstancesResponse>;
-
-type IncusEnv = {
+export type IncusEnv = {
 	cloudflare_access_client_id: string;
 	cloudflare_access_client_secret: string;
 	server_url: string;
 };
 
-const IncusOperationStatus = z.enum([
-	"Pending",
-	"Running",
-	"Cancelling",
-	"Cancelled",
-	"Success",
-	"Failure",
-]);
-
-const IncusOperationMetadata = z.object({
-	class: z.string().optional(),
-	err: z.string().optional(),
-	id: z.string().optional(),
-	status: IncusOperationStatus.optional(),
-	status_code: z.number().optional(),
-});
-
-const IncusAsyncResponse = z.discriminatedUnion("type", [
-	z.object({
-		metadata: IncusOperationMetadata.optional(),
-		operation: z.string(),
-		status: z.string(),
-		status_code: z.number(),
-		type: z.literal("async"),
-	}),
-	z.object({
-		metadata: IncusOperationMetadata.optional(),
-		status: z.string(),
-		status_code: z.number(),
-		type: z.literal("sync"),
-	}),
-	z.object({
-		error: z.string(),
-		error_code: z.number(),
-		metadata: IncusOperationMetadata.optional(),
-		status: z.string(),
-		status_code: z.number(),
-		type: z.literal("error"),
-	}),
-]);
-
-export type IncusAsyncResponse = z.infer<typeof IncusAsyncResponse>;
+export type { IncusAsyncResponse, IncusInstancesResponse, IncusProperty };
 
 export async function _fetchIncusInstances(
 	envData: IncusEnv,
@@ -84,7 +36,7 @@ export async function _fetchIncusInstances(
 		);
 	}
 
-	return IncusInstancesResponse.parse(await recursionRes.json());
+	return IncusInstancesResponseSchema.parse(await recursionRes.json());
 }
 
 export async function fetchAvailableIncusInstances(
@@ -128,7 +80,7 @@ export async function requestCreateInstance(
 		);
 	}
 
-	const result = IncusAsyncResponse.parse(await response.json());
+	const result = IncusAsyncResponseSchema.parse(await response.json());
 
 	if (result.type === "async") {
 		const parts = result.operation.split("/");
@@ -183,7 +135,7 @@ export async function fetchStatusOfOperation(
 		);
 	}
 
-	return IncusAsyncResponse.parse(await response.json());
+	return IncusAsyncResponseSchema.parse(await response.json());
 }
 
 export async function waitForOperation(
