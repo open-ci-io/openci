@@ -2,10 +2,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
 	_fetchIncusInstances,
 	createInstance,
+	execCommand,
 	fetchAvailableIncusInstances,
 	fetchStatusOfOperation,
 	requestCreateInstance,
 	waitForOperation,
+	waitForVMAgent,
 } from "../../src/services/incus";
 
 const mockFetch = vi.fn();
@@ -333,6 +335,7 @@ describe("requestCreateInstance", () => {
 						alias: "test-image",
 						type: "image",
 					},
+					start: true,
 					type: "virtual-machine",
 				}),
 				headers: {
@@ -507,5 +510,173 @@ describe("createInstance", () => {
 		await expect(
 			createInstance(mockEnv, "test-instance", "test-image"),
 		).rejects.toThrow("Operation failed: Image not found");
+	});
+});
+
+describe("waitForVMAgent", () => {
+	it("returns when VM agent is ready with default timeout values", async () => {
+		vi.mocked(fetch).mockResolvedValueOnce({
+			json: () => Promise.resolve({ metadata: { processes: 10 } }),
+			ok: true,
+		} as Response);
+
+		await waitForVMAgent(mockEnv, "test-instance");
+
+		expect(fetch).toHaveBeenCalledWith(
+			"https://incus.example.com/1.0/instances/test-instance/state",
+			{
+				headers: {
+					"CF-Access-Client-Id": "test-client-id",
+					"CF-Access-Client-Secret": "test-client-secret",
+				},
+			},
+		);
+	});
+
+	it("retries until VM agent is ready", async () => {
+		vi.mocked(fetch)
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve({ metadata: { processes: -1 } }),
+				ok: true,
+			} as Response)
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve({ metadata: { processes: 5 } }),
+				ok: true,
+			} as Response);
+
+		await waitForVMAgent(mockEnv, "test-instance", 10000, 10);
+
+		expect(fetch).toHaveBeenCalledTimes(2);
+	});
+
+	it("retries when response is not ok", async () => {
+		vi.mocked(fetch)
+			.mockResolvedValueOnce({
+				ok: false,
+			} as Response)
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve({ metadata: { processes: 5 } }),
+				ok: true,
+			} as Response);
+
+		await waitForVMAgent(mockEnv, "test-instance", 10000, 10);
+
+		expect(fetch).toHaveBeenCalledTimes(2);
+	});
+
+	it("throws when timeout is reached", async () => {
+		vi.mocked(fetch).mockResolvedValue({
+			json: () => Promise.resolve({ metadata: { processes: -1 } }),
+			ok: true,
+		} as Response);
+
+		await expect(
+			waitForVMAgent(mockEnv, "test-instance", 50, 10),
+		).rejects.toThrow("VM agent did not become ready within 0.05 seconds");
+	});
+});
+
+describe("execCommand", () => {
+	it("executes command and waits for operation to complete", async () => {
+		vi.mocked(fetch)
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve(asyncResponse),
+				ok: true,
+			} as Response)
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve(mockSuccessResponse),
+				ok: true,
+			} as Response);
+
+		await execCommand(mockEnv, "test-instance", ["echo", "hello"], {
+			cwd: "/root",
+		});
+
+		expect(fetch).toHaveBeenNthCalledWith(
+			1,
+			"https://incus.example.com/1.0/instances/test-instance/exec",
+			{
+				body: JSON.stringify({
+					command: ["echo", "hello"],
+					cwd: "/root",
+					environment: {},
+					interactive: false,
+					"record-output": true,
+					"wait-for-websocket": false,
+				}),
+				headers: {
+					"CF-Access-Client-Id": "test-client-id",
+					"CF-Access-Client-Secret": "test-client-secret",
+					"Content-Type": "application/json",
+				},
+				method: "POST",
+			},
+		);
+	});
+
+	it("executes command with environment variables", async () => {
+		vi.mocked(fetch)
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve(asyncResponse),
+				ok: true,
+			} as Response)
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve(mockSuccessResponse),
+				ok: true,
+			} as Response);
+
+		await execCommand(mockEnv, "test-instance", ["./run.sh"], {
+			environment: { RUNNER_ALLOW_RUNASROOT: "1" },
+		});
+
+		expect(fetch).toHaveBeenNthCalledWith(
+			1,
+			"https://incus.example.com/1.0/instances/test-instance/exec",
+			expect.objectContaining({
+				body: expect.stringContaining("RUNNER_ALLOW_RUNASROOT"),
+			}),
+		);
+	});
+
+	it("throws when exec fails", async () => {
+		vi.mocked(fetch).mockResolvedValueOnce({
+			ok: false,
+			status: 500,
+			statusText: "Internal Server Error",
+		} as Response);
+
+		await expect(
+			execCommand(mockEnv, "test-instance", ["echo", "hello"]),
+		).rejects.toThrow(
+			"Failed to execute command in Incus instance: 500 Internal Server Error",
+		);
+	});
+
+	it("throws when operation path is invalid", async () => {
+		vi.mocked(fetch).mockResolvedValueOnce({
+			json: () =>
+				Promise.resolve({
+					operation: "",
+					status: "Operation created",
+					status_code: 100,
+					type: "async",
+				}),
+			ok: true,
+		} as Response);
+
+		await expect(
+			execCommand(mockEnv, "test-instance", ["echo", "hello"]),
+		).rejects.toThrow("Invalid operation path format: ");
+	});
+
+	it("completes immediately for sync response", async () => {
+		vi.mocked(fetch).mockResolvedValueOnce({
+			json: () => Promise.resolve(syncResponse),
+			ok: true,
+		} as Response);
+
+		await execCommand(mockEnv, "test-instance", ["echo", "hello"]);
+
+		expect(fetch).toHaveBeenCalledTimes(1);
 	});
 });

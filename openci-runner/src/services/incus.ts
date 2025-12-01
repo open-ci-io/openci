@@ -74,6 +74,7 @@ export async function requestCreateInstance(
 			alias: imageName,
 			type: "image",
 		},
+		start: true,
 		type: "virtual-machine",
 	};
 
@@ -181,4 +182,100 @@ export async function waitForOperation(
 	}
 
 	throw new Error(`Operation timed out after ${maxWaitMs / 1000} seconds`);
+}
+
+export async function waitForVMAgent(
+	envData: IncusEnv,
+	instanceName: string,
+	maxWaitMs = 2 * 60 * 1000,
+	intervalMs = 3000,
+): Promise<void> {
+	console.log(
+		`Waiting for VM agent to be ready in instance ${instanceName}...`,
+	);
+
+	const baseUrl = envData.server_url;
+	const stateUrl = `${baseUrl}/1.0/instances/${instanceName}/state`;
+	const cloudflareAccessHeaders = {
+		"CF-Access-Client-Id": envData.cloudflare_access_client_id,
+		"CF-Access-Client-Secret": envData.cloudflare_access_client_secret,
+	};
+
+	const startTime = Date.now();
+
+	while (Date.now() - startTime < maxWaitMs) {
+		const response = await fetch(stateUrl, {
+			headers: cloudflareAccessHeaders,
+		});
+
+		if (response.ok) {
+			const result = (await response.json()) as {
+				metadata?: { processes?: number };
+			};
+			const processes = result.metadata?.processes;
+			if (processes !== undefined && processes !== -1) {
+				console.log(`VM agent is ready in instance ${instanceName}`);
+				return;
+			}
+		}
+
+		await new Promise((resolve) => setTimeout(resolve, intervalMs));
+	}
+
+	throw new Error(
+		`VM agent did not become ready within ${maxWaitMs / 1000} seconds`,
+	);
+}
+
+export async function execCommand(
+	envData: IncusEnv,
+	instanceName: string,
+	command: string[],
+	options?: { cwd?: string; environment?: Record<string, string> },
+): Promise<void> {
+	console.log(
+		`Executing command in instance ${instanceName}: ${command.join(" ")}`,
+	);
+
+	const baseUrl = envData.server_url;
+	const execUrl = `${baseUrl}/1.0/instances/${instanceName}/exec`;
+	const cloudflareAccessHeaders = {
+		"CF-Access-Client-Id": envData.cloudflare_access_client_id,
+		"CF-Access-Client-Secret": envData.cloudflare_access_client_secret,
+		"Content-Type": "application/json",
+	};
+
+	const requestBody = {
+		command,
+		cwd: options?.cwd,
+		environment: options?.environment ?? {},
+		interactive: false,
+		"record-output": true,
+		"wait-for-websocket": false,
+	};
+
+	const response = await fetch(execUrl, {
+		body: JSON.stringify(requestBody),
+		headers: cloudflareAccessHeaders,
+		method: "POST",
+	});
+
+	if (!response.ok) {
+		throw new Error(
+			`Failed to execute command in Incus instance: ${response.status} ${response.statusText}`,
+		);
+	}
+
+	const result = IncusAsyncResponseSchema.parse(await response.json());
+
+	if (result.type === "async") {
+		const parts = result.operation.split("/");
+		const operationId = parts[parts.length - 1];
+		if (!operationId) {
+			throw new Error(`Invalid operation path format: ${result.operation}`);
+		}
+		console.log(`Waiting for exec operation ${operationId} to complete...`);
+		await waitForOperation(envData, operationId);
+		console.log(`Command executed successfully in instance ${instanceName}`);
+	}
 }
