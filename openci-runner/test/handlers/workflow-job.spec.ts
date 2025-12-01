@@ -41,6 +41,7 @@ vi.mock("@octokit/app", () => {
 vi.mock("../../src/services/incus", () => {
 	return {
 		createInstance: vi.fn(),
+		deleteInstance: vi.fn(),
 		execCommand: vi.fn(),
 		fetchAvailableIncusInstances: vi.fn(),
 		waitForVMAgent: vi.fn(),
@@ -91,6 +92,7 @@ describe("workflow-job handler", () => {
 			workflow_job: {
 				id: 1,
 				labels: [OPENCI_RUNNER_LABEL],
+				run_id: 12345,
 			},
 		});
 
@@ -110,6 +112,7 @@ describe("workflow-job handler", () => {
 			workflow_job: {
 				id: 1,
 				labels: [OPENCI_RUNNER_LABEL],
+				run_id: 12345,
 			},
 		});
 
@@ -132,6 +135,7 @@ describe("workflow-job handler", () => {
 			workflow_job: {
 				id: 1,
 				labels: [OPENCI_RUNNER_LABEL],
+				run_id: 12345,
 			},
 		});
 
@@ -156,6 +160,7 @@ describe("workflow-job handler", () => {
 			workflow_job: {
 				id: 1,
 				labels: [OPENCI_RUNNER_LABEL],
+				run_id: 12345,
 			},
 		});
 
@@ -177,6 +182,7 @@ describe("workflow-job handler", () => {
 			workflow_job: {
 				id: 1,
 				labels: [OPENCI_RUNNER_LABEL],
+				run_id: 12345,
 			},
 		});
 
@@ -190,7 +196,7 @@ describe("workflow-job handler", () => {
 				cloudflare_access_client_secret: env.CF_ACCESS_CLIENT_SECRET,
 				server_url: env.INCUS_SERVER_URL,
 			}),
-			expect.stringMatching(/^openci-runner-\d+$/),
+			"openci-runner-12345",
 			"openci-runner-0.0.1",
 		);
 	});
@@ -211,6 +217,7 @@ describe("workflow-job handler", () => {
 			workflow_job: {
 				id: 1,
 				labels: [OPENCI_RUNNER_LABEL],
+				run_id: 12345,
 			},
 		});
 

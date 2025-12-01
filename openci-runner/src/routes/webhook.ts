@@ -1,5 +1,8 @@
 import { Hono } from "hono";
-import { handleWorkflowJob } from "../handlers/workflow-job";
+import {
+	handleWorkflowJobCompleted,
+	handleWorkflowJobQueued,
+} from "../handlers/workflow-job";
 import { verifySignature } from "../middleware/github";
 
 const webhook = new Hono<{ Bindings: Env }>();
@@ -15,16 +18,20 @@ webhook.post("/", async (c) => {
 		return c.text("Event ignored", 200);
 	}
 
-	if (payload.action !== "queued") {
-		return c.text("Workflow Job but status is not queued", 200);
-	}
-
 	const labels: string[] = payload.workflow_job.labels ?? [];
 	if (!labels.includes(OPENCI_RUNNER_LABEL)) {
 		return c.text("Workflow Job does not target OpenCI runner", 200);
 	}
 
-	return handleWorkflowJob(c, payload);
+	if (payload.action === "queued") {
+		return handleWorkflowJobQueued(c, payload);
+	}
+
+	if (payload.action === "completed") {
+		return handleWorkflowJobCompleted(c, payload);
+	}
+
+	return c.text("Workflow Job action not supported", 200);
 });
 
 export { webhook };

@@ -3,6 +3,7 @@ import { Octokit } from "@octokit/rest";
 import type { Context } from "hono";
 import {
 	createInstance,
+	deleteInstance,
 	execCommand,
 	fetchAvailableIncusInstances,
 	waitForVMAgent,
@@ -42,7 +43,14 @@ async function generateRunnerJitConfig(
 	return data.encoded_jit_config;
 }
 
-async function getOrCreateIncusInstance(incusEnv: IncusEnv): Promise<string> {
+export function generateInstanceName(runId: number): string {
+	return `openci-runner-${runId}`;
+}
+
+async function getOrCreateIncusInstance(
+	incusEnv: IncusEnv,
+	runId: number,
+): Promise<string> {
 	console.log("Started to search available Incus VMs");
 
 	const availableInstances = await fetchAvailableIncusInstances(incusEnv);
@@ -50,19 +58,24 @@ async function getOrCreateIncusInstance(incusEnv: IncusEnv): Promise<string> {
 
 	// 次のissueでVMのWarm Poolを実装する https://github.com/open-ci-io/openci/issues/591
 	console.log("Start to create new Incus instance");
-	const instanceName = `openci-runner-${Date.now()}`;
+	const instanceName = generateInstanceName(runId);
 	const imageName = "openci-runner-0.0.1";
 	await createInstance(incusEnv, instanceName, imageName);
 	return instanceName;
 }
 
-export async function handleWorkflowJob(
+export async function handleWorkflowJobQueued(
 	c: Context<{ Bindings: Env }>,
 	payload: WorkflowJobPayload,
 ) {
 	const installationId = payload.installation?.id;
 	if (!installationId) {
 		return c.text("Installation ID not found", 400);
+	}
+
+	const runId = payload.workflow_job?.run_id;
+	if (!runId) {
+		return c.text("Run ID not found", 400);
 	}
 
 	try {
@@ -77,7 +90,7 @@ export async function handleWorkflowJob(
 			server_url: c.env.INCUS_SERVER_URL,
 		};
 
-		const instanceName = await getOrCreateIncusInstance(incusEnv);
+		const instanceName = await getOrCreateIncusInstance(incusEnv, runId);
 
 		await waitForVMAgent(incusEnv, instanceName);
 
@@ -97,6 +110,32 @@ export async function handleWorkflowJob(
 		console.log("Successfully registered as GitHub Actions Self-Hosted Runner");
 
 		return c.text("Successfully created OpenCI runner", 201);
+	} catch (e) {
+		console.error(e);
+		return c.text("Internal Server Error", 500);
+	}
+}
+
+export async function handleWorkflowJobCompleted(
+	c: Context<{ Bindings: Env }>,
+	payload: WorkflowJobPayload,
+) {
+	const runId = payload.workflow_job?.run_id;
+	if (!runId) {
+		return c.text("Run ID not found", 400);
+	}
+
+	try {
+		const incusEnv = {
+			cloudflare_access_client_id: c.env.CF_ACCESS_CLIENT_ID,
+			cloudflare_access_client_secret: c.env.CF_ACCESS_CLIENT_SECRET,
+			server_url: c.env.INCUS_SERVER_URL,
+		};
+
+		const instanceName = generateInstanceName(runId);
+		await deleteInstance(incusEnv, instanceName);
+
+		return c.text("Successfully deleted OpenCI runner", 200);
 	} catch (e) {
 		console.error(e);
 		return c.text("Internal Server Error", 500);

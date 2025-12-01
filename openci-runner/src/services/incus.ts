@@ -124,6 +124,44 @@ export async function createInstance(
 	}
 }
 
+export async function deleteInstance(
+	envData: IncusEnv,
+	instanceName: string,
+): Promise<void> {
+	console.log(`Deleting Incus instance: ${instanceName}`);
+
+	const baseUrl = envData.server_url;
+	const instanceUrl = `${baseUrl}/1.0/instances/${instanceName}`;
+	const cloudflareAccessHeaders = {
+		"CF-Access-Client-Id": envData.cloudflare_access_client_id,
+		"CF-Access-Client-Secret": envData.cloudflare_access_client_secret,
+	};
+
+	const response = await fetch(instanceUrl, {
+		headers: cloudflareAccessHeaders,
+		method: "DELETE",
+	});
+
+	if (!response.ok) {
+		throw new Error(
+			`Failed to delete Incus instance: ${response.status} ${response.statusText}`,
+		);
+	}
+
+	const result = IncusAsyncResponseSchema.parse(await response.json());
+
+	if (result.type === "async") {
+		const parts = result.operation.split("/");
+		const operationId = parts[parts.length - 1];
+		if (!operationId) {
+			throw new Error(`Invalid operation path format: ${result.operation}`);
+		}
+		console.log(`Waiting for delete operation ${operationId} to complete...`);
+		await waitForOperation(envData, operationId);
+		console.log(`Instance ${instanceName} deleted successfully`);
+	}
+}
+
 export async function fetchStatusOfOperation(
 	envData: IncusEnv,
 	operationId: string,
