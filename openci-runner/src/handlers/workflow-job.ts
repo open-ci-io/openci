@@ -3,6 +3,7 @@ import { Octokit } from "@octokit/rest";
 import type { Context } from "hono";
 import {
 	createInstance,
+	execCommand,
 	fetchAvailableIncusInstances,
 } from "../services/incus";
 import type { WorkflowJobPayload } from "../types/github.types";
@@ -40,17 +41,17 @@ async function generateRunnerJitConfig(
 	return data.encoded_jit_config;
 }
 
-async function getOrCreateIncusInstance(incusEnv: IncusEnv) {
+async function getOrCreateIncusInstance(incusEnv: IncusEnv): Promise<string> {
 	console.log("Started to search available Incus VMs");
 
 	const availableInstances = await fetchAvailableIncusInstances(incusEnv);
 	console.log(`Found ${availableInstances.length} available Incus instances`);
 
-	if (availableInstances.length === 0) {
-		console.log("Start to create new Incus instance");
-		const instanceName = `openci-runner-${Date.now()}`;
-		await createInstance(incusEnv, instanceName, "openci-runner0");
-	}
+	// 次のissueでVMのWarm Poolを実装する https://github.com/open-ci-io/openci/issues/591
+	console.log("Start to create new Incus instance");
+	const instanceName = `openci-runner-${Date.now()}`;
+	await createInstance(incusEnv, instanceName, "openci-runner0");
+	return instanceName;
 }
 
 export async function handleWorkflowJob(
@@ -65,7 +66,6 @@ export async function handleWorkflowJob(
 	try {
 		const octokit = await createOctokit(c, installationId);
 
-		// biome-ignore lint/correctness/noUnusedVariables: <Use later>
 		const encodedJitConfig = await generateRunnerJitConfig(octokit, payload);
 		console.log("Successfully generated GHA JIT config");
 
@@ -75,7 +75,15 @@ export async function handleWorkflowJob(
 			server_url: c.env.INCUS_SERVER_URL,
 		};
 
-		await getOrCreateIncusInstance(incusEnv);
+		const instanceName = await getOrCreateIncusInstance(incusEnv);
+
+		await execCommand(
+			incusEnv,
+			instanceName,
+			["./run.sh", "--jitconfig", encodedJitConfig],
+			{ cwd: "/root/actions-runner" },
+		);
+		console.log("Successfully registered as GitHub Actions Self-Hosted Runner");
 
 		return c.text("Successfully created OpenCI runner", 201);
 	} catch (e) {
