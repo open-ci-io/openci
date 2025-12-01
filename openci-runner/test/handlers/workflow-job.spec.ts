@@ -198,7 +198,7 @@ describe("workflow-job handler", () => {
 				server_url: env.INCUS_SERVER_URL,
 			}),
 			"openci-runner-12345",
-			"openci-runner-0.0.1",
+			"openci-runner-0.0.3",
 		);
 	});
 
