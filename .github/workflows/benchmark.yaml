@@ -11,13 +11,8 @@ jobs:
       matrix:
         runner: [ubuntu-latest, openci-runner-beta-dev]
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
-      - name: Install sysbench
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y sysbench
-
       - name: System Info
         run: |
           echo "=== CPU Info ==="
@@ -27,31 +22,41 @@ jobs:
           echo "=== Memory Info ==="
           free -h
 
-      - name: Sysbench CPU (single-thread)
-        run: |
-          echo "=== CPU Benchmark (single-thread, 60s) ==="
-          sysbench cpu --cpu-max-prime=20000 --threads=1 --time=60 run
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Sysbench CPU (multi-thread)
+      - name: Build TypeScript Compiler (tsc)
         run: |
-          echo "=== CPU Benchmark (multi-thread, 60s) ==="
-          sysbench cpu --cpu-max-prime=20000 --threads=$(nproc) --time=60 run
+          echo "=== Building TypeScript from source ==="
+          git clone --depth 1 https://github.com/microsoft/TypeScript.git
+          cd TypeScript
+          time npm ci
+          time npm run build
 
-      - name: Sysbench Memory
+      - name: Build webpack
         run: |
-          echo "=== Memory Benchmark (60s) ==="
-          sysbench memory --memory-block-size=1M --memory-total-size=100G --threads=$(nproc) run
+          echo "=== Building webpack from source ==="
+          git clone --depth 1 https://github.com/webpack/webpack.git
+          cd webpack
+          time npm ci
+          time npm run build
 
-      - name: Sysbench FileIO Prepare
+      - name: Build Vite
         run: |
-          echo "=== Preparing FileIO test files ==="
-          sysbench fileio --file-total-size=2G prepare
+          echo "=== Building Vite from source ==="
+          git clone --depth 1 https://github.com/vitejs/vite.git
+          cd vite
+          time npm ci
+          time npm run build
 
-      - name: Sysbench FileIO (random read/write)
-        run: |
-          echo "=== FileIO Benchmark (random r/w, 60s) ==="
-          sysbench fileio --file-total-size=2G --file-test-mode=rndrw --time=60 --threads=$(nproc) run
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Sysbench FileIO Cleanup
+      - name: Build ripgrep
         run: |
-          sysbench fileio --file-total-size=2G cleanup
+          echo "=== Building ripgrep from source ==="
+          git clone --depth 1 https://github.com/BurntSushi/ripgrep.git
+          cd ripgrep
+          time cargo build --release
