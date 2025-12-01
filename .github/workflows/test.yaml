@@ -11,7 +11,7 @@ jobs:
   test:
     strategy:
       matrix:
-        runner: [ubuntu-latest, openci-runner-beta]
+        runner: [ubuntu-latest, openci-runner-beta-dev]
     runs-on: ${{ matrix.runner }}
     defaults:
       run:
