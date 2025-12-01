@@ -19,7 +19,6 @@ export async function _fetchIncusInstances(
 	const cloudflareAccessHeaders = {
 		"CF-Access-Client-Id": envData.cloudflare_access_client_id,
 		"CF-Access-Client-Secret": envData.cloudflare_access_client_secret,
-		"Content-Type": "application/json",
 	};
 
 	const recursionRes = await fetch(`${instanceUrl}?recursion=1`, {
@@ -121,7 +120,6 @@ export async function fetchStatusOfOperation(
 	const cloudflareAccessHeaders = {
 		"CF-Access-Client-Id": envData.cloudflare_access_client_id,
 		"CF-Access-Client-Secret": envData.cloudflare_access_client_secret,
-		"Content-Type": "application/json",
 	};
 
 	const response = await fetch(operationUrl, {
