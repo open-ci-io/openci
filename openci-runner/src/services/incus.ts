@@ -1,68 +1,15 @@
-import z from "zod";
+import {
+	type IncusAsyncResponse,
+	IncusAsyncResponseSchema,
+	type IncusEnv,
+	type IncusInstancesResponse,
+	IncusInstancesResponseSchema,
+	IncusOperationStatusSchema,
+	type IncusProperty,
+	IncusStatusSchema,
+} from "../types/incus.types";
 
-const IncusStatus = z.enum(["Running", "Stopped", "Frozen", "Error"]);
-
-const IncusProperty = z.object({
-	name: z.string(),
-	status: IncusStatus,
-});
-
-export type IncusProperty = z.infer<typeof IncusProperty>;
-
-export const IncusInstancesResponse = z.object({
-	metadata: z.array(IncusProperty),
-});
-
-export type IncusInstancesResponse = z.infer<typeof IncusInstancesResponse>;
-
-type IncusEnv = {
-	cloudflare_access_client_id: string;
-	cloudflare_access_client_secret: string;
-	server_url: string;
-};
-
-const IncusOperationStatus = z.enum([
-	"Pending",
-	"Running",
-	"Cancelling",
-	"Cancelled",
-	"Success",
-	"Failure",
-]);
-
-const IncusOperationMetadata = z.object({
-	class: z.string().optional(),
-	err: z.string().optional(),
-	id: z.string().optional(),
-	status: IncusOperationStatus.optional(),
-	status_code: z.number().optional(),
-});
-
-const IncusAsyncResponse = z.discriminatedUnion("type", [
-	z.object({
-		metadata: IncusOperationMetadata.optional(),
-		operation: z.string(),
-		status: z.string(),
-		status_code: z.number(),
-		type: z.literal("async"),
-	}),
-	z.object({
-		metadata: IncusOperationMetadata.optional(),
-		status: z.string(),
-		status_code: z.number(),
-		type: z.literal("sync"),
-	}),
-	z.object({
-		error: z.string(),
-		error_code: z.number(),
-		metadata: IncusOperationMetadata.optional(),
-		status: z.string(),
-		status_code: z.number(),
-		type: z.literal("error"),
-	}),
-]);
-
-export type IncusAsyncResponse = z.infer<typeof IncusAsyncResponse>;
+export type { IncusAsyncResponse, IncusInstancesResponse, IncusProperty };
 
 export async function _fetchIncusInstances(
 	envData: IncusEnv,
@@ -84,14 +31,16 @@ export async function _fetchIncusInstances(
 		);
 	}
 
-	return IncusInstancesResponse.parse(await recursionRes.json());
+	return IncusInstancesResponseSchema.parse(await recursionRes.json());
 }
 
 export async function fetchAvailableIncusInstances(
 	envData: IncusEnv,
 ): Promise<IncusProperty[]> {
 	const res = await _fetchIncusInstances(envData);
-	return res.metadata.filter((e) => e.status === IncusStatus.enum.Stopped);
+	return res.metadata.filter(
+		(e) => e.status === IncusStatusSchema.enum.Stopped,
+	);
 }
 
 export async function requestCreateInstance(
@@ -128,7 +77,7 @@ export async function requestCreateInstance(
 		);
 	}
 
-	const result = IncusAsyncResponse.parse(await response.json());
+	const result = IncusAsyncResponseSchema.parse(await response.json());
 
 	if (result.type === "async") {
 		const parts = result.operation.split("/");
@@ -183,7 +132,7 @@ export async function fetchStatusOfOperation(
 		);
 	}
 
-	return IncusAsyncResponse.parse(await response.json());
+	return IncusAsyncResponseSchema.parse(await response.json());
 }
 
 export async function waitForOperation(
@@ -201,13 +150,16 @@ export async function waitForOperation(
 
 		console.log(`Operation status: ${status} (code: ${statusCode})`);
 
-		if (status === IncusOperationStatus.enum.Success || statusCode === 200) {
+		if (
+			status === IncusOperationStatusSchema.enum.Success ||
+			statusCode === 200
+		) {
 			return;
 		}
 
 		if (
-			status === IncusOperationStatus.enum.Failure ||
-			status === IncusOperationStatus.enum.Cancelled ||
+			status === IncusOperationStatusSchema.enum.Failure ||
+			status === IncusOperationStatusSchema.enum.Cancelled ||
 			(statusCode && statusCode >= 400)
 		) {
 			throw new Error(`Operation failed: ${result.metadata?.err}`);

@@ -1,27 +1,12 @@
 import { App } from "@octokit/app";
 import { Octokit } from "@octokit/rest";
 import type { Context } from "hono";
-import { z } from "zod";
 import {
 	createInstance,
 	fetchAvailableIncusInstances,
 } from "../services/incus";
-
-const WorkflowJobPayloadSchema = z.object({
-	installation: z
-		.object({
-			id: z.number(),
-		})
-		.optional(),
-	repository: z.object({
-		name: z.string(),
-		owner: z.object({
-			login: z.string(),
-		}),
-	}),
-});
-
-export type WorkflowJobPayload = z.infer<typeof WorkflowJobPayloadSchema>;
+import type { WorkflowJobPayload } from "../types/github.types";
+import type { IncusEnv } from "../types/incus.types";
 
 async function createOctokit(
 	c: Context<{ Bindings: Env }>,
@@ -54,12 +39,6 @@ async function generateRunnerJitConfig(
 
 	return data.encoded_jit_config;
 }
-
-type IncusEnv = {
-	cloudflare_access_client_id: string;
-	cloudflare_access_client_secret: string;
-	server_url: string;
-};
 
 async function getOrCreateIncusInstance(incusEnv: IncusEnv) {
 	console.log("Started to search available Incus VMs");
