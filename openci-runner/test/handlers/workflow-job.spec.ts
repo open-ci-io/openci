@@ -6,6 +6,7 @@ import {
 import { createHmac } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import worker from "../../src/index";
+import { OPENCI_RUNNER_LABEL } from "../../src/routes/webhook";
 import {
 	createInstance,
 	fetchAvailableIncusInstances,
@@ -89,7 +90,7 @@ describe("workflow-job handler", () => {
 			},
 			workflow_job: {
 				id: 1,
-				labels: ["self-hosted"],
+				labels: [OPENCI_RUNNER_LABEL],
 			},
 		});
 
@@ -108,7 +109,7 @@ describe("workflow-job handler", () => {
 			},
 			workflow_job: {
 				id: 1,
-				labels: ["self-hosted"],
+				labels: [OPENCI_RUNNER_LABEL],
 			},
 		});
 
@@ -130,7 +131,7 @@ describe("workflow-job handler", () => {
 			},
 			workflow_job: {
 				id: 1,
-				labels: ["self-hosted"],
+				labels: [OPENCI_RUNNER_LABEL],
 			},
 		});
 
@@ -154,7 +155,7 @@ describe("workflow-job handler", () => {
 			},
 			workflow_job: {
 				id: 1,
-				labels: ["self-hosted"],
+				labels: [OPENCI_RUNNER_LABEL],
 			},
 		});
 
@@ -175,7 +176,7 @@ describe("workflow-job handler", () => {
 			},
 			workflow_job: {
 				id: 1,
-				labels: ["self-hosted"],
+				labels: [OPENCI_RUNNER_LABEL],
 			},
 		});
 
@@ -209,7 +210,7 @@ describe("workflow-job handler", () => {
 			},
 			workflow_job: {
 				id: 1,
-				labels: ["self-hosted"],
+				labels: [OPENCI_RUNNER_LABEL],
 			},
 		});
 
