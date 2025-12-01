@@ -20,8 +20,10 @@ webhook.post("/", async (c) => {
 
 	const labels: string[] = payload.workflow_job.labels ?? [];
 	if (!labels.includes(OPENCI_RUNNER_LABEL)) {
+		console.log("Workflow Job does not target OpenCI runner, ignoring");
 		return c.text("Workflow Job does not target OpenCI runner", 200);
 	}
+	console.log("Processing Workflow Job for OpenCI runner");
 
 	if (payload.action === "queued") {
 		return handleWorkflowJobQueued(c, payload);
