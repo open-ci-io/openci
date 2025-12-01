@@ -40,13 +40,6 @@ jobs:
         run: biome ci . --error-on-warnings
         working-directory: .
 
-      - name: Check PATH
-        run: |
-          echo "PATH: $PATH"
-          which npm || echo "npm not found in PATH"
-          ls -la /usr/bin/npm || echo "/usr/bin/npm not found"
-          /usr/bin/npm --version || echo "npm execution failed"
-
       - name: Install dependencies
         run: npm ci
 

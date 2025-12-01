@@ -1,6 +1,7 @@
 import { App } from "@octokit/app";
 import { Octokit } from "@octokit/rest";
 import type { Context } from "hono";
+import { OPENCI_RUNNER_LABEL } from "../routes/webhook";
 import {
 	createInstance,
 	deleteInstance,
@@ -28,11 +29,10 @@ async function generateRunnerJitConfig(
 	octokit: Octokit,
 	payload: WorkflowJobPayload,
 ) {
-	const runnerLabel = "openci-runner-beta-dev";
 	const runnerName = "OpenCIランナーβ(開発環境)";
 
 	const { data } = await octokit.rest.actions.generateRunnerJitconfigForRepo({
-		labels: [runnerLabel],
+		labels: [OPENCI_RUNNER_LABEL],
 		name: `${runnerName}-${Date.now()}`,
 		owner: payload.repository.owner.login,
 		repo: payload.repository.name,
@@ -59,7 +59,7 @@ async function getOrCreateIncusInstance(
 	// 次のissueでVMのWarm Poolを実装する https://github.com/open-ci-io/openci/issues/591
 	console.log("Start to create new Incus instance");
 	const instanceName = generateInstanceName(runId);
-	const imageName = "openci-runner-0.0.3";
+	const imageName = "openci-runner-0.0.4";
 	await createInstance(incusEnv, instanceName, imageName);
 	return instanceName;
 }
@@ -103,7 +103,7 @@ export async function handleWorkflowJobQueued(
 				"-d",
 				"-s",
 				"runner",
-				`PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin RUNNER_ALLOW_RUNASROOT=1 ./run.sh --jitconfig ${encodedJitConfig}`,
+				`RUNNER_ALLOW_RUNASROOT=1 ./run.sh --jitconfig ${encodedJitConfig}`,
 			],
 			{ cwd: "/root/actions-runner" },
 		);
