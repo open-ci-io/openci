@@ -33,6 +33,7 @@ vi.mock("@octokit/app", () => {
 vi.mock("../../src/services/incus", () => {
 	return {
 		createInstance: vi.fn(),
+		deleteInstance: vi.fn(),
 		execCommand: vi.fn(),
 		fetchAvailableIncusInstances: vi.fn(),
 		waitForVMAgent: vi.fn(),
@@ -77,11 +78,14 @@ describe("webhook route", () => {
 		);
 	});
 
-	it("responds with 200 when workflow_job status is not queued", async () => {
-		const response = await runFetch({ action: "ping", workflow_job: {} });
+	it("responds with 200 when workflow_job action is not supported", async () => {
+		const response = await runFetch({
+			action: "in_progress",
+			workflow_job: { labels: [OPENCI_RUNNER_LABEL] },
+		});
 		expect(response.status).toBe(200);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
-			`"Workflow Job but status is not queued"`,
+			`"Workflow Job action not supported"`,
 		);
 	});
 
@@ -100,6 +104,7 @@ describe("webhook route", () => {
 			workflow_job: {
 				id: 1,
 				labels: [OPENCI_RUNNER_LABEL],
+				run_id: 12345,
 			},
 		});
 
@@ -126,6 +131,26 @@ describe("webhook route", () => {
 		expect(response.status).toBe(200);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
 			`"Workflow Job does not target OpenCI runner"`,
+		);
+	});
+
+	it("deletes instance when workflow_job is completed", async () => {
+		const response = await runFetch({
+			action: "completed",
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: [OPENCI_RUNNER_LABEL],
+				run_id: 12345,
+			},
+		});
+
+		expect(response.status).toBe(200);
+		await expect(response.text()).resolves.toMatchInlineSnapshot(
+			`"Successfully deleted OpenCI runner"`,
 		);
 	});
 });

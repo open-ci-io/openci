@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
 	_fetchIncusInstances,
 	createInstance,
+	deleteInstance,
 	execCommand,
 	fetchAvailableIncusInstances,
 	fetchStatusOfOperation,
@@ -510,6 +511,74 @@ describe("createInstance", () => {
 		await expect(
 			createInstance(mockEnv, "test-instance", "test-image"),
 		).rejects.toThrow("Operation failed: Image not found");
+	});
+});
+
+describe("deleteInstance", () => {
+	it("deletes instance and waits for operation to complete", async () => {
+		vi.mocked(fetch)
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve(asyncResponse),
+				ok: true,
+			} as Response)
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve(mockSuccessResponse),
+				ok: true,
+			} as Response);
+
+		await deleteInstance(mockEnv, "test-instance");
+
+		expect(fetch).toHaveBeenNthCalledWith(
+			1,
+			"https://incus.example.com/1.0/instances/test-instance",
+			{
+				headers: {
+					"CF-Access-Client-Id": "test-client-id",
+					"CF-Access-Client-Secret": "test-client-secret",
+				},
+				method: "DELETE",
+			},
+		);
+	});
+
+	it("throws when delete fails", async () => {
+		vi.mocked(fetch).mockResolvedValueOnce({
+			ok: false,
+			status: 404,
+			statusText: "Not Found",
+		} as Response);
+
+		await expect(deleteInstance(mockEnv, "test-instance")).rejects.toThrow(
+			"Failed to delete Incus instance: 404 Not Found",
+		);
+	});
+
+	it("completes immediately for sync response", async () => {
+		vi.mocked(fetch).mockResolvedValueOnce({
+			json: () => Promise.resolve(syncResponse),
+			ok: true,
+		} as Response);
+
+		await deleteInstance(mockEnv, "test-instance");
+
+		expect(fetch).toHaveBeenCalledTimes(1);
+	});
+
+	it("throws when operation path is invalid", async () => {
+		vi.mocked(fetch).mockResolvedValueOnce({
+			json: () =>
+				Promise.resolve({
+					operation: "",
+					status: "Operation created",
+					status_code: 100,
+					type: "async",
+				}),
+			ok: true,
+		} as Response);
+
+		await expect(deleteInstance(mockEnv, "test-instance")).rejects.toThrow(
+			"Invalid operation path format: ",
+		);
 	});
 });
 

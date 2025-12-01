@@ -12,6 +12,11 @@ export const WorkflowJobPayloadSchema = z.object({
 			login: z.string(),
 		}),
 	}),
+	workflow_job: z
+		.object({
+			run_id: z.number(),
+		})
+		.optional(),
 });
 
 export type WorkflowJobPayload = z.infer<typeof WorkflowJobPayloadSchema>;
