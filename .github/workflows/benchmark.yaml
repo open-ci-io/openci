@@ -1,4 +1,4 @@
-name: CPU Benchmark
+name: Benchmark
 on:
   workflow_dispatch:
   pull_request:
@@ -11,58 +11,47 @@ jobs:
       matrix:
         runner: [ubuntu-latest, openci-runner-beta-dev]
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - name: CPU Info
+      - name: Install sysbench
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sysbench
+
+      - name: System Info
         run: |
           echo "=== CPU Info ==="
           nproc
           cat /proc/cpuinfo | grep "model name" | head -1 || true
+          echo ""
+          echo "=== Memory Info ==="
+          free -h
 
-      - name: Prime Number Calculation
+      - name: Sysbench CPU (single-thread)
         run: |
-          echo "=== Prime Number Calculation (CPU intensive) ==="
-          time python3 -c "
-          import time
-          start = time.time()
-          count = 0
-          for n in range(2, 300000):
-              is_prime = True
-              for i in range(2, int(n**0.5) + 1):
-                  if n % i == 0:
-                      is_prime = False
-                      break
-              if is_prime:
-                  count += 1
-          print(f'Found {count} primes in {time.time() - start:.2f} seconds')
-          "
+          echo "=== CPU Benchmark (single-thread, 60s) ==="
+          sysbench cpu --cpu-max-prime=20000 --threads=1 --time=60 run
 
-      - name: Compression Benchmark
+      - name: Sysbench CPU (multi-thread)
         run: |
-          echo "=== Compression Benchmark (100MB) ==="
-          dd if=/dev/urandom of=/tmp/testfile bs=1M count=100 2>/dev/null
-          time gzip -k /tmp/testfile
-          rm /tmp/testfile /tmp/testfile.gz
+          echo "=== CPU Benchmark (multi-thread, 60s) ==="
+          sysbench cpu --cpu-max-prime=20000 --threads=$(nproc) --time=60 run
 
-      - name: Multi-core Benchmark
+      - name: Sysbench Memory
         run: |
-          echo "=== Multi-core Benchmark ==="
-          time sh -c '
-            for i in $(seq 1 $(nproc)); do
-              (
-                python3 -c "
-                count = 0
-                for n in range(2, 100000):
-                    is_prime = True
-                    for i in range(2, int(n**0.5) + 1):
-                        if n % i == 0:
-                            is_prime = False
-                            break
-                    if is_prime:
-                        count += 1
-                "
-              ) &
-            done
-            wait
-          '
-          echo "Completed with $(nproc) cores"
+          echo "=== Memory Benchmark (60s) ==="
+          sysbench memory --memory-block-size=1M --memory-total-size=100G --threads=$(nproc) run
+
+      - name: Sysbench FileIO Prepare
+        run: |
+          echo "=== Preparing FileIO test files ==="
+          sysbench fileio --file-total-size=2G prepare
+
+      - name: Sysbench FileIO (random read/write)
+        run: |
+          echo "=== FileIO Benchmark (random r/w, 60s) ==="
+          sysbench fileio --file-total-size=2G --file-test-mode=rndrw --time=60 --threads=$(nproc) run
+
+      - name: Sysbench FileIO Cleanup
+        run: |
+          sysbench fileio --file-total-size=2G cleanup
