@@ -118,19 +118,8 @@ describe("fetch available(stop) incus instances", () => {
 
 describe("fetchStatusOfOperation", () => {
 	it("fetches operation status", async () => {
-		const mockResponse = {
-			metadata: {
-				id: "abc-123",
-				status: "Running",
-				status_code: 103,
-			},
-			status: "Success",
-			status_code: 200,
-			type: "sync",
-		};
-
 		vi.mocked(fetch).mockResolvedValue({
-			json: () => Promise.resolve(mockResponse),
+			json: () => Promise.resolve(mockRunningResponse),
 			ok: true,
 		} as Response);
 
@@ -315,12 +304,6 @@ describe("waitForOperation", () => {
 });
 
 describe("requestCreateInstance", () => {
-	const mockEnv = {
-		cloudflare_access_client_id: "test-client-id",
-		cloudflare_access_client_secret: "test-client-secret",
-		server_url: "https://incus.example.com",
-	};
-
 	it("sends correct request body with virtual-machine type", async () => {
 		vi.mocked(fetch).mockResolvedValue({
 			json: () => Promise.resolve(asyncResponse),
@@ -333,6 +316,18 @@ describe("requestCreateInstance", () => {
 			"https://incus.example.com/1.0/instances",
 			{
 				body: JSON.stringify({
+					config: {
+						"limits.cpu": "8",
+						"limits.memory": "16GB",
+					},
+					devices: {
+						root: {
+							path: "/",
+							pool: "default",
+							size: "100GB",
+							type: "disk",
+						},
+					},
 					name: "test-instance",
 					source: {
 						alias: "test-image",
@@ -442,12 +437,6 @@ describe("requestCreateInstance", () => {
 });
 
 describe("createInstance", () => {
-	const mockEnv = {
-		cloudflare_access_client_id: "test-client-id",
-		cloudflare_access_client_secret: "test-client-secret",
-		server_url: "https://incus.example.com",
-	};
-
 	it("creates instance and waits for operation to complete", async () => {
 		vi.mocked(fetch)
 			.mockResolvedValueOnce({
