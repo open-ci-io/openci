@@ -1,18 +1,13 @@
 import {
 	type IncusAsyncResponse,
-	IncusAsyncResponse as IncusAsyncResponseSchema,
+	IncusAsyncResponseSchema,
+	type IncusEnv,
 	type IncusInstancesResponse,
-	IncusInstancesResponse as IncusInstancesResponseSchema,
-	IncusOperationStatus,
+	IncusInstancesResponseSchema,
+	IncusOperationStatusSchema,
 	type IncusProperty,
-	IncusStatus,
+	IncusStatusSchema,
 } from "../types/incus.types";
-
-export type IncusEnv = {
-	cloudflare_access_client_id: string;
-	cloudflare_access_client_secret: string;
-	server_url: string;
-};
 
 export type { IncusAsyncResponse, IncusInstancesResponse, IncusProperty };
 
@@ -24,6 +19,7 @@ export async function _fetchIncusInstances(
 	const cloudflareAccessHeaders = {
 		"CF-Access-Client-Id": envData.cloudflare_access_client_id,
 		"CF-Access-Client-Secret": envData.cloudflare_access_client_secret,
+		"Content-Type": "application/json",
 	};
 
 	const recursionRes = await fetch(`${instanceUrl}?recursion=1`, {
@@ -43,7 +39,7 @@ export async function fetchAvailableIncusInstances(
 	envData: IncusEnv,
 ): Promise<IncusProperty[]> {
 	const res = await _fetchIncusInstances(envData);
-	return res.metadata.filter((e) => e.status === IncusStatus.enum.Stopped);
+	return res.metadata.filter((e) => e.status === IncusStatusSchema.enum.Stopped);
 }
 
 export async function requestCreateInstance(
@@ -123,6 +119,7 @@ export async function fetchStatusOfOperation(
 	const cloudflareAccessHeaders = {
 		"CF-Access-Client-Id": envData.cloudflare_access_client_id,
 		"CF-Access-Client-Secret": envData.cloudflare_access_client_secret,
+		"Content-Type": "application/json",
 	};
 
 	const response = await fetch(operationUrl, {
@@ -153,13 +150,13 @@ export async function waitForOperation(
 
 		console.log(`Operation status: ${status} (code: ${statusCode})`);
 
-		if (status === IncusOperationStatus.enum.Success || statusCode === 200) {
+		if (status === IncusOperationStatusSchema.enum.Success || statusCode === 200) {
 			return;
 		}
 
 		if (
-			status === IncusOperationStatus.enum.Failure ||
-			status === IncusOperationStatus.enum.Cancelled ||
+			status === IncusOperationStatusSchema.enum.Failure ||
+			status === IncusOperationStatusSchema.enum.Cancelled ||
 			(statusCode && statusCode >= 400)
 		) {
 			throw new Error(`Operation failed: ${result.metadata?.err}`);

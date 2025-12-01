@@ -4,9 +4,9 @@ import type { Context } from "hono";
 import {
 	createInstance,
 	fetchAvailableIncusInstances,
-	type IncusEnv,
 } from "../services/incus";
 import type { WorkflowJobPayload } from "../types/github.types";
+import type { IncusEnv } from "../types/incus.types";
 
 async function createOctokit(
 	c: Context<{ Bindings: Env }>,

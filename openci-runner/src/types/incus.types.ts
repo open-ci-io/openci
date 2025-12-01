@@ -1,19 +1,25 @@
 import z from "zod";
 
-export const IncusStatus = z.enum(["Running", "Stopped", "Frozen", "Error"]);
+export const IncusStatusSchema = z.enum([
+	"Running",
+	"Stopped",
+	"Frozen",
+	"Error",
+]);
+export type IncusStatus = z.infer<typeof IncusStatusSchema>;
 
-export const IncusProperty = z.object({
+export const IncusPropertySchema = z.object({
 	name: z.string(),
-	status: IncusStatus,
+	status: IncusStatusSchema,
 });
+export type IncusProperty = z.infer<typeof IncusPropertySchema>;
 
-export type IncusProperty = z.infer<typeof IncusProperty>;
-
-export const IncusInstancesResponse = z.object({
-	metadata: z.array(IncusProperty),
+export const IncusInstancesResponseSchema = z.object({
+	metadata: z.array(IncusPropertySchema),
 });
-
-export type IncusInstancesResponse = z.infer<typeof IncusInstancesResponse>;
+export type IncusInstancesResponse = z.infer<
+	typeof IncusInstancesResponseSchema
+>;
 
 export type IncusEnv = {
 	cloudflare_access_client_id: string;
@@ -21,7 +27,7 @@ export type IncusEnv = {
 	server_url: string;
 };
 
-export const IncusOperationStatus = z.enum([
+export const IncusOperationStatusSchema = z.enum([
 	"Pending",
 	"Running",
 	"Cancelling",
@@ -29,25 +35,29 @@ export const IncusOperationStatus = z.enum([
 	"Success",
 	"Failure",
 ]);
+export type IncusOperationStatus = z.infer<typeof IncusOperationStatusSchema>;
 
-export const IncusOperationMetadata = z.object({
+export const IncusOperationMetadataSchema = z.object({
 	class: z.string().optional(),
 	err: z.string().optional(),
 	id: z.string().optional(),
-	status: IncusOperationStatus.optional(),
+	status: IncusOperationStatusSchema.optional(),
 	status_code: z.number().optional(),
 });
+export type IncusOperationMetadata = z.infer<
+	typeof IncusOperationMetadataSchema
+>;
 
-export const IncusAsyncResponse = z.discriminatedUnion("type", [
+export const IncusAsyncResponseSchema = z.discriminatedUnion("type", [
 	z.object({
-		metadata: IncusOperationMetadata.optional(),
+		metadata: IncusOperationMetadataSchema.optional(),
 		operation: z.string(),
 		status: z.string(),
 		status_code: z.number(),
 		type: z.literal("async"),
 	}),
 	z.object({
-		metadata: IncusOperationMetadata.optional(),
+		metadata: IncusOperationMetadataSchema.optional(),
 		status: z.string(),
 		status_code: z.number(),
 		type: z.literal("sync"),
@@ -55,11 +65,10 @@ export const IncusAsyncResponse = z.discriminatedUnion("type", [
 	z.object({
 		error: z.string(),
 		error_code: z.number(),
-		metadata: IncusOperationMetadata.optional(),
+		metadata: IncusOperationMetadataSchema.optional(),
 		status: z.string(),
 		status_code: z.number(),
 		type: z.literal("error"),
 	}),
 ]);
-
-export type IncusAsyncResponse = z.infer<typeof IncusAsyncResponse>;
+export type IncusAsyncResponse = z.infer<typeof IncusAsyncResponseSchema>;
