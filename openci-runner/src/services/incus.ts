@@ -57,6 +57,18 @@ export async function requestCreateInstance(
 	};
 
 	const requestBody = {
+		config: {
+			"limits.cpu": "8",
+			"limits.memory": "16GB",
+		},
+		devices: {
+			root: {
+				path: "/",
+				pool: "default",
+				size: "100GB",
+				type: "disk",
+			},
+		},
 		name: instanceName,
 		source: {
 			alias: imageName,
