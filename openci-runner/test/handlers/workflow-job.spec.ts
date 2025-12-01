@@ -9,6 +9,7 @@ import worker from "../../src/index";
 import { OPENCI_RUNNER_LABEL } from "../../src/routes/webhook";
 import {
 	createInstance,
+	deleteInstance,
 	fetchAvailableIncusInstances,
 } from "../../src/services/incus";
 
@@ -224,5 +225,92 @@ describe("workflow-job handler", () => {
 		expect(response.status).toBe(500);
 		await expect(response.text()).resolves.toBe("Internal Server Error");
 		expect(createInstance).toHaveBeenCalledTimes(1);
+	});
+
+	it("returns 400 when run_id is undefined in queued action", async () => {
+		const response = await runFetch({
+			action: "queued",
+			installation: { id: 123456 },
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: [OPENCI_RUNNER_LABEL],
+			},
+		});
+
+		expect(response.status).toBe(400);
+		await expect(response.text()).resolves.toBe("Run ID not found");
+	});
+
+	it("returns 200 when runner is deleted on completed action", async () => {
+		vi.mocked(deleteInstance).mockResolvedValueOnce(undefined);
+
+		const response = await runFetch({
+			action: "completed",
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: [OPENCI_RUNNER_LABEL],
+				run_id: 12345,
+			},
+		});
+
+		expect(response.status).toBe(200);
+		await expect(response.text()).resolves.toBe(
+			"Successfully deleted OpenCI runner",
+		);
+		expect(deleteInstance).toHaveBeenCalledWith(
+			expect.objectContaining({
+				cloudflare_access_client_id: env.CF_ACCESS_CLIENT_ID,
+				cloudflare_access_client_secret: env.CF_ACCESS_CLIENT_SECRET,
+				server_url: env.INCUS_SERVER_URL,
+			}),
+			"openci-runner-12345",
+		);
+	});
+
+	it("returns 400 when run_id is undefined in completed action", async () => {
+		const response = await runFetch({
+			action: "completed",
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: [OPENCI_RUNNER_LABEL],
+			},
+		});
+
+		expect(response.status).toBe(400);
+		await expect(response.text()).resolves.toBe("Run ID not found");
+	});
+
+	it("returns 500 when deleteInstance fails in completed action", async () => {
+		vi.mocked(deleteInstance).mockRejectedValueOnce(
+			new Error("Failed to delete instance"),
+		);
+
+		const response = await runFetch({
+			action: "completed",
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: [OPENCI_RUNNER_LABEL],
+				run_id: 12345,
+			},
+		});
+
+		expect(response.status).toBe(500);
+		await expect(response.text()).resolves.toBe("Internal Server Error");
 	});
 });
