@@ -14,7 +14,11 @@ export const WorkflowJobPayloadSchema = z.object({
 	}),
 	workflow_job: z
 		.object({
+			completed_at: z.string().optional(),
+			conclusion: z.string().nullable().optional(),
+			name: z.string().optional(),
 			run_id: z.number(),
+			started_at: z.string().optional(),
 		})
 		.optional(),
 });

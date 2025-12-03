@@ -15,6 +15,7 @@ declare namespace Cloudflare {
 		GH_APP_WEBHOOK_SECRET: string;
 		GH_APP_PRIVATE_KEY: string;
 		SENTRY_DSN: string;
+		SLACK_WEBHOOK_URL?: string;
 	}
 }
 interface Env extends Cloudflare.Env {}
