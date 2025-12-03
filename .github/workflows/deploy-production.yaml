@@ -21,4 +21,4 @@ jobs:
       - name: Deploy to Cloudflare Workers
         run: npx wrangler deploy --env production
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKER_DEPLOY_TOKEN }}
