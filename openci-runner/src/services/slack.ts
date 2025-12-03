@@ -54,9 +54,7 @@ function isConclusion(value: string): value is Conclusion {
 	return value in ConclusionStatusMap;
 }
 
-function getStatusInfo(
-	conclusion: string,
-): z.infer<typeof StatusInfoSchema> {
+function getStatusInfo(conclusion: string): z.infer<typeof StatusInfoSchema> {
 	if (isConclusion(conclusion)) {
 		return ConclusionStatusMap[conclusion];
 	}
