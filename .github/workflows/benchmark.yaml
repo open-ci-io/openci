@@ -9,7 +9,7 @@ jobs:
   benchmark:
     strategy:
       matrix:
-        runner: [ubuntu-latest, openci-runner-beta]
+        runner: [blacksmith-8vcpu-ubuntu-2404, openci-runner-beta]
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
     steps:

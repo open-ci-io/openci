@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         runner:
-          - ubuntu-latest
+          - blacksmith-4vcpu-ubuntu-2404
           - openci-runner-beta
     defaults:
       run:
