@@ -123,23 +123,56 @@ describe("notifyJobCompleted", () => {
 
 		expect(mockFetch).toHaveBeenCalledWith(mockWebhookUrl, {
 			body: JSON.stringify({
-				text: "❌ ジョブ完了: test | 失敗 | N/A",
+				text: "❓ ジョブ完了: test | 不明 | N/A",
 			}),
 			headers: { "Content-Type": "application/json" },
 			method: "POST",
 		});
 	});
 
-	it("logs error when fetch fails", async () => {
-		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+	it("handles cancelled conclusion", async () => {
+		mockFetch.mockResolvedValueOnce({ ok: true });
+
+		const payload = createPayload({
+			conclusion: "cancelled",
+			name: "test",
+		});
+		await notifyJobCompleted(mockWebhookUrl, payload);
+
+		expect(mockFetch).toHaveBeenCalledWith(mockWebhookUrl, {
+			body: JSON.stringify({
+				text: "🚫 ジョブ完了: test | キャンセル | N/A",
+			}),
+			headers: { "Content-Type": "application/json" },
+			method: "POST",
+		});
+	});
+
+	it("handles skipped conclusion", async () => {
+		mockFetch.mockResolvedValueOnce({ ok: true });
+
+		const payload = createPayload({
+			conclusion: "skipped",
+			name: "test",
+		});
+		await notifyJobCompleted(mockWebhookUrl, payload);
+
+		expect(mockFetch).toHaveBeenCalledWith(mockWebhookUrl, {
+			body: JSON.stringify({
+				text: "⏭️ ジョブ完了: test | スキップ | N/A",
+			}),
+			headers: { "Content-Type": "application/json" },
+			method: "POST",
+		});
+	});
+
+	it("throws error when fetch fails", async () => {
 		mockFetch.mockResolvedValueOnce({ ok: false, status: 500 });
 
 		const payload = createPayload({ conclusion: "success", name: "test" });
-		await notifyJobCompleted(mockWebhookUrl, payload);
 
-		expect(consoleSpy).toHaveBeenCalledWith(
+		await expect(notifyJobCompleted(mockWebhookUrl, payload)).rejects.toThrow(
 			"Failed to send Slack message: 500",
 		);
-		consoleSpy.mockRestore();
 	});
 });

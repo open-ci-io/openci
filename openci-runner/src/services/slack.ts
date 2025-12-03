@@ -1,8 +1,28 @@
+import z from "zod";
 import type { WorkflowJobPayload } from "../types/github.types";
 
 interface SlackMessage {
 	text: string;
 }
+
+const StatusInfoSchema = z.object({
+	emoji: z.string(),
+	status: z.string(),
+});
+
+const ConclusionStatusMap = {
+	cancelled: { emoji: "🚫", status: "キャンセル" },
+	failure: { emoji: "❌", status: "失敗" },
+	skipped: { emoji: "⏭️", status: "スキップ" },
+	success: { emoji: "✅", status: "成功" },
+} as const satisfies Record<string, z.infer<typeof StatusInfoSchema>>;
+
+type Conclusion = keyof typeof ConclusionStatusMap;
+
+const DEFAULT_STATUS_INFO: z.infer<typeof StatusInfoSchema> = {
+	emoji: "❓",
+	status: "不明",
+};
 
 export async function notifyJobStarted(
 	webhookUrl: string,
@@ -22,13 +42,25 @@ export async function notifyJobCompleted(
 	const job = payload.workflow_job;
 	const jobName = job?.name ?? "Unknown";
 	const conclusion = job?.conclusion ?? "unknown";
-	const status = conclusion === "success" ? "成功" : "失敗";
-	const emoji = conclusion === "success" ? "✅" : "❌";
+	const { status, emoji } = getStatusInfo(conclusion);
 	const duration = calculateDuration(job?.started_at, job?.completed_at);
 
 	await sendSlackMessage(webhookUrl, {
 		text: `${emoji} ジョブ完了: ${jobName} | ${status} | ${duration}`,
 	});
+}
+
+function isConclusion(value: string): value is Conclusion {
+	return value in ConclusionStatusMap;
+}
+
+function getStatusInfo(
+	conclusion: string,
+): z.infer<typeof StatusInfoSchema> {
+	if (isConclusion(conclusion)) {
+		return ConclusionStatusMap[conclusion];
+	}
+	return DEFAULT_STATUS_INFO;
 }
 
 function calculateDuration(startedAt?: string, completedAt?: string): string {
@@ -63,6 +95,6 @@ async function sendSlackMessage(
 	});
 
 	if (!response.ok) {
-		console.error(`Failed to send Slack message: ${response.status}`);
+		throw new Error(`Failed to send Slack message: ${response.status}`);
 	}
 }

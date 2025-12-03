@@ -40,6 +40,13 @@ vi.mock("../../src/services/incus", () => {
 	};
 });
 
+vi.mock("../../src/services/slack", () => {
+	return {
+		notifyJobCompleted: vi.fn(),
+		notifyJobStarted: vi.fn(),
+	};
+});
+
 // Use env.OPENCI_RUNNER_LABEL from wrangler.toml
 const OPENCI_RUNNER_LABEL = "openci-runner-beta-dev";
 
