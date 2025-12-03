@@ -22,6 +22,7 @@
 		"cf-typegen": "wrangler types",
 		"deploy": "wrangler deploy",
 		"dev": "wrangler dev",
+		"format": "biome format . --write",
 		"start": "wrangler dev",
 		"test": "vitest",
 		"test-with-codecov": "vitest run --coverage --reporter=junit --outputFile=test-report.junit.xml"

@@ -8,6 +8,7 @@ import {
 	fetchAvailableIncusInstances,
 	waitForVMAgent,
 } from "../services/incus";
+import { notifyJobCompleted, notifyJobStarted } from "../services/slack";
 import type { WorkflowJobPayload } from "../types/github.types";
 import type { IncusEnv } from "../types/incus.types";
 
@@ -121,6 +122,10 @@ export async function handleWorkflowJobQueued(
 					console.log(
 						"Successfully registered as GitHub Actions Self-Hosted Runner",
 					);
+
+					if (c.env.SLACK_WEBHOOK_URL) {
+						await notifyJobStarted(c.env.SLACK_WEBHOOK_URL, payload);
+					}
 				} catch (e) {
 					console.error("Background task failed:", e);
 				}
@@ -152,6 +157,10 @@ export async function handleWorkflowJobCompleted(
 
 		const instanceName = generateInstanceName(runId);
 		await deleteInstance(incusEnv, instanceName);
+
+		if (c.env.SLACK_WEBHOOK_URL) {
+			await notifyJobCompleted(c.env.SLACK_WEBHOOK_URL, payload);
+		}
 
 		return c.text("Successfully deleted OpenCI runner", 200);
 	} catch (e) {
