@@ -50,6 +50,17 @@ export async function notifyJobCompleted(
 	});
 }
 
+export async function notifyJobCancelled(
+	webhookUrl: string,
+	payload: WorkflowJobPayload,
+): Promise<void> {
+	const jobName = payload.workflow_job?.name ?? "Unknown";
+
+	await sendSlackMessage(webhookUrl, {
+		text: `🚫 ジョブキャンセル: ${jobName}`,
+	});
+}
+
 function isConclusion(value: string): value is Conclusion {
 	return value in ConclusionStatusMap;
 }

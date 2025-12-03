@@ -12,7 +12,11 @@ import {
 	deleteInstance,
 	fetchAvailableIncusInstances,
 } from "../../src/services/incus";
-import { notifyJobCompleted, notifyJobStarted } from "../../src/services/slack";
+import {
+	notifyJobCancelled,
+	notifyJobCompleted,
+	notifyJobStarted,
+} from "../../src/services/slack";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 
@@ -52,6 +56,7 @@ vi.mock("../../src/services/incus", () => {
 
 vi.mock("../../src/services/slack", () => {
 	return {
+		notifyJobCancelled: vi.fn(),
 		notifyJobCompleted: vi.fn(),
 		notifyJobStarted: vi.fn(),
 	};
@@ -385,6 +390,106 @@ describe("workflow-job handler", () => {
 				repository: { name: "test-repo", owner: { login: "test-owner" } },
 				workflow_job: expect.objectContaining({
 					conclusion: "success",
+					name: "test-job",
+				}),
+			}),
+		);
+	});
+
+	it("returns 200 when runner is deleted on cancelled action", async () => {
+		vi.mocked(deleteInstance).mockResolvedValueOnce(undefined);
+
+		const response = await runFetch({
+			action: "cancelled",
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: [OPENCI_RUNNER_LABEL],
+				run_id: 12345,
+			},
+		});
+
+		expect(response.status).toBe(200);
+		await expect(response.text()).resolves.toBe(
+			"Successfully deleted cancelled OpenCI runner",
+		);
+		expect(deleteInstance).toHaveBeenCalledWith(
+			expect.objectContaining({
+				cloudflare_access_client_id: env.CF_ACCESS_CLIENT_ID,
+				cloudflare_access_client_secret: env.CF_ACCESS_CLIENT_SECRET,
+				server_url: env.INCUS_SERVER_URL,
+			}),
+			"openci-runner-12345",
+		);
+	});
+
+	it("returns 400 when run_id is undefined in cancelled action", async () => {
+		const response = await runFetch({
+			action: "cancelled",
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: [OPENCI_RUNNER_LABEL],
+			},
+		});
+
+		expect(response.status).toBe(400);
+		await expect(response.text()).resolves.toBe("Run ID not found");
+	});
+
+	it("returns 500 when deleteInstance fails in cancelled action", async () => {
+		vi.mocked(deleteInstance).mockRejectedValueOnce(
+			new Error("Failed to delete instance"),
+		);
+
+		const response = await runFetch({
+			action: "cancelled",
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: [OPENCI_RUNNER_LABEL],
+				run_id: 12345,
+			},
+		});
+
+		expect(response.status).toBe(500);
+		await expect(response.text()).resolves.toBe("Internal Server Error");
+	});
+
+	it("calls notifyJobCancelled when SLACK_WEBHOOK_URL is set on cancelled action", async () => {
+		vi.mocked(deleteInstance).mockResolvedValueOnce(undefined);
+
+		const response = await runFetch({
+			action: "cancelled",
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				conclusion: "cancelled",
+				id: 1,
+				labels: [OPENCI_RUNNER_LABEL],
+				name: "test-job",
+				run_id: 12345,
+			},
+		});
+
+		expect(response.status).toBe(200);
+		expect(vi.mocked(notifyJobCancelled)).toHaveBeenCalledWith(
+			env.SLACK_WEBHOOK_URL,
+			expect.objectContaining({
+				repository: { name: "test-repo", owner: { login: "test-owner" } },
+				workflow_job: expect.objectContaining({
+					conclusion: "cancelled",
 					name: "test-job",
 				}),
 			}),

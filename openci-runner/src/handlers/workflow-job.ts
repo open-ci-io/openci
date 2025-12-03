@@ -8,7 +8,11 @@ import {
 	fetchAvailableIncusInstances,
 	waitForVMAgent,
 } from "../services/incus";
-import { notifyJobCompleted, notifyJobStarted } from "../services/slack";
+import {
+	notifyJobCancelled,
+	notifyJobCompleted,
+	notifyJobStarted,
+} from "../services/slack";
 import type { WorkflowJobPayload } from "../types/github.types";
 import type { IncusEnv } from "../types/incus.types";
 
@@ -46,6 +50,20 @@ async function generateRunnerJitConfig(
 
 export function generateInstanceName(runId: number): string {
 	return `openci-runner-${runId}`;
+}
+
+async function deleteRunnerInstance(
+	c: Context<{ Bindings: Env }>,
+	runId: number,
+): Promise<void> {
+	const incusEnv = {
+		cloudflare_access_client_id: c.env.CF_ACCESS_CLIENT_ID,
+		cloudflare_access_client_secret: c.env.CF_ACCESS_CLIENT_SECRET,
+		server_url: c.env.INCUS_SERVER_URL,
+	};
+
+	const instanceName = generateInstanceName(runId);
+	await deleteInstance(incusEnv, instanceName);
 }
 
 async function getOrCreateIncusInstance(
@@ -149,20 +167,36 @@ export async function handleWorkflowJobCompleted(
 	}
 
 	try {
-		const incusEnv = {
-			cloudflare_access_client_id: c.env.CF_ACCESS_CLIENT_ID,
-			cloudflare_access_client_secret: c.env.CF_ACCESS_CLIENT_SECRET,
-			server_url: c.env.INCUS_SERVER_URL,
-		};
-
-		const instanceName = generateInstanceName(runId);
-		await deleteInstance(incusEnv, instanceName);
+		await deleteRunnerInstance(c, runId);
 
 		if (c.env.SLACK_WEBHOOK_URL) {
 			await notifyJobCompleted(c.env.SLACK_WEBHOOK_URL, payload);
 		}
 
 		return c.text("Successfully deleted OpenCI runner", 200);
+	} catch (e) {
+		console.error(e);
+		return c.text("Internal Server Error", 500);
+	}
+}
+
+export async function handleWorkflowJobCancelled(
+	c: Context<{ Bindings: Env }>,
+	payload: WorkflowJobPayload,
+) {
+	const runId = payload.workflow_job?.run_id;
+	if (!runId) {
+		return c.text("Run ID not found", 400);
+	}
+
+	try {
+		await deleteRunnerInstance(c, runId);
+
+		if (c.env.SLACK_WEBHOOK_URL) {
+			await notifyJobCancelled(c.env.SLACK_WEBHOOK_URL, payload);
+		}
+
+		return c.text("Successfully deleted cancelled OpenCI runner", 200);
 	} catch (e) {
 		console.error(e);
 		return c.text("Internal Server Error", 500);
