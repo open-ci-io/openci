@@ -170,7 +170,9 @@ describe("workflow-job handler", () => {
 
 		// Background task errors are logged but don't affect the response
 		expect(response.status).toBe(202);
-		await expect(response.text()).resolves.toBe("Workflow job accepted, runner provisioning started");
+		await expect(response.text()).resolves.toBe(
+			"Workflow job accepted, runner provisioning started",
+		);
 	});
 
 	it("creates new instance when no available instances found", async () => {
@@ -228,7 +230,9 @@ describe("workflow-job handler", () => {
 
 		// Background task errors are logged but don't affect the response
 		expect(response.status).toBe(202);
-		await expect(response.text()).resolves.toBe("Workflow job accepted, runner provisioning started");
+		await expect(response.text()).resolves.toBe(
+			"Workflow job accepted, runner provisioning started",
+		);
 		expect(createInstance).toHaveBeenCalledTimes(1);
 	});
 
