@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="49" failures="0" errors="0" time="0.495">
-    <testsuite name="test/handlers/workflow-job.spec.ts" timestamp="2025-11-30T15:17:42.988Z" hostname="MasahironoMacBook-Pro-2.local" tests="6" failures="0" errors="0" skipped="0" time="0.065">
-        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 201 when new runner is created with available instance" time="0.015">
+<testsuites name="vitest tests" tests="73" failures="0" errors="0" time="8.44">
+    <testsuite name="test/handlers/workflow-job.spec.ts" timestamp="2025-12-03T05:54:32.872Z" hostname="MasahironoMacBook-Pro-2.local" tests="10" failures="0" errors="0" skipped="0" time="1.737">
+        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 202 when workflow job is accepted and runner provisioning starts" time="0.222">
             <system-out>
 Successfully generated GHA JIT config
 Started to search available Incus VMs
 
 Found 1 available Incus instances
+Start to create new Incus instance
+
+Successfully registered as GitHub Actions Self-Hosted Runner
 
             </system-out>
         </testcase>
-        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 400 when installationId is undefined" time="0.008">
+        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 400 when installationId is undefined" time="0.183">
         </testcase>
-        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 500 when GitHub API fails" time="0.009">
+        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 500 when GitHub API fails" time="0.19">
             <system-err>
 Error: API Error
-    at /Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/test/handlers/workflow-job.spec.ts:117:47
+    at /Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/test/handlers/workflow-job.spec.ts:131:47
     at Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
     at Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
     at Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
@@ -28,15 +31,15 @@ Error: API Error
 
             </system-err>
         </testcase>
-        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 500 when fetchAvailableIncusInstances fails" time="0.009">
+        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 202 when fetchAvailableIncusInstances fails (error handled in background)" time="0.186">
             <system-out>
 Successfully generated GHA JIT config
 Started to search available Incus VMs
 
             </system-out>
             <system-err>
-Error: Failed to connect to Incus server
-    at /Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/test/handlers/workflow-job.spec.ts:140:4
+Background task failed: Error: Failed to connect to Incus server
+    at /Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/test/handlers/workflow-job.spec.ts:155:4
     at Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
     at Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
     at Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
@@ -49,7 +52,19 @@ Error: Failed to connect to Incus server
 
             </system-err>
         </testcase>
-        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; creates new instance when no available instances found" time="0.008">
+        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; creates new instance when no available instances found" time="0.167">
+            <system-out>
+Successfully generated GHA JIT config
+Started to search available Incus VMs
+
+Found 0 available Incus instances
+Start to create new Incus instance
+
+Successfully registered as GitHub Actions Self-Hosted Runner
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 202 when createInstance fails (error handled in background)" time="0.145">
             <system-out>
 Successfully generated GHA JIT config
 Started to search available Incus VMs
@@ -58,19 +73,31 @@ Found 0 available Incus instances
 Start to create new Incus instance
 
             </system-out>
-        </testcase>
-        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 500 when createInstance fails" time="0.007">
-            <system-out>
-Successfully generated GHA JIT config
-Started to search available Incus VMs
-
-Found 0 available Incus instances
-Start to create new Incus instance
-
-            </system-out>
             <system-err>
-Error: Failed to create instance
-    at /Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/test/handlers/workflow-job.spec.ts:195:4
+Background task failed: Error: Failed to create instance
+    at /Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/test/handlers/workflow-job.spec.ts:213:4
+    at Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runFiles (Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:1787:3)
+
+            </system-err>
+        </testcase>
+        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 400 when run_id is undefined in queued action" time="0.17">
+        </testcase>
+        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 200 when runner is deleted on completed action" time="0.124">
+        </testcase>
+        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 400 when run_id is undefined in completed action" time="0.194">
+        </testcase>
+        <testcase classname="test/handlers/workflow-job.spec.ts" name="workflow-job handler &gt; returns 500 when deleteInstance fails in completed action" time="0.147">
+            <system-err>
+Error: Failed to delete instance
+    at /Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/test/handlers/workflow-job.spec.ts:303:4
     at Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
     at Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
     at Users/masahiroaoki/Developer/openci-inc/openci/openci-runner/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
@@ -84,79 +111,86 @@ Error: Failed to create instance
             </system-err>
         </testcase>
     </testsuite>
-    <testsuite name="test/middleware/github.spec.ts" timestamp="2025-11-30T15:17:42.991Z" hostname="MasahironoMacBook-Pro-2.local" tests="9" failures="0" errors="0" skipped="0" time="0.078">
-        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 for GET method without signature" time="0.01">
+    <testsuite name="test/middleware/github.spec.ts" timestamp="2025-12-03T05:54:32.875Z" hostname="MasahironoMacBook-Pro-2.local" tests="9" failures="0" errors="0" skipped="0" time="1.205">
+        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 for GET method without signature" time="0.184">
         </testcase>
-        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 for PUT method without signature" time="0.008">
+        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 for PUT method without signature" time="0.181">
         </testcase>
-        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 for DELETE method without signature" time="0.007">
+        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 for DELETE method without signature" time="0.179">
         </testcase>
-        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 for PATCH method without signature" time="0.007">
+        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 for PATCH method without signature" time="0.177">
         </testcase>
-        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 for OPTIONS method without signature" time="0.009">
+        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 for OPTIONS method without signature" time="0.004">
         </testcase>
-        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 for HEAD method without signature" time="0.007">
+        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 for HEAD method without signature" time="0.005">
         </testcase>
-        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 when signature is missing" time="0.01">
+        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 when signature is missing" time="0.158">
         </testcase>
-        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 when signature is not valid" time="0.007">
+        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; returns 401 when signature is not valid" time="0.15">
         </testcase>
-        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; allows request with valid signature" time="0.005">
-        </testcase>
-    </testsuite>
-    <testsuite name="test/middleware/validate-env.spec.ts" timestamp="2025-11-30T15:17:42.992Z" hostname="MasahironoMacBook-Pro-2.local" tests="6" failures="0" errors="0" skipped="0" time="0.054">
-        <testcase classname="test/middleware/validate-env.spec.ts" name="validate-env middleware &gt; returns 500 when GH_APP_WEBHOOK_SECRET not provided" time="0.009">
-        </testcase>
-        <testcase classname="test/middleware/validate-env.spec.ts" name="validate-env middleware &gt; returns 500 when GH_APP_ID not provided" time="0.007">
-        </testcase>
-        <testcase classname="test/middleware/validate-env.spec.ts" name="validate-env middleware &gt; returns 500 when GH_APP_PRIVATE_KEY not provided" time="0.008">
-        </testcase>
-        <testcase classname="test/middleware/validate-env.spec.ts" name="validate-env middleware &gt; returns 500 when CF_ACCESS_CLIENT_ID not provided" time="0.006">
-        </testcase>
-        <testcase classname="test/middleware/validate-env.spec.ts" name="validate-env middleware &gt; returns 500 when CF_ACCESS_CLIENT_SECRET not provided" time="0.006">
-        </testcase>
-        <testcase classname="test/middleware/validate-env.spec.ts" name="validate-env middleware &gt; returns 500 when INCUS_SERVER_URL not provided" time="0.009">
+        <testcase classname="test/middleware/github.spec.ts" name="github middleware - signature verification &gt; allows request with valid signature" time="0.161">
         </testcase>
     </testsuite>
-    <testsuite name="test/routes/webhook.spec.ts" timestamp="2025-11-30T15:17:42.992Z" hostname="MasahironoMacBook-Pro-2.local" tests="3" failures="0" errors="0" skipped="0" time="0.041">
-        <testcase classname="test/routes/webhook.spec.ts" name="webhook route &gt; responds with 200 for non-workflow_job events" time="0.014">
+    <testsuite name="test/middleware/validate-env.spec.ts" timestamp="2025-12-03T05:54:32.876Z" hostname="MasahironoMacBook-Pro-2.local" tests="6" failures="0" errors="0" skipped="0" time="1.088">
+        <testcase classname="test/middleware/validate-env.spec.ts" name="validate-env middleware &gt; returns 500 when GH_APP_WEBHOOK_SECRET not provided" time="0.221">
         </testcase>
-        <testcase classname="test/routes/webhook.spec.ts" name="webhook route &gt; responds with 200 when workflow_job status is not queued" time="0.008">
+        <testcase classname="test/middleware/validate-env.spec.ts" name="validate-env middleware &gt; returns 500 when GH_APP_ID not provided" time="0.186">
         </testcase>
-        <testcase classname="test/routes/webhook.spec.ts" name="webhook route &gt; forwards queued workflow_job events to handler" time="0.009">
+        <testcase classname="test/middleware/validate-env.spec.ts" name="validate-env middleware &gt; returns 500 when GH_APP_PRIVATE_KEY not provided" time="0.19">
+        </testcase>
+        <testcase classname="test/middleware/validate-env.spec.ts" name="validate-env middleware &gt; returns 500 when CF_ACCESS_CLIENT_ID not provided" time="0.179">
+        </testcase>
+        <testcase classname="test/middleware/validate-env.spec.ts" name="validate-env middleware &gt; returns 500 when CF_ACCESS_CLIENT_SECRET not provided" time="0.157">
+        </testcase>
+        <testcase classname="test/middleware/validate-env.spec.ts" name="validate-env middleware &gt; returns 500 when INCUS_SERVER_URL not provided" time="0.148">
+        </testcase>
+    </testsuite>
+    <testsuite name="test/routes/webhook.spec.ts" timestamp="2025-12-03T05:54:32.876Z" hostname="MasahironoMacBook-Pro-2.local" tests="5" failures="0" errors="0" skipped="0" time="0.946">
+        <testcase classname="test/routes/webhook.spec.ts" name="webhook route &gt; responds with 200 for non-workflow_job events" time="0.226">
+        </testcase>
+        <testcase classname="test/routes/webhook.spec.ts" name="webhook route &gt; responds with 200 when workflow_job action is not supported" time="0.179">
+        </testcase>
+        <testcase classname="test/routes/webhook.spec.ts" name="webhook route &gt; forwards queued workflow_job events to handler when openci-runner-beta label is present" time="0.19">
             <system-out>
 Successfully generated GHA JIT config
 Started to search available Incus VMs
 
 Found 1 available Incus instances
+Start to create new Incus instance
+
+Successfully registered as GitHub Actions Self-Hosted Runner
 
             </system-out>
         </testcase>
+        <testcase classname="test/routes/webhook.spec.ts" name="webhook route &gt; ignores queued workflow_job events without openci-runner-beta label" time="0.18">
+        </testcase>
+        <testcase classname="test/routes/webhook.spec.ts" name="webhook route &gt; deletes instance when workflow_job is completed" time="0.165">
+        </testcase>
     </testsuite>
-    <testsuite name="test/services/incus.spec.ts" timestamp="2025-11-30T15:17:42.993Z" hostname="MasahironoMacBook-Pro-2.local" tests="25" failures="0" errors="0" skipped="0" time="0.257">
+    <testsuite name="test/services/incus.spec.ts" timestamp="2025-12-03T05:54:32.877Z" hostname="MasahironoMacBook-Pro-2.local" tests="39" failures="0" errors="0" skipped="0" time="3.411">
         <testcase classname="test/services/incus.spec.ts" name="fetchIncusInstances &gt; fetches instances with correct headers" time="0.012">
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="fetchIncusInstances &gt; throws when response is invalid" time="0.009">
+        <testcase classname="test/services/incus.spec.ts" name="fetchIncusInstances &gt; throws when response is invalid" time="0.011">
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="fetchIncusInstances &gt; throws when response is not ok" time="0.004">
+        <testcase classname="test/services/incus.spec.ts" name="fetchIncusInstances &gt; throws when response is not ok" time="0.009">
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="fetchIncusInstances &gt; throws when response is 401 Unauthorized" time="0.008">
+        <testcase classname="test/services/incus.spec.ts" name="fetchIncusInstances &gt; throws when response is 401 Unauthorized" time="0.007">
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="fetchIncusInstances &gt; throws when response is 404 Not Found" time="0.007">
+        <testcase classname="test/services/incus.spec.ts" name="fetchIncusInstances &gt; throws when response is 404 Not Found" time="0.01">
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="fetch available(stop) incus instances &gt; fetch stopped instances" time="0.003">
+        <testcase classname="test/services/incus.spec.ts" name="fetch available(stop) incus instances &gt; fetch stopped instances" time="0.007">
         </testcase>
         <testcase classname="test/services/incus.spec.ts" name="fetchStatusOfOperation &gt; fetches operation status" time="0.007">
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="fetchStatusOfOperation &gt; throws when API returns an error" time="0.005">
+        <testcase classname="test/services/incus.spec.ts" name="fetchStatusOfOperation &gt; throws when API returns an error" time="0.006">
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="waitForOperation &gt; waits until operation is Success" time="0.007">
+        <testcase classname="test/services/incus.spec.ts" name="waitForOperation &gt; waits until operation is Success" time="0.009">
             <system-out>
 Operation status: Success (code: 200)
 
             </system-out>
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="waitForOperation &gt; three retries and Success" time="0.01">
+        <testcase classname="test/services/incus.spec.ts" name="waitForOperation &gt; three retries and Success" time="0.011">
             <system-out>
 Operation status: Running (code: 103)
 
@@ -166,7 +200,7 @@ Operation status: Success (code: 200)
 
             </system-out>
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="waitForOperation &gt; three retries and Fail" time="0.009">
+        <testcase classname="test/services/incus.spec.ts" name="waitForOperation &gt; three retries and Fail" time="0.008">
             <system-out>
 Operation status: Running (code: 103)
 
@@ -176,10 +210,8 @@ Operation status: Failure (code: 400)
 
             </system-out>
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="waitForOperation &gt; timeouts" time="0.067">
+        <testcase classname="test/services/incus.spec.ts" name="waitForOperation &gt; timeouts" time="0.057">
             <system-out>
-Operation status: Running (code: 103)
-
 Operation status: Running (code: 103)
 
 Operation status: Running (code: 103)
@@ -192,29 +224,29 @@ Operation status: Running (code: 103)
 
             </system-out>
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="waitForOperation &gt; throws when fetch fails" time="0.008">
+        <testcase classname="test/services/incus.spec.ts" name="waitForOperation &gt; throws when fetch fails" time="0.007">
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="waitForOperation &gt; handles Cancelled status as failure" time="0.007">
+        <testcase classname="test/services/incus.spec.ts" name="waitForOperation &gt; handles Cancelled status as failure" time="0.005">
             <system-out>
 Operation status: Cancelled (code: 400)
 
             </system-out>
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="requestCreateInstance &gt; sends correct request body with virtual-machine type" time="0.007">
+        <testcase classname="test/services/incus.spec.ts" name="requestCreateInstance &gt; sends correct request body with virtual-machine type" time="0.004">
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="requestCreateInstance &gt; returns operation ID for async response" time="0.008">
+        <testcase classname="test/services/incus.spec.ts" name="requestCreateInstance &gt; returns operation ID for async response" time="0.007">
         </testcase>
         <testcase classname="test/services/incus.spec.ts" name="requestCreateInstance &gt; returns undefined for sync response" time="0.007">
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="requestCreateInstance &gt; throws when API returns error status" time="0.007">
+        <testcase classname="test/services/incus.spec.ts" name="requestCreateInstance &gt; throws when API returns error status" time="0.006">
         </testcase>
         <testcase classname="test/services/incus.spec.ts" name="requestCreateInstance &gt; throws when API returns 409 Conflict (instance already exists)" time="0.006">
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="requestCreateInstance &gt; throws when operation path is empty string" time="0.005">
+        <testcase classname="test/services/incus.spec.ts" name="requestCreateInstance &gt; throws when operation path is empty string" time="0.007">
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="requestCreateInstance &gt; throws when operation path ends with slash" time="0.004">
+        <testcase classname="test/services/incus.spec.ts" name="requestCreateInstance &gt; throws when operation path ends with slash" time="0.007">
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="createInstance &gt; creates instance and waits for operation to complete" time="0.005">
+        <testcase classname="test/services/incus.spec.ts" name="createInstance &gt; creates instance and waits for operation to complete" time="0.007">
             <system-out>
 Incus instance creation initiated
 
@@ -226,19 +258,19 @@ Operation abc-123 completed successfully
 
             </system-out>
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="createInstance &gt; completes immediately for sync response without waiting" time="0.003">
+        <testcase classname="test/services/incus.spec.ts" name="createInstance &gt; completes immediately for sync response without waiting" time="0.004">
             <system-out>
 Incus instance creation initiated
 
             </system-out>
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="createInstance &gt; throws when instance creation fails" time="0.003">
+        <testcase classname="test/services/incus.spec.ts" name="createInstance &gt; throws when instance creation fails" time="0.007">
             <system-out>
 Incus instance creation initiated
 
             </system-out>
         </testcase>
-        <testcase classname="test/services/incus.spec.ts" name="createInstance &gt; throws when operation fails" time="0.003">
+        <testcase classname="test/services/incus.spec.ts" name="createInstance &gt; throws when operation fails" time="0.008">
             <system-out>
 Incus instance creation initiated
 
@@ -247,6 +279,136 @@ Waiting for operation abc-123 to complete...
 Operation status: Failure (code: 400)
 
             </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="deleteInstance &gt; stops instance then deletes and waits for operations to complete" time="0.018">
+            <system-out>
+Stopping Incus instance: test-instance
+
+Waiting for stop operation abc-123 to complete...
+
+Operation status: Success (code: 200)
+
+Instance test-instance stopped successfully
+
+Deleting Incus instance: test-instance
+
+Waiting for delete operation abc-123 to complete...
+
+Operation status: Success (code: 200)
+
+Instance test-instance deleted successfully
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="deleteInstance &gt; throws when stop fails" time="0.006">
+            <system-out>
+Stopping Incus instance: test-instance
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="deleteInstance &gt; throws when delete fails after successful stop" time="0.015">
+            <system-out>
+Stopping Incus instance: test-instance
+
+Deleting Incus instance: test-instance
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="deleteInstance &gt; completes immediately when both stop and delete are sync responses" time="0.026">
+            <system-out>
+Stopping Incus instance: test-instance
+
+Deleting Incus instance: test-instance
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="deleteInstance &gt; throws when stop operation path is invalid" time="0.005">
+            <system-out>
+Stopping Incus instance: test-instance
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="waitForVMAgent &gt; returns when VM agent is ready with default timeout values" time="0.003">
+            <system-out>
+Waiting for VM agent to be ready in instance test-instance...
+
+VM agent is ready in instance test-instance
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="waitForVMAgent &gt; retries until VM agent is ready" time="1.006">
+            <system-out>
+Waiting for VM agent to be ready in instance test-instance...
+
+VM agent is ready in instance test-instance
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="waitForVMAgent &gt; retries when response is not ok" time="1.014">
+            <system-out>
+Waiting for VM agent to be ready in instance test-instance...
+
+VM agent is ready in instance test-instance
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="waitForVMAgent &gt; throws when timeout is reached" time="1.008">
+            <system-out>
+Waiting for VM agent to be ready in instance test-instance...
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="execCommand &gt; executes command and waits for operation to complete" time="0.004">
+            <system-out>
+Executing command in instance test-instance: echo hello
+
+Waiting for exec operation abc-123 to complete...
+
+Operation status: Success (code: 200)
+
+Command executed successfully in instance test-instance
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="execCommand &gt; executes command with environment variables" time="0.004">
+            <system-out>
+Executing command in instance test-instance: ./run.sh
+
+Waiting for exec operation abc-123 to complete...
+
+Operation status: Success (code: 200)
+
+Command executed successfully in instance test-instance
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="execCommand &gt; throws when exec fails" time="0.003">
+            <system-out>
+Executing command in instance test-instance: echo hello
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="execCommand &gt; throws when operation path is invalid" time="0.003">
+            <system-out>
+Executing command in instance test-instance: echo hello
+
+            </system-out>
+        </testcase>
+        <testcase classname="test/services/incus.spec.ts" name="execCommand &gt; completes immediately for sync response" time="0.002">
+            <system-out>
+Executing command in instance test-instance: echo hello
+
+            </system-out>
+        </testcase>
+    </testsuite>
+    <testsuite name="test/types/github.types.spec.ts" timestamp="2025-12-03T05:54:32.881Z" hostname="MasahironoMacBook-Pro-2.local" tests="4" failures="0" errors="0" skipped="0" time="0.053">
+        <testcase classname="test/types/github.types.spec.ts" name="WorkflowJobPayloadSchema &gt; parses valid payload with installation" time="0.014">
+        </testcase>
+        <testcase classname="test/types/github.types.spec.ts" name="WorkflowJobPayloadSchema &gt; parses valid payload without installation" time="0.009">
+        </testcase>
+        <testcase classname="test/types/github.types.spec.ts" name="WorkflowJobPayloadSchema &gt; throws on invalid payload missing repository" time="0.01">
+        </testcase>
+        <testcase classname="test/types/github.types.spec.ts" name="WorkflowJobPayloadSchema &gt; throws on invalid payload missing owner" time="0.009">
         </testcase>
     </testsuite>
 </testsuites>

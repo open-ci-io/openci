@@ -6,8 +6,6 @@ import {
 	deleteInstance,
 	execCommand,
 	fetchAvailableIncusInstances,
-	OPENCI_RUNNER_BASE_IMAGE,
-	OPENCI_RUNNER_LABEL,
 	waitForVMAgent,
 } from "../services/incus";
 import type { WorkflowJobPayload } from "../types/github.types";
@@ -29,11 +27,12 @@ async function createOctokit(
 async function generateRunnerJitConfig(
 	octokit: Octokit,
 	payload: WorkflowJobPayload,
+	runnerLabel: string,
 ) {
 	const runnerName = "OpenCIランナーβ(開発環境)";
 
 	const { data } = await octokit.rest.actions.generateRunnerJitconfigForRepo({
-		labels: [OPENCI_RUNNER_LABEL],
+		labels: [runnerLabel],
 		name: `${runnerName}-${Date.now()}`,
 		owner: payload.repository.owner.login,
 		repo: payload.repository.name,
@@ -51,6 +50,7 @@ export function generateInstanceName(runId: number): string {
 async function getOrCreateIncusInstance(
 	incusEnv: IncusEnv,
 	runId: number,
+	baseImage: string,
 ): Promise<string> {
 	console.log("Started to search available Incus VMs");
 
@@ -60,8 +60,7 @@ async function getOrCreateIncusInstance(
 	// 次のissueでVMのWarm Poolを実装する https://github.com/open-ci-io/openci/issues/591
 	console.log("Start to create new Incus instance");
 	const instanceName = generateInstanceName(runId);
-	const imageName = OPENCI_RUNNER_BASE_IMAGE;
-	await createInstance(incusEnv, instanceName, imageName);
+	await createInstance(incusEnv, instanceName, baseImage);
 	return instanceName;
 }
 
@@ -82,7 +81,11 @@ export async function handleWorkflowJobQueued(
 	try {
 		const octokit = await createOctokit(c, installationId);
 
-		const encodedJitConfig = await generateRunnerJitConfig(octokit, payload);
+		const encodedJitConfig = await generateRunnerJitConfig(
+			octokit,
+			payload,
+			c.env.OPENCI_RUNNER_LABEL,
+		);
 		console.log("Successfully generated GHA JIT config");
 
 		const incusEnv = {
@@ -91,26 +94,40 @@ export async function handleWorkflowJobQueued(
 			server_url: c.env.INCUS_SERVER_URL,
 		};
 
-		const instanceName = await getOrCreateIncusInstance(incusEnv, runId);
+		c.executionCtx.waitUntil(
+			(async () => {
+				try {
+					const instanceName = await getOrCreateIncusInstance(
+						incusEnv,
+						runId,
+						c.env.OPENCI_RUNNER_BASE_IMAGE,
+					);
 
-		await waitForVMAgent(incusEnv, instanceName);
+					await waitForVMAgent(incusEnv, instanceName);
 
-		await execCommand(
-			incusEnv,
-			instanceName,
-			[
-				"tmux",
-				"new-session",
-				"-d",
-				"-s",
-				"runner",
-				`RUNNER_ALLOW_RUNASROOT=1 ./run.sh --jitconfig ${encodedJitConfig}`,
-			],
-			{ cwd: "/root/actions-runner" },
+					await execCommand(
+						incusEnv,
+						instanceName,
+						[
+							"tmux",
+							"new-session",
+							"-d",
+							"-s",
+							"runner",
+							`RUNNER_ALLOW_RUNASROOT=1 ./run.sh --jitconfig ${encodedJitConfig}`,
+						],
+						{ cwd: "/root/actions-runner" },
+					);
+					console.log(
+						"Successfully registered as GitHub Actions Self-Hosted Runner",
+					);
+				} catch (e) {
+					console.error("Background task failed:", e);
+				}
+			})(),
 		);
-		console.log("Successfully registered as GitHub Actions Self-Hosted Runner");
 
-		return c.text("Successfully created OpenCI runner", 201);
+		return c.text("Workflow job accepted, runner provisioning started", 202);
 	} catch (e) {
 		console.error(e);
 		return c.text("Internal Server Error", 500);

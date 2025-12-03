@@ -11,9 +11,6 @@ import {
 
 export type { IncusAsyncResponse, IncusInstancesResponse, IncusProperty };
 
-export const OPENCI_RUNNER_LABEL = "openci-runner-beta-dev";
-export const OPENCI_RUNNER_BASE_IMAGE = "openci-runner-0.0.4";
-
 export async function _fetchIncusInstances(
 	envData: IncusEnv,
 ): Promise<IncusInstancesResponse> {
@@ -277,7 +274,6 @@ export async function waitForVMAgent(
 	envData: IncusEnv,
 	instanceName: string,
 	maxWaitMs = 2 * 60 * 1000,
-	intervalMs = 3000,
 ): Promise<void> {
 	console.log(
 		`Waiting for VM agent to be ready in instance ${instanceName}...`,
@@ -291,7 +287,9 @@ export async function waitForVMAgent(
 	};
 
 	const startTime = Date.now();
+	let checkCount = 0;
 
+	// Cloudflare Workersのアイドルタイムアウト対策：setTimeoutの代わりにfetchでポーリング
 	while (Date.now() - startTime < maxWaitMs) {
 		const response = await fetch(stateUrl, {
 			headers: cloudflareAccessHeaders,
@@ -308,7 +306,15 @@ export async function waitForVMAgent(
 			}
 		}
 
-		await new Promise((resolve) => setTimeout(resolve, intervalMs));
+		checkCount++;
+		if (checkCount % 10 === 0) {
+			console.log(
+				`Still waiting for VM agent... (${Math.round((Date.now() - startTime) / 1000)}s elapsed)`,
+			);
+		}
+
+		// 短い間隔でポーリング（I/Oアクティビティを維持）
+		await new Promise((resolve) => setTimeout(resolve, 1000));
 	}
 
 	throw new Error(
