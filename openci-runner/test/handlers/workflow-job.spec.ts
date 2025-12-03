@@ -12,6 +12,10 @@ import {
 	deleteInstance,
 	fetchAvailableIncusInstances,
 } from "../../src/services/incus";
+import {
+	notifyJobCompleted,
+	notifyJobStarted,
+} from "../../src/services/slack";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 
@@ -46,6 +50,13 @@ vi.mock("../../src/services/incus", () => {
 		execCommand: vi.fn(),
 		fetchAvailableIncusInstances: vi.fn(),
 		waitForVMAgent: vi.fn(),
+	};
+});
+
+vi.mock("../../src/services/slack", () => {
+	return {
+		notifyJobCompleted: vi.fn(),
+		notifyJobStarted: vi.fn(),
 	};
 });
 
@@ -321,5 +332,65 @@ describe("workflow-job handler", () => {
 
 		expect(response.status).toBe(500);
 		await expect(response.text()).resolves.toBe("Internal Server Error");
+	});
+
+	it("calls notifyJobStarted when SLACK_WEBHOOK_URL is set", async () => {
+		vi.mocked(fetchAvailableIncusInstances).mockResolvedValueOnce([]);
+		vi.mocked(createInstance).mockResolvedValueOnce(undefined);
+
+		const response = await runFetch({
+			action: "queued",
+			installation: { id: 123456 },
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				id: 1,
+				labels: [OPENCI_RUNNER_LABEL],
+				name: "test-job",
+				run_id: 12345,
+			},
+		});
+
+		expect(response.status).toBe(202);
+		expect(vi.mocked(notifyJobStarted)).toHaveBeenCalledWith(
+			env.SLACK_WEBHOOK_URL,
+			expect.objectContaining({
+				repository: { name: "test-repo", owner: { login: "test-owner" } },
+				workflow_job: expect.objectContaining({ name: "test-job" }),
+			}),
+		);
+	});
+
+	it("calls notifyJobCompleted when SLACK_WEBHOOK_URL is set", async () => {
+		vi.mocked(deleteInstance).mockResolvedValueOnce(undefined);
+
+		const response = await runFetch({
+			action: "completed",
+			repository: {
+				name: "test-repo",
+				owner: { login: "test-owner" },
+			},
+			workflow_job: {
+				conclusion: "success",
+				id: 1,
+				labels: [OPENCI_RUNNER_LABEL],
+				name: "test-job",
+				run_id: 12345,
+			},
+		});
+
+		expect(response.status).toBe(200);
+		expect(vi.mocked(notifyJobCompleted)).toHaveBeenCalledWith(
+			env.SLACK_WEBHOOK_URL,
+			expect.objectContaining({
+				repository: { name: "test-repo", owner: { login: "test-owner" } },
+				workflow_job: expect.objectContaining({
+					conclusion: "success",
+					name: "test-job",
+				}),
+			}),
+		);
 	});
 });
