@@ -631,6 +631,30 @@ describe("deleteInstance", () => {
 			"Invalid operation path format: ",
 		);
 	});
+
+	it("throws when delete operation path is invalid", async () => {
+		vi.mocked(fetch)
+			// stopInstance: sync response (immediate success)
+			.mockResolvedValueOnce({
+				json: () => Promise.resolve(syncResponse),
+				ok: true,
+			} as Response)
+			// deleteInstance: DELETE returns async with invalid path
+			.mockResolvedValueOnce({
+				json: () =>
+					Promise.resolve({
+						operation: "/1.0/operations/",
+						status: "Operation created",
+						status_code: 100,
+						type: "async",
+					}),
+				ok: true,
+			} as Response);
+
+		await expect(deleteInstance(mockEnv, "test-instance")).rejects.toThrow(
+			"Invalid operation path format: /1.0/operations/",
+		);
+	});
 });
 
 describe("waitForVMAgent", () => {
@@ -664,7 +688,7 @@ describe("waitForVMAgent", () => {
 				ok: true,
 			} as Response);
 
-		await waitForVMAgent(mockEnv, "test-instance", 10000, 10);
+		await waitForVMAgent(mockEnv, "test-instance", 10000);
 
 		expect(fetch).toHaveBeenCalledTimes(2);
 	});
@@ -679,7 +703,7 @@ describe("waitForVMAgent", () => {
 				ok: true,
 			} as Response);
 
-		await waitForVMAgent(mockEnv, "test-instance", 10000, 10);
+		await waitForVMAgent(mockEnv, "test-instance", 10000);
 
 		expect(fetch).toHaveBeenCalledTimes(2);
 	});
@@ -690,9 +714,45 @@ describe("waitForVMAgent", () => {
 			ok: true,
 		} as Response);
 
-		await expect(
-			waitForVMAgent(mockEnv, "test-instance", 50, 10),
-		).rejects.toThrow("VM agent did not become ready within 0.05 seconds");
+		await expect(waitForVMAgent(mockEnv, "test-instance", 50)).rejects.toThrow(
+			"VM agent did not become ready within 0.05 seconds",
+		);
+	});
+
+	it("logs progress every 10 checks", async () => {
+		vi.useFakeTimers();
+		const consoleSpy = vi.spyOn(console, "log");
+
+		let callCount = 0;
+		vi.mocked(fetch).mockImplementation(() => {
+			callCount++;
+			if (callCount <= 10) {
+				return Promise.resolve({
+					json: () => Promise.resolve({ metadata: { processes: -1 } }),
+					ok: true,
+				} as Response);
+			}
+			return Promise.resolve({
+				json: () => Promise.resolve({ metadata: { processes: 5 } }),
+				ok: true,
+			} as Response);
+		});
+
+		const promise = waitForVMAgent(mockEnv, "test-instance", 30000);
+
+		// Advance timers to allow all 11 fetch calls
+		for (let i = 0; i < 11; i++) {
+			await vi.advanceTimersByTimeAsync(1000);
+		}
+
+		await promise;
+
+		expect(fetch).toHaveBeenCalledTimes(11);
+		expect(consoleSpy).toHaveBeenCalledWith(
+			expect.stringContaining("Still waiting for VM agent..."),
+		);
+		consoleSpy.mockRestore();
+		vi.useRealTimers();
 	});
 });
 

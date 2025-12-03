@@ -11,8 +11,6 @@ import {
 	createInstance,
 	deleteInstance,
 	fetchAvailableIncusInstances,
-	OPENCI_RUNNER_BASE_IMAGE,
-	OPENCI_RUNNER_LABEL,
 } from "../../src/services/incus";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
@@ -47,11 +45,12 @@ vi.mock("../../src/services/incus", () => {
 		deleteInstance: vi.fn(),
 		execCommand: vi.fn(),
 		fetchAvailableIncusInstances: vi.fn(),
-		OPENCI_RUNNER_BASE_IMAGE: "openci-runner-0.0.4",
-		OPENCI_RUNNER_LABEL: "openci-runner-beta-dev",
 		waitForVMAgent: vi.fn(),
 	};
 });
+
+// Use env values from wrangler.toml
+const OPENCI_RUNNER_LABEL = "openci-runner-beta-dev";
 
 const createSignature = (payload: string, secret: string) =>
 	`sha256=${createHmac("sha256", secret).update(payload).digest("hex")}`;
@@ -82,7 +81,7 @@ afterEach(() => {
 });
 
 describe("workflow-job handler", () => {
-	it("returns 201 when new runner is created with available instance", async () => {
+	it("returns 202 when workflow job is accepted and runner provisioning starts", async () => {
 		vi.mocked(fetchAvailableIncusInstances).mockResolvedValueOnce([
 			{ name: "vm-1", status: "Stopped" },
 		]);
@@ -101,9 +100,9 @@ describe("workflow-job handler", () => {
 			},
 		});
 
-		expect(response.status).toBe(201);
+		expect(response.status).toBe(202);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
-			`"Successfully created OpenCI runner"`,
+			`"Workflow job accepted, runner provisioning started"`,
 		);
 	});
 
@@ -150,7 +149,7 @@ describe("workflow-job handler", () => {
 		);
 	});
 
-	it("returns 500 when fetchAvailableIncusInstances fails", async () => {
+	it("returns 202 when fetchAvailableIncusInstances fails (error handled in background)", async () => {
 		vi.mocked(fetchAvailableIncusInstances).mockRejectedValueOnce(
 			new Error("Failed to connect to Incus server"),
 		);
@@ -169,8 +168,11 @@ describe("workflow-job handler", () => {
 			},
 		});
 
-		expect(response.status).toBe(500);
-		await expect(response.text()).resolves.toBe("Internal Server Error");
+		// Background task errors are logged but don't affect the response
+		expect(response.status).toBe(202);
+		await expect(response.text()).resolves.toBe(
+			"Workflow job accepted, runner provisioning started",
+		);
 	});
 
 	it("creates new instance when no available instances found", async () => {
@@ -191,9 +193,9 @@ describe("workflow-job handler", () => {
 			},
 		});
 
-		expect(response.status).toBe(201);
+		expect(response.status).toBe(202);
 		await expect(response.text()).resolves.toBe(
-			"Successfully created OpenCI runner",
+			"Workflow job accepted, runner provisioning started",
 		);
 		expect(createInstance).toHaveBeenCalledWith(
 			expect.objectContaining({
@@ -202,11 +204,11 @@ describe("workflow-job handler", () => {
 				server_url: env.INCUS_SERVER_URL,
 			}),
 			"openci-runner-12345",
-			OPENCI_RUNNER_BASE_IMAGE,
+			env.OPENCI_RUNNER_BASE_IMAGE,
 		);
 	});
 
-	it("returns 500 when createInstance fails", async () => {
+	it("returns 202 when createInstance fails (error handled in background)", async () => {
 		vi.mocked(fetchAvailableIncusInstances).mockResolvedValueOnce([]);
 		vi.mocked(createInstance).mockRejectedValueOnce(
 			new Error("Failed to create instance"),
@@ -226,8 +228,11 @@ describe("workflow-job handler", () => {
 			},
 		});
 
-		expect(response.status).toBe(500);
-		await expect(response.text()).resolves.toBe("Internal Server Error");
+		// Background task errors are logged but don't affect the response
+		expect(response.status).toBe(202);
+		await expect(response.text()).resolves.toBe(
+			"Workflow job accepted, runner provisioning started",
+		);
 		expect(createInstance).toHaveBeenCalledTimes(1);
 	});
 

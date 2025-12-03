@@ -4,7 +4,6 @@ import {
 	handleWorkflowJobQueued,
 } from "../handlers/workflow-job";
 import { verifySignature } from "../middleware/github";
-import { OPENCI_RUNNER_LABEL } from "../services/incus";
 
 const webhook = new Hono<{ Bindings: Env }>();
 
@@ -18,7 +17,7 @@ webhook.post("/", async (c) => {
 	}
 
 	const labels: string[] = payload.workflow_job.labels ?? [];
-	if (!labels.includes(OPENCI_RUNNER_LABEL)) {
+	if (!labels.includes(c.env.OPENCI_RUNNER_LABEL)) {
 		return c.text("Workflow Job does not target OpenCI runner", 200);
 	}
 

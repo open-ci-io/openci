@@ -6,10 +6,7 @@ import {
 import { createHmac } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import worker from "../../src/index";
-import {
-	fetchAvailableIncusInstances,
-	OPENCI_RUNNER_LABEL,
-} from "../../src/services/incus";
+import { fetchAvailableIncusInstances } from "../../src/services/incus";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 
@@ -39,10 +36,12 @@ vi.mock("../../src/services/incus", () => {
 		execCommand: vi.fn(),
 		fetchAvailableIncusInstances: vi.fn(),
 		OPENCI_RUNNER_BASE_IMAGE: "openci-runner-0.0.4",
-		OPENCI_RUNNER_LABEL: "openci-runner-beta-dev",
 		waitForVMAgent: vi.fn(),
 	};
 });
+
+// Use env.OPENCI_RUNNER_LABEL from wrangler.toml
+const OPENCI_RUNNER_LABEL = "openci-runner-beta-dev";
 
 const createSignature = (payload: string, secret: string) =>
 	`sha256=${createHmac("sha256", secret).update(payload).digest("hex")}`;
@@ -112,9 +111,9 @@ describe("webhook route", () => {
 			},
 		});
 
-		expect(response.status).toBe(201);
+		expect(response.status).toBe(202);
 		await expect(response.text()).resolves.toMatchInlineSnapshot(
-			`"Successfully created OpenCI runner"`,
+			`"Workflow job accepted, runner provisioning started"`,
 		);
 	});
 
