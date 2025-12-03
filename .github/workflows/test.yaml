@@ -9,7 +9,12 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        runner:
+          - ubuntu-latest
+          - openci-runner-beta
     defaults:
       run:
         working-directory: ./openci-runner
