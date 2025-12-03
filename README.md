@@ -1,34 +1,26 @@
-# Welcome to OpenCI.
+<p align="center" width="100%">
+  <img width="600" alt="スクリーンショット 2025-10-07 午後7 30 13" src="https://github.com/user-attachments/assets/f6aff39f-3ef4-4fea-8d04-498f097b4e4c" />
+</p>
 
-# Get started
+# OpenCI ランナー へようこそ
+[![Deploy GitHub Apps](https://github.com/open-ci-io/openci/actions/workflows/test.yaml/badge.svg)](https://github.com/open-ci-io/openci/actions/workflows/test.yaml)
+[![codecov](https://codecov.io/github/open-ci-io/openci/graph/badge.svg?token=RAJBUMJU3O)](https://codecov.io/github/open-ci-io/openci)
 
-Go to [OpenCI Docs](https://docs.open-ci.io) to get started.
 
-## Contribute to OpenCI Docs
+OpenCIランナーは、GitHub Actionsの、より高速で低価格なランナーを提供するサービスです。
 
-If you want to contribute to our docs, please fork apps/docs and make a PR.
+OSSで開発しています。ご意見・ご要望がありましたら気軽にissueを作成、もしくは [Slackチャンネル](https://join.slack.com/t/open-ci-io/shared_invite/zt-3ectydtjn-GbcRVXkX~DKVFZNAqB~XtQ) でご連絡ください。XでDMをいただいても大丈夫です。
 
-## Discord Channel
+## 料金
+2025年12月31日までは無料です。ぜひご意見・ご要望をお聞かせください！
 
-Join our [Discord channel](https://discord.gg/gwbnwWtefk) to get help from the community.
+## ランナースペック
+テスト期間中は、一律v8CPU, 16GB RAM, 240GB, Ubuntu 24.04のランナーを提供します。
 
-# Goals of OpenCI
+## 使い方
+[こちら](https://openci.craft.me/WRmKUOlz2MOsJE)を参照してください。
 
-The best CI/CD service.
+## テストカバー状況
+[![codecov](https://codecov.io/github/open-ci-io/openci/graph/badge.svg?token=RAJBUMJU3O)](https://codecov.io/github/open-ci-io/openci)
 
-1. Super fast loading of dashboards
-2. Extremely easy setup
-3. No charges for builds during setup
-4. Free or very low-cost usage for small-scale development
-5. Ability to self-host
-6. Open-source
-7. Accessible to everyone
-8. Super fast CI/CD processes
-9. Positive impact of OpenCI on Flutter and the entire software community
-10. Contribute to the success of the business and make a big contribution to humanity
-
-# branch strategy
-
-- `main` is the default branch.
-- `develop` is the branch for the next release. It uses develop env CI.
-
+<img src = "https://codecov.io/github/open-ci-io/openci/graphs/sunburst.svg" width = "120" />

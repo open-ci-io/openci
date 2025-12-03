@@ -1,1 +1,0 @@
-melos publish --no-dry-run

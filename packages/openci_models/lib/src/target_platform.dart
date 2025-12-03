@@ -1,4 +1,0 @@
-enum OpenCITargetPlatform {
-  android,
-  ios,
-}

@@ -1,6 +1,0 @@
-name: openci
-publish_to: none
-environment:
-  sdk: ^3.7.2
-dev_dependencies:
-  melos: ^6.3.2
