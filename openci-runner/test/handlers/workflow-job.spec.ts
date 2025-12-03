@@ -12,10 +12,7 @@ import {
 	deleteInstance,
 	fetchAvailableIncusInstances,
 } from "../../src/services/incus";
-import {
-	notifyJobCompleted,
-	notifyJobStarted,
-} from "../../src/services/slack";
+import { notifyJobCompleted, notifyJobStarted } from "../../src/services/slack";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 
