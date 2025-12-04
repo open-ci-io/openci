@@ -29,7 +29,7 @@ export async function notifyJobStarted(
 	payload: WorkflowJobPayload,
 ): Promise<void> {
 	await sendSlackMessage(webhookUrl, {
-		text: `🚀 ジョブ開始: ${payload}`,
+		text: `🚀 ジョブ開始: ${JSON.stringify(payload)}`,
 	});
 }
 
