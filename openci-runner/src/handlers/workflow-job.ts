@@ -173,6 +173,10 @@ export async function handleWorkflowJobCompleted(
 			await notifyJobCompleted(c.env.SLACK_WEBHOOK_URL, payload);
 		}
 
+		if (c.env.SLACK_WEBHOOK_URL) {
+			await notifyJobCompleted(c.env.SLACK_WEBHOOK_URL, payload);
+		}
+
 		return c.text("Successfully deleted OpenCI runner", 200);
 	} catch (e) {
 		console.error(e);
