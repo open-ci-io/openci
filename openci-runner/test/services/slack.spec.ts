@@ -37,7 +37,9 @@ describe("notifyJobStarted", () => {
 		await notifyJobStarted(mockWebhookUrl, payload);
 
 		expect(mockFetch).toHaveBeenCalledWith(mockWebhookUrl, {
-			body: JSON.stringify({ text: "🚀 ジョブ開始: build" }),
+			body: JSON.stringify({
+				text: `🚀 ジョブ開始: ${JSON.stringify(payload)}`,
+			}),
 			headers: { "Content-Type": "application/json" },
 			method: "POST",
 		});
@@ -50,7 +52,9 @@ describe("notifyJobStarted", () => {
 		await notifyJobStarted(mockWebhookUrl, payload);
 
 		expect(mockFetch).toHaveBeenCalledWith(mockWebhookUrl, {
-			body: JSON.stringify({ text: "🚀 ジョブ開始: Unknown" }),
+			body: JSON.stringify({
+				text: `🚀 ジョブ開始: ${JSON.stringify(payload)}`,
+			}),
 			headers: { "Content-Type": "application/json" },
 			method: "POST",
 		});
