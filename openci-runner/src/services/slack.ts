@@ -28,10 +28,8 @@ export async function notifyJobStarted(
 	webhookUrl: string,
 	payload: WorkflowJobPayload,
 ): Promise<void> {
-	const jobName = payload.workflow_job?.name ?? "Unknown";
-
 	await sendSlackMessage(webhookUrl, {
-		text: `🚀 ジョブ開始: ${jobName}`,
+		text: `🚀 ジョブ開始: ${JSON.stringify(payload)}`,
 	});
 }
 
@@ -47,6 +45,17 @@ export async function notifyJobCompleted(
 
 	await sendSlackMessage(webhookUrl, {
 		text: `${emoji} ジョブ完了: ${jobName} | ${status} | ${duration}`,
+	});
+}
+
+export async function notifyJobCancelled(
+	webhookUrl: string,
+	payload: WorkflowJobPayload,
+): Promise<void> {
+	const jobName = payload.workflow_job?.name ?? "Unknown";
+
+	await sendSlackMessage(webhookUrl, {
+		text: `🚫 ジョブキャンセル: ${jobName}`,
 	});
 }
 

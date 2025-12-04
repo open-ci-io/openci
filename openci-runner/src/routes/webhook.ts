@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import {
+	handleWorkflowJobCancelled,
 	handleWorkflowJobCompleted,
 	handleWorkflowJobQueued,
 } from "../handlers/workflow-job";
@@ -27,6 +28,10 @@ webhook.post("/", async (c) => {
 
 	if (payload.action === "completed") {
 		return handleWorkflowJobCompleted(c, payload);
+	}
+
+	if (payload.action === "cancelled") {
+		return handleWorkflowJobCancelled(c, payload);
 	}
 
 	return c.text("Workflow Job action not supported", 200);

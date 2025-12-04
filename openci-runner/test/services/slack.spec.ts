@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { notifyJobCompleted, notifyJobStarted } from "../../src/services/slack";
+import {
+	notifyJobCancelled,
+	notifyJobCompleted,
+	notifyJobStarted,
+} from "../../src/services/slack";
 import type { WorkflowJobPayload } from "../../src/types/github.types";
 
 const mockFetch = vi.fn();
@@ -33,7 +37,9 @@ describe("notifyJobStarted", () => {
 		await notifyJobStarted(mockWebhookUrl, payload);
 
 		expect(mockFetch).toHaveBeenCalledWith(mockWebhookUrl, {
-			body: JSON.stringify({ text: "🚀 ジョブ開始: build" }),
+			body: JSON.stringify({
+				text: `🚀 ジョブ開始: ${JSON.stringify(payload)}`,
+			}),
 			headers: { "Content-Type": "application/json" },
 			method: "POST",
 		});
@@ -46,7 +52,9 @@ describe("notifyJobStarted", () => {
 		await notifyJobStarted(mockWebhookUrl, payload);
 
 		expect(mockFetch).toHaveBeenCalledWith(mockWebhookUrl, {
-			body: JSON.stringify({ text: "🚀 ジョブ開始: Unknown" }),
+			body: JSON.stringify({
+				text: `🚀 ジョブ開始: ${JSON.stringify(payload)}`,
+			}),
 			headers: { "Content-Type": "application/json" },
 			method: "POST",
 		});
@@ -172,6 +180,44 @@ describe("notifyJobCompleted", () => {
 		const payload = createPayload({ conclusion: "success", name: "test" });
 
 		await expect(notifyJobCompleted(mockWebhookUrl, payload)).rejects.toThrow(
+			"Failed to send Slack message: 500",
+		);
+	});
+});
+
+describe("notifyJobCancelled", () => {
+	it("sends job cancelled notification", async () => {
+		mockFetch.mockResolvedValueOnce({ ok: true });
+
+		const payload = createPayload({ name: "build" });
+		await notifyJobCancelled(mockWebhookUrl, payload);
+
+		expect(mockFetch).toHaveBeenCalledWith(mockWebhookUrl, {
+			body: JSON.stringify({ text: "🚫 ジョブキャンセル: build" }),
+			headers: { "Content-Type": "application/json" },
+			method: "POST",
+		});
+	});
+
+	it("uses Unknown when job name is missing", async () => {
+		mockFetch.mockResolvedValueOnce({ ok: true });
+
+		const payload = createPayload({ name: undefined });
+		await notifyJobCancelled(mockWebhookUrl, payload);
+
+		expect(mockFetch).toHaveBeenCalledWith(mockWebhookUrl, {
+			body: JSON.stringify({ text: "🚫 ジョブキャンセル: Unknown" }),
+			headers: { "Content-Type": "application/json" },
+			method: "POST",
+		});
+	});
+
+	it("throws error when fetch fails", async () => {
+		mockFetch.mockResolvedValueOnce({ ok: false, status: 500 });
+
+		const payload = createPayload({ name: "test" });
+
+		await expect(notifyJobCancelled(mockWebhookUrl, payload)).rejects.toThrow(
 			"Failed to send Slack message: 500",
 		);
 	});
