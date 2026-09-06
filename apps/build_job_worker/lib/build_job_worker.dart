@@ -4,3 +4,4 @@ export 'src/loki/push_log_to_loki.dart';
 export 'src/orchard/execute_command.dart';
 export 'src/orchard/orchard_api_client.dart';
 export 'src/orchard/prepare_vm.dart';
+export 'src/orchard/write_file.dart';
