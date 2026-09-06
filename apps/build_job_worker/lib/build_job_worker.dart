@@ -1,3 +1,4 @@
+export 'src/checkout_repository.dart';
 export 'src/claim_next_build_job.dart';
 export 'src/config.dart';
 export 'src/loki/push_log_to_loki.dart';
