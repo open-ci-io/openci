@@ -13,4 +13,5 @@ export 'src/orchard/orchard_api_client.dart';
 export 'src/orchard/prepare_vm.dart';
 export 'src/orchard/write_file.dart';
 export 'src/resolve_github_installation_token.dart';
+export 'src/run_build_job_worker.dart';
 export 'src/run_workflow.dart';
