@@ -1,5 +1,6 @@
 export 'src/checkout_repository.dart';
 export 'src/claim_next_build_job.dart';
+export 'src/complete_build_run.dart';
 export 'src/config.dart';
 export 'src/create_build_run.dart';
 export 'src/fetch_job_secrets.dart';
