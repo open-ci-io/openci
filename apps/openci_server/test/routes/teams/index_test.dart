@@ -162,6 +162,26 @@ void main() {
   });
 
   group('POST /teams', () {
+    for (final id in [42, '   ']) {
+      test('rejects invalid team ID $id without creating a team', () async {
+        final before = await db.select(db.teams).get();
+        final context = TestRequestContext(
+          path: '/teams',
+          method: HttpMethod.post,
+          body: jsonEncode({'name': 'New team', 'id': id}),
+        );
+        context.provide<AppDatabase>(db);
+        context.provide<String?>('user-1');
+        final response = await route.onRequest(context.context);
+        expect(response.statusCode, HttpStatus.badRequest);
+        expect(await response.json(), {
+          'success': false,
+          'error': id is String ? 'id cannot be empty' : 'id must be a string',
+        });
+        expect(await db.select(db.teams).get(), before);
+      });
+    }
+
     test(
       'responds with 401 Unauthorized when unauthorized (uid is null)',
       () async {

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_test/dart_frog_test.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -73,6 +74,47 @@ void main() {
   });
 
   group('Branches Endpoint', () {
+    test(
+      'rejects a team without a GitHub installation before any request',
+      () async {
+        await db
+            .into(db.teamMembers)
+            .insert(
+              TeamMembersCompanion.insert(teamId: 'team-123', userId: 'user-1'),
+            );
+        await db
+            .update(db.teams)
+            .write(
+              const TeamsCompanion(installationIds: Value([])),
+            );
+        final client = MockClient((_) async {
+          fail('GitHub should not be called without an installation');
+        });
+        addTearDown(client.close);
+        final context = TestRequestContext(
+          path: '/teams/team-123/github/repositories/owner/repo/branches',
+          method: HttpMethod.get,
+        );
+        context.provide<AppDatabase>(db);
+        context.provide<String?>('user-1');
+        context.provide<Map<String, String>>(testEnv);
+        context.provide<http.Client>(client);
+
+        final response = await branches_route.onRequest(
+          context.context,
+          'team-123',
+          'owner',
+          'repo',
+        );
+
+        expect(response.statusCode, HttpStatus.badRequest);
+        expect(await response.json(), {
+          'success': false,
+          'error': 'GitHub App is not installed for this team',
+        });
+      },
+    );
+
     test('responds with 401 Unauthorized when uid is null', () async {
       final context = TestRequestContext(
         path: '/teams/team-123/github/repositories/owner/repo/branches',

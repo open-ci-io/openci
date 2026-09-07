@@ -164,6 +164,28 @@ void main() {
   });
 
   group('PATCH /builds/<id>/runs/<runId>', () {
+    test('rejects an empty status without writing a build run', () async {
+      final context = TestRequestContext(
+        path: '/builds/job-xyz/runs/run-456',
+        method: HttpMethod.patch,
+        body: '{"status": ""}',
+      );
+      context.provide<AppDatabase>(db);
+
+      final response = await route.onRequest(
+        context.context,
+        'job-xyz',
+        'run-456',
+      );
+
+      expect(response.statusCode, HttpStatus.badRequest);
+      expect(await response.json(), {
+        'success': false,
+        'error': 'status is required',
+      });
+      expect(await db.select(db.buildRuns).get(), isEmpty);
+    });
+
     test(
       'responds with 400 Bad Request when body is invalid JSON',
       () async {
