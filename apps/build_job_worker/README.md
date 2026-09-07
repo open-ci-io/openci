@@ -1,13 +1,13 @@
 # build_job_worker
 
 OpenCIのビルドjobを実行するDartバックエンドサービス。
-最終的にはComposeから起動する常駐プロセスとして動作させます。
+jobを1件ずつ取得・実行する常駐プロセスです。
 
 現在は設定の読み込み、jobを1件取得する関数、runの作成・完了記録、jobの完了記録、GitHub Checksの完了更新、OrchardのVM準備・削除・コマンド実行、Lokiへのログ送信、GitHubトークン・secretsの取得、ソースのcheckout・ワークフロー実行を実装しています。
 `executeBuildJob()`で、取得済みのjobを実行開始の記録から結果保存・VM削除まで処理できます。
 `runBuildJobWorker()`で、jobを1件ずつ取得して実行するループを利用できます。
-起動すると設定を確認して終了し、job取得関数はまだ起動処理から呼び出しません。
-そのため、起動時の外部API接続・VM操作は行いません。
+`main.dart`からこのループを起動し、`executeBuildJob()`を呼び出します。
+サーバー・Orchard・Lokiのクライアントは起動時に生成し、job間で共有します。
 既存dispatcher/executorやComposeの起動構成も変更していません。
 現在のplannerは`needs`を扱わず、jobを`QUEUED`で作成します。
 
@@ -48,7 +48,7 @@ HTTPクライアントは呼び出し元で共有し、使用後に閉じます�
 `lokiUrl: config.internalLokiUrl`とrun・job・必要に応じてstepのIDを指定します。
 送信エラーは`onLogError`に通知し、後続ログの送信を続けます。このコールバックは例外を投げずにエラーを記録してください。
 1件の送信待ちは標準で最大10秒（`logTimeout`）です。コマンド終了・実行エラーのどちらでも待機中のログを処理してから、終了コードまたは元の実行エラーを返します。
-両クライアントの管理は呼び出し元で行います。起動処理からの呼び出しはまだ行いません。
+両クライアントの管理は呼び出し元で行います。
 
 `writeFile()`はVM内の親ディレクトリを作成し、指定したパスへUTF-8の内容を書き込みます。
 既存ファイルは上書きします。`mode: '+x'`で実行権限を付与し、`mode: '600'`なども指定できます。
@@ -58,38 +58,37 @@ HTTPクライアントは呼び出し元で共有し、使用後に閉じます�
 `createBuildRun(api: api, jobId: job.id, runId: runId)`は、既存APIで実行開始を記録します。run IDは呼び出し元で生成します。
 サーバー側でrunを`in_progress`として作成し、jobのrun数・最新run IDを更新します。
 HTTP失敗（run ID重複の409を含む）や通信・変換エラーは`StateError`にし、レスポンス本文や元の例外メッセージは含めません。
-自動再送は行いません。起動処理への組み込みはまだ行いません。
+自動再送は行いません。
 
 `completeBuildRun(api: api, jobId: job.id, runId: runId, status: status)`は、既存APIでrunを`completed`に更新します。
 `SUCCESS`・`FAILURE`・`CANCELLED`・`SKIPPED`・`TIMED_OUT`を、それぞれ小文字の`conclusion`として保存します。
 `WAITING`・`QUEUED`・`IN_PROGRESS`は、APIを呼び出す前に`ArgumentError`にします。
 HTTP失敗や通信・変換エラーは`StateError`にし、レスポンス本文や元の例外メッセージは含めません。
-自動再送は行いません。job本体の更新は`completeBuildJob()`で行います。起動処理への組み込みはまだ行いません。
+自動再送は行いません。job本体の更新は`completeBuildJob()`で行います。
 
 `completeBuildJob(api: api, jobId: job.id, status: status, completedAt: completedAt)`は、既存APIでjobの終了状態と終了時刻を保存します。
 `status`は`SUCCESS`などの大文字で送り、呼び出し元から受け取った`completedAt`はUTCのISO 8601形式に変換します。
 受け付ける状態・APIエラーの扱いは`completeBuildRun()`と同じです。
-自動再送は行いません。GitHub Checksの更新は`completeGitHubCheckRun()`で行います。起動処理への組み込みはまだ行いません。
+自動再送は行いません。GitHub Checksの更新は`completeGitHubCheckRun()`で行います。
 
 `completeGitHubCheckRun(api: api, jobId: job.id, status: status)`は、サーバー経由でjobに紐づくGitHub Checkを`completed`に更新します。
 終了結果は`completeBuildRun()`と同じ小文字の`conclusion`で送り、GitHub Checkの終了時刻はサーバー側で設定します。
 受け付ける状態・APIエラーの扱いは`completeBuildRun()`と同じです。自動再送は行いません。
-起動処理への組み込みはまだ行いません。
 
 `resolveGitHubInstallationToken(api: api, jobId: job.id)`は、既存の`OpenCiApiService`からjob用のGitHubトークンを取得して返します。
 API失敗やトークンの欠落・空文字・型不正は`StateError`にし、レスポンス本文や元の例外メッセージは含めません。
-返されたトークンを`checkoutRepository()`へ渡します。起動処理への組み込みはまだ行いません。
+返されたトークンを`checkoutRepository()`へ渡します。
 
 `checkoutRepository()`は、引数で受け取ったGitHubトークンを使い、VMの`/tmp/workspace`へソースを取得します。
 取得先はjobのコミットSHA、PRのhead ref、ブランチ（未指定なら`develop`）の順で決め、取得失敗はエラーにします。
 `writeFile()`でスクリプトを配置し、`executeCommand()`で実行して`step_id: checkout`のログをLokiへ送ります。
 トークンは取得時のHTTPヘッダーだけに設定し、remote URLには保存しません。スクリプトは権限`600`で配置し、実行終了時に削除します。
-`workspacePath`で配置先を変更できます。起動処理への組み込みはまだ行いません。
+`workspacePath`で配置先を変更できます。
 
 `fetchJobSecrets(api: api, jobId: job.id)`は、既存APIから`secretsContent`を取得して加工せず返します。
 HTTP成功・`success: true`・`secretsContent`が文字列であることを確認し、空文字列もそのまま返します。
 API失敗や不正な応答は`StateError`にし、レスポンス本文や元の例外メッセージは含めません。
-返された文字列を`runWorkflow()`の`secretsContent`へ渡します。起動処理への組み込みはまだ行いません。
+返された文字列を`runWorkflow()`の`secretsContent`へ渡します。
 
 `runWorkflow()`は、checkout済みのVMで`flutter pub get`と`flutter pub run genuine_ci/<workflowFileName>`を順に実行し、終了コードを返します。
 `secretsContent`はAPIと同じ`NAME=value`形式で渡し、secretsがない場合は空文字列を渡します。
@@ -97,7 +96,7 @@ API失敗や不正な応答は`StateError`にし、レスポンス本文や元�
 `vmHomePath`（標準`/Users/admin`）配下の`fvm/default`をFlutterに使い、run・job IDとVM用Loki URLを設定します。
 `lokiUrl: config.internalLokiUrl`はworkerのログ送信先、`vmLokiUrl: config.lokiUrl`はVM内のワークフローの送信先です。
 stdout・stderrは`step_id: run_workflow`でLokiへ送り、送信待ちが終わってから終了コードを返します。書き込み・Orchard通信の失敗は例外、Loki送信の失敗は`onLogError`へ通知します。
-実行終了時に`.env`と実行スクリプトを削除します。起動処理への組み込みはまだ行いません。
+実行終了時に`.env`と実行スクリプトを削除します。
 
 `executeBuildJob(api: api, orchardApi: orchardApi, lokiClient: lokiClient, config: config, job: job, onError: onError)`は、claim済みの`IN_PROGRESS`のjobを1件実行します。
 run IDとVM名を生成し、run作成、GitHubトークン取得、VM準備、checkout、secrets取得、ワークフロー実行を順に行います。
@@ -107,7 +106,7 @@ VM準備に成功した場合は`finally`でVMの削除を試みます。起動�
 結果保存とVM削除はそれぞれ失敗しても後続処理を続け、1処理の待ち時間は`finalizationTimeout`（標準10秒）で制限します。自動再送は行いません。
 返り値は実行結果の`BuildJobStatus`です。結果保存やVM削除の失敗によって、この実行結果は変更しません。
 ログ送信の失敗は発生時に、それ以外の例外は終了処理を試みた後に`onError`へ通知します。このコールバックは例外を投げずに記録してください。
-クライアントの生成・共有・終了処理は呼び出し元で行います。起動処理への組み込み、キャンセル監視、job全体のタイムアウトはまだ行いません。
+クライアントの生成・共有・終了処理は呼び出し元で行います。キャンセル監視、job全体のタイムアウトはまだ行いません。
 
 `runBuildJobWorker(api: api, executeJob: executeJob, shouldStop: shouldStop, onError: onError)`は、jobの取得と実行を順番に繰り返します。
 `executeJob`には`executeBuildJob()`を呼ぶ関数を渡します。結果保存・VM削除を含む実行関数の終了を待ってから次のjobを取得するため、jobの同時実行は1件です。
@@ -115,7 +114,7 @@ jobがない場合と、取得・実行関数が例外を投げた場合は、`p
 実行関数が`FAILURE`を返した場合もループを継続します。同じjobの自動再実行は行いません。
 ループで捕捉した例外は`onError`へ通知します。`executeBuildJob()`内で捕捉する例外は、そちらへ渡した`onError`で記録してください。コールバックは例外を投げないようにしてください。
 `shouldStop`が`true`なら新たなjob取得を止めます。取得待ち中に停止要求が来ても、取得できたjobは実行と後片付けを終えてから停止します。
-待機中の停止要求は待機終了後に確認します。クライアントの生成・終了、OSの終了シグナルとの接続、起動処理への組み込みは呼び出し元で行います。
+待機中の停止要求は待機終了後に確認します。クライアントの生成・終了とOSの終了シグナルとの接続は`main.dart`で行います。
 
 ## 実行
 
@@ -124,10 +123,17 @@ jobがない場合と、取得・実行関数が例外を投げた場合は、`p
 ```sh
 OPENCI_SERVER_URL=http://localhost:8080 \
 INTERNAL_API_KEY=local-development-key \
+ORCHARD_API_URL=https://localhost:6120 \
 ORCHARD_SERVICE_ACCOUNT_NAME=bootstrap-admin \
 ORCHARD_SERVICE_ACCOUNT_TOKEN=local-development-token \
+LOKI_URL=http://localhost:3100 \
 dart run bin/main.dart
 ```
+
+起動後はjobを継続して取得します。取得・実行中の例外は標準エラー出力へ記録します。
+`SIGTERM`または`SIGINT`（Ctrl+C）で新しいjobの取得を止め、取得済みjobの結果保存・VM削除を試みてからクライアントを閉じます。
+空キューの待機中なら最大3秒、job取得・実行中ならその処理が終わるまで待ちます。
+停止シグナルによる正常終了は終了コード0、設定・起動に失敗した場合は終了コード1です。
 
 ## 検証
 
@@ -135,6 +141,7 @@ dart run bin/main.dart
 ファイル書き込みテストはmacOSまたはLinuxの`/bin/sh`と`base64`を使い、一時ディレクトリ内で検証します。
 checkoutテストはローカルの`git`も使い、一時リポジトリで取得結果を検証します。
 ワークフローのテストは一時ディレクトリ内のテスト用Flutterコマンドで、環境変数・実行順・終了コードを検証します。
+起動テストは子プロセスとローカルの偽APIで、認証・ログ送信・結果保存・停止時の後片付けを検証します。停止シグナルのテストはmacOS・Linux向けです。
 
 ```sh
 dart format --output=none --set-exit-if-changed .
