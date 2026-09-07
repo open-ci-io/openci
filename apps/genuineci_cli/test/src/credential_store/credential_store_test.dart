@@ -145,4 +145,45 @@ void main() {
     expect(configStr, contains('token: ***'));
     expect(configStr, isNot(contains('super-secret-api-key-12345')));
   });
+
+  test(
+    'deleting an inactive profile preserves the active profile after reload',
+    () async {
+      const active = AuthProfile(
+        serverUrl: 'https://ci.example.test',
+        token: 'active-token',
+      );
+      const inactive = AuthProfile(
+        serverUrl: 'http://localhost:8080',
+        token: 'local-token',
+      );
+      await store.saveProfile('prod', active);
+      await store.saveProfile('local', inactive, setActive: false);
+
+      expect(await store.deleteProfile('local'), isTrue);
+      final reloaded = CredentialStore(customFilePath: store.filePath);
+      expect(await reloaded.getActiveProfile(), active);
+      expect((await reloaded.get()).activeProfile, 'prod');
+      expect(await reloaded.getProfile('local'), isNull);
+    },
+  );
+
+  test('deleting the active profile selects a remaining profile', () async {
+    const prod = AuthProfile(
+      serverUrl: 'https://ci.example.test',
+      token: 'prod-token',
+    );
+    const local = AuthProfile(
+      serverUrl: 'http://localhost:8080',
+      token: 'local-token',
+    );
+    await store.saveProfile('prod', prod);
+    await store.saveProfile('local', local);
+
+    expect(await store.deleteProfile('local'), isTrue);
+    final reloaded = CredentialStore(customFilePath: store.filePath);
+    expect(await reloaded.getActiveProfile(), prod);
+    expect((await reloaded.get()).activeProfile, 'prod');
+    expect(await reloaded.getProfile('local'), isNull);
+  });
 }

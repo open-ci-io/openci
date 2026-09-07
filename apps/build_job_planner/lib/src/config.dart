@@ -13,11 +13,12 @@ class Config {
   final String internalApiKey;
   final String? sentryDsn;
 
-  factory Config.fromEnvironment() {
+  factory Config.fromEnvironment({Map<String, String>? environment}) {
+    final env = environment ?? Platform.environment;
     return Config(
-      serverUrl: getRequiredEnv('OPENCI_SERVER_URL'),
-      internalApiKey: getRequiredEnv('INTERNAL_API_KEY'),
-      sentryDsn: Platform.environment['SENTRY_DSN'],
+      serverUrl: getRequiredEnv('OPENCI_SERVER_URL', environment: env),
+      internalApiKey: getRequiredEnv('INTERNAL_API_KEY', environment: env),
+      sentryDsn: env['SENTRY_DSN'],
     );
   }
 }
