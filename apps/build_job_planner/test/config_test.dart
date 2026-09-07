@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:build_job_planner/src/config.dart';
 import 'package:test/test.dart';
 
@@ -6,6 +8,30 @@ void main() {
     'OPENCI_SERVER_URL': 'https://ci.example.test/api',
     'INTERNAL_API_KEY': 'planner-test-key',
   };
+
+  test('uses the process environment when no environment is supplied', () {
+    final environment = Platform.environment;
+    for (final key in requiredEnvironment.keys) {
+      if (environment[key] == null || environment[key]!.isEmpty) {
+        expect(
+          Config.fromEnvironment,
+          throwsA(
+            isA<StateError>().having(
+              (error) => error.message,
+              'message',
+              'Required environment variable $key is not set.',
+            ),
+          ),
+        );
+        return;
+      }
+    }
+
+    final config = Config.fromEnvironment();
+    expect(config.serverUrl == environment['OPENCI_SERVER_URL'], isTrue);
+    expect(config.internalApiKey == environment['INTERNAL_API_KEY'], isTrue);
+    expect(config.sentryDsn == environment['SENTRY_DSN'], isTrue);
+  });
 
   test('loads required settings without requiring Sentry', () {
     final config = Config.fromEnvironment(environment: requiredEnvironment);
