@@ -3,7 +3,7 @@
 OpenCIのビルドjobを実行するDartバックエンドサービス。
 最終的にはComposeから起動する常駐プロセスとして動作させます。
 
-現在は設定の読み込み、jobを1件取得する関数、OrchardのVM準備・削除・コマンド実行、Lokiへのログ送信、ソースのcheckout・ワークフロー実行を実装しています。
+現在は設定の読み込み、jobを1件取得する関数、OrchardのVM準備・削除・コマンド実行、Lokiへのログ送信、GitHubトークンの取得、ソースのcheckout・ワークフロー実行を実装しています。
 起動すると設定を確認して終了し、job取得関数はまだ起動処理から呼び出しません。
 そのため、起動時の外部API接続・VM操作は行いません。
 既存dispatcher/executorやComposeの起動構成も変更していません。
@@ -52,11 +52,15 @@ HTTPクライアントは呼び出し元で共有し、使用後に閉じます�
 書き込み・権限変更の終了コードが0以外ならエラーにします。
 ファイル内容を含むコマンドや出力はログへ送らず、通信・実行例外にも内容を含めません。
 
+`resolveGitHubInstallationToken(api: api, jobId: job.id)`は、既存の`OpenCiApiService`からjob用のGitHubトークンを取得して返します。
+API失敗やトークンの欠落・空文字・型不正は`StateError`にし、レスポンス本文や元の例外メッセージは含めません。
+返されたトークンを`checkoutRepository()`へ渡します。起動処理への組み込みはまだ行いません。
+
 `checkoutRepository()`は、引数で受け取ったGitHubトークンを使い、VMの`/tmp/workspace`へソースを取得します。
 取得先はjobのコミットSHA、PRのhead ref、ブランチ（未指定なら`develop`）の順で決め、取得失敗はエラーにします。
 `writeFile()`でスクリプトを配置し、`executeCommand()`で実行して`step_id: checkout`のログをLokiへ送ります。
 トークンは取得時のHTTPヘッダーだけに設定し、remote URLには保存しません。スクリプトは権限`600`で配置し、実行終了時に削除します。
-`workspacePath`で配置先を変更できます。トークン取得や起動処理への組み込みはまだ行いません。
+`workspacePath`で配置先を変更できます。起動処理への組み込みはまだ行いません。
 
 `runWorkflow()`は、checkout済みのVMで`flutter pub get`と`flutter pub run genuine_ci/<workflowFileName>`を順に実行し、終了コードを返します。
 `secretsContent`はAPIと同じ`NAME=value`形式で渡し、secretsがない場合は空文字列を渡します。
