@@ -383,14 +383,30 @@ Future<void> main() async {
       endpoint: githubApiBaseUrl,
       client: client,
     );
-    final slug = RepositorySlug(owner, repo);
+    Future<RepositoryContents> getContents(String path) {
+      // getContents in github.dart does not validate the HTTP status. Require
+      // 200 here so a missing directory is reported as NotFound.
+      return github.getJSON<dynamic, RepositoryContents>(
+        '/repos/$owner/$repo/contents/$path',
+        statusCode: HttpStatus.ok,
+        params: {'ref': commitSha},
+        convert: (data) => data is List
+            ? RepositoryContents(
+                tree: data
+                    .map(
+                      (item) =>
+                          GitHubFile.fromJson(item as Map<String, dynamic>),
+                    )
+                    .toList(),
+              )
+            : RepositoryContents(
+                file: GitHubFile.fromJson(data as Map<String, dynamic>),
+              ),
+      );
+    }
 
     try {
-      final contents = await github.repositories.getContents(
-        slug,
-        'genuine_ci',
-        ref: commitSha,
-      );
+      final contents = await getContents('genuine_ci');
 
       final files = <GenuineCiFile>[];
       if (contents.isDirectory && contents.tree != null) {
@@ -401,11 +417,7 @@ Future<void> main() async {
           if (fileName != null &&
               filePath != null &&
               fileName.endsWith('.dart')) {
-            final fileContents = await github.repositories.getContents(
-              slug,
-              filePath,
-              ref: commitSha,
-            );
+            final fileContents = await getContents(filePath);
             final text = fileContents.file?.text;
             if (text != null) {
               files.add(

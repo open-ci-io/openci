@@ -43,9 +43,25 @@ jobs:
               apps/openci_server/lib
               apps/openci_server/routes
               apps/openci_server/test
+              apps/openci_server/integration_test
           - app: openci_shared
             path: packages/openci_shared
             format_paths: packages/openci_shared
+
+    services:
+      postgres:
+        image: ${{ matrix.app == 'openci_server' && 'postgres:16-alpine' || '' }}
+        env:
+          POSTGRES_DB: openci_test
+          POSTGRES_USER: openci_test
+          POSTGRES_PASSWORD: openci_test
+        ports:
+          - 5432/tcp
+        options: >-
+          --health-cmd "pg_isready -U openci_test -d openci_test"
+          --health-interval 2s
+          --health-timeout 2s
+          --health-retries 10
 
     steps:
       - name: Checkout repository
@@ -73,8 +89,18 @@ jobs:
         run: flutter analyze --no-pub ${{ matrix.path }}
 
       - name: Run unit tests with coverage
+        if: matrix.app != 'openci_server'
         working-directory: ${{ matrix.path }}
         run: flutter test --coverage --no-pub
+
+      - name: Run server tests with lib and routes coverage
+        if: matrix.app == 'openci_server'
+        working-directory: ${{ matrix.path }}
+        env:
+          TEST_DATABASE_URL: postgres://openci_test:openci_test@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/openci_test?sslmode=disable
+        run: |
+          dart test test integration_test --coverage=coverage/raw
+          dart run coverage:format_coverage --lcov --in=coverage/raw --out=coverage/lcov.info --report-on=lib --report-on=routes --base-directory=.
 
       - name: Run worker startup tests
         if: matrix.app == 'build_job_worker'

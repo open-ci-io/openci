@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:openci_server/build_job/build_job_dao.dart';
 import 'package:openci_server/database.dart';
@@ -19,6 +20,227 @@ void main() {
     tearDown(() async {
       await db.close();
     });
+
+    test(
+      'successful macOS queries filter jobs and sort by completion time',
+      () async {
+        final old = _job('old').copyWith(
+          status: BuildJobStatus.SUCCESS,
+          branch: const Value('develop'),
+          runsOn: const Value('macos-latest'),
+          completedAt: Value(DateTime.utc(2026, 9, 1, 0, 1)),
+        );
+        final latest = old.copyWith(
+          id: 'latest',
+          createdAt: old.createdAt.subtract(const Duration(hours: 1)),
+          completedAt: Value(DateTime.utc(2026, 9, 1, 0, 2)),
+        );
+        for (final job in [
+          latest,
+          old,
+          latest.copyWith(id: 'wrong-owner', owner: 'other'),
+          latest.copyWith(id: 'wrong-repo', repo: 'other'),
+          latest.copyWith(id: 'failed', status: BuildJobStatus.FAILURE),
+          latest.copyWith(id: 'linux', runsOn: const Value('ubuntu-latest')),
+          latest.copyWith(id: 'main', branch: const Value('main')),
+          latest.copyWith(id: 'no-runner', runsOn: const Value(null)),
+        ]) {
+          await dao.insertBuildJob(job);
+        }
+
+        expect(
+          (await dao.getLatestSuccessfulMacosJob(
+            owner: 'openci-org',
+            repo: 'openci',
+          ))?.id,
+          'latest',
+        );
+        expect(
+          (await dao.getRecentSuccessfulMacosJobs(
+            owner: 'openci-org',
+            repo: 'openci',
+          )).map((job) => job.id),
+          ['latest', 'old'],
+        );
+        expect(
+          (await dao.getRecentSuccessfulMacosJobs(
+            owner: 'openci-org',
+            repo: 'openci',
+            limit: 1,
+          )).map((job) => job.id),
+          ['latest'],
+        );
+        expect(
+          await dao.getLatestSuccessfulMacosJob(
+            owner: 'missing',
+            repo: 'openci',
+          ),
+          isNull,
+        );
+        expect(
+          await dao.getRecentSuccessfulMacosJobs(
+            owner: 'missing',
+            repo: 'openci',
+          ),
+          isEmpty,
+        );
+      },
+    );
+
+    test('team queries apply IPA filters and limits after sorting', () async {
+      for (final job in [
+        _job('ipa').copyWith(hasIpa: const Value(true)),
+        _job('no-ipa').copyWith(
+          hasIpa: const Value(false),
+          createdAt: DateTime.utc(2026, 9, 2),
+        ),
+        _job('unknown-ipa').copyWith(createdAt: DateTime.utc(2026, 9, 3)),
+        _job('other-team').copyWith(teamId: const Value('other-team')),
+      ]) {
+        await dao.insertBuildJob(job);
+      }
+
+      expect(
+        (await dao.getBuildJobsForTeam(teamId: 'team-a')).map((job) => job.id),
+        ['unknown-ipa', 'no-ipa', 'ipa'],
+      );
+      expect(
+        (await dao.getBuildJobsForTeam(
+          teamId: 'team-a',
+          limit: 1,
+        )).map((job) => job.id),
+        ['unknown-ipa'],
+      );
+      expect(
+        (await dao.getBuildJobsForTeam(
+          teamId: 'team-a',
+          hasIpa: true,
+          limit: 1,
+        )).map((job) => job.id),
+        ['ipa'],
+      );
+      expect(
+        (await dao.getBuildJobsForTeam(
+          teamId: 'team-a',
+          hasIpa: false,
+        )).map((job) => job.id),
+        ['no-ipa'],
+      );
+      expect(await dao.getBuildJobsForTeam(teamId: 'missing'), isEmpty);
+    });
+
+    test('team watch updates the filtered and limited result', () async {
+      final old = _job('old').copyWith(hasIpa: const Value(true));
+      final newest = _job(
+        'newest',
+      ).copyWith(createdAt: DateTime.utc(2026, 9, 2));
+      await dao.insertBuildJob(old);
+      await dao.insertBuildJob(newest);
+      await dao.insertBuildJob(
+        _job('other-team').copyWith(
+          teamId: const Value('other-team'),
+          hasIpa: const Value(true),
+          createdAt: DateTime.utc(2026, 9, 3),
+        ),
+      );
+      final updates = StreamIterator(
+        dao.watchBuildJobsForTeam(teamId: 'team-a', hasIpa: true, limit: 1),
+      );
+      addTearDown(updates.cancel);
+
+      expect(await updates.moveNext(), isTrue);
+      expect(updates.current.map((job) => job.id), ['old']);
+      await dao.updateBuildJob(newest.copyWith(hasIpa: const Value(true)));
+      expect(await updates.moveNext(), isTrue);
+      expect(updates.current.map((job) => job.id), ['newest']);
+      await dao.updateBuildJob(newest.copyWith(hasIpa: const Value(false)));
+      expect(await updates.moveNext(), isTrue);
+      expect(updates.current.map((job) => job.id), ['old']);
+    });
+
+    test('queued queries remove jobs when their status changes', () async {
+      final queued = _job('queued');
+      await dao.insertBuildJob(queued);
+      await dao.insertBuildJob(
+        _job('running').copyWith(status: BuildJobStatus.IN_PROGRESS),
+      );
+      await dao.insertBuildJob(
+        _job('waiting').copyWith(status: BuildJobStatus.WAITING),
+      );
+      final updates = StreamIterator(dao.watchQueuedJobs());
+      addTearDown(updates.cancel);
+
+      expect((await dao.getQueuedJobs()).map((job) => job.id), ['queued']);
+      expect(await updates.moveNext(), isTrue);
+      expect(updates.current.map((job) => job.id), ['queued']);
+      await dao.updateBuildJob(
+        queued.copyWith(status: BuildJobStatus.IN_PROGRESS),
+      );
+      expect(await updates.moveNext(), isTrue);
+      expect(updates.current, isEmpty);
+      expect(await dao.getQueuedJobs(), isEmpty);
+    });
+
+    test('incrementRunCount starts a null count at one', () async {
+      await dao.insertBuildJob(_job('first-run'));
+      final updatedAt = DateTime.utc(2026, 9, 2);
+
+      await dao.incrementRunCount(
+        id: 'first-run',
+        latestRunId: 'run-1',
+        updatedAt: updatedAt,
+      );
+
+      final job = (await dao.getBuildJob('first-run'))!;
+      expect(job.runCount, 1);
+      expect(job.latestRunId, 'run-1');
+      expect(job.updatedAt.toUtc(), updatedAt);
+    });
+
+    test(
+      'steps are ordered within a run and upsert preserves a single row',
+      () async {
+        final first = DriftBuildStep(
+          id: 'first',
+          runId: 'run-a',
+          name: 'Checkout',
+          status: BuildJobStatus.IN_PROGRESS,
+          durationMs: 0,
+          stepOrder: 0,
+          createdAt: DateTime.utc(2026, 9, 1),
+          updatedAt: DateTime.utc(2026, 9, 1),
+        );
+        await dao.insertBuildStep(first.copyWith(id: 'second', stepOrder: 1));
+        await dao.insertBuildStep(
+          first.copyWith(id: 'other-run', runId: 'run-b'),
+        );
+        await dao.insertBuildStep(first);
+        await dao.insertBuildStep(
+          first.copyWith(status: BuildJobStatus.SUCCESS, durationMs: 10),
+        );
+
+        final steps = await dao.getBuildSteps('run-a');
+        expect(steps.map((step) => step.id), ['first', 'second']);
+        expect(steps.first.status, BuildJobStatus.SUCCESS);
+        expect(steps.first.durationMs, 10);
+        expect(await dao.getBuildSteps('missing'), isEmpty);
+      },
+    );
+
+    test(
+      'step logs preserve insertion order and stay within their step',
+      () async {
+        await dao.insertBuildStepLog('step-a', 'first');
+        await dao.insertBuildStepLog('step-b', 'unrelated');
+        await dao.insertBuildStepLog('step-a', 'second');
+
+        expect(
+          (await dao.getBuildStepLogs('step-a')).map((log) => log.logContent),
+          ['first', 'second'],
+        );
+        expect(await dao.getBuildStepLogs('missing'), isEmpty);
+      },
+    );
 
     test('Job CRUD Operations', () async {
       final now = DateTime.now().toUtc();
@@ -173,3 +395,15 @@ void main() {
     );
   });
 }
+
+DriftBuildJob _job(String id) => DriftBuildJob(
+  id: id,
+  teamId: 'team-a',
+  status: BuildJobStatus.QUEUED,
+  owner: 'openci-org',
+  repo: 'openci',
+  workflowName: 'CI',
+  workflowFileName: 'ci.dart',
+  createdAt: DateTime.utc(2026, 9, 1),
+  updatedAt: DateTime.utc(2026, 9, 1),
+);
