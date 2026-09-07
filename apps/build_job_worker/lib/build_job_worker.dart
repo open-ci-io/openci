@@ -1,6 +1,7 @@
 export 'src/checkout_repository.dart';
 export 'src/claim_next_build_job.dart';
 export 'src/config.dart';
+export 'src/create_build_run.dart';
 export 'src/fetch_job_secrets.dart';
 export 'src/loki/push_log_to_loki.dart';
 export 'src/orchard/execute_command.dart';
