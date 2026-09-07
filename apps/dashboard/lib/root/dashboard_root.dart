@@ -6,7 +6,6 @@ import 'package:dashboard/extensions/circular_progress_indicator_extensions.dart
 import 'package:dashboard/firebase/firebase_config_provider.dart';
 import 'package:dashboard/secret_manager/secret_manager_page.dart';
 import 'package:dashboard/settings/settings_page.dart';
-import 'package:dashboard/store_release/store_release_page.dart';
 import 'package:dashboard/team/selected_team_provider.dart';
 import 'package:dashboard/team/switch_team_bottom_sheet.dart';
 import 'package:dashboard/team/team_provider.dart';
@@ -92,11 +91,6 @@ class DashboardRoot extends HookWidget {
             label: 'シークレット',
           ),
           NavigationDestination(
-            icon: Icon(Icons.rocket_launch_outlined),
-            selectedIcon: Icon(Icons.rocket_launch_rounded),
-            label: 'ストアリリース',
-          ),
-          NavigationDestination(
             icon: Icon(Icons.settings_outlined),
             selectedIcon: Icon(Icons.settings_rounded),
             label: '設定',
@@ -109,7 +103,6 @@ class DashboardRoot extends HookWidget {
           children: [
             const CicdLogsPage(),
             const SecretManagerPage(),
-            const StoreReleasePage(),
             SettingsPage(onSwitchTeam: onSwitchTeam),
           ],
         ),

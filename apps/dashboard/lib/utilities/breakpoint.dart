@@ -1,8 +1,7 @@
 enum Breakpoint {
   mobile(0),
   tablet(600),
-  desktop(840)
-  ;
+  desktop(840);
 
   const Breakpoint(this.width);
 

@@ -7,8 +7,7 @@ enum ChipStatus {
   fail,
   success,
   cancelled,
-  skipped
-  ;
+  skipped;
 
   Color get backgroundColor => switch (this) {
     ChipStatus.queued => const Color(0xFFF4F7FF),

@@ -43,14 +43,14 @@ void main() {
     );
   }
 
-  testWidgets('uses a dialog on desktop width', (tester) async {
+  testWidgets('uses a bottom sheet on desktop width', (tester) async {
     await pumpModalHost(tester, const Size(900, 700));
 
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
 
-    check(find.byType(Dialog)).findsOneWidget();
-    check(find.byType(BottomSheet)).findsNothing();
+    check(find.byType(Dialog)).findsNothing();
+    check(find.byType(BottomSheet)).findsOneWidget();
     check(find.text('modal content')).findsOneWidget();
   });
 
