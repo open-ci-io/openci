@@ -3,7 +3,7 @@
 OpenCIのビルドjobを実行するDartバックエンドサービス。
 最終的にはComposeから起動する常駐プロセスとして動作させます。
 
-現在は設定の読み込み、jobを1件取得する関数、runの作成・完了記録、OrchardのVM準備・削除・コマンド実行、Lokiへのログ送信、GitHubトークン・secretsの取得、ソースのcheckout・ワークフロー実行を実装しています。
+現在は設定の読み込み、jobを1件取得する関数、runの作成・完了記録、jobの完了記録、OrchardのVM準備・削除・コマンド実行、Lokiへのログ送信、GitHubトークン・secretsの取得、ソースのcheckout・ワークフロー実行を実装しています。
 起動すると設定を確認して終了し、job取得関数はまだ起動処理から呼び出しません。
 そのため、起動時の外部API接続・VM操作は行いません。
 既存dispatcher/executorやComposeの起動構成も変更していません。
@@ -61,7 +61,12 @@ HTTP失敗（run ID重複の409を含む）や通信・変換エラーは`StateE
 `SUCCESS`・`FAILURE`・`CANCELLED`・`SKIPPED`・`TIMED_OUT`を、それぞれ小文字の`conclusion`として保存します。
 `WAITING`・`QUEUED`・`IN_PROGRESS`は、APIを呼び出す前に`ArgumentError`にします。
 HTTP失敗や通信・変換エラーは`StateError`にし、レスポンス本文や元の例外メッセージは含めません。
-自動再送は行いません。job本体・GitHub Checksの結果更新と起動処理への組み込みはまだ行いません。
+自動再送は行いません。job本体の更新は`completeBuildJob()`で行います。起動処理への組み込みはまだ行いません。
+
+`completeBuildJob(api: api, jobId: job.id, status: status, completedAt: completedAt)`は、既存APIでjobの終了状態と終了時刻を保存します。
+`status`は`SUCCESS`などの大文字で送り、呼び出し元から受け取った`completedAt`はUTCのISO 8601形式に変換します。
+受け付ける状態・APIエラーの扱いは`completeBuildRun()`と同じです。
+自動再送は行いません。GitHub Checksの更新・依存jobへの完了通知と起動処理への組み込みはまだ行いません。
 
 `resolveGitHubInstallationToken(api: api, jobId: job.id)`は、既存の`OpenCiApiService`からjob用のGitHubトークンを取得して返します。
 API失敗やトークンの欠落・空文字・型不正は`StateError`にし、レスポンス本文や元の例外メッセージは含めません。
