@@ -311,4 +311,3 @@ bool _isNoiseLine(String line) {
   ];
   return prefixes.any(trimmed.startsWith);
 }
-

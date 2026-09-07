@@ -39,7 +39,7 @@ class DashboardRouteGateway extends ConsumerWidget {
           loading: () =>
               const CircularProgressIndicator.adaptive().withScaffoldCenter(),
           error: asyncErrorWidget,
-          data: (_, selectedTeamId, team) {
+          data: (_, selectedTeamId, _) {
             if (selectedTeamId == null) {
               FirebaseAuth.instance.signOut();
               throw Exception("No team selected");
@@ -47,8 +47,6 @@ class DashboardRouteGateway extends ConsumerWidget {
 
             return DashboardRoot(
               key: ValueKey(selectedTeamId),
-              workspaceId: selectedTeamId,
-              workspaceName: team.name,
               onSwitchTeam: () => showTeamFlowModal(context),
             );
           },
@@ -61,13 +59,9 @@ class DashboardRouteGateway extends ConsumerWidget {
 class DashboardRoot extends HookWidget {
   const DashboardRoot({
     super.key,
-    this.workspaceId = '',
-    this.workspaceName = 'OpenCI team',
     this.onSwitchTeam,
   });
 
-  final String workspaceId;
-  final String workspaceName;
   final VoidCallback? onSwitchTeam;
 
   @override

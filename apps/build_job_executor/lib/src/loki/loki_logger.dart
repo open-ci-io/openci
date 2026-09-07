@@ -5,10 +5,8 @@ class LokiLogger {
   final String lokiUrl;
   final HttpClient _client;
 
-  LokiLogger({
-    required this.lokiUrl,
-    HttpClient? client,
-  }) : _client = client ?? HttpClient();
+  LokiLogger({required this.lokiUrl, HttpClient? client})
+    : _client = client ?? HttpClient();
 
   Future<void> pushLog({
     required String runId,
@@ -27,8 +25,8 @@ class LokiLogger {
       'type': type,
       'run_id': runId,
       'build_job_id': jobId,
-      if (stepId != null) 'step_id': stepId,
-      if (command != null) 'command': command,
+      'step_id': ?stepId,
+      'command': ?command,
     };
 
     final payload = {

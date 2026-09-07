@@ -10,10 +10,6 @@ class OrchardVmService {
 
   OrchardVmService({required this.apiClient});
 
-  String generateVmName(String jobId) {
-    return 'orchard-vm-$jobId';
-  }
-
   Future<void> prepare({
     required String baseInstanceName,
     required String containerName,

@@ -13,14 +13,12 @@ dependencies:
   flutter:
     sdk: flutter
   meta: ^1.17.0
-  plugin_platform_interface: ^2.1.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   pigeon: ^26.0.1
-  checks: ^0.3.1
 
 flutter:
   plugin:

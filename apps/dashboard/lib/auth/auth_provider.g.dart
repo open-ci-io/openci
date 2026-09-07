@@ -190,47 +190,6 @@ final class CurrentUserProvider extends $FunctionalProvider<User?, User?, User?>
 
 String _$currentUserHash() => r'a5bcb438e190bbc8fe821cc39d43e5c28ad9997c';
 
-@ProviderFor(currentUserEmail)
-final currentUserEmailProvider = CurrentUserEmailProvider._();
-
-final class CurrentUserEmailProvider
-    extends $FunctionalProvider<String?, String?, String?>
-    with $Provider<String?> {
-  CurrentUserEmailProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'currentUserEmailProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$currentUserEmailHash();
-
-  @$internal
-  @override
-  $ProviderElement<String?> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  String? create(Ref ref) {
-    return currentUserEmail(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(String? value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<String?>(value),
-    );
-  }
-}
-
-String _$currentUserEmailHash() => r'eff4523829003dfe02feefab3a0b12624e175f68';
-
 @ProviderFor(currentUserId)
 final currentUserIdProvider = CurrentUserIdProvider._();
 
@@ -271,45 +230,3 @@ final class CurrentUserIdProvider
 }
 
 String _$currentUserIdHash() => r'4173c6d82d4354012bae7868e0778e83f6502ecb';
-
-@ProviderFor(nonNullCurrentUserId)
-final nonNullCurrentUserIdProvider = NonNullCurrentUserIdProvider._();
-
-final class NonNullCurrentUserIdProvider
-    extends $FunctionalProvider<String, String, String>
-    with $Provider<String> {
-  NonNullCurrentUserIdProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'nonNullCurrentUserIdProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$nonNullCurrentUserIdHash();
-
-  @$internal
-  @override
-  $ProviderElement<String> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  String create(Ref ref) {
-    return nonNullCurrentUserId(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(String value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<String>(value),
-    );
-  }
-}
-
-String _$nonNullCurrentUserIdHash() =>
-    r'1a39f6dc8b12e282ff7eae3ba134af3cc60e6e99';
