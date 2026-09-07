@@ -1,14 +1,11 @@
-import 'package:args/command_runner.dart';
-import 'package:cli_util/cli_logging.dart';
 import 'package:genuineci_cli/genuineci_cli.dart';
 import 'package:test/test.dart';
 
 void main() {
-  late CommandRunner<int> runner;
+  late GenuineCiCommandRunner runner;
 
   setUp(() {
-    runner = CommandRunner<int>('genuineci', 'CLI tool');
-    runner.addCommand(DevCommand(logger: Logger.standard()));
+    runner = GenuineCiCommandRunner();
   });
 
   test('dev command is registered with name dev and valid description', () {
