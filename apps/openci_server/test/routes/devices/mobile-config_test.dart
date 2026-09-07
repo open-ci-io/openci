@@ -179,7 +179,7 @@ void main() {
     test(
       'successfully updates an existing device on conflict (upsert)',
       () async {
-        await db.deviceDao.createDevice(
+        await db.deviceDao.upsertDevice(
           userId: 'user-123',
           teamId: 'team-123',
           udid: 'test-udid-456-longer-than-25-chars',

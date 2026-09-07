@@ -33,16 +33,4 @@ Stream<User?> authStateChanges(Ref ref) =>
 User? currentUser(Ref ref) => ref.watch(firebaseAuthProvider).currentUser;
 
 @riverpod
-String? currentUserEmail(Ref ref) => ref.watch(currentUserProvider)?.email;
-
-@riverpod
 String? currentUserId(Ref ref) => ref.watch(currentUserProvider)?.uid;
-
-@riverpod
-String nonNullCurrentUserId(Ref ref) {
-  final id = ref.watch(currentUserIdProvider);
-  if (id == null) {
-    throw StateError('User is not authenticated');
-  }
-  return id;
-}

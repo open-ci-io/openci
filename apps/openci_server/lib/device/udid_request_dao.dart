@@ -16,10 +16,4 @@ class UdidRequestDao extends DatabaseAccessor<AppDatabase>
   Future<List<DriftUdidRequest>> getRequestsByTeamId(String teamId) {
     return (select(udidRequests)..where((r) => r.teamId.equals(teamId))).get();
   }
-
-  Future<DriftUdidRequest?> getRequestById(String id) {
-    return (select(
-      udidRequests,
-    )..where((r) => r.id.equals(id))).getSingleOrNull();
-  }
 }

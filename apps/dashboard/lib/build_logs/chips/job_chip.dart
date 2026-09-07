@@ -7,12 +7,10 @@ class JobChip extends StatelessWidget {
     super.key,
     required this.label,
     required this.status,
-    this.durationWidget,
   });
 
   final String label;
   final ChipStatus status;
-  final Widget? durationWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +24,6 @@ class JobChip extends StatelessWidget {
           StatusIcon(status: status),
           const SizedBox(width: 5),
           Text(label),
-          ?durationWidget,
         ],
       ),
     );

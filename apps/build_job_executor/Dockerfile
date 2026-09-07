@@ -17,17 +17,11 @@ RUN dart compile exe bin/main.dart -o processor
 FROM debian:bookworm-slim
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends openssh-client sshpass && \
+    apt-get install -y --no-install-recommends ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
 RUN groupadd -g 10001 appgroup && \
-    useradd -u 10001 -g appgroup -m -s /bin/bash appuser && \
-    mkdir -p /home/appuser/.ssh && \
-    printf "Host 100.*\n    StrictHostKeyChecking no\n    UserKnownHostsFile /dev/null\n" > /home/appuser/.ssh/config && \
-    chmod 700 /home/appuser/.ssh && \
-    chmod 600 /home/appuser/.ssh/config && \
-    chown -R appuser:appgroup /home/appuser/.ssh && \
-    printf "\nHost 100.*\n    StrictHostKeyChecking no\n    UserKnownHostsFile /dev/null\n" >> /etc/ssh/ssh_config
+    useradd -u 10001 -g appgroup -m -s /bin/bash appuser
 
 WORKDIR /app
 

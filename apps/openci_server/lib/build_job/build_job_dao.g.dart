@@ -5,7 +5,6 @@ part of 'build_job_dao.dart';
 // ignore_for_file: type=lint
 mixin _$BuildJobDaoMixin on DatabaseAccessor<AppDatabase> {
   $BuildJobsTable get buildJobs => attachedDatabase.buildJobs;
-  $BuildJobLogsTable get buildJobLogs => attachedDatabase.buildJobLogs;
   $BuildStepsTable get buildSteps => attachedDatabase.buildSteps;
   $BuildStepLogsTable get buildStepLogs => attachedDatabase.buildStepLogs;
   BuildJobDaoManager get managers => BuildJobDaoManager(this);
@@ -16,8 +15,6 @@ class BuildJobDaoManager {
   BuildJobDaoManager(this._db);
   $$BuildJobsTableTableManager get buildJobs =>
       $$BuildJobsTableTableManager(_db.attachedDatabase, _db.buildJobs);
-  $$BuildJobLogsTableTableManager get buildJobLogs =>
-      $$BuildJobLogsTableTableManager(_db.attachedDatabase, _db.buildJobLogs);
   $$BuildStepsTableTableManager get buildSteps =>
       $$BuildStepsTableTableManager(_db.attachedDatabase, _db.buildSteps);
   $$BuildStepLogsTableTableManager get buildStepLogs =>

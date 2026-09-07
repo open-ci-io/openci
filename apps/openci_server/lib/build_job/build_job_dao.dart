@@ -5,7 +5,7 @@ import 'package:openci_shared/openci_shared.dart';
 
 part 'build_job_dao.g.dart';
 
-@DriftAccessor(tables: [BuildJobs, BuildJobLogs, BuildSteps, BuildStepLogs])
+@DriftAccessor(tables: [BuildJobs, BuildSteps, BuildStepLogs])
 class BuildJobDao extends DatabaseAccessor<AppDatabase>
     with _$BuildJobDaoMixin {
   BuildJobDao(super.attachedDatabase);
@@ -70,37 +70,6 @@ class BuildJobDao extends DatabaseAccessor<AppDatabase>
 
   Future<void> insertBuildJob(DriftBuildJob job) => into(buildJobs).insert(job);
 
-  Future<DriftBuildJob?> getLatestSuccessfulMacosJob({
-    required String owner,
-    required String repo,
-  }) async {
-    return (select(buildJobs)
-          ..where((t) => t.owner.equals(owner))
-          ..where((t) => t.repo.equals(repo))
-          ..where((t) => t.status.equals(BuildJobStatus.SUCCESS.name))
-          ..where((t) => t.runsOn.like('%macos%'))
-          ..where((t) => t.branch.equals('develop'))
-          ..orderBy([(t) => OrderingTerm.desc(t.completedAt)])
-          ..limit(1))
-        .getSingleOrNull();
-  }
-
-  Future<List<DriftBuildJob>> getRecentSuccessfulMacosJobs({
-    required String owner,
-    required String repo,
-    int limit = 10,
-  }) async {
-    return (select(buildJobs)
-          ..where((t) => t.owner.equals(owner))
-          ..where((t) => t.repo.equals(repo))
-          ..where((t) => t.status.equals(BuildJobStatus.SUCCESS.name))
-          ..where((t) => t.runsOn.like('%macos%'))
-          ..where((t) => t.branch.equals('develop'))
-          ..orderBy([(t) => OrderingTerm.desc(t.completedAt)])
-          ..limit(limit))
-        .get();
-  }
-
   Future<DriftBuildJob?> getBuildJob(String id) =>
       (select(buildJobs)..where((t) => t.id.equals(id))).getSingleOrNull();
 
@@ -137,9 +106,6 @@ class BuildJobDao extends DatabaseAccessor<AppDatabase>
 
     return query.watch();
   }
-
-  Stream<DriftBuildJob?> watchBuildJob(String id) =>
-      (select(buildJobs)..where((t) => t.id.equals(id))).watchSingleOrNull();
 
   Stream<List<DriftBuildJob>> watchQueuedJobs() {
     final query = select(buildJobs)
@@ -179,32 +145,8 @@ class BuildJobDao extends DatabaseAccessor<AppDatabase>
     }
   }
 
-  Future<void> insertBuildJobLog(String runId, String content) =>
-      into(buildJobLogs).insert(
-        BuildJobLogsCompanion.insert(
-          runId: runId,
-          logContent: content,
-          createdAt: DateTime.now().toUtc(),
-        ),
-      );
-
-  Future<List<DriftBuildJobLog>> getBuildJobLogs(String runId) =>
-      (select(buildJobLogs)
-            ..where((t) => t.runId.equals(runId))
-            ..orderBy([(t) => OrderingTerm.asc(t.id)]))
-          .get();
-
-  Stream<List<DriftBuildJobLog>> watchBuildJobLogs(String runId) =>
-      (select(buildJobLogs)
-            ..where((t) => t.runId.equals(runId))
-            ..orderBy([(t) => OrderingTerm.asc(t.id)]))
-          .watch();
-
   Future<void> insertBuildStep(DriftBuildStep step) =>
       into(buildSteps).insertOnConflictUpdate(step);
-
-  Future<void> updateBuildStep(DriftBuildStep step) =>
-      update(buildSteps).replace(step);
 
   Future<List<DriftBuildStep>> getBuildSteps(String runId) =>
       (select(buildSteps)

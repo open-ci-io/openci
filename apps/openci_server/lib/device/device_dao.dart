@@ -33,64 +33,6 @@ class DeviceDao extends DatabaseAccessor<AppDatabase> with _$DeviceDaoMixin {
         .getSingleOrNull();
   }
 
-  Future<DriftUserDevice> createDevice({
-    required String userId,
-    required String teamId,
-    required String udid,
-    required String deviceProduct,
-    required String deviceOsVersion,
-  }) async {
-    final existing = await findDevice(
-      userId: userId,
-      teamId: teamId,
-      udid: udid,
-    );
-    if (existing != null) {
-      throw DeviceAlreadyExistsException(
-        'Device with UDID $udid is already registered for this user and team.',
-      );
-    }
-
-    final now = DateTime.now().toUtc();
-    final newDevice = DriftUserDevice(
-      id: const Uuid().v4(),
-      userId: userId,
-      teamId: teamId,
-      udid: udid,
-      deviceProduct: deviceProduct,
-      deviceOsVersion: deviceOsVersion,
-      createdAt: now,
-      updatedAt: now,
-    );
-    await into(userDevices).insert(newDevice);
-    return newDevice;
-  }
-
-  Future<DriftUserDevice> updateDevice({
-    required DriftUserDevice existing,
-    required String deviceProduct,
-    required String deviceOsVersion,
-  }) async {
-    final now = DateTime.now().toUtc();
-    final updated = DriftUserDevice(
-      id: existing.id,
-      userId: existing.userId,
-      teamId: existing.teamId,
-      udid: existing.udid,
-      deviceProduct: deviceProduct,
-      deviceOsVersion: deviceOsVersion,
-      createdAt: existing.createdAt,
-      updatedAt: now,
-    );
-    final success = await update(userDevices).replace(updated);
-    if (!success) {
-      throw StateError(
-        'Failed to update device: device with id ${existing.id} not found.',
-      );
-    }
-    return updated;
-  }
-
   Future<DriftUserDevice> upsertDevice({
     required String userId,
     required String teamId,
@@ -133,12 +75,4 @@ class DeviceDao extends DatabaseAccessor<AppDatabase> with _$DeviceDaoMixin {
     }
     return resolved;
   }
-}
-
-class DeviceAlreadyExistsException implements Exception {
-  final String message;
-  DeviceAlreadyExistsException(this.message);
-
-  @override
-  String toString() => 'DeviceAlreadyExistsException: $message';
 }

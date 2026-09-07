@@ -1,6 +1,5 @@
 import 'package:drift/native.dart';
 import 'package:openci_server/database.dart';
-import 'package:openci_server/device/device_dao.dart';
 import 'package:openci_server/device/device_table.dart';
 import 'package:test/test.dart';
 
@@ -224,9 +223,9 @@ void main() {
       );
     });
 
-    group('createDevice', () {
+    group('upsertDevice', () {
       test('successfully inserts a new device', () async {
-        final device = await db.deviceDao.createDevice(
+        final device = await db.deviceDao.upsertDevice(
           userId: 'user-123',
           teamId: 'team-123',
           udid: '00008101-000A12345678901E',
@@ -250,58 +249,8 @@ void main() {
         expect(found!.id, equals(device.id));
       });
 
-      test(
-        'throws DeviceAlreadyExistsException when registering a device with same userId, teamId, and udid',
-        () async {
-          await db.deviceDao.createDevice(
-            userId: 'user-123',
-            teamId: 'team-123',
-            udid: '00008101-000A12345678901E',
-            deviceProduct: 'iPhone 15 Pro',
-            deviceOsVersion: '17.4',
-          );
-
-          expect(
-            () => db.deviceDao.createDevice(
-              userId: 'user-123',
-              teamId: 'team-123',
-              udid: '00008101-000A12345678901E',
-              deviceProduct: 'iPhone 15 Pro',
-              deviceOsVersion: '17.4',
-            ),
-            throwsA(isA<DeviceAlreadyExistsException>()),
-          );
-        },
-      );
-
-      test(
-        'throws DeviceAlreadyExistsException when registering a device with same userId, teamId, and udid but different OS version',
-        () async {
-          await db.deviceDao.createDevice(
-            userId: 'user-123',
-            teamId: 'team-123',
-            udid: '00008101-000A12345678901E',
-            deviceProduct: 'iPhone 15 Pro',
-            deviceOsVersion: '17.4',
-          );
-
-          expect(
-            () => db.deviceDao.createDevice(
-              userId: 'user-123',
-              teamId: 'team-123',
-              udid: '00008101-000A12345678901E',
-              deviceProduct: 'iPhone 15 Pro',
-              deviceOsVersion: '18.0',
-            ),
-            throwsA(isA<DeviceAlreadyExistsException>()),
-          );
-        },
-      );
-    });
-
-    group('updateDevice', () {
       test('successfully updates device fields', () async {
-        final now = DateTime.now().toUtc();
+        final now = DateTime.utc(2026, 9, 7);
         final existing = DriftUserDevice(
           id: 'existing-id',
           userId: 'user-123',
@@ -314,13 +263,16 @@ void main() {
         );
         await db.into(db.userDevices).insert(existing);
 
-        final updated = await db.deviceDao.updateDevice(
-          existing: existing,
+        final updated = await db.deviceDao.upsertDevice(
+          userId: existing.userId,
+          teamId: existing.teamId,
+          udid: existing.udid,
           deviceProduct: 'iPhone 15 Pro',
           deviceOsVersion: '17.4',
         );
 
         expect(updated.id, equals('existing-id'));
+        expect(updated.createdAt.toUtc(), existing.createdAt);
         expect(updated.deviceProduct, equals('iPhone 15 Pro'));
         expect(updated.deviceOsVersion, equals('17.4'));
 
@@ -332,33 +284,8 @@ void main() {
         expect(found, isNotNull);
         expect(found!.deviceProduct, equals('iPhone 15 Pro'));
         expect(found.deviceOsVersion, equals('17.4'));
+        expect(await db.deviceDao.getDevicesByUserId('user-123'), hasLength(1));
       });
-
-      test(
-        'throws StateError when trying to update a non-existent device',
-        () async {
-          final now = DateTime.now().toUtc();
-          final nonExistent = DriftUserDevice(
-            id: 'non-existent-id',
-            userId: 'user-123',
-            teamId: 'team-123',
-            udid: '00008101-000A12345678901E',
-            deviceProduct: 'iPhone 14',
-            deviceOsVersion: '16.5',
-            createdAt: now,
-            updatedAt: now,
-          );
-
-          expect(
-            () => db.deviceDao.updateDevice(
-              existing: nonExistent,
-              deviceProduct: 'iPhone 15 Pro',
-              deviceOsVersion: '17.4',
-            ),
-            throwsA(isA<StateError>()),
-          );
-        },
-      );
     });
   });
 }

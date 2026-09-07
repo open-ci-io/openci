@@ -88,10 +88,7 @@ void main() {
           writtenScript,
           contains('export PATH="/Users/admin/fvm/default/bin:'),
         );
-        expect(
-          writtenScript,
-          contains('flutter pub get'),
-        );
+        expect(writtenScript, contains('flutter pub get'));
         expect(
           writtenScript,
           contains('flutter pub run genuine_ci/dashboard_ci.dart'),
