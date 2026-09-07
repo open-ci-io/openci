@@ -26,9 +26,6 @@ class AppStrings {
   late final AppStringsSubscription subscription = AppStringsSubscription._(
     _root,
   );
-  late final AppStringsStoreRelease storeRelease = AppStringsStoreRelease._(
-    _root,
-  );
 }
 
 class AppStringsCommon {
@@ -399,110 +396,6 @@ class AppStringsSubscription {
   String get per3Months => '3ヶ月ごと';
   String get per6Months => '6ヶ月ごと';
   String get perYear => '年額';
-}
-
-// Path: storeRelease
-class AppStringsStoreRelease {
-  AppStringsStoreRelease._(this._root);
-
-  final AppStrings _root; // ignore: unused_field
-
-  // Translations
-  String get title => 'ストアリリース';
-  String get setupTitle => 'App Store Connectを接続';
-  String get setupDescription =>
-      'App Store Connect APIの認証情報を入力して、OpenCIから直接リリースを管理しましょう。';
-  String get issuerId => 'Issuer ID';
-  String get keyId => 'Key ID';
-  String get privateKey => '秘密鍵 (.p8)';
-  String get privateKeyHint => '.p8ファイルの内容を貼り付けてください';
-  String get connect => '接続';
-  String get connecting => '接続中...';
-  String get setupSuccess => 'App Store Connectが正常に接続されました';
-  String setupFailed({required Object error}) => '接続に失敗: ${error}';
-  String get enterIssuerId => 'Issuer IDを入力してください';
-  String get enterKeyId => 'Key IDを入力してください';
-  String get enterPrivateKey => '秘密鍵を入力してください';
-  String get selectApp => 'アプリを選択';
-  String get selectAppHint => 'リリースを管理するアプリを選択してください';
-  String get noApps => 'アプリが見つかりません';
-  String get noAppsHint => 'App Store Connectアカウントにアプリが見つかりませんでした。';
-  String get loadingApps => 'アプリを読み込み中...';
-  String get ascLoadingHint => 'App Store Connect APIの応答に少し時間がかかる場合があります';
-  String get builds => 'ビルド';
-  String get noBuilds => 'ビルドが見つかりません';
-  String get noBuildsHint => 'App Store Connectにビルドをアップロードしてください。';
-  String version({required Object version}) => 'v${version}';
-  String buildNumber({required Object number}) => 'ビルド ${number}';
-  String get processing => '処理中';
-  String get readyForSale => '販売準備完了';
-  String get valid => '準備完了';
-  String get invalid => '無効';
-  String get testFlight => 'TestFlight';
-  String get submitToTestFlight => 'TestFlightに送信';
-  String get submitToTestFlightConfirm => 'このビルドをTestFlightの外部テスターに送信しますか？';
-  String testFlightSuccess({required Object group}) =>
-      'TestFlightグループにビルドが送信されました: ${group}';
-  String testFlightFailed({required Object error}) =>
-      'TestFlightへの送信に失敗: ${error}';
-  String get appStoreReview => 'App Storeレビュー';
-  String get submitForReview => 'レビューに提出';
-  String submitForReviewConfirm({required Object version}) =>
-      'このビルドをApp Storeレビューに提出しますか？\n\nバージョン: ${version}';
-  String get reviewSuccess => 'App Storeレビューにビルドが提出されました';
-  String reviewFailed({required Object error}) => 'レビューへの提出に失敗: ${error}';
-  String get versionString => 'バージョン文字列';
-  String get enterVersionString => '例: 1.0.0';
-  String get versionRequired => 'バージョン文字列を入力してください';
-  String get whatsNew => '新機能';
-  String get whatsNewHint => 'このバージョンの新機能を説明してください';
-  String get whatsNewRequired => 'リリースノートを入力してください';
-  String get changeApp => 'アプリを変更';
-  String get reconfigure => '再設定';
-  String get howToGetCredentials => '認証情報の取得方法';
-  String get credentialsHelp =>
-      'App Store Connect > ユーザーとアクセス > 統合 > App Store Connect API でAPIキーを生成してください。';
-  String get waitingForReview => '審査待ち';
-  String get inReview => '審査中';
-  String get pendingRelease => 'リリース待ち';
-  String get readyForDistribution => '配信準備完了';
-  String get developerRejected => 'デベロッパが却下';
-  String get rejected => '却下';
-  String get prepareForSubmission => '提出準備中';
-  String get submitted => '提出済み';
-  String get stepBuild => 'ビルド';
-  String get stepDetails => '詳細';
-  String get stepReview => '確認';
-  String get selectBuildTitle => 'ビルドを選択';
-  String get selectBuildHint => 'App Storeレビューに提出するビルドを選択してください';
-  String get releaseDetailsTitle => 'リリース情報';
-  String get releaseDetailsHint => 'バージョンとリリースノートを設定';
-  String get reviewTitle => '確認 & 提出';
-  String get reviewHint => '提出前にすべての情報を確認してください';
-  String get next => '次へ';
-  String get back => '戻る';
-  String get confirmSubmit => 'レビューに提出';
-  String get submittingReview => '提出中...';
-  String get selectedBuildLabel => '選択されたビルド';
-  String get screenshotsTitle => 'スクリーンショット';
-  String get noScreenshots => 'スクリーンショットがありません';
-  String get screenshotsHint => 'App Store Connectでスクリーンショットを管理してください';
-  String screenshotCount({required Object count}) => '${count}枚のスクリーンショット';
-  String get appDescription => '説明';
-  String get keywordsLabel => 'キーワード';
-  String get noVersionInfo => '既存のバージョン情報が見つかりません';
-  String get existingInfo => '現在のApp Store情報';
-  String get summarySection => '提出サマリー';
-  String get underReview => '審査中';
-  String get underReviewDescription =>
-      'アプリは現在Appleによる審査中です。審査が完了するまで変更を行うことはできません。';
-  String get waitingForReviewDescription => 'アプリは提出済みで、Appleの審査開始を待っています。';
-  String get pendingReleaseTitle => '承認済み';
-  String get pendingReleaseDescription => 'アプリが承認されました！App Storeへのリリースを待っています。';
-  String get submittedBuild => '提出されたビルド';
-  String get submittedOn => '提出日';
-  String get estimatedWait => '審査は通常24〜48時間かかります';
-  String get viewInAsc => 'App Store Connectで確認';
 }
 
 // Path: common.functionErrors

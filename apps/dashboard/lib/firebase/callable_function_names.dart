@@ -1,7 +1,3 @@
-const ascListAppsFunction = 'ascListApps';
-const ascListBuildsFunction = 'ascListBuilds';
-const ascSubmitToTestFlightFunction = 'ascSubmitToTestFlight';
-const ascSubmitForReviewFunction = 'ascSubmitForReview';
 const cancelBuildJobFunction = 'cancelBuildJob';
 const createSecretFunction = 'createSecretV1';
 const createGitHubSetupUrlFunction = 'createGitHubSetupUrl';
@@ -22,7 +18,6 @@ const mergeIssuePullRequestFunction = 'mergeIssuePullRequest';
 const retryBuildJobFunction = 'retryBuildJob';
 const retryWorkflowRunFunction = 'retryWorkflowRun';
 const searchGitHubActionsFunction = 'searchGitHubActions';
-const setupAscApiKeyFunction = 'setupAscApiKeyV1';
 const suggestWorkflowTemplatesFunction = 'suggestWorkflowTemplates';
 const syncWorkflowFilesFunction = 'syncWorkflowFiles';
 const updateSecretFunction = 'updateSecretV1';

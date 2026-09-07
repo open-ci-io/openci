@@ -137,29 +137,6 @@ class SecretManager extends _$SecretManager {
     }
     ref.invalidateSelf();
   }
-
-  Future<void> setupAscApiKey({
-    required String issuerId,
-    required String keyId,
-    required String privateKey,
-  }) async {
-    final teamId = ref.read(selectedTeamProvider).value?.id;
-    if (teamId == null) throw StateError('team is not loaded yet');
-
-    final api = ref.read(openciApiServiceProvider);
-    final response = await api.setupAscApiKey(teamId, {
-      'issuerId': issuerId,
-      'keyId': keyId,
-      'privateKey': privateKey,
-    });
-
-    if (!response.isSuccessful) {
-      throw StateError(
-        'Failed to setup App Store Connect API Key: ${response.statusCode} ${response.error}',
-      );
-    }
-    ref.invalidateSelf();
-  }
 }
 
 @freezed
