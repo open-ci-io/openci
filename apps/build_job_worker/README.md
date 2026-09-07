@@ -4,6 +4,7 @@ OpenCIのビルドjobを実行するDartバックエンドサービス。
 最終的にはComposeから起動する常駐プロセスとして動作させます。
 
 現在は設定の読み込み、jobを1件取得する関数、runの作成・完了記録、jobの完了記録、GitHub Checksの完了更新、OrchardのVM準備・削除・コマンド実行、Lokiへのログ送信、GitHubトークン・secretsの取得、ソースのcheckout・ワークフロー実行を実装しています。
+`executeBuildJob()`で、取得済みのjobを実行開始の記録から結果保存・VM削除まで処理できます。
 起動すると設定を確認して終了し、job取得関数はまだ起動処理から呼び出しません。
 そのため、起動時の外部API接続・VM操作は行いません。
 既存dispatcher/executorやComposeの起動構成も変更していません。
@@ -96,6 +97,16 @@ API失敗や不正な応答は`StateError`にし、レスポンス本文や元�
 `lokiUrl: config.internalLokiUrl`はworkerのログ送信先、`vmLokiUrl: config.lokiUrl`はVM内のワークフローの送信先です。
 stdout・stderrは`step_id: run_workflow`でLokiへ送り、送信待ちが終わってから終了コードを返します。書き込み・Orchard通信の失敗は例外、Loki送信の失敗は`onLogError`へ通知します。
 実行終了時に`.env`と実行スクリプトを削除します。起動処理への組み込みはまだ行いません。
+
+`executeBuildJob(api: api, orchardApi: orchardApi, lokiClient: lokiClient, config: config, job: job, onError: onError)`は、claim済みの`IN_PROGRESS`のjobを1件実行します。
+run IDとVM名を生成し、run作成、GitHubトークン取得、VM準備、checkout、secrets取得、ワークフロー実行を順に行います。
+終了コード0なら`SUCCESS`、それ以外や実行途中の例外なら`FAILURE`として、run・job・GitHub Checksに結果の保存を試みます。
+run作成が失敗した場合はrunの完了更新とVM作成を行わず、job・GitHub Checksの失敗記録を試みます。
+VM準備に成功した場合は`finally`でVMの削除を試みます。起動待ち中の失敗は`prepareVm()`が削除を担当します。
+結果保存とVM削除はそれぞれ失敗しても後続処理を続け、1処理の待ち時間は`finalizationTimeout`（標準10秒）で制限します。自動再送は行いません。
+返り値は実行結果の`BuildJobStatus`です。結果保存やVM削除の失敗によって、この実行結果は変更しません。
+ログ送信の失敗は発生時に、それ以外の例外は終了処理を試みた後に`onError`へ通知します。このコールバックは例外を投げずに記録してください。
+クライアントの生成・共有・終了処理は呼び出し元で行います。起動処理への組み込み、キャンセル監視、job全体のタイムアウトはまだ行いません。
 
 ## 実行
 
