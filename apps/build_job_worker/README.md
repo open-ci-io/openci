@@ -3,7 +3,7 @@
 OpenCIのビルドjobを実行するDartバックエンドサービス。
 最終的にはComposeから起動する常駐プロセスとして動作させます。
 
-現在は設定の読み込み、jobを1件取得する関数、OrchardのVM準備・削除・コマンド実行、Lokiへのログ送信、GitHubトークンの取得、ソースのcheckout・ワークフロー実行を実装しています。
+現在は設定の読み込み、jobを1件取得する関数、OrchardのVM準備・削除・コマンド実行、Lokiへのログ送信、GitHubトークン・secretsの取得、ソースのcheckout・ワークフロー実行を実装しています。
 起動すると設定を確認して終了し、job取得関数はまだ起動処理から呼び出しません。
 そのため、起動時の外部API接続・VM操作は行いません。
 既存dispatcher/executorやComposeの起動構成も変更していません。
@@ -62,13 +62,18 @@ API失敗やトークンの欠落・空文字・型不正は`StateError`にし�
 トークンは取得時のHTTPヘッダーだけに設定し、remote URLには保存しません。スクリプトは権限`600`で配置し、実行終了時に削除します。
 `workspacePath`で配置先を変更できます。起動処理への組み込みはまだ行いません。
 
+`fetchJobSecrets(api: api, jobId: job.id)`は、既存APIから`secretsContent`を取得して加工せず返します。
+HTTP成功・`success: true`・`secretsContent`が文字列であることを確認し、空文字列もそのまま返します。
+API失敗や不正な応答は`StateError`にし、レスポンス本文や元の例外メッセージは含めません。
+返された文字列を`runWorkflow()`の`secretsContent`へ渡します。起動処理への組み込みはまだ行いません。
+
 `runWorkflow()`は、checkout済みのVMで`flutter pub get`と`flutter pub run genuine_ci/<workflowFileName>`を順に実行し、終了コードを返します。
 `secretsContent`はAPIと同じ`NAME=value`形式で渡し、secretsがない場合は空文字列を渡します。
 `.env`を権限`600`で上書きし、値をシェルコードとして評価せず環境変数に設定します。値の引用は不要です。
 `vmHomePath`（標準`/Users/admin`）配下の`fvm/default`をFlutterに使い、run・job IDとVM用Loki URLを設定します。
 `lokiUrl: config.internalLokiUrl`はworkerのログ送信先、`vmLokiUrl: config.lokiUrl`はVM内のワークフローの送信先です。
 stdout・stderrは`step_id: run_workflow`でLokiへ送り、送信待ちが終わってから終了コードを返します。書き込み・Orchard通信の失敗は例外、Loki送信の失敗は`onLogError`へ通知します。
-実行終了時に`.env`と実行スクリプトを削除します。secretsのAPI取得や起動処理への組み込みはまだ行いません。
+実行終了時に`.env`と実行スクリプトを削除します。起動処理への組み込みはまだ行いません。
 
 ## 実行
 
