@@ -154,7 +154,8 @@ void main() {
 
     Future<Response> queuePushWebhook({
       required String body,
-      required String deliveryId,
+      String? deliveryId,
+      String eventType = 'push',
     }) {
       final context = TestRequestContext(
         path: '/webhook',
@@ -162,8 +163,8 @@ void main() {
         body: body,
         headers: {
           'x-hub-signature-256': computeSignature(body),
-          'x-github-event': 'push',
-          'x-github-delivery': deliveryId,
+          'x-github-event': eventType,
+          'x-github-delivery': ?deliveryId,
         },
       );
       context.provide<Map<String, String>>({
@@ -178,6 +179,84 @@ void main() {
     });
 
     tearDown(() => db.close());
+
+    for (final deliveryId in [null, '']) {
+      test('rejects a missing or empty delivery ID: $deliveryId', () async {
+        final response = await queuePushWebhook(
+          body: '{}',
+          deliveryId: deliveryId,
+        );
+        expect(response.statusCode, HttpStatus.badRequest);
+        expect(await response.json(), {
+          'success': false,
+          'error': 'Missing x-github-delivery header',
+        });
+        expect(await db.select(db.webhookTasks).get(), isEmpty);
+      });
+    }
+
+    for (final event in ['ping', 'issues', '']) {
+      test('acknowledges $event without queuing a task', () async {
+        final response = await queuePushWebhook(
+          body: '{}',
+          deliveryId: 'ignored-event',
+          eventType: event,
+        );
+        expect(response.statusCode, HttpStatus.ok);
+        expect(await response.json(), {
+          'success': true,
+          'message': 'Ignored event type: $event',
+        });
+        expect(await db.select(db.webhookTasks).get(), isEmpty);
+      });
+    }
+
+    for (final action in [
+      'opened',
+      'synchronize',
+      'reopened',
+      'closed',
+      null,
+    ]) {
+      test('filters pull request action $action before queuing', () async {
+        final payload = jsonEncode({'action': action, 'number': 42});
+        final response = await queuePushWebhook(
+          body: payload,
+          deliveryId: 'pr-event',
+          eventType: 'pull_request',
+        );
+        expect(response.statusCode, HttpStatus.ok);
+        final tasks = await db.select(db.webhookTasks).get();
+        if (['opened', 'synchronize', 'reopened'].contains(action)) {
+          expect(tasks, hasLength(1));
+          expect(tasks.single.eventType, 'pull_request');
+          expect(tasks.single.payload, payload);
+          expect(tasks.single.status, 'pending');
+        } else {
+          expect(tasks, isEmpty);
+          expect(await response.json(), {
+            'success': true,
+            'message': 'Ignored pull_request action: $action',
+          });
+        }
+      });
+    }
+
+    for (final payload in ['{', '[]', 'null', '{"action":42}']) {
+      test('rejects a malformed signed PR payload: $payload', () async {
+        final response = await queuePushWebhook(
+          body: payload,
+          deliveryId: 'bad-pr',
+          eventType: 'pull_request',
+        );
+        expect(response.statusCode, HttpStatus.badRequest);
+        expect(await response.json(), {
+          'success': false,
+          'error': 'Invalid JSON body',
+        });
+        expect(await db.select(db.webhookTasks).get(), isEmpty);
+      });
+    }
 
     test('queues a valid webhook delivery', () async {
       const body = '{"ref":"refs/heads/main"}';

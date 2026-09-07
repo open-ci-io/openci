@@ -43,6 +43,201 @@ void main() {
     await db.close();
   });
 
+  Future<Response> request({
+    required HttpMethod method,
+    String? name,
+    String? uid = 'user-1',
+    String? body,
+    Map<String, String>? environment,
+    AppDatabase? database,
+  }) async {
+    final context = TestRequestContext(
+      path: '/teams/team-123/secrets${name == null ? '' : '/$name'}',
+      method: method,
+      body: body,
+    );
+    context.provide<AppDatabase>(database ?? db);
+    context.provide<String?>(uid);
+    context.provide<Map<String, String>>(environment ?? env);
+    return name == null
+        ? index_route.onRequest(context.context, 'team-123')
+        : name_route.onRequest(context.context, 'team-123', name);
+  }
+
+  group('secret authorization and failures', () {
+    setUp(() async {
+      await db.teamDao.addTeamMember('team-123', 'user-1');
+      final now = DateTime.now().toUtc();
+      await db.secretDao.insertOrUpdateSecret(
+        DriftSecret(
+          name: 'API_KEY',
+          teamId: 'team-123',
+          encryptedValue: 'stored-ciphertext',
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
+    });
+
+    for (final (method, name) in [
+      (HttpMethod.get, null),
+      (HttpMethod.get, 'API_KEY'),
+      (HttpMethod.delete, 'API_KEY'),
+    ]) {
+      for (final (uid, status) in [
+        (null, HttpStatus.unauthorized),
+        ('stranger', HttpStatus.forbidden),
+      ]) {
+        test(
+          '$method $name rejects $uid without exposing or deleting secrets',
+          () async {
+            final response = await request(
+              method: method,
+              name: name,
+              uid: uid,
+            );
+
+            expect(response.statusCode, status);
+            final body = await response.json() as Map<String, dynamic>;
+            expect(body['success'], isFalse);
+            expect(body, isNot(contains('value')));
+            expect(body, isNot(contains('secrets')));
+            expect(
+              await db.secretDao.getSecret('team-123', 'API_KEY'),
+              isNotNull,
+            );
+          },
+        );
+      }
+    }
+
+    test(
+      'internal processor cannot delete a secret without membership',
+      () async {
+        final response = await request(
+          method: HttpMethod.delete,
+          name: 'API_KEY',
+          uid: 'system-job-processor',
+        );
+        expect(response.statusCode, HttpStatus.forbidden);
+        expect(await db.secretDao.getSecret('team-123', 'API_KEY'), isNotNull);
+      },
+    );
+
+    test(
+      'deleting a missing secret returns 404 and preserves other secrets',
+      () async {
+        final response = await request(
+          method: HttpMethod.delete,
+          name: 'MISSING',
+        );
+        expect(response.statusCode, HttpStatus.notFound);
+        expect(await response.json(), {
+          'success': false,
+          'error': 'Secret not found',
+        });
+        expect(await db.secretDao.getSecret('team-123', 'API_KEY'), isNotNull);
+      },
+    );
+
+    for (final name in [null, 'API_KEY']) {
+      test('unsupported method for $name returns 405', () async {
+        final response = await request(method: HttpMethod.patch, name: name);
+        expect(response.statusCode, HttpStatus.methodNotAllowed);
+        expect(await db.secretDao.getSecret('team-123', 'API_KEY'), isNotNull);
+      });
+    }
+
+    for (final payload in [
+      '{',
+      '[]',
+      jsonEncode({'value': 'value'}),
+      jsonEncode({'name': '  ', 'value': 'value'}),
+      jsonEncode({'name': 1, 'value': 'value'}),
+      jsonEncode({'name': 'NEW_SECRET'}),
+      jsonEncode({'name': 'NEW_SECRET', 'value': '  '}),
+      jsonEncode({'name': 'NEW_SECRET', 'value': 1}),
+    ]) {
+      test('invalid payload $payload is rejected before storage', () async {
+        final response = await request(method: HttpMethod.post, body: payload);
+        expect(response.statusCode, HttpStatus.badRequest);
+        final body = await response.json() as Map<String, dynamic>;
+        expect(body['success'], isFalse);
+        expect(body['error'], isNotEmpty);
+        expect(await db.secretDao.getSecretsForTeam('team-123'), hasLength(1));
+      });
+    }
+
+    test(
+      'member can retrieve the decrypted value after updating a secret',
+      () async {
+        final updated = await request(
+          method: HttpMethod.post,
+          body: jsonEncode({'name': ' API_KEY ', 'value': ' new-value '}),
+        );
+        expect(updated.statusCode, HttpStatus.ok);
+        final response = await request(method: HttpMethod.get, name: 'API_KEY');
+        expect(response.statusCode, HttpStatus.ok);
+        expect(await response.json(), {'success': true, 'value': 'new-value'});
+        final stored = await db.secretDao.getSecret('team-123', 'API_KEY');
+        expect(stored!.encryptedValue, isNot('new-value'));
+        expect(await db.secretDao.getSecretsForTeam('team-123'), hasLength(1));
+      },
+    );
+
+    for (final (method, name) in [
+      (HttpMethod.post, null),
+      (HttpMethod.get, 'API_KEY'),
+    ]) {
+      test(
+        '$method rejects an invalid encryption key without changing storage',
+        () async {
+          final response = await request(
+            method: method,
+            name: name,
+            body: jsonEncode({'name': 'API_KEY', 'value': 'replacement'}),
+            environment: {'SECRET_ENCRYPTION_KEY': 'invalid-key'},
+          );
+          expect(response.statusCode, HttpStatus.internalServerError);
+          expect(await response.json(), {
+            'success': false,
+            'error': 'Invalid encryption key configuration',
+          });
+          final stored = await db.secretDao.getSecret('team-123', 'API_KEY');
+          expect(stored!.encryptedValue, 'stored-ciphertext');
+        },
+      );
+    }
+
+    for (final (method, name) in [
+      (HttpMethod.get, null),
+      (HttpMethod.post, null),
+      (HttpMethod.get, 'API_KEY'),
+      (HttpMethod.delete, 'API_KEY'),
+    ]) {
+      test('$method $name hides database failure details', () async {
+        final failingDb = MockAppDatabase();
+        when(() => failingDb.teamDao).thenReturn(db.teamDao);
+        when(
+          () => failingDb.secretDao,
+        ).thenThrow(StateError('private-db-detail'));
+        final response = await request(
+          method: method,
+          name: name,
+          body: jsonEncode({'name': 'API_KEY', 'value': 'replacement'}),
+          database: failingDb,
+        );
+        expect(response.statusCode, HttpStatus.internalServerError);
+        expect(await response.json(), {
+          'success': false,
+          'error': 'Internal server error',
+        });
+        final stored = await db.secretDao.getSecret('team-123', 'API_KEY');
+        expect(stored!.encryptedValue, 'stored-ciphertext');
+      });
+    }
+  });
+
   group('Secrets Endpoints', () {
     group('POST /teams/<id>/secrets', () {
       test('responds with 401 Unauthorized when uid is null', () async {
