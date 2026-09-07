@@ -3,7 +3,7 @@
 OpenCIのビルドjobを実行するDartバックエンドサービス。
 最終的にはComposeから起動する常駐プロセスとして動作させます。
 
-現在は設定の読み込み、jobを1件取得する関数、OrchardのVM準備・削除・コマンド実行、Lokiへのログ送信、ソースのcheckoutを実装しています。
+現在は設定の読み込み、jobを1件取得する関数、OrchardのVM準備・削除・コマンド実行、Lokiへのログ送信、ソースのcheckout・ワークフロー実行を実装しています。
 起動すると設定を確認して終了し、job取得関数はまだ起動処理から呼び出しません。
 そのため、起動時の外部API接続・VM操作は行いません。
 既存dispatcher/executorやComposeの起動構成も変更していません。
@@ -58,6 +58,14 @@ HTTPクライアントは呼び出し元で共有し、使用後に閉じます�
 トークンは取得時のHTTPヘッダーだけに設定し、remote URLには保存しません。スクリプトは権限`600`で配置し、実行終了時に削除します。
 `workspacePath`で配置先を変更できます。トークン取得や起動処理への組み込みはまだ行いません。
 
+`runWorkflow()`は、checkout済みのVMで`flutter pub get`と`flutter pub run genuine_ci/<workflowFileName>`を順に実行し、終了コードを返します。
+`secretsContent`はAPIと同じ`NAME=value`形式で渡し、secretsがない場合は空文字列を渡します。
+`.env`を権限`600`で上書きし、値をシェルコードとして評価せず環境変数に設定します。値の引用は不要です。
+`vmHomePath`（標準`/Users/admin`）配下の`fvm/default`をFlutterに使い、run・job IDとVM用Loki URLを設定します。
+`lokiUrl: config.internalLokiUrl`はworkerのログ送信先、`vmLokiUrl: config.lokiUrl`はVM内のワークフローの送信先です。
+stdout・stderrは`step_id: run_workflow`でLokiへ送り、送信待ちが終わってから終了コードを返します。書き込み・Orchard通信の失敗は例外、Loki送信の失敗は`onLogError`へ通知します。
+実行終了時に`.env`と実行スクリプトを削除します。secretsのAPI取得や起動処理への組み込みはまだ行いません。
+
 ## 実行
 
 リポジトリルートで`flutter pub get`を実行してから、このディレクトリで実行します。
@@ -75,6 +83,7 @@ dart run bin/main.dart
 このディレクトリで実行します。WebSocketテストはローカルのテスト用サーバーを自動起動するため、OrchardやVMの起動は不要です。
 ファイル書き込みテストはmacOSまたはLinuxの`/bin/sh`と`base64`を使い、一時ディレクトリ内で検証します。
 checkoutテストはローカルの`git`も使い、一時リポジトリで取得結果を検証します。
+ワークフローのテストは一時ディレクトリ内のテスト用Flutterコマンドで、環境変数・実行順・終了コードを検証します。
 
 ```sh
 dart format --output=none --set-exit-if-changed .
