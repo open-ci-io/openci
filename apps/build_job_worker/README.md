@@ -3,7 +3,7 @@
 OpenCIのビルドjobを実行するDartバックエンドサービス。
 最終的にはComposeから起動する常駐プロセスとして動作させます。
 
-現在は設定の読み込み、jobを1件取得する関数、OrchardのVM準備・削除・コマンド実行、Lokiへのログ送信、GitHubトークン・secretsの取得、ソースのcheckout・ワークフロー実行を実装しています。
+現在は設定の読み込み、jobを1件取得する関数、runの作成、OrchardのVM準備・削除・コマンド実行、Lokiへのログ送信、GitHubトークン・secretsの取得、ソースのcheckout・ワークフロー実行を実装しています。
 起動すると設定を確認して終了し、job取得関数はまだ起動処理から呼び出しません。
 そのため、起動時の外部API接続・VM操作は行いません。
 既存dispatcher/executorやComposeの起動構成も変更していません。
@@ -51,6 +51,11 @@ HTTPクライアントは呼び出し元で共有し、使用後に閉じます�
 既存ファイルは上書きします。`mode: '+x'`で実行権限を付与し、`mode: '600'`なども指定できます。
 書き込み・権限変更の終了コードが0以外ならエラーにします。
 ファイル内容を含むコマンドや出力はログへ送らず、通信・実行例外にも内容を含めません。
+
+`createBuildRun(api: api, jobId: job.id, runId: runId)`は、既存APIで実行開始を記録します。run IDは呼び出し元で生成します。
+サーバー側でrunを`in_progress`として作成し、jobのrun数・最新run IDを更新します。
+HTTP失敗（run ID重複の409を含む）や通信・変換エラーは`StateError`にし、レスポンス本文や元の例外メッセージは含めません。
+自動再送は行いません。起動処理への組み込みはまだ行いません。
 
 `resolveGitHubInstallationToken(api: api, jobId: job.id)`は、既存の`OpenCiApiService`からjob用のGitHubトークンを取得して返します。
 API失敗やトークンの欠落・空文字・型不正は`StateError`にし、レスポンス本文や元の例外メッセージは含めません。
