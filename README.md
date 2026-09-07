@@ -1,7 +1,3 @@
-v2 is out! Easier to self-host.
+[![codecov](https://codecov.io/gh/openci-org/openci/graph/badge.svg?token=RAJBUMJU3O)](https://codecov.io/gh/openci-org/openci)
 
-New registration is closed.
-
-See: https://openci.org
-
-Docs: WIP
+https://codecov.io/gh/openci-org/openci/graphs/sunburst.svg?token=RAJBUMJU3O
