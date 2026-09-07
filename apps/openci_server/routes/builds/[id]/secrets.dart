@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:http/http.dart' as http;
 import 'package:openci_server/database.dart';
 import 'package:openci_server/github/github_service.dart';
 import 'package:openci_server/request/error_handler.dart';
@@ -39,8 +40,23 @@ Future<Response> _get(RequestContext context, String id) async {
       );
     }
 
+    Map<String, String>? environment;
+    try {
+      environment = context.read<Map<String, String>>();
+    } catch (_) {
+      // GitHubService uses process configuration when none is provided.
+    }
+    http.Client? client;
+    try {
+      client = context.read<http.Client>();
+    } catch (_) {
+      // GitHubService creates its own HTTP requests when none is provided.
+    }
+
     final token = await GitHubService.getInstallationToken(
       installationIdStr: installationIdStr,
+      environment: environment,
+      client: client,
     );
 
     final workflowContent = await GitHubService.fetchWorkflowContent(
@@ -51,9 +67,29 @@ Future<Response> _get(RequestContext context, String id) async {
       token: token,
       commitSha: driftJob.commitSha,
       branch: driftJob.branch,
+      environment: environment,
+      client: client,
     );
 
-    final usedSecretNames = extractSecretNames(workflowContent);
+    String? secretDefinitions;
+    if (workflowFileName.endsWith('.dart') &&
+        RegExp(r'\bSecrets\s*\.').hasMatch(workflowContent)) {
+      secretDefinitions = await GitHubService.fetchWorkflowContent(
+        owner: driftJob.owner,
+        repo: driftJob.repo,
+        workflowFileName: 'secrets.g.dart',
+        installationIdStr: installationIdStr,
+        token: token,
+        commitSha: driftJob.commitSha,
+        branch: driftJob.branch,
+        environment: environment,
+        client: client,
+      );
+    }
+    final usedSecretNames = extractSecretNames(
+      workflowContent,
+      secretDefinitions: secretDefinitions,
+    );
 
     final targetSecrets = <DriftSecret>[];
     if (teamId != null) {
@@ -77,12 +113,7 @@ Future<Response> _get(RequestContext context, String id) async {
       );
     }
 
-    Map<String, String> env;
-    try {
-      env = context.read<Map<String, String>>();
-    } catch (_) {
-      env = Platform.environment;
-    }
+    final env = environment ?? Platform.environment;
     final encryptionKey = env['SECRET_ENCRYPTION_KEY']!;
     final crypter = SecretCrypter(encryptionKey);
 

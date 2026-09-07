@@ -302,8 +302,11 @@ jobs:
     final query = ref != null && ref.isNotEmpty
         ? '?ref=${Uri.encodeComponent(ref)}'
         : '';
+    final directory = workflowFileName.endsWith('.dart')
+        ? 'genuine_ci'
+        : '.openci';
     final url =
-        '$githubApiBaseUrlStr/repos/$owner/$repo/contents/.openci/$workflowFileName$query';
+        '$githubApiBaseUrlStr/repos/$owner/$repo/contents/$directory/$workflowFileName$query';
 
     final headers = {
       'Authorization': 'Bearer $actualToken',
