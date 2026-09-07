@@ -15,6 +15,10 @@ class JsonToTypeConverter extends JsonConverter {
   FutureOr<Response<BodyType>> convertResponse<BodyType, InnerType>(
     Response response,
   ) async {
+    // Chopper's copyWith keeps the original string when the decoded body is null.
+    if (response.body is String && (response.body as String).trim() == 'null') {
+      return Response<BodyType>(response.base, null, error: response.error);
+    }
     final jsonResponse = await super.convertResponse<dynamic, dynamic>(
       response,
     );

@@ -187,5 +187,49 @@ void main() {
       );
       expect(logger.stderrMessages.single, contains('not found'));
     });
+
+    for (final command in ['create', 'default']) {
+      test(
+        'reports a process error during context $command without continuing',
+        () async {
+          final commands = <String>[];
+          final result = await setupOrchardContext(
+            logger,
+            processRunner: (executable, arguments) async {
+              if (executable == 'docker') {
+                return ProcessResult(1, 0, 'test-bootstrap-token', '');
+              }
+              commands.add(arguments[1]);
+              if (arguments[1] == command) {
+                throw ProcessException(
+                  executable,
+                  arguments,
+                  'executable unavailable',
+                );
+              }
+              return ProcessResult(2, 0, '', '');
+            },
+          );
+
+          expect(result, isFalse);
+          expect(
+            commands,
+            command == 'create' ? ['create'] : ['create', 'default'],
+          );
+          expect(
+            logger.stderrMessages.single,
+            contains(t.dev.start.stepOrchardContextFailed),
+          );
+          expect(
+            logger.stderrMessages.single,
+            contains('executable unavailable'),
+          );
+          expect(
+            logger.stdoutMessages,
+            isNot(contains(t.dev.start.stepOrchardContextRegistered)),
+          );
+        },
+      );
+    }
   });
 }

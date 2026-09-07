@@ -140,4 +140,15 @@ void main() {
       expect(await File(config.filePath).readAsString(), '{');
     },
   );
+
+  test(
+    'help describes the use command without writing configuration',
+    () async {
+      final help = runner.commands['use']!.usage;
+      expect(help, contains(t.use.description));
+      expect(help, contains('genuineci use'));
+      expect(await File(config.filePath).exists(), isFalse);
+      expect(LocaleSettings.currentLocale, AppLocale.en);
+    },
+  );
 }
