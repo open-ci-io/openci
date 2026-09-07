@@ -17,6 +17,14 @@ class BuildJobDao extends DatabaseAccessor<AppDatabase>
   }) async {
     return db.transaction(() async {
       if (maxConcurrentJobs != null && workerHost != null) {
+        // Serialize the count and claim for this host across server instances.
+        await db
+            .customSelect(
+              r"SELECT pg_advisory_xact_lock(hashtext('build_job_claim'), hashtext($1))",
+              variables: [Variable.withString(workerHost)],
+            )
+            .get();
+
         final countExpr = buildJobs.id.count();
         final activeCount =
             await (selectOnly(buildJobs)
