@@ -114,16 +114,18 @@ Middleware authProvider(FirebaseApp? firebaseApp, {bool allowTestUid = false}) {
       if (token == null || token.isEmpty) {
         return handler(context.provide<String?>(() => null));
       }
+      final String uid;
       try {
         final decodedToken = await firebaseApp.auth().verifyIdToken(
           token,
           checkRevoked: false,
         );
-        return await handler(context.provide<String?>(() => decodedToken.uid));
+        uid = decodedToken.uid;
       } catch (e) {
         stderr.writeln('Token verification failed: $e');
         return handler(context.provide<String?>(() => null));
       }
+      return handler(context.provide<String?>(() => uid));
     };
   };
 }

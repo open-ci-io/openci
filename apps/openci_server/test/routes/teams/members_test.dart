@@ -49,6 +49,89 @@ void main() {
   });
 
   group('members route', () {
+    Future<Response> post({String? uid = 'member-1', String body = '{}'}) {
+      final context = TestRequestContext(
+        path: '/teams/team-123/members',
+        method: HttpMethod.post,
+        body: body,
+      );
+      context.provide<AppDatabase>(db);
+      context.provide<FirebaseApp>(mockFirebaseApp);
+      context.provide<String?>(uid);
+      return Future.value(route.onRequest(context.context, 'team-123'));
+    }
+
+    for (final (uid, status) in [(null, 401), ('stranger', 403)]) {
+      test(
+        'POST rejects $uid without contacting Firebase or adding members',
+        () async {
+          final response = await post(
+            uid: uid,
+            body: '{"email":"test@example.com"}',
+          );
+          expect(response.statusCode, status);
+          verifyNever(() => mockAuthService.getUserByEmail(any()));
+          expect(await db.teamDao.getTeamMembers('team-123'), isEmpty);
+        },
+      );
+    }
+
+    for (final body in ['{}', '{"email":"   "}']) {
+      test('POST rejects missing or blank email: $body', () async {
+        await db.teamDao.addTeamMember('team-123', 'member-1');
+        final response = await post(body: body);
+        expect(response.statusCode, HttpStatus.badRequest);
+        expect(await response.json(), {
+          'success': false,
+          'error': 'Email is required',
+        });
+        verifyNever(() => mockAuthService.getUserByEmail(any()));
+        expect(await db.teamDao.getTeamMembers('team-123'), hasLength(1));
+      });
+    }
+
+    test(
+      'POST normalizes the email before looking up and adding a member',
+      () async {
+        await db.teamDao.addTeamMember('team-123', 'member-1');
+        final user = MockUserRecord();
+        when(() => user.uid).thenReturn('new-member');
+        when(
+          () => mockAuthService.getUserByEmail('new@example.com'),
+        ).thenAnswer((_) async => user);
+        final response = await post(body: '{"email":"  New@Example.COM  "}');
+        expect(response.statusCode, HttpStatus.ok);
+        expect(await db.teamDao.isTeamMember('new-member', 'team-123'), isTrue);
+        verify(
+          () => mockAuthService.getUserByEmail('new@example.com'),
+        ).called(1);
+      },
+    );
+
+    test(
+      'POST reports a Firebase failure without creating a membership',
+      () async {
+        await db.teamDao.addTeamMember('team-123', 'member-1');
+        when(
+          () => mockAuthService.getUserByEmail(any()),
+        ).thenThrow(StateError('Firebase unavailable'));
+        final response = await post(body: '{"email":"new@example.com"}');
+        expect(response.statusCode, HttpStatus.internalServerError);
+        final body = await response.json() as Map<String, dynamic>;
+        expect(body['success'], isFalse);
+        expect(await db.teamDao.getTeamMembers('team-123'), hasLength(1));
+      },
+    );
+
+    test('rejects unsupported methods', () async {
+      final context = TestRequestContext(
+        path: '/teams/team-123/members',
+        method: HttpMethod.patch,
+      );
+      final response = await route.onRequest(context.context, 'team-123');
+      expect(response.statusCode, HttpStatus.methodNotAllowed);
+    });
+
     test('responds with 401 Unauthorized when uid is null', () async {
       final context = TestRequestContext(
         path: '/teams/team-123/members',

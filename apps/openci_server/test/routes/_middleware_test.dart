@@ -1,9 +1,12 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:dart_frog_test/dart_frog_test.dart';
+import 'package:drift/native.dart';
 import 'package:firebase_admin_sdk/auth.dart';
 import 'package:firebase_admin_sdk/firebase_admin_sdk.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:openci_server/database.dart';
 import 'package:test/test.dart';
 
 import '../../routes/_middleware.dart';
@@ -21,6 +24,60 @@ class MockRequest extends Mock implements Request {}
 void main() {
   setUpAll(() {
     registerFallbackValue(() => 'dummy');
+  });
+
+  test(
+    'databaseProvider makes the same database available downstream',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      final context = MockRequestContext();
+      registerFallbackValue(() => db);
+      when(() => context.provide<AppDatabase>(any())).thenAnswer((invocation) {
+        final create =
+            invocation.positionalArguments.single as AppDatabase Function();
+        expect(create(), same(db));
+        return context;
+      });
+      final handler = databaseProvider(db)(
+        (_) => Response(statusCode: 201, body: 'created'),
+      );
+      final response = await handler(context);
+      expect(response.statusCode, 201);
+      expect(await response.body(), 'created');
+    },
+  );
+
+  group('sentryMiddleware', () {
+    test('preserves a successful downstream response', () async {
+      final context = TestRequestContext(path: '/');
+      final expected = Response(statusCode: 202, body: 'accepted');
+      final handler = sentryMiddleware()((_) => expected);
+      expect(await handler(context.context), same(expected));
+    });
+
+    test(
+      'returns a generic error without exposing exception details',
+      () async {
+        final context = TestRequestContext(path: '/');
+        final handler = sentryMiddleware()((_) async {
+          throw StateError('private exception detail');
+        });
+        final response = await handler(context.context);
+        expect(response.statusCode, HttpStatus.internalServerError);
+        expect(await response.json(), {
+          'success': false,
+          'error': 'Internal server error',
+        });
+      },
+    );
+
+    test('propagates hijack exceptions for streaming responses', () async {
+      final context = TestRequestContext(path: '/');
+      final error = StateError('request hijack');
+      final handler = sentryMiddleware()((_) async => throw error);
+      await expectLater(handler(context.context), throwsA(same(error)));
+    });
   });
 
   group('corsMiddleware', () {
@@ -227,6 +284,35 @@ void main() {
               ).captured.single
               as String? Function();
       expect(captured(), equals('user-firebase-123'));
+    });
+
+    test('does not retry an authenticated handler when it throws', () async {
+      when(() => mockFirebaseApp.auth()).thenReturn(mockAuth);
+      when(
+        () => mockAuth.verifyIdToken('valid-token', checkRevoked: false),
+      ).thenAnswer((_) async => mockToken);
+      when(() => mockToken.uid).thenReturn('user-1');
+      when(
+        () => mockRequest.uri,
+      ).thenReturn(Uri.parse('http://localhost/teams'));
+      when(() => mockRequest.headers).thenReturn({
+        'authorization': 'Bearer valid-token',
+      });
+      final error = StateError('downstream request failed');
+      var handlerCalls = 0;
+      final handler = authProvider(mockFirebaseApp)((_) async {
+        handlerCalls++;
+        throw error;
+      });
+
+      await expectLater(handler(mockContext), throwsA(same(error)));
+      expect(handlerCalls, 1);
+      final captured =
+          verify(
+                () => mockContext.provide<String?>(captureAny()),
+              ).captured.single
+              as String? Function();
+      expect(captured(), 'user-1');
     });
 
     test(

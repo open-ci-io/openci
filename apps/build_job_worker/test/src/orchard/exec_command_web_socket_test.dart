@@ -87,125 +87,130 @@ void main() {
   Future<void> expectClosed() =>
       peerClosed.future.timeout(const Duration(seconds: 5));
 
-  test(
-    'decodes split UTF-8, separates streams, and flushes final lines',
-    () async {
-      final japanese = utf8.encode('日本語');
-      frames = [
-        _output('stdout', [...utf8.encode('hello\n\n'), ...japanese.take(2)]),
-        utf8.encode(_output('stderr', utf8.encode('warning\r\n'))),
-        _output('stdout', [
-          ...japanese.skip(2),
-          ...utf8.encode('\r\nfinal-out'),
-        ]),
-        _output('stderr', utf8.encode('final-err')),
-        jsonEncode({'type': 'heartbeat'}),
-        jsonEncode({
-          'type': 'exit',
-          'exit': {'code': 23},
-        }),
-      ];
-
-      expect(await execute(), 23);
-      expect(logs, [
-        ('hello', 'stdout'),
-        ('warning', 'stderr'),
-        ('日本語', 'stdout'),
-        ('final-out', 'stdout'),
-        ('final-err', 'stderr'),
-      ]);
-      await expectClosed();
-    },
-  );
-
-  test('returns zero for a silent command and closes the connection', () async {
-    frames = [
-      jsonEncode({
-        'type': 'exit',
-        'exit': {'code': 0},
-      }),
-    ];
-    expect(await execute(), 0);
-    expect(logs, isEmpty);
-    await expectClosed();
-  });
-
-  for (final frame in [
-    'not json',
-    '[]',
-    jsonEncode({'type': 'stdout', 'data': 42}),
-    jsonEncode({'type': 'stderr', 'data': '%%%'}),
-    jsonEncode({'type': 'exit', 'exit': null}),
-    jsonEncode({
-      'type': 'exit',
-      'exit': {'code': '0'},
-    }),
-  ]) {
+  group('execCommandWebSocket', () {
     test(
-      'rejects malformed message $frame and closes the connection',
+      'decodes split UTF-8, separates streams, and flushes final lines',
       () async {
-        frames = [frame];
-        await expectLater(execute(), throwsFormatException);
+        final japanese = utf8.encode('日本語');
+        frames = [
+          _output('stdout', [...utf8.encode('hello\n\n'), ...japanese.take(2)]),
+          utf8.encode(_output('stderr', utf8.encode('warning\r\n'))),
+          _output('stdout', [
+            ...japanese.skip(2),
+            ...utf8.encode('\r\nfinal-out'),
+          ]),
+          _output('stderr', utf8.encode('final-err')),
+          jsonEncode({'type': 'heartbeat'}),
+          jsonEncode({
+            'type': 'exit',
+            'exit': {'code': 23},
+          }),
+        ];
+
+        expect(await execute(), 23);
+        expect(logs, [
+          ('hello', 'stdout'),
+          ('warning', 'stderr'),
+          ('日本語', 'stdout'),
+          ('final-out', 'stdout'),
+          ('final-err', 'stderr'),
+        ]);
+        await expectClosed();
+      },
+    );
+
+    test(
+      'returns zero for a silent command and closes the connection',
+      () async {
+        frames = [
+          jsonEncode({
+            'type': 'exit',
+            'exit': {'code': 0},
+          }),
+        ];
+        expect(await execute(), 0);
         expect(logs, isEmpty);
         await expectClosed();
       },
     );
-  }
 
-  test('reports an Orchard error and flushes buffered output', () async {
-    frames = [
-      _output('stderr', utf8.encode('last diagnostic')),
-      jsonEncode({'type': 'error', 'error': 'execution denied'}),
-    ];
-    await expectLater(
-      execute(),
-      throwsA(
-        isA<StateError>().having(
-          (e) => e.message,
-          'message',
-          contains('execution denied'),
-        ),
-      ),
-    );
-    expect(logs, [('last diagnostic', 'stderr')]);
-    await expectClosed();
-  });
+    for (final frame in [
+      'not json',
+      '[]',
+      jsonEncode({'type': 'stdout', 'data': 42}),
+      jsonEncode({'type': 'stderr', 'data': '%%%'}),
+      jsonEncode({'type': 'exit', 'exit': null}),
+      jsonEncode({
+        'type': 'exit',
+        'exit': {'code': '0'},
+      }),
+    ]) {
+      test(
+        'rejects malformed message $frame and closes the connection',
+        () async {
+          frames = [frame];
+          await expectLater(execute(), throwsFormatException);
+          expect(logs, isEmpty);
+          await expectClosed();
+        },
+      );
+    }
 
-  test(
-    'rejects a connection closed before exit and retains final output',
-    () async {
-      frames = [_output('stdout', utf8.encode('partial output'))];
-      closeBeforeExit = true;
+    test('reports an Orchard error and flushes buffered output', () async {
+      frames = [
+        _output('stderr', utf8.encode('last diagnostic')),
+        jsonEncode({'type': 'error', 'error': 'execution denied'}),
+      ];
       await expectLater(
         execute(),
         throwsA(
           isA<StateError>().having(
             (e) => e.message,
             'message',
-            contains('closed before exit'),
+            contains('execution denied'),
           ),
         ),
       );
-      expect(logs, [('partial output', 'stdout')]);
+      expect(logs, [('last diagnostic', 'stderr')]);
       await expectClosed();
-    },
-  );
+    });
 
-  test('closes the socket when the log callback throws', () async {
-    frames = [_output('stdout', utf8.encode('line\n'))];
-    final error = StateError('log consumer failed');
-    await expectLater(
-      execute(onLog: (_, _) => throw error),
-      throwsA(same(error)),
+    test(
+      'rejects a connection closed before exit and retains final output',
+      () async {
+        frames = [_output('stdout', utf8.encode('partial output'))];
+        closeBeforeExit = true;
+        await expectLater(
+          execute(),
+          throwsA(
+            isA<StateError>().having(
+              (e) => e.message,
+              'message',
+              contains('closed before exit'),
+            ),
+          ),
+        );
+        expect(logs, [('partial output', 'stdout')]);
+        await expectClosed();
+      },
     );
-    await expectClosed();
-  });
 
-  test('propagates a rejected WebSocket handshake without logging', () async {
-    rejectUpgrade = true;
-    await expectLater(execute(), throwsA(isA<WebSocketException>()));
-    expect(logs, isEmpty);
-    expect(sockets, isEmpty);
+    test('closes the socket when the log callback throws', () async {
+      frames = [_output('stdout', utf8.encode('line\n'))];
+      final error = StateError('log consumer failed');
+      await expectLater(
+        execute(onLog: (_, _) => throw error),
+        throwsA(same(error)),
+      );
+      await expectClosed();
+    });
+
+    test('propagates a rejected WebSocket handshake without logging', () async {
+      rejectUpgrade = true;
+      await expectLater(execute(), throwsA(isA<WebSocketException>()));
+      expect(logs, isEmpty);
+      expect(sockets, isEmpty);
+    });
   });
 }
 

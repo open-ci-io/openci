@@ -40,6 +40,58 @@ void main() {
   });
 
   group('Generate Key Endpoint', () {
+    test('rejects unsupported methods without creating a key', () async {
+      final context = TestRequestContext(
+        path: '/teams/team-123/ios-signing/generate-key',
+        method: HttpMethod.get,
+      );
+
+      final response = await generate_key_route.onRequest(
+        context.context,
+        'team-123',
+      );
+
+      expect(response.statusCode, HttpStatus.methodNotAllowed);
+      expect(await db.secretDao.getSecretsForTeam('team-123'), isEmpty);
+    });
+
+    for (final (key, error) in [
+      (null, 'Internal server error'),
+      ('invalid', 'Invalid encryption key configuration'),
+    ]) {
+      test(
+        'does not save a key with invalid encryption config: $key',
+        () async {
+          await db
+              .into(db.teamMembers)
+              .insert(
+                TeamMembersCompanion.insert(
+                  teamId: 'team-123',
+                  userId: 'user-1',
+                ),
+              );
+          final context = TestRequestContext(
+            path: '/teams/team-123/ios-signing/generate-key',
+            method: HttpMethod.post,
+          );
+          context.provide<AppDatabase>(db);
+          context.provide<String?>('user-1');
+          context.provide<Map<String, String>>({
+            'SECRET_ENCRYPTION_KEY': ?key,
+          });
+
+          final response = await generate_key_route.onRequest(
+            context.context,
+            'team-123',
+          );
+
+          expect(response.statusCode, HttpStatus.internalServerError);
+          expect(await response.json(), {'success': false, 'error': error});
+          expect(await db.secretDao.getSecretsForTeam('team-123'), isEmpty);
+        },
+      );
+    }
+
     test('responds with 401 Unauthorized when uid is null', () async {
       final context = TestRequestContext(
         path: '/teams/team-123/ios-signing/generate-key',

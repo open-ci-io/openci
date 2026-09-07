@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_test/dart_frog_test.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -147,6 +148,44 @@ void main() {
       expect(response.statusCode, HttpStatus.ok);
       expect(await response.json(), isEmpty);
     });
+
+    for (final (scenario, status, message) in [
+      ('missing team', HttpStatus.notFound, 'Team not found'),
+      (
+        'no installation',
+        HttpStatus.badRequest,
+        'GitHub App is not installed for this team',
+      ),
+      ('invalid installation', HttpStatus.badRequest, 'Invalid installationId'),
+    ]) {
+      test('rejects $scenario before contacting GitHub', () async {
+        if (scenario == 'missing team') {
+          await db.delete(db.teams).go();
+        } else if (scenario == 'no installation') {
+          await db
+              .update(db.teams)
+              .write(const TeamsCompanion(installationIds: Value([])));
+        }
+        final client = MockClient(
+          (_) async => fail('GitHub must not be contacted'),
+        );
+        addTearDown(client.close);
+        final context = _requestContext(
+          db: db,
+          path:
+              '/teams/team-123/repositories/openci/genuine-ci-files?owner=openci-org&installationId=not-a-number',
+          environment: environment,
+          client: client,
+        );
+        final response = await route.onRequest(
+          context.context,
+          'team-123',
+          'openci',
+        );
+        expect(response.statusCode, status);
+        expect(await response.json(), {'success': false, 'error': message});
+      });
+    }
 
     test('requires owner', () async {
       final context = _requestContext(

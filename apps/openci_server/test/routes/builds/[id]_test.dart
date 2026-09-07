@@ -164,6 +164,7 @@ void main() {
           'failureSummaryDurationMs': 1200,
           'ipaUrl': 'https://s3.example.com/build.ipa',
           'hasIpa': true,
+          'provisionedUdids': ['udid-1', 'udid-2'],
           'bundleId': 'com.example.app',
           'ipaVersion': '1.0.0',
           'appName': 'Test App',
@@ -201,6 +202,7 @@ void main() {
         expect(updatedDrift.failureSummaryDurationMs, equals(1200));
         expect(updatedDrift.ipaUrl, equals('https://s3.example.com/build.ipa'));
         expect(updatedDrift.hasIpa, isTrue);
+        expect(updatedDrift.provisionedUdids, ['udid-1', 'udid-2']);
         expect(updatedDrift.bundleId, equals('com.example.app'));
         expect(updatedDrift.ipaVersion, equals('1.0.0'));
         expect(updatedDrift.appName, equals('Test App'));

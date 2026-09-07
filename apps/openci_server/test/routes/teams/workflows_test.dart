@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_test/dart_frog_test.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -68,6 +69,220 @@ void main() {
     await db.close();
     if (tempDir.existsSync()) {
       tempDir.deleteSync(recursive: true);
+    }
+  });
+
+  group('workflow lookup failures and installations', () {
+    setUp(() => db.teamDao.addTeamMember('team-123', 'user-1'));
+
+    Future<Response> fetch({
+      Object? graphqlBody,
+      int statusCode = 200,
+      http.Client? client,
+      HttpMethod method = HttpMethod.get,
+      String branch = 'feature/builds',
+    }) {
+      final httpClient =
+          client ??
+          MockClient((request) async {
+            if (request.url.path.endsWith('/access_tokens')) {
+              return http.Response(jsonEncode({'token': 'test-token'}), 200);
+            }
+            final body = jsonDecode(request.body) as Map<String, dynamic>;
+            expect(body['variables']['expression'], '$branch:.openci');
+            return http.Response(jsonEncode(graphqlBody), statusCode);
+          });
+      addTearDown(httpClient.close);
+      final context = TestRequestContext(
+        path: '/teams/team-123/workflows?repository=owner/repo&branch=$branch',
+        method: method,
+      );
+      context.provide<AppDatabase>(db);
+      context.provide<String?>('user-1');
+      context.provide<Map<String, String>>(testEnv);
+      context.provide<http.Client>(httpClient);
+      return Future.value(
+        workflows_route.onRequest(context.context, 'team-123'),
+      );
+    }
+
+    test('rejects unsupported methods', () async {
+      expect(
+        (await fetch(method: HttpMethod.post)).statusCode,
+        HttpStatus.methodNotAllowed,
+      );
+    });
+
+    test(
+      'reports a missing GitHub installation before making requests',
+      () async {
+        await db
+            .update(db.teams)
+            .write(
+              const TeamsCompanion(installationIds: Value([])),
+            );
+        final response = await fetch(
+          client: MockClient((_) async {
+            fail('No GitHub request should be made without an installation');
+          }),
+        );
+        expect(response.statusCode, HttpStatus.badRequest);
+        expect(await response.json(), {
+          'success': false,
+          'error': 'GitHub App is not installed for this team',
+        });
+      },
+    );
+
+    for (final payload in [
+      {
+        'data': {
+          'repository': {'object': null},
+        },
+      },
+      {
+        'errors': [
+          {'message': 'Could not resolve to an object at this path'},
+        ],
+      },
+    ]) {
+      test(
+        'returns an empty workflow list for a missing tree: $payload',
+        () async {
+          final response = await fetch(graphqlBody: payload);
+          expect(response.statusCode, HttpStatus.ok);
+          expect(await response.json(), {'success': true, 'files': []});
+        },
+      );
+    }
+
+    test('reports a repository absent from all installations', () async {
+      final response = await fetch(
+        graphqlBody: {
+          'data': {'repository': null},
+        },
+      );
+      expect(response.statusCode, HttpStatus.notFound);
+      expect(await response.json(), {
+        'success': false,
+        'error': 'Repository not found in any installation',
+      });
+    });
+
+    for (final (status, payload) in [
+      (503, {'message': 'private upstream detail'}),
+      (
+        200,
+        {
+          'errors': [
+            {'message': 'private upstream detail'},
+          ],
+        },
+      ),
+    ]) {
+      test(
+        'hides upstream failure details for HTTP $status: $payload',
+        () async {
+          final response = await fetch(
+            statusCode: status,
+            graphqlBody: payload,
+          );
+          expect(response.statusCode, HttpStatus.internalServerError);
+          expect(await response.json(), {
+            'success': false,
+            'error': 'Internal server error',
+          });
+        },
+      );
+    }
+
+    test('tries the next installation when the first request fails', () async {
+      await db
+          .update(db.teams)
+          .write(
+            const TeamsCompanion(installationIds: Value([111, 222])),
+          );
+      final tokenPaths = <String>[];
+      var graphRequests = 0;
+      final response = await fetch(
+        client: MockClient((request) async {
+          if (request.url.path.endsWith('/access_tokens')) {
+            tokenPaths.add(request.url.path);
+            return http.Response(jsonEncode({'token': 'test-token'}), 200);
+          }
+          if (++graphRequests == 1) return http.Response('unavailable', 503);
+          return http.Response(
+            jsonEncode({
+              'data': {
+                'repository': {
+                  'object': {
+                    'entries': [
+                      {
+                        'type': 'blob',
+                        'name': 'build.yml',
+                        'object': {'text': 'steps: []'},
+                      },
+                    ],
+                  },
+                },
+              },
+            }),
+            200,
+          );
+        }),
+      );
+      expect(response.statusCode, HttpStatus.ok);
+      expect(tokenPaths, [
+        '/app/installations/111/access_tokens',
+        '/app/installations/222/access_tokens',
+      ]);
+      expect(graphRequests, 2);
+      expect(await response.json(), {
+        'success': true,
+        'files': [
+          {
+            'name': 'build.yml',
+            'path': '.openci/build.yml',
+            'content': 'steps: []',
+          },
+        ],
+      });
+    });
+
+    for (final (baseUrl, graphUrl) in [
+      ('https://github.com/', 'https://api.github.com/graphql'),
+      ('https://github.example.com/', 'https://github.example.com/api/graphql'),
+    ]) {
+      test('uses the GraphQL endpoint for $baseUrl', () async {
+        await db
+            .update(db.teams)
+            .write(
+              TeamsCompanion(githubBaseUrl: Value(baseUrl)),
+            );
+        var queriedGraph = false;
+        final response = await fetch(
+          client: MockClient((request) async {
+            if (request.url.path.endsWith('/access_tokens')) {
+              return http.Response(jsonEncode({'token': 'test-token'}), 200);
+            }
+            queriedGraph = true;
+            expect(request.url.toString(), graphUrl);
+            return http.Response(
+              jsonEncode({
+                'data': {
+                  'repository': {
+                    'object': {'entries': []},
+                  },
+                },
+              }),
+              200,
+            );
+          }),
+        );
+        expect(queriedGraph, isTrue);
+        expect(response.statusCode, HttpStatus.ok);
+        expect(await response.json(), {'success': true, 'files': []});
+      });
     }
   });
 

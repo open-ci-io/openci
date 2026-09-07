@@ -32,6 +32,7 @@ void main() {
     }
   ''';
   late AppDatabase db;
+  late SecretDao dao;
   late Directory tempDir;
   late Map<String, String> environment;
   late List<String> requestedFiles;
@@ -65,7 +66,7 @@ void main() {
           updatedAt: now,
         ),
     ];
-    final dao = _MockSecretDao();
+    dao = _MockSecretDao();
     db = _MockAppDatabase();
     when(() => db.secretDao).thenReturn(dao);
     when(
@@ -80,8 +81,10 @@ void main() {
   Future<Response> requestSecrets({
     required String workflow,
     String fileName = 'ci.dart',
+    String? installationId = '98765',
     String? commitSha = 'job-commit',
     int definitionsStatus = 200,
+    HttpMethod method = HttpMethod.get,
   }) async {
     final directory = fileName.endsWith('.dart') ? 'genuine_ci' : '.openci';
     final client = MockClient((request) async {
@@ -119,7 +122,7 @@ void main() {
 
     final context = TestRequestContext(
       path: '/builds/job-1/secrets',
-      method: HttpMethod.get,
+      method: method,
     );
     final now = DateTime.utc(2026, 9, 7);
     context.provide<DriftBuildJob>(
@@ -128,7 +131,7 @@ void main() {
         owner: 'owner',
         repo: 'repo',
         teamId: 'team-1',
-        installationId: '98765',
+        installationId: installationId,
         commitSha: commitSha,
         branch: 'feature/ci',
         status: BuildJobStatus.IN_PROGRESS,
@@ -145,6 +148,49 @@ void main() {
   }
 
   group('GET /builds/[id]/secrets', () {
+    test('rejects unsupported methods without fetching secrets', () async {
+      final response = await requestSecrets(
+        workflow: 'Secrets.ascKey;',
+        method: HttpMethod.post,
+      );
+
+      expect(response.statusCode, 405);
+      expect(requestedFiles, isEmpty);
+      verifyNever(() => dao.getSecretsForTeam('team-1'));
+    });
+
+    for (final installationId in [null, '']) {
+      test('rejects a missing installation ID: $installationId', () async {
+        final response = await requestSecrets(
+          workflow: 'Secrets.ascKey;',
+          installationId: installationId,
+        );
+
+        expect(response.statusCode, 400);
+        expect(await response.json(), {
+          'success': false,
+          'error': 'No installationId found for job',
+        });
+        expect(requestedFiles, isEmpty);
+        verifyNever(() => dao.getSecretsForTeam('team-1'));
+      });
+    }
+
+    test('rejects a missing workflow filename', () async {
+      final response = await requestSecrets(
+        workflow: 'Secrets.ascKey;',
+        fileName: '',
+      );
+
+      expect(response.statusCode, 400);
+      expect(await response.json(), {
+        'success': false,
+        'error': 'No workflowFileName found for job',
+      });
+      expect(requestedFiles, isEmpty);
+      verifyNever(() => dao.getSecretsForTeam('team-1'));
+    });
+
     for (final commitSha in ['job-commit', null]) {
       test('resolves the getter using the same job ref: $commitSha', () async {
         final response = await requestSecrets(
@@ -219,6 +265,58 @@ void main() {
         'genuine_ci/ci.dart',
         'genuine_ci/secrets.g.dart',
       ]);
+    });
+
+    test('does not return partial credentials when decryption fails', () async {
+      final now = DateTime.utc(2026, 9, 7);
+      when(() => dao.getSecretsForTeam('team-1')).thenAnswer(
+        (_) async => [
+          DriftSecret(
+            name: 'ASC_KEY',
+            teamId: 'team-1',
+            encryptedValue: 'invalid-ciphertext',
+            createdAt: now,
+            updatedAt: now,
+          ),
+        ],
+      );
+
+      final response = await requestSecrets(workflow: 'Secrets.ascKey;');
+
+      verify(() => dao.getSecretsForTeam('team-1')).called(1);
+      expect(response.statusCode, 500);
+      expect(await response.json(), {
+        'success': false,
+        'error': 'Internal server error',
+      });
+    });
+
+    test('escapes multiline secret values in the environment file', () async {
+      final now = DateTime.utc(2026, 9, 7);
+      final encrypted = await SecretCrypter(encryptionKey).encrypt(
+        '-----BEGIN KEY-----\nsecret value\n-----END KEY-----\n',
+      );
+      when(() => dao.getSecretsForTeam('team-1')).thenAnswer(
+        (_) async => [
+          DriftSecret(
+            name: 'ASC_KEY',
+            teamId: 'team-1',
+            encryptedValue: encrypted,
+            createdAt: now,
+            updatedAt: now,
+          ),
+        ],
+      );
+
+      final response = await requestSecrets(workflow: 'Secrets.ascKey;');
+
+      expect(response.statusCode, 200);
+      final body = await response.json() as Map<String, dynamic>;
+      expect(
+        body['secretsContent'],
+        'GITHUB_TOKEN=$token\n'
+        r'ASC_KEY=-----BEGIN KEY-----\nsecret value\n-----END KEY-----\n',
+      );
     });
   });
 }

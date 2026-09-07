@@ -23,6 +23,27 @@ void main() {
 
   group('Workers Route Endpoints', () {
     group('POST /workers/heartbeat', () {
+      for (final payload in ['{', '[]', '{}', '{"workerId":""}']) {
+        test(
+          'rejects malformed heartbeat $payload without recording a worker',
+          () async {
+            final context = TestRequestContext(
+              path: '/workers/heartbeat',
+              method: HttpMethod.post,
+              body: payload,
+            );
+            context.provide<AppDatabase>(db);
+            context.provide<String?>('worker-1');
+            final response = await heartbeat_route.onRequest(context.context);
+            expect(response.statusCode, HttpStatus.badRequest);
+            final body = await response.json() as Map<String, dynamic>;
+            expect(body['success'], isFalse);
+            expect(body['error'], isNotEmpty);
+            expect(await db.workerHeartbeatDao.getAllHeartbeats(), isEmpty);
+          },
+        );
+      }
+
       test('responds with 401 Unauthorized when uid is null', () async {
         final context = TestRequestContext(
           path: '/workers/heartbeat',

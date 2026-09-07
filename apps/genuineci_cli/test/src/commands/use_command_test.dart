@@ -83,7 +83,7 @@ void main() {
     },
   );
 
-  test('unknown language preserves the saved file and active locale', () async {
+  test('unknown language does not change the file or active locale', () async {
     await language.setLanguage('ja');
     final before = await File(config.filePath).readAsString();
     expect(await runner.run(['use', 'klingon']), 1);
