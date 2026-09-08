@@ -614,6 +614,163 @@ void main() {
       );
     });
 
+    group('createGitHubCheckRun', () {
+      Future<String> createCheck({
+        http.Client? client,
+        Map<String, String>? environment,
+      }) => GitHubService.createGitHubCheckRun(
+        owner: 'org',
+        repo: 'mobile',
+        installationIdStr: '98765',
+        name: 'Flutter CI',
+        headSha: 'abc123',
+        externalId: 'job-123',
+        environment: environment ?? testEnv,
+        client: client,
+      );
+
+      test('creates an in-progress check and returns its ID', () async {
+        testEnv['GITHUB_API_BASE_URL'] = 'https://github.example.test/api/v3';
+        final requests = <http.Request>[];
+        final client = apiClient((request) {
+          requests.add(request);
+          return http.Response('{"id": 99999}', HttpStatus.created);
+        });
+
+        expect(await createCheck(client: client), '99999');
+        final request = requests.single;
+        expect(request.method, 'POST');
+        expect(
+          request.url.toString(),
+          'https://github.example.test/api/v3/repos/org/mobile/check-runs',
+        );
+        expect(request.headers['authorization'], 'Bearer ghs_test_token');
+        expect(request.headers['content-type'], 'application/json');
+        final body = jsonDecode(request.body) as Map<String, dynamic>;
+        final startedAt = DateTime.parse(body.remove('started_at') as String);
+        expect(startedAt.isUtc, isTrue);
+        expect(body, {
+          'name': 'Flutter CI',
+          'head_sha': 'abc123',
+          'external_id': 'job-123',
+          'status': 'in_progress',
+        });
+      });
+
+      test('uses the default HTTP client when none is supplied', () async {
+        final client = apiClient(
+          (_) => http.Response('{"id": 99999}', HttpStatus.created),
+        );
+
+        expect(
+          await http.runWithClient(() => createCheck(), () => client),
+          '99999',
+        );
+      });
+
+      test(
+        'reports missing process configuration when no environment is supplied',
+        () async {
+          final client = MockClient((_) async => fail('No request expected'));
+          addTearDown(client.close);
+
+          await expectLater(
+            GitHubService.createGitHubCheckRun(
+              owner: 'org',
+              repo: 'mobile',
+              installationIdStr: '98765',
+              name: 'Flutter CI',
+              headSha: 'abc123',
+              externalId: 'job-123',
+              client: client,
+            ),
+            throwsA(
+              isA<StateError>().having(
+                (error) => error.message,
+                'message',
+                'GITHUB_API_BASE_URL environment variable is not configured',
+              ),
+            ),
+          );
+        },
+        skip: (Platform.environment['GITHUB_API_BASE_URL'] ?? '').isNotEmpty
+            ? 'Requires an unconfigured process environment.'
+            : false,
+      );
+
+      for (final status in [
+        HttpStatus.forbidden,
+        HttpStatus.unprocessableEntity,
+      ]) {
+        test('reports a Check creation failure with status $status', () async {
+          final client = apiClient((_) => http.Response('Rejected', status));
+
+          await expectLater(
+            createCheck(client: client),
+            throwsA(
+              isA<HttpException>().having(
+                (e) => e.message,
+                'message',
+                contains('$status Rejected'),
+              ),
+            ),
+          );
+        });
+      }
+
+      for (final body in [
+        'not-json',
+        '[]',
+        '{}',
+        '{"id":"99999"}',
+        '{"id":0}',
+      ]) {
+        test('rejects an invalid Check response: $body', () async {
+          final client = apiClient(
+            (_) => http.Response(body, HttpStatus.created),
+          );
+
+          await expectLater(createCheck(client: client), throwsFormatException);
+        });
+      }
+
+      for (final baseUrl in [null, '']) {
+        test('rejects missing API configuration: $baseUrl', () async {
+          final env = Map<String, String>.from(testEnv)
+            ..remove('GITHUB_API_BASE_URL');
+          if (baseUrl != null) env['GITHUB_API_BASE_URL'] = baseUrl;
+          final client = MockClient((_) async => fail('No request expected'));
+          addTearDown(client.close);
+
+          await expectLater(
+            createCheck(client: client, environment: env),
+            throwsStateError,
+          );
+        });
+      }
+
+      test(
+        'does not create a Check if installation authentication fails',
+        () async {
+          final requests = <http.Request>[];
+          final client = MockClient((request) async {
+            requests.add(request);
+            return http.Response('Forbidden', HttpStatus.forbidden);
+          });
+          addTearDown(client.close);
+
+          await expectLater(
+            createCheck(client: client),
+            throwsA(isA<HttpException>()),
+          );
+          expect(
+            requests.single.url.path,
+            '/app/installations/98765/access_tokens',
+          );
+        },
+      );
+    });
+
     group('updateGitHubCheckRun', () {
       test('successfully updates check run (queued/in_progress)', () async {
         var tokenRequested = false;

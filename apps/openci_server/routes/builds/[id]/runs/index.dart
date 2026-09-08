@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:drift/drift.dart';
+import 'package:http/http.dart' as http;
 import 'package:openci_server/database.dart';
 import 'package:openci_server/github/github_service.dart';
 import 'package:openci_server/request/error_handler.dart';
@@ -121,18 +123,59 @@ Future<Response> _post(RequestContext context, String id) async {
     }
 
     final driftJob = context.read<DriftBuildJob>();
-    if (driftJob.checkRunId != null && driftJob.installationId != null) {
+    final installationId = driftJob.installationId;
+    if (installationId != null &&
+        installationId.isNotEmpty &&
+        installationId != '12345678') {
       try {
-        await GitHubService.updateGitHubCheckRun(
-          owner: driftJob.owner,
-          repo: driftJob.repo,
-          checkRunIdStr: driftJob.checkRunId!,
-          installationIdStr: driftJob.installationId!,
-          runStatus: 'in_progress',
-        );
+        Map<String, String>? environment;
+        http.Client? client;
+        try {
+          environment = context.read<Map<String, String>>();
+        } catch (_) {
+          // GitHubService falls back to the process environment.
+        }
+        try {
+          client = context.read<http.Client>();
+        } catch (_) {
+          // GitHubService uses its default HTTP client.
+        }
+
+        final checkRunId = driftJob.checkRunId;
+        if (checkRunId == null || checkRunId.isEmpty) {
+          final commitSha = driftJob.commitSha;
+          if (commitSha == null || commitSha.isEmpty) {
+            throw StateError('commitSha is required to create a GitHub check');
+          }
+          final createdCheckRunId = await GitHubService.createGitHubCheckRun(
+            owner: driftJob.owner,
+            repo: driftJob.repo,
+            installationIdStr: installationId,
+            name: driftJob.workflowName,
+            headSha: commitSha,
+            externalId: driftJob.id,
+            environment: environment,
+            client: client,
+          );
+          await (db.update(
+            db.buildJobs,
+          )..where((job) => job.id.equals(id))).write(
+            BuildJobsCompanion(checkRunId: Value(createdCheckRunId)),
+          );
+        } else {
+          await GitHubService.updateGitHubCheckRun(
+            owner: driftJob.owner,
+            repo: driftJob.repo,
+            checkRunIdStr: checkRunId,
+            installationIdStr: installationId,
+            runStatus: 'in_progress',
+            environment: environment,
+            client: client,
+          );
+        }
       } catch (e) {
         stderr.writeln(
-          'Failed to update check run to in_progress for job ${driftJob.id}: $e',
+          'Failed to start GitHub check run for job ${driftJob.id}: $e',
         );
       }
     }
