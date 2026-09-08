@@ -8,7 +8,7 @@ jobを1件ずつ取得・実行する常駐プロセスです。
 `runBuildJobWorker()`で、jobを1件ずつ取得して実行するループを利用できます。
 `main.dart`からこのループを起動し、`executeBuildJob()`を呼び出します。
 サーバー・Orchard・Lokiのクライアントは起動時に生成し、job間で共有します。
-既存dispatcher/executorやComposeの起動構成も変更していません。
+Composeの通常起動では`build-job-worker`を使います。旧dispatcher/executorは移行確認用に残し、通常の起動対象から外しています。
 現在のplannerは`needs`を扱わず、jobを`QUEUED`で作成します。
 
 ## 設定
@@ -118,6 +118,27 @@ jobがない場合と、取得・実行関数が例外を投げた場合は、`p
 
 ## 実行
 
+### Composeから起動
+
+ルートの`.env.example`を参考に、`.env`とserver用の認証ファイルを準備します。
+Orchardのサービスアカウント名とAPI用トークンは`.env`へ設定してください。
+macOS側のOrchard workerとTartの`base-macos`も準備済みの状態で、リポジトリルートから実行します。
+旧executorで実行中のjobがある場合は、完了を待ってから切り替えてください。
+
+```sh
+docker compose stop build-job-dispatcher
+docker compose up -d --build build-job-worker
+docker compose logs -f build-job-worker
+```
+
+workerの依存としてserver・DB・Orchard Controller・Lokiも起動します。
+plannerも動かす場合は、`docker compose up -d --build build-job-planner`を実行します。
+
+停止は`docker compose stop build-job-worker`で行います。
+`BUILD_JOB_WORKER_STOP_GRACE_PERIOD`はjobの完了を待つ停止猶予時間で、標準1時間です。
+
+### Dartから直接起動
+
 リポジトリルートで`flutter pub get`を実行してから、このディレクトリで実行します。
 
 ```sh
@@ -148,4 +169,11 @@ dart format --output=none --set-exit-if-changed .
 dart analyze --fatal-infos
 dart test
 dart test integration_test
+```
+
+DockerイメージはDart 3.12.2でコンパイルし、非rootユーザーで実行します。リポジトリルートで次の検証を行えます。
+
+```sh
+docker compose --env-file .env.example --profile '*' config --quiet
+docker build -f apps/build_job_worker/Dockerfile -t openci-build-job-worker .
 ```
