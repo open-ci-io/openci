@@ -94,6 +94,7 @@ services:
       ORCHARD_VM_MEMORY_GB: ${ORCHARD_VM_MEMORY_GB:-4}
       LOKI_URL: http://loki:3100
       LOKI_URL_FOR_VM: ${LOKI_URL_FOR_VM:-http://192.168.64.1:3100}
+      SENTRY_DSN: ${SENTRY_DSN_BUILD_JOB_WORKER:-}
     depends_on:
       server:
         condition: service_healthy

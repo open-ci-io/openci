@@ -21,7 +21,7 @@ Composeでは`build-job-worker`を常駐サービスとして起動します。
 - `ORCHARD_API_URL`: 任意。デフォルトは`https://orchard-controller:6120`。
 - `LOKI_URL`: 任意。workerからのログ送信先。デフォルトは`http://loki:3100`。
 - `LOKI_URL_FOR_VM`: 任意。VMからのログ送信先。デフォルトは`http://192.168.64.1:3100`。
-- `SENTRY_DSN`: 任意。現段階では読み込みのみで、Sentryへの接続は行いません。
+- `SENTRY_DSN`: 任意。設定するとworker内部の例外をSentryへ送信します。未設定・空文字列の場合は送信しません。
 
 必須設定が未指定または空文字列の場合は、変数名を標準エラー出力へ出して
 終了コード1で終了します。認証キーやトークンの値は出力しません。
@@ -122,6 +122,7 @@ jobがない場合と、取得・実行関数が例外を投げた場合は、`p
 
 ルートの`.env.example`を参考に、`.env`とserver用の認証ファイルを準備します。
 Orchardのサービスアカウント名とAPI用トークンは`.env`へ設定してください。
+Sentryへの通知を有効にする場合は、`.env`の`SENTRY_DSN_BUILD_JOB_WORKER`を設定します。
 macOS側のOrchard workerとTartの`base-macos`も準備済みの状態で、リポジトリルートから実行します。
 既存環境から切り替える場合は、更新前の構成でjobの取得を止め、実行中のjobが完了してからworkerを起動してください。
 
@@ -150,7 +151,8 @@ LOKI_URL=http://localhost:3100 \
 dart run bin/main.dart
 ```
 
-起動後はjobを継続して取得します。取得・実行中の例外は標準エラー出力へ記録します。
+起動後はjobを継続して取得します。起動・取得・実行・結果保存・VM削除などの例外は標準エラー出力へ記録し、DSN設定時はSentryにも送信します。
+Sentryへの送信はjobの処理を待たせずに行い、worker終了時に送信完了を最大5秒待ってからSentryを閉じます。送信の失敗でjobの結果は変更しません。
 `SIGTERM`または`SIGINT`（Ctrl+C）で新しいjobの取得を止め、取得済みjobの結果保存・VM削除を試みてからクライアントを閉じます。
 空キューの待機中なら最大3秒、job取得・実行中ならその処理が終わるまで待ちます。
 停止シグナルによる正常終了は終了コード0、設定・起動に失敗した場合は終了コード1です。
@@ -181,5 +183,4 @@ docker build -f apps/build_job_worker/Dockerfile -t openci-build-job-worker .
 
 - 実行中jobのキャンセル監視。
 - VM準備に失敗した場合の自動リトライ。
-- Sentryへのエラー通知。
 - VM準備・checkout・ワークフロー全体の進捗イベント送信。

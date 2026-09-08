@@ -3,7 +3,11 @@ import 'dart:io';
 
 import 'package:build_job_worker/build_job_worker.dart';
 import 'package:http/http.dart' as http;
+import 'package:openci_shared/initialize_sentry.dart';
 import 'package:openci_shared/openci_shared.dart';
+import 'package:sentry/sentry.dart';
+
+final _pendingErrorReports = <Future<void>>{};
 
 Future<void> main() async {
   final Config config;
@@ -16,11 +20,22 @@ Future<void> main() async {
   }
 
   try {
+    await initializeSentry(config.sentryDsn);
     await _runWorker(config);
     stdout.writeln('Build job worker stopped.');
   } catch (error, stackTrace) {
     _reportError(error, stackTrace);
     exitCode = 1;
+  } finally {
+    try {
+      await Future.wait(
+        _pendingErrorReports,
+      ).timeout(const Duration(seconds: 5));
+    } on TimeoutException {
+      stderr.writeln('Timed out sending worker errors to Sentry.');
+    } finally {
+      await Sentry.close();
+    }
   }
 }
 
@@ -80,4 +95,15 @@ Future<void> _runWorker(Config config) async {
 void _reportError(Object error, StackTrace stackTrace) {
   stderr.writeln('Build job worker error: $error');
   stderr.writeln(stackTrace);
+  if (!Sentry.isEnabled) return;
+
+  final report = Sentry.captureException(error, stackTrace: stackTrace)
+      .then<void>(
+        (_) {},
+        onError: (Object _, StackTrace _) {
+          stderr.writeln('Failed to send worker error to Sentry.');
+        },
+      );
+  _pendingErrorReports.add(report);
+  unawaited(report.whenComplete(() => _pendingErrorReports.remove(report)));
 }

@@ -36,6 +36,7 @@ void main() {
         final worker = await _startWorker({
           ...environment,
           'OPENCI_SERVER_URL': _url(server),
+          'SENTRY_DSN': '',
         });
 
         await claimed.future.timeout(_waitTimeout);
@@ -57,8 +58,13 @@ void main() {
     );
   }
 
-  test('reports claim errors and continues polling', () async {
+  test('keeps polling when Sentry rejects errors', () async {
     final nextClaim = Completer<HttpRequest>();
+    final reports = <Map<String, dynamic>>[];
+    final sentry = await _serve((request) async {
+      reports.add(await _sentryEvent(request));
+      await _reply(request, null, statusCode: 503);
+    });
     var claims = 0;
     final server = await _serve((request) async {
       expect(request.uri.path, '/builds/claim');
@@ -72,6 +78,7 @@ void main() {
     final worker = await _startWorker({
       ...environment,
       'OPENCI_SERVER_URL': _url(server),
+      'SENTRY_DSN': _sentryDsn(sentry),
     });
 
     final request = await nextClaim.future.timeout(_waitTimeout);
@@ -85,14 +92,19 @@ void main() {
     expect(result.stderr, contains('HTTP 503'));
     expect(result.stderr, contains('claimNextBuildJob'));
     expect(claims, 2);
+    _expectSentryException(reports.single, 'StateError', 'HTTP 503');
     _expectNoCredentials(result, environment);
   }, skip: Platform.isWindows);
 
   test(
-    'finishes a job claimed during shutdown and reports execution errors',
+    'finishes a job claimed during shutdown and waits for its Sentry report',
     () async {
       final claim = Completer<HttpRequest>();
       final completed = <String>[];
+      final report = Completer<(HttpRequest, Map<String, dynamic>)>();
+      final sentry = await _serve((request) async {
+        report.complete((request, await _sentryEvent(request)));
+      });
       final server = await _serve((request) async {
         final path = request.uri.path;
         final body = await _body(request);
@@ -117,12 +129,21 @@ void main() {
       final worker = await _startWorker({
         ...environment,
         'OPENCI_SERVER_URL': _url(server),
+        'SENTRY_DSN': _sentryDsn(sentry),
       });
 
       final request = await claim.future.timeout(_waitTimeout);
       expect(worker.process.kill(ProcessSignal.sigint), isTrue);
       await worker.waitForOutput('Waiting for the current job to finish.');
       await _reply(request, {'job': _job().toJson()});
+      final (sentryRequest, event) = await report.future.timeout(_waitTimeout);
+      await worker.waitForOutput('Build job worker stopped.');
+      await expectLater(
+        worker.exited.timeout(const Duration(milliseconds: 100)),
+        throwsA(isA<TimeoutException>()),
+      );
+      _expectSentryException(event, 'StateError', 'Failed to create build run');
+      await _reply(sentryRequest, {});
       final result = await worker.finish();
 
       expect(result.exitCode, 0);
@@ -332,16 +353,47 @@ void main() {
 
   for (final key in ['OPENCI_SERVER_URL', 'ORCHARD_API_URL']) {
     test('exits with an error if $key prevents client creation', () async {
-      final worker = await _startWorker({...environment, key: 'http://['});
+      final reports = <Map<String, dynamic>>[];
+      final sentry = await _serve((request) async {
+        reports.add(await _sentryEvent(request));
+        await _reply(request, {});
+      });
+      final worker = await _startWorker({
+        ...environment,
+        key: 'http://[',
+        'SENTRY_DSN': _sentryDsn(sentry),
+      });
       final result = await worker.finish();
 
       expect(result.exitCode, 1);
       expect(result.stdout, isEmpty);
       expect(result.stderr, contains('Build job worker error:'));
       expect(result.stderr, contains('FormatException'));
+      _expectSentryException(reports.single, 'FormatException', 'http://[');
       _expectNoCredentials(result, environment);
     });
   }
+
+  test('stops when Sentry does not respond', () async {
+    final reports = <Map<String, dynamic>>[];
+    final sentry = await _serve((request) async {
+      reports.add(await _sentryEvent(request));
+    });
+    final worker = await _startWorker({
+      ...environment,
+      'ORCHARD_API_URL': 'http://[',
+      'SENTRY_DSN': _sentryDsn(sentry),
+    });
+    final result = await worker.finish();
+
+    expect(result.exitCode, 1);
+    expect(
+      result.stderr,
+      contains('Timed out sending worker errors to Sentry.'),
+    );
+    _expectSentryException(reports.single, 'FormatException', 'http://[');
+    _expectNoCredentials(result, environment);
+  });
 }
 
 Future<_WorkerProcess> _startWorker(Map<String, String> environment) async {
@@ -425,6 +477,35 @@ Future<HttpServer> _serve(Future<void> Function(HttpRequest) handler) async {
 }
 
 String _url(HttpServer server) => 'http://127.0.0.1:${server.port}';
+
+String _sentryDsn(HttpServer server) =>
+    'http://public@127.0.0.1:${server.port}/1';
+
+Future<Map<String, dynamic>> _sentryEvent(HttpRequest request) async {
+  expect(request.method, 'POST');
+  expect(request.uri.path, '/api/1/envelope/');
+  var bytes = await request.fold(<int>[], (body, chunk) => body..addAll(chunk));
+  if (request.headers.value(HttpHeaders.contentEncodingHeader) == 'gzip') {
+    bytes = gzip.decode(bytes);
+  }
+  final lines = const LineSplitter().convert(utf8.decode(bytes));
+  expect(jsonDecode(lines[1]), containsPair('type', 'event'));
+  return jsonDecode(lines[2]) as Map<String, dynamic>;
+}
+
+void _expectSentryException(
+  Map<String, dynamic> event,
+  String type,
+  String message,
+) {
+  final exceptions = event['exception'] as Map<String, dynamic>;
+  final exception =
+      (exceptions['values'] as List<dynamic>).single as Map<String, dynamic>;
+  expect(exception['type'], type);
+  expect(exception['value'], contains(message));
+  final stackTrace = exception['stacktrace'] as Map<String, dynamic>;
+  expect(stackTrace['frames'], isNotEmpty);
+}
 
 Future<Map<String, dynamic>> _body(HttpRequest request) async =>
     jsonDecode(await utf8.decoder.bind(request).join()) as Map<String, dynamic>;
