@@ -26,7 +26,7 @@
   "dev": {
     "description": "Manage local development environment (Docker, Tart, DB, Server).",
     "start": {
-      "description": "Start local development environment (Docker containers, Tart VM, Orchard).",
+      "description": "Start local services and run the Mac Orchard Worker until Ctrl+C.",
       "flags": {
         "seed": "Seed local test data after starting services."
       },
@@ -42,6 +42,8 @@
       "stepOrchardContext": "Step 4: Registering Orchard CLI context...",
       "stepOrchardContextFailed": "Error: Failed to register Orchard CLI context.",
       "stepOrchardContextRegistered": "Orchard CLI context authenticated.",
+      "stepOrchardWorker": "Starting Orchard Worker on this Mac. Press Ctrl+C to stop it. Docker containers will keep running.",
+      "stepOrchardWorkerFailed": "Error: Orchard Worker could not start or exited with an error.",
       "stepSeed": "Step 5: Seeding local test data...",
       "stepSeedFailed": "Error: Failed to seed local test data.",
       "stepSeedCompleted": "Local test data seeded.",
