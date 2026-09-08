@@ -303,10 +303,32 @@ void main() {
           'status': 'completed',
           'conclusion': conclusion,
         });
-        expect(logs, hasLength(2));
-        for (var index = 0; index < logs.length; index++) {
+        expect(logs, hasLength(4));
+        for (final (index, log) in logs.take(2).indexed) {
           final stream =
-              (logs[index]['streams'] as List<dynamic>).single
+              (log['streams'] as List<dynamic>).single as Map<String, dynamic>;
+          expect(stream['stream'], {
+            'stream': 'stdout',
+            'type': 'step_event',
+            'run_id': runId,
+            'build_job_id': 'job-1',
+            'step_id': 'prepare_vm',
+          });
+          final values =
+              (stream['values'] as List<dynamic>).single as List<dynamic>;
+          final step = BuildStep.fromJson(
+            jsonDecode(values[1] as String) as Map<String, dynamic>,
+          );
+          expect(step.runId, runId);
+          expect(
+            step.status,
+            index == 0 ? BuildJobStatus.IN_PROGRESS : BuildJobStatus.SUCCESS,
+          );
+        }
+        final outputLogs = logs.skip(2).toList();
+        for (var index = 0; index < outputLogs.length; index++) {
+          final stream =
+              (outputLogs[index]['streams'] as List<dynamic>).single
                   as Map<String, dynamic>;
           expect(stream['stream'], {
             'stream': 'stdout',
