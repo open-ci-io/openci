@@ -108,6 +108,35 @@ void main() {
       expect(capturedEnvironment, {'PATH': '/usr/local/bin'});
     });
 
+    test(
+      'inherits the process environment when no override is given',
+      () async {
+        late Map<String, String> capturedEnvironment;
+
+        final result = await startDockerCompose(
+          logger,
+          projectRoot,
+          processRunner:
+              (_, _, {required workingDirectory, required environment}) async {
+                capturedEnvironment = environment;
+                return 0;
+              },
+        );
+
+        expect(result, isTrue);
+        expect(
+          capturedEnvironment.keys,
+          unorderedEquals(Platform.environment.keys),
+        );
+        expect(
+          capturedEnvironment.entries.every(
+            (entry) => entry.value == Platform.environment[entry.key],
+          ),
+          isTrue,
+        );
+      },
+    );
+
     test('returns false when Docker Compose exits with an error', () async {
       const dockerComposeFailureExitCode = 17;
 
