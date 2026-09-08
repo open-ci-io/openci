@@ -83,6 +83,61 @@ class GitHubService {
     return tokenData['token'] as String;
   }
 
+  static Future<String> createGitHubCheckRun({
+    required String owner,
+    required String repo,
+    required String installationIdStr,
+    required String name,
+    required String headSha,
+    required String externalId,
+    Map<String, String>? environment,
+    http.Client? client,
+  }) async {
+    final env = environment ?? Platform.environment;
+    final githubApiBaseUrl = env['GITHUB_API_BASE_URL'];
+    if (githubApiBaseUrl == null || githubApiBaseUrl.isEmpty) {
+      throw StateError(
+        'GITHUB_API_BASE_URL environment variable is not configured',
+      );
+    }
+
+    final token = await getInstallationToken(
+      installationIdStr: installationIdStr,
+      environment: environment,
+      client: client,
+    );
+    final url = Uri.parse('$githubApiBaseUrl/repos/$owner/$repo/check-runs');
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'User-Agent': 'OpenCI-Server',
+      'Content-Type': 'application/json',
+    };
+    final body = jsonEncode({
+      'name': name,
+      'head_sha': headSha,
+      'external_id': externalId,
+      'status': 'in_progress',
+      'started_at': DateTime.now().toUtc().toIso8601String(),
+    });
+    final response = client != null
+        ? await client.post(url, headers: headers, body: body)
+        : await http.post(url, headers: headers, body: body);
+    if (response.statusCode != HttpStatus.created) {
+      throw HttpException(
+        'Failed to create GitHub check run: '
+        '${response.statusCode} ${response.body}',
+      );
+    }
+
+    final data = jsonDecode(response.body);
+    if (data case {'id': final int id} when id > 0) {
+      return id.toString();
+    }
+    throw const FormatException('GitHub check run response has no valid id');
+  }
+
   static Future<void> updateGitHubCheckRun({
     required String owner,
     required String repo,

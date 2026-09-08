@@ -1,13 +1,18 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_test/dart_frog_test.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:openci_server/database.dart';
 import 'package:openci_shared/openci_shared.dart';
 import 'package:test/test.dart';
 
 import '../../../../routes/builds/[id]/runs/index.dart' as route;
+import '../../../helpers/github_app_test_key.dart';
 
 DateTime _getNormalizedNow() {
   final now = DateTime.now().toUtc();
@@ -299,6 +304,213 @@ void main() {
         expect(body['error'], contains('Invalid payload structure'));
       },
     );
+  });
+
+  group('GitHub Check at build start', () {
+    late Directory tempDirectory;
+    late Map<String, String> environment;
+    late List<http.Request> requests;
+    late MockClient client;
+    var createStatus = HttpStatus.created;
+    var updateStatus = HttpStatus.ok;
+
+    setUp(() async {
+      tempDirectory = await Directory.systemTemp.createTemp('build_run_check_');
+      final keyFile = File('${tempDirectory.path}/key.pem');
+      await keyFile.writeAsString(testRsaPrivateKey);
+      environment = {
+        'GITHUB_APP_ID': '123456',
+        'GITHUB_PRIVATE_KEY_PATH': keyFile.path,
+        'GITHUB_API_BASE_URL': 'https://api.github.com',
+      };
+      requests = [];
+      createStatus = HttpStatus.created;
+      updateStatus = HttpStatus.ok;
+      client = MockClient((request) async {
+        requests.add(request);
+        if (request.url.path.endsWith('/access_tokens')) {
+          return http.Response('{"token":"test-token"}', HttpStatus.created);
+        }
+        if (request.method == 'POST' &&
+            request.url.path == '/repos/org/mobile/check-runs') {
+          return http.Response('{"id":99999}', createStatus);
+        }
+        if (request.method == 'PATCH' &&
+            request.url.path == '/repos/org/mobile/check-runs/99999') {
+          return http.Response('{}', updateStatus);
+        }
+        fail('Unexpected GitHub request: ${request.method} ${request.url}');
+      });
+      addTearDown(client.close);
+      addTearDown(() => tempDirectory.delete(recursive: true));
+
+      final now = _getNormalizedNow();
+      await db.buildJobDao.insertBuildJob(
+        DriftBuildJob(
+          id: 'job-check',
+          status: BuildJobStatus.IN_PROGRESS,
+          owner: 'org',
+          repo: 'mobile',
+          workflowName: 'Flutter CI',
+          workflowFileName: 'ci.dart',
+          installationId: '98765',
+          commitSha: 'abc123',
+          runCount: 2,
+          latestRunId: 'previous-run',
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
+    });
+
+    Future<Response> startRun({
+      String runId = 'run-check',
+      bool provideEnvironment = true,
+      bool provideClient = true,
+    }) async {
+      final job = (await db.buildJobDao.getBuildJob('job-check'))!;
+      final context = TestRequestContext(
+        path: '/builds/job-check/runs',
+        method: HttpMethod.post,
+        body: jsonEncode({'id': runId}),
+      )..provide<AppDatabase>(db);
+      context.provide<DriftBuildJob>(job);
+      if (provideEnvironment) {
+        context.provide<Map<String, String>>(environment);
+      }
+      if (provideClient) context.provide<http.Client>(client);
+      return route.onRequest(context.context, job.id);
+    }
+
+    List<http.Request> checkRequests() => requests
+        .where((request) => request.url.path.contains('/check-runs'))
+        .toList();
+
+    for (final checkRunId in [null, '']) {
+      test('creates and saves a Check when the ID is $checkRunId', () async {
+        await db
+            .update(db.buildJobs)
+            .write(
+              BuildJobsCompanion(checkRunId: Value(checkRunId)),
+            );
+
+        final response = await startRun();
+
+        expect(response.statusCode, HttpStatus.ok);
+        final request = checkRequests().single;
+        expect(request.method, 'POST');
+        expect(jsonDecode(request.body), containsPair('head_sha', 'abc123'));
+        expect(jsonDecode(request.body), containsPair('name', 'Flutter CI'));
+        expect(
+          jsonDecode(request.body),
+          containsPair('external_id', 'job-check'),
+        );
+        final stored = (await db.buildJobDao.getBuildJob('job-check'))!;
+        expect(stored.checkRunId, '99999');
+        expect(stored.runCount, 3);
+        expect(stored.latestRunId, 'run-check');
+        expect(stored.status, BuildJobStatus.IN_PROGRESS);
+        expect(
+          (await db.buildRunDao.getBuildRun('job-check', 'run-check'))!.status,
+          'in_progress',
+        );
+      });
+    }
+
+    test('reuses the saved Check on a subsequent run', () async {
+      expect((await startRun()).statusCode, HttpStatus.ok);
+      expect((await startRun(runId: 'rerun')).statusCode, HttpStatus.ok);
+
+      final calls = checkRequests();
+      expect(calls.map((request) => request.method), ['POST', 'PATCH']);
+      expect(calls.last.url.path, '/repos/org/mobile/check-runs/99999');
+      expect(jsonDecode(calls.last.body), {'status': 'in_progress'});
+      final stored = (await db.buildJobDao.getBuildJob('job-check'))!;
+      expect(stored.checkRunId, '99999');
+      expect(stored.runCount, 4);
+      expect(stored.latestRunId, 'rerun');
+    });
+
+    test('does not create another Check for a duplicate run ID', () async {
+      expect((await startRun()).statusCode, HttpStatus.ok);
+      expect((await startRun()).statusCode, HttpStatus.conflict);
+      expect(checkRequests(), hasLength(1));
+    });
+
+    test('keeps the build run when Check creation fails', () async {
+      createStatus = HttpStatus.forbidden;
+
+      expect((await startRun()).statusCode, HttpStatus.ok);
+      expect(checkRequests().single.method, 'POST');
+      final stored = (await db.buildJobDao.getBuildJob('job-check'))!;
+      expect(stored.checkRunId, isNull);
+      expect(stored.runCount, 3);
+      expect(
+        await db.buildRunDao.getBuildRun('job-check', 'run-check'),
+        isNotNull,
+      );
+    });
+
+    test('preserves an existing Check if its update fails', () async {
+      await db
+          .update(db.buildJobs)
+          .write(
+            const BuildJobsCompanion(
+              checkRunId: Value('99999'),
+              commitSha: Value(null),
+            ),
+          );
+      updateStatus = HttpStatus.internalServerError;
+
+      expect((await startRun()).statusCode, HttpStatus.ok);
+      expect(checkRequests().single.method, 'PATCH');
+      expect(
+        (await db.buildJobDao.getBuildJob('job-check'))!.checkRunId,
+        '99999',
+      );
+    });
+
+    for (final installationId in [null, '', '12345678']) {
+      test(
+        'skips GitHub for an absent or dummy installation: $installationId',
+        () async {
+          await db
+              .update(db.buildJobs)
+              .write(
+                BuildJobsCompanion(installationId: Value(installationId)),
+              );
+
+          expect((await startRun()).statusCode, HttpStatus.ok);
+          expect(requests, isEmpty);
+          expect(
+            (await db.buildJobDao.getBuildJob('job-check'))!.checkRunId,
+            isNull,
+          );
+        },
+      );
+    }
+
+    for (final commitSha in [null, '']) {
+      test('skips Check creation when commit SHA is $commitSha', () async {
+        await db
+            .update(db.buildJobs)
+            .write(
+              BuildJobsCompanion(commitSha: Value(commitSha)),
+            );
+
+        final response = await startRun(
+          provideEnvironment: false,
+          provideClient: false,
+        );
+
+        expect(response.statusCode, HttpStatus.ok);
+        expect(requests, isEmpty);
+        expect(
+          (await db.buildJobDao.getBuildJob('job-check'))!.checkRunId,
+          isNull,
+        );
+      });
+    }
   });
 
   group('GET /builds/<id>/runs', () {
