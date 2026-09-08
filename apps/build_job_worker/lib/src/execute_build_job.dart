@@ -51,7 +51,7 @@ Future<BuildJobStatus> executeBuildJob({
   String? leaseId;
   final errors = <(Object, StackTrace)>[];
 
-  Future<void> reportVmStep(BuildStep step) async {
+  Future<void> reportStep(BuildStep step) async {
     try {
       await pushLogToLoki(
         client: lokiClient,
@@ -82,7 +82,7 @@ Future<BuildJobStatus> executeBuildJob({
       createdAt: startedAt,
       updatedAt: startedAt,
     );
-    await reportVmStep(vmStep);
+    await reportStep(vmStep);
     final stopwatch = Stopwatch()..start();
     try {
       final lease = await prepareVm(
@@ -93,7 +93,7 @@ Future<BuildJobStatus> executeBuildJob({
       leaseId = lease.id.isNotEmpty ? lease.id : vmName;
     } finally {
       stopwatch.stop();
-      await reportVmStep(
+      await reportStep(
         vmStep.copyWith(
           status: leaseId == null
               ? BuildJobStatus.FAILURE
@@ -104,16 +104,44 @@ Future<BuildJobStatus> executeBuildJob({
       );
     }
 
-    await checkoutRepository(
-      api: orchardApi,
-      lokiClient: lokiClient,
-      lokiUrl: config.internalLokiUrl,
-      vmName: vmName,
-      job: job,
-      token: token,
+    final checkoutStartedAt = DateTime.now().toUtc();
+    final checkoutStep = BuildStep(
+      id: 'checkout',
       runId: runId,
-      onLogError: onError,
+      name: 'Checkout Repository',
+      status: BuildJobStatus.IN_PROGRESS,
+      durationMs: 0,
+      stepOrder: 1,
+      createdAt: checkoutStartedAt,
+      updatedAt: checkoutStartedAt,
     );
+    await reportStep(checkoutStep);
+    final checkoutStopwatch = Stopwatch()..start();
+    var checkoutSucceeded = false;
+    try {
+      await checkoutRepository(
+        api: orchardApi,
+        lokiClient: lokiClient,
+        lokiUrl: config.internalLokiUrl,
+        vmName: vmName,
+        job: job,
+        token: token,
+        runId: runId,
+        onLogError: onError,
+      );
+      checkoutSucceeded = true;
+    } finally {
+      checkoutStopwatch.stop();
+      await reportStep(
+        checkoutStep.copyWith(
+          status: checkoutSucceeded
+              ? BuildJobStatus.SUCCESS
+              : BuildJobStatus.FAILURE,
+          durationMs: checkoutStopwatch.elapsedMilliseconds,
+          updatedAt: DateTime.now().toUtc(),
+        ),
+      );
+    }
     final secretsContent = await fetchJobSecrets(api: api, jobId: job.id);
     final exitCode = await runWorkflow(
       api: orchardApi,
