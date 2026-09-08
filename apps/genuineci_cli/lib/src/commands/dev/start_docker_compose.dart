@@ -13,18 +13,15 @@ typedef DockerComposeProcessRunner =
       required Map<String, String> environment,
     });
 
-const _dockerComposeCommands = [
-  ['compose', 'stop', 'build-job-dispatcher'],
-  [
-    'compose',
-    'up',
-    '-d',
-    '--build',
-    'server',
-    'build-job-planner',
-    'build-job-worker',
-    'loki',
-  ],
+const _dockerComposeArguments = [
+  'compose',
+  'up',
+  '-d',
+  '--build',
+  'server',
+  'build-job-planner',
+  'build-job-worker',
+  'loki',
 ];
 
 Future<bool> startDockerCompose(
@@ -46,17 +43,15 @@ Future<bool> startDockerCompose(
   };
 
   try {
-    for (final arguments in _dockerComposeCommands) {
-      final exitCode = await processRunner(
-        'docker',
-        arguments,
-        workingDirectory: projectRoot.path,
-        environment: composeEnvironment,
-      );
-      if (exitCode != 0) {
-        logger.stderr(t.dev.start.stepDockerComposeFailed);
-        return false;
-      }
+    final exitCode = await processRunner(
+      'docker',
+      _dockerComposeArguments,
+      workingDirectory: projectRoot.path,
+      environment: composeEnvironment,
+    );
+    if (exitCode != 0) {
+      logger.stderr(t.dev.start.stepDockerComposeFailed);
+      return false;
     }
   } on ProcessException catch (error) {
     logger.stderr('${t.dev.start.stepDockerComposeFailed}\n${error.message}');

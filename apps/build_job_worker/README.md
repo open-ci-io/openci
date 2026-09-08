@@ -8,7 +8,7 @@ jobを1件ずつ取得・実行する常駐プロセスです。
 `runBuildJobWorker()`で、jobを1件ずつ取得して実行するループを利用できます。
 `main.dart`からこのループを起動し、`executeBuildJob()`を呼び出します。
 サーバー・Orchard・Lokiのクライアントは起動時に生成し、job間で共有します。
-Composeの通常起動では`build-job-worker`を使います。旧dispatcher/executorは移行確認用に残し、通常の起動対象から外しています。
+Composeでは`build-job-worker`を常駐サービスとして起動します。
 現在のplannerは`needs`を扱わず、jobを`QUEUED`で作成します。
 
 ## 設定
@@ -36,11 +36,11 @@ HTTP応答待ちも制限時間に含み、APIエラーは呼び出し元へ返�
 終了通知前の切断や不正なレスポンスはエラーにし、処理終了時に接続を閉じます。
 VMのCPU数・メモリは`createLease()`の引数、`ORCHARD_VM_CPU`・`ORCHARD_VM_MEMORY_GB`、
 デフォルト値（2コア・4 GiB）の順に決まります。
-既存executorと同様に、ローカルOrchardの`--no-pki`構成に対応します。
+ローカルOrchardの`--no-pki`構成に対応します。
 証明書の例外許可は設定した接続先のホスト・ポートに限定します。
 
 `pushLogToLoki()`は、`lokiUrl: config.internalLokiUrl`を指定してログを1件ずつHTTP POSTします。
-`run_id`・`build_job_id`などのラベルは既存executorと同じ形式です。
+`run_id`・`build_job_id`などのラベルでログを識別します。
 送信成功（HTTP 204）以外や通信エラーは呼び出し元へ返すため、ジョブ実行側でエラーを処理してください。
 HTTPクライアントは呼び出し元で共有し、使用後に閉じます。
 
@@ -123,10 +123,9 @@ jobがない場合と、取得・実行関数が例外を投げた場合は、`p
 ルートの`.env.example`を参考に、`.env`とserver用の認証ファイルを準備します。
 Orchardのサービスアカウント名とAPI用トークンは`.env`へ設定してください。
 macOS側のOrchard workerとTartの`base-macos`も準備済みの状態で、リポジトリルートから実行します。
-旧executorで実行中のjobがある場合は、完了を待ってから切り替えてください。
+既存環境から切り替える場合は、更新前の構成でjobの取得を止め、実行中のjobが完了してからworkerを起動してください。
 
 ```sh
-docker compose stop build-job-dispatcher
 docker compose up -d --build build-job-worker
 docker compose logs -f build-job-worker
 ```
@@ -177,3 +176,10 @@ DockerイメージはDart 3.12.2でコンパイルし、非rootユーザーで�
 docker compose --env-file .env.example --profile '*' config --quiet
 docker build -f apps/build_job_worker/Dockerfile -t openci-build-job-worker .
 ```
+
+## 残タスク
+
+- 実行中jobのキャンセル監視。
+- VM準備に失敗した場合の自動リトライ。
+- Sentryへのエラー通知。
+- VM準備・checkout・ワークフロー全体の進捗イベント送信。

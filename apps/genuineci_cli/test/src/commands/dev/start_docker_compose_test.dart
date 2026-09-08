@@ -29,7 +29,7 @@ void main() {
       projectRoot = Directory('/path/to/openci');
     });
 
-    test('stops the dispatcher before starting worker services', () async {
+    test('starts worker services from the project root', () async {
       late String executable;
       final calls = <List<String>>[];
       late String capturedWorkingDirectory;
@@ -42,7 +42,6 @@ void main() {
           'PATH': '/usr/local/bin',
           'BASE_VM_NAME': 'custom-base',
           'ORCHARD_API_URL': 'https://ignored.example.com',
-          'COMPOSE_PROFILES': 'legacy',
         },
         processRunner:
             (
@@ -62,7 +61,6 @@ void main() {
       expect(result, isTrue);
       expect(executable, equals('docker'));
       expect(calls, [
-        ['compose', 'stop', 'build-job-dispatcher'],
         [
           'compose',
           'up',
@@ -80,7 +78,6 @@ void main() {
         'BASE_VM_NAME': 'custom-base',
         'ORCHARD_API_URL': 'https://orchard-controller:6120',
         'INTERNAL_API_KEY': 'genuineci-local-dev-key',
-        'COMPOSE_PROFILES': 'legacy',
       });
       expect(logger.stderrMessages, isEmpty);
       expect(
@@ -92,33 +89,22 @@ void main() {
       );
     });
 
-    for (final failedCommand in ['stop', 'up']) {
-      test('returns false when compose $failedCommand fails', () async {
-        final calls = <String>[];
+    test('returns false when Docker Compose exits with an error', () async {
+      const dockerComposeFailureExitCode = 17;
 
-        final result = await startDockerCompose(
-          logger,
-          projectRoot,
-          environment: const {},
-          processRunner:
-              (
-                _,
-                arguments, {
-                required workingDirectory,
-                required environment,
-              }) async {
-                final command = arguments[1];
-                calls.add(command);
-                return command == failedCommand ? 17 : 0;
-              },
-        );
+      final result = await startDockerCompose(
+        logger,
+        projectRoot,
+        environment: const {},
+        processRunner:
+            (_, _, {required workingDirectory, required environment}) async =>
+                dockerComposeFailureExitCode,
+      );
 
-        expect(result, isFalse);
-        expect(calls, failedCommand == 'stop' ? ['stop'] : ['stop', 'up']);
-        expect(logger.stderrMessages, [t.dev.start.stepDockerComposeFailed]);
-        expect(logger.stdoutMessages, ['\n${t.dev.start.stepDockerCompose}']);
-      });
-    }
+      expect(result, isFalse);
+      expect(logger.stderrMessages, [t.dev.start.stepDockerComposeFailed]);
+      expect(logger.stdoutMessages, ['\n${t.dev.start.stepDockerCompose}']);
+    });
 
     test('returns false when Docker cannot be started', () async {
       final result = await startDockerCompose(
