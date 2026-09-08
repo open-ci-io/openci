@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:http/http.dart' as http;
@@ -10,6 +11,7 @@ import 'complete_github_check_run.dart';
 import 'config.dart';
 import 'create_build_run.dart';
 import 'fetch_job_secrets.dart';
+import 'loki/push_log_to_loki.dart';
 import 'orchard/orchard_api_client.dart';
 import 'orchard/prepare_vm.dart';
 import 'resolve_github_installation_token.dart';
@@ -49,16 +51,58 @@ Future<BuildJobStatus> executeBuildJob({
   String? leaseId;
   final errors = <(Object, StackTrace)>[];
 
+  Future<void> reportVmStep(BuildStep step) async {
+    try {
+      await pushLogToLoki(
+        client: lokiClient,
+        lokiUrl: config.internalLokiUrl,
+        runId: runId,
+        jobId: job.id,
+        stepId: step.id,
+        type: 'step_event',
+        message: jsonEncode(step.toJson()),
+      ).timeout(const Duration(seconds: 10));
+    } catch (error, stackTrace) {
+      errors.add((error, stackTrace));
+    }
+  }
+
   try {
     await createBuildRun(api: api, jobId: job.id, runId: runId);
     runCreated = true;
     final token = await resolveGitHubInstallationToken(api: api, jobId: job.id);
-    final lease = await prepareVm(
-      api: orchardApi,
-      baseVmName: config.baseVmName,
-      vmName: vmName,
+    final startedAt = DateTime.now().toUtc();
+    final vmStep = BuildStep(
+      id: 'prepare_vm',
+      runId: runId,
+      name: 'Set up VM',
+      status: BuildJobStatus.IN_PROGRESS,
+      durationMs: 0,
+      stepOrder: 0,
+      createdAt: startedAt,
+      updatedAt: startedAt,
     );
-    leaseId = lease.id.isNotEmpty ? lease.id : vmName;
+    await reportVmStep(vmStep);
+    final stopwatch = Stopwatch()..start();
+    try {
+      final lease = await prepareVm(
+        api: orchardApi,
+        baseVmName: config.baseVmName,
+        vmName: vmName,
+      );
+      leaseId = lease.id.isNotEmpty ? lease.id : vmName;
+    } finally {
+      stopwatch.stop();
+      await reportVmStep(
+        vmStep.copyWith(
+          status: leaseId == null
+              ? BuildJobStatus.FAILURE
+              : BuildJobStatus.SUCCESS,
+          durationMs: stopwatch.elapsedMilliseconds,
+          updatedAt: DateTime.now().toUtc(),
+        ),
+      );
+    }
 
     await checkoutRepository(
       api: orchardApi,
