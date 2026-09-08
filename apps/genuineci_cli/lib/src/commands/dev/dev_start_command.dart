@@ -10,6 +10,7 @@ import 'find_project_root.dart';
 import 'seed_local_data.dart';
 import 'setup_orchard_context.dart';
 import 'start_docker_compose.dart';
+import 'start_orchard_worker.dart';
 
 typedef ProjectRootFinder = Directory? Function();
 typedef TartBaseImageChecker = Future<bool> Function(Logger logger);
@@ -17,6 +18,7 @@ typedef DockerComposeStarter =
     Future<bool> Function(Logger logger, Directory projectRoot);
 typedef OrchardContextSetup = Future<bool> Function(Logger logger);
 typedef LocalDataSeeder = Future<bool> Function(Logger logger);
+typedef OrchardWorkerStarter = Future<int> Function(Logger logger);
 
 class DevStartCommand extends Command<int> {
   @override
@@ -31,6 +33,7 @@ class DevStartCommand extends Command<int> {
   final DockerComposeStarter _dockerComposeStarter;
   final OrchardContextSetup _orchardContextSetup;
   final LocalDataSeeder _localDataSeeder;
+  final OrchardWorkerStarter _orchardWorkerStarter;
 
   DevStartCommand({
     required Logger logger,
@@ -42,12 +45,15 @@ class DevStartCommand extends Command<int> {
     @visibleForTesting
     OrchardContextSetup orchardContextSetup = setupOrchardContext,
     @visibleForTesting LocalDataSeeder localDataSeeder = seedLocalData,
+    @visibleForTesting
+    OrchardWorkerStarter orchardWorkerStarter = startOrchardWorker,
   }) : _logger = logger,
        _projectRootFinder = projectRootFinder,
        _tartBaseImageChecker = tartBaseImageChecker,
        _dockerComposeStarter = dockerComposeStarter,
        _orchardContextSetup = orchardContextSetup,
-       _localDataSeeder = localDataSeeder {
+       _localDataSeeder = localDataSeeder,
+       _orchardWorkerStarter = orchardWorkerStarter {
     argParser.addFlag('seed', negatable: false, help: t.dev.start.flags.seed);
   }
 
@@ -87,6 +93,6 @@ class DevStartCommand extends Command<int> {
       }
     }
 
-    return 0;
+    return _orchardWorkerStarter(_logger);
   }
 }

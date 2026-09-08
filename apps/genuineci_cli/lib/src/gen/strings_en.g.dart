@@ -166,8 +166,8 @@ class Translations$dev$start$en {
 
 	// Translations
 
-	/// en: 'Start local development environment (Docker containers, Tart VM, Orchard).'
-	String get description => 'Start local development environment (Docker containers, Tart VM, Orchard).';
+	/// en: 'Start local services and run the Mac Orchard Worker until Ctrl+C.'
+	String get description => 'Start local services and run the Mac Orchard Worker until Ctrl+C.';
 
 	late final Translations$dev$start$flags$en flags = Translations$dev$start$flags$en.internal(_root);
 
@@ -206,6 +206,12 @@ class Translations$dev$start$en {
 
 	/// en: 'Orchard CLI context authenticated.'
 	String get stepOrchardContextRegistered => 'Orchard CLI context authenticated.';
+
+	/// en: 'Starting Orchard Worker on this Mac. Press Ctrl+C to stop it. Docker containers will keep running.'
+	String get stepOrchardWorker => 'Starting Orchard Worker on this Mac. Press Ctrl+C to stop it. Docker containers will keep running.';
+
+	/// en: 'Error: Orchard Worker could not start or exited with an error.'
+	String get stepOrchardWorkerFailed => 'Error: Orchard Worker could not start or exited with an error.';
 
 	/// en: 'Step 5: Seeding local test data...'
 	String get stepSeed => 'Step 5: Seeding local test data...';
@@ -255,7 +261,7 @@ extension on Translations {
 			'use.success' => ({required Object language}) => 'Language set to ${language}.',
 			'use.invalidLanguage' => ({required Object input}) => 'Invalid language "${input}". Supported languages: japanese, english.',
 			'dev.description' => 'Manage local development environment (Docker, Tart, DB, Server).',
-			'dev.start.description' => 'Start local development environment (Docker containers, Tart VM, Orchard).',
+			'dev.start.description' => 'Start local services and run the Mac Orchard Worker until Ctrl+C.',
 			'dev.start.flags.seed' => 'Seed local test data after starting services.',
 			'dev.start.starting' => 'Starting OpenCI Local Development Environment...',
 			'dev.start.stepTart' => 'Step 1: Checking Tart VM base image...',
@@ -269,6 +275,8 @@ extension on Translations {
 			'dev.start.stepOrchardContext' => 'Step 4: Registering Orchard CLI context...',
 			'dev.start.stepOrchardContextFailed' => 'Error: Failed to register Orchard CLI context.',
 			'dev.start.stepOrchardContextRegistered' => 'Orchard CLI context authenticated.',
+			'dev.start.stepOrchardWorker' => 'Starting Orchard Worker on this Mac. Press Ctrl+C to stop it. Docker containers will keep running.',
+			'dev.start.stepOrchardWorkerFailed' => 'Error: Orchard Worker could not start or exited with an error.',
 			'dev.start.stepSeed' => 'Step 5: Seeding local test data...',
 			'dev.start.stepSeedFailed' => 'Error: Failed to seed local test data.',
 			'dev.start.stepSeedCompleted' => 'Local test data seeded.',

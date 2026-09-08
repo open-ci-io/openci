@@ -26,7 +26,7 @@
   "dev": {
     "description": "ローカル開発環境（Docker, Tart, DB, サーバー）を管理します。",
     "start": {
-      "description": "ローカル開発環境（Docker コンテナ、Tart VM、Orchard）を起動します。",
+      "description": "ローカルサービスを起動し、Ctrl+CまでMac側のOrchard Workerを実行します。",
       "flags": {
         "seed": "サービス起動後にローカルテストデータを投入します。"
       },
@@ -42,6 +42,8 @@
       "stepOrchardContext": "Step 4: Orchard CLI コンテキストを登録中...",
       "stepOrchardContextFailed": "エラー: Orchard CLI コンテキストの登録に失敗しました。",
       "stepOrchardContextRegistered": "Orchard CLI コンテキストを認証しました。",
+      "stepOrchardWorker": "Mac側のOrchard Workerを起動します。Ctrl+Cで停止できます。Dockerコンテナは起動したままになります。",
+      "stepOrchardWorkerFailed": "エラー: Orchard Workerを起動できなかったか、異常終了しました。",
       "stepSeed": "Step 5: ローカルテストデータを投入中...",
       "stepSeedFailed": "エラー: ローカルテストデータの投入に失敗しました。",
       "stepSeedCompleted": "ローカルテストデータを投入しました。",

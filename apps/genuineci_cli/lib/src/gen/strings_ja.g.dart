@@ -134,7 +134,7 @@ class _Translations$dev$start$ja extends Translations$dev$start$en {
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
-	@override String get description => 'ローカル開発環境（Docker コンテナ、Tart VM、Orchard）を起動します。';
+	@override String get description => 'ローカルサービスを起動し、Ctrl+CまでMac側のOrchard Workerを実行します。';
 	@override late final _Translations$dev$start$flags$ja flags = _Translations$dev$start$flags$ja._(_root);
 	@override String get starting => 'OpenCI ローカル開発環境を起動しています...';
 	@override String get stepTart => 'Step 1: Tart VM ベースイメージを確認中...';
@@ -148,6 +148,8 @@ class _Translations$dev$start$ja extends Translations$dev$start$en {
 	@override String get stepOrchardContext => 'Step 4: Orchard CLI コンテキストを登録中...';
 	@override String get stepOrchardContextFailed => 'エラー: Orchard CLI コンテキストの登録に失敗しました。';
 	@override String get stepOrchardContextRegistered => 'Orchard CLI コンテキストを認証しました。';
+	@override String get stepOrchardWorker => 'Mac側のOrchard Workerを起動します。Ctrl+Cで停止できます。Dockerコンテナは起動したままになります。';
+	@override String get stepOrchardWorkerFailed => 'エラー: Orchard Workerを起動できなかったか、異常終了しました。';
 	@override String get stepSeed => 'Step 5: ローカルテストデータを投入中...';
 	@override String get stepSeedFailed => 'エラー: ローカルテストデータの投入に失敗しました。';
 	@override String get stepSeedCompleted => 'ローカルテストデータを投入しました。';
@@ -187,7 +189,7 @@ extension on TranslationsJa {
 			'use.success' => ({required Object language}) => '言語を${language}に設定しました。',
 			'use.invalidLanguage' => ({required Object input}) => '無効な言語です: 「${input}」。対応言語: japanese, english',
 			'dev.description' => 'ローカル開発環境（Docker, Tart, DB, サーバー）を管理します。',
-			'dev.start.description' => 'ローカル開発環境（Docker コンテナ、Tart VM、Orchard）を起動します。',
+			'dev.start.description' => 'ローカルサービスを起動し、Ctrl+CまでMac側のOrchard Workerを実行します。',
 			'dev.start.flags.seed' => 'サービス起動後にローカルテストデータを投入します。',
 			'dev.start.starting' => 'OpenCI ローカル開発環境を起動しています...',
 			'dev.start.stepTart' => 'Step 1: Tart VM ベースイメージを確認中...',
@@ -201,6 +203,8 @@ extension on TranslationsJa {
 			'dev.start.stepOrchardContext' => 'Step 4: Orchard CLI コンテキストを登録中...',
 			'dev.start.stepOrchardContextFailed' => 'エラー: Orchard CLI コンテキストの登録に失敗しました。',
 			'dev.start.stepOrchardContextRegistered' => 'Orchard CLI コンテキストを認証しました。',
+			'dev.start.stepOrchardWorker' => 'Mac側のOrchard Workerを起動します。Ctrl+Cで停止できます。Dockerコンテナは起動したままになります。',
+			'dev.start.stepOrchardWorkerFailed' => 'エラー: Orchard Workerを起動できなかったか、異常終了しました。',
 			'dev.start.stepSeed' => 'Step 5: ローカルテストデータを投入中...',
 			'dev.start.stepSeedFailed' => 'エラー: ローカルテストデータの投入に失敗しました。',
 			'dev.start.stepSeedCompleted' => 'ローカルテストデータを投入しました。',

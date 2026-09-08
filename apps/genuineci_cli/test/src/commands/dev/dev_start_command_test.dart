@@ -41,6 +41,7 @@ void main() {
     required bool shouldSeed,
     required bool seedSucceeds,
     required void Function() onSeed,
+    OrchardWorkerStarter? orchardWorkerStarter,
   }) {
     final runner = CommandRunner<int>('genuineci', 'CLI tool')
       ..addCommand(
@@ -54,6 +55,7 @@ void main() {
             onSeed();
             return seedSucceeds;
           },
+          orchardWorkerStarter: orchardWorkerStarter ?? (_) async => 0,
         ),
       );
 
@@ -111,9 +113,62 @@ void main() {
       shouldSeed: true,
       seedSucceeds: false,
       onSeed: () => seedCallCount++,
+      orchardWorkerStarter: (_) async => fail('Worker must not start'),
     );
 
     expect(result, equals(1));
     expect(seedCallCount, equals(1));
   });
+
+  for (final shouldSeed in [false, true]) {
+    test('runs the worker after setup with seed=$shouldSeed', () async {
+      final calls = <String>[];
+      bool recordStep(String step) {
+        calls.add(step);
+        return true;
+      }
+
+      final logger = _RecordingLogger();
+      final runner = CommandRunner<int>('genuineci', 'CLI tool')
+        ..addCommand(
+          DevStartCommand(
+            logger: logger,
+            projectRootFinder: () => tempDirectory,
+            tartBaseImageChecker: (_) async => recordStep('tart'),
+            dockerComposeStarter: (_, _) async => recordStep('compose'),
+            orchardContextSetup: (_) async => recordStep('context'),
+            localDataSeeder: (_) async => recordStep('seed'),
+            orchardWorkerStarter: (workerLogger) async {
+              expect(workerLogger, same(logger));
+              calls.add('worker');
+              return 17;
+            },
+          ),
+        );
+
+      expect(await runner.run(['start', if (shouldSeed) '--seed']), 17);
+      expect(calls, [
+        'tart',
+        'compose',
+        'context',
+        if (shouldSeed) 'seed',
+        'worker',
+      ]);
+    });
+  }
+
+  for (final failingStep in ['tart', 'compose', 'context']) {
+    test('does not start the worker when $failingStep fails', () async {
+      final result = await DevStartCommand(
+        logger: _RecordingLogger(),
+        projectRootFinder: () => tempDirectory,
+        tartBaseImageChecker: (_) async => failingStep != 'tart',
+        dockerComposeStarter: (_, _) async => failingStep != 'compose',
+        orchardContextSetup: (_) async => failingStep != 'context',
+        orchardWorkerStarter: (_) async => fail('Worker must not start'),
+      ).run();
+
+      expect(result, 1);
+    });
+  }
 }
