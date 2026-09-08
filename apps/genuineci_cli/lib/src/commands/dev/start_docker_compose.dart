@@ -33,14 +33,7 @@ Future<bool> startDockerCompose(
 }) async {
   logger.stdout('\n${t.dev.start.stepDockerCompose}');
 
-  final parentEnvironment = environment ?? Platform.environment;
-  final composeEnvironment = {
-    ...parentEnvironment,
-    'BASE_VM_NAME': parentEnvironment['BASE_VM_NAME'] ?? 'base-macos',
-    'INTERNAL_API_KEY':
-        parentEnvironment['INTERNAL_API_KEY'] ?? 'genuineci-local-dev-key',
-    'ORCHARD_API_URL': 'https://orchard-controller:6120',
-  };
+  final composeEnvironment = environment ?? Platform.environment;
 
   try {
     final exitCode = await processRunner(

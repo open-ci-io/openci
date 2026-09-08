@@ -41,7 +41,8 @@ void main() {
         environment: const {
           'PATH': '/usr/local/bin',
           'BASE_VM_NAME': 'custom-base',
-          'ORCHARD_API_URL': 'https://ignored.example.com',
+          'INTERNAL_API_KEY': 'custom-api-key',
+          'ORCHARD_API_URL': 'https://custom-orchard.example.com',
         },
         processRunner:
             (
@@ -76,8 +77,8 @@ void main() {
       expect(capturedEnvironment, {
         'PATH': '/usr/local/bin',
         'BASE_VM_NAME': 'custom-base',
-        'ORCHARD_API_URL': 'https://orchard-controller:6120',
-        'INTERNAL_API_KEY': 'genuineci-local-dev-key',
+        'INTERNAL_API_KEY': 'custom-api-key',
+        'ORCHARD_API_URL': 'https://custom-orchard.example.com',
       });
       expect(logger.stderrMessages, isEmpty);
       expect(
@@ -87,6 +88,24 @@ void main() {
           t.dev.start.stepDockerComposeStarted,
         ]),
       );
+    });
+
+    test('leaves unset configuration to Compose and its .env file', () async {
+      late Map<String, String> capturedEnvironment;
+
+      final result = await startDockerCompose(
+        logger,
+        projectRoot,
+        environment: const {'PATH': '/usr/local/bin'},
+        processRunner:
+            (_, _, {required workingDirectory, required environment}) async {
+              capturedEnvironment = environment;
+              return 0;
+            },
+      );
+
+      expect(result, isTrue);
+      expect(capturedEnvironment, {'PATH': '/usr/local/bin'});
     });
 
     test('returns false when Docker Compose exits with an error', () async {
