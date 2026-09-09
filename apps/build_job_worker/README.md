@@ -33,13 +33,15 @@ HTTP失敗・不正なレスポンスは例外にし、応答待ちは標準10�
 `calculateMaxConcurrentJobs()`はworker一覧、1 jobのCPU数・メモリ（GiB）、現在時刻から実行可能数を計算します。
 workerごとのVM枠・CPU・メモリの制約を反映し、停止中・最終heartbeatから3分超・Tart/arm64以外のworkerを除外します。
 返す値は総実行枠です。実行中jobの差し引きと実行ループへの接続は呼び出し側で行います。
+`OrchardApiClient.getMaxConcurrentJobs()`はworker一覧を取得し、この計算関数で総実行枠を返します。
+CPU・メモリの既定値はVM作成と共通です。HTTP失敗・不正な応答・タイムアウトは呼び出し元へ返します。
 `waitForVmRunning()`は標準で3秒間隔・最大5分間、`running`または`active`になるまで待機します。
 HTTP応答待ちも制限時間に含み、APIエラーは呼び出し元へ返します。
 `prepareVm()`はVMを作成し、標準で最大15分の起動待ちを行ってVM情報を返します。
 起動待ちが失敗した場合は作成済みVMの削除を試み、削除も失敗した場合は両方の原因を返します。
 `execCommandWebSocket()`はVM内でコマンドを実行し、`onLog(line, stream)`にstdout・stderrを行単位で通知して終了コードを返します。
 終了通知前の切断や不正なレスポンスはエラーにし、処理終了時に接続を閉じます。
-VMのCPU数・メモリは`createLease()`の引数、`ORCHARD_VM_CPU`・`ORCHARD_VM_MEMORY_GB`、
+VMのCPU数・メモリは`createLease()`・`getMaxConcurrentJobs()`の引数、`ORCHARD_VM_CPU`・`ORCHARD_VM_MEMORY_GB`、
 デフォルト値（2コア・4 GiB）の順に決まります。
 ローカルOrchardの`--no-pki`構成に対応します。
 証明書の例外許可は設定した接続先のホスト・ポートに限定します。
