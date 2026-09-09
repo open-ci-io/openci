@@ -303,7 +303,7 @@ void main() {
           'status': 'completed',
           'conclusion': conclusion,
         });
-        expect(logs, hasLength(8));
+        expect(logs, hasLength(10));
         final streams = logs
             .map(
               (log) =>
@@ -349,20 +349,25 @@ void main() {
                   'step_log',
             )
             .toList();
-        expect(outputLogs, hasLength(2));
-        for (var index = 0; index < outputLogs.length; index++) {
+        expect(outputLogs, hasLength(4));
+        for (final (index, (stepId, message)) in [
+          (
+            'prepare_vm',
+            'Creating VM from test-base-macos and waiting for it to start.',
+          ),
+          ('prepare_vm', 'VM is ready.'),
+          ('checkout', 'checkout output'),
+          ('run_workflow', 'workflow output'),
+        ].indexed) {
           final stream = outputLogs[index];
           expect(stream['stream'], {
             'stream': 'stdout',
             'type': 'step_log',
             'run_id': runId,
             'build_job_id': 'job-1',
-            'step_id': index == 0 ? 'checkout' : 'run_workflow',
+            'step_id': stepId,
           });
-          expect(
-            (stream['values'] as List<dynamic>).single[1],
-            index == 0 ? 'checkout output' : 'workflow output',
-          );
+          expect((stream['values'] as List<dynamic>).single[1], message);
         }
 
         await _reply(deleteRequest, null, statusCode: 204);

@@ -51,19 +51,24 @@ Future<BuildJobStatus> executeBuildJob({
   String? leaseId;
   final errors = <(Object, StackTrace)>[];
 
-  Future<void> reportStep(BuildStep step) async {
-    try {
-      await pushLogToLoki(
-        client: lokiClient,
-        lokiUrl: config.internalLokiUrl,
-        runId: runId,
-        jobId: job.id,
-        stepId: step.id,
-        type: 'step_event',
-        message: jsonEncode(step.toJson()),
-      ).timeout(const Duration(seconds: 10));
-    } catch (error, stackTrace) {
-      errors.add((error, stackTrace));
+  Future<void> reportStep(BuildStep step, {String? logMessage}) async {
+    for (final entry in {
+      'step_event': jsonEncode(step.toJson()),
+      'step_log': ?logMessage,
+    }.entries) {
+      try {
+        await pushLogToLoki(
+          client: lokiClient,
+          lokiUrl: config.internalLokiUrl,
+          runId: runId,
+          jobId: job.id,
+          stepId: step.id,
+          type: entry.key,
+          message: entry.value,
+        ).timeout(const Duration(seconds: 10));
+      } catch (error, stackTrace) {
+        errors.add((error, stackTrace));
+      }
     }
   }
 
@@ -82,7 +87,11 @@ Future<BuildJobStatus> executeBuildJob({
       createdAt: startedAt,
       updatedAt: startedAt,
     );
-    await reportStep(vmStep);
+    await reportStep(
+      vmStep,
+      logMessage:
+          'Creating VM from ${config.baseVmName} and waiting for it to start.',
+    );
     final stopwatch = Stopwatch()..start();
     try {
       final lease = await prepareVm(
@@ -101,6 +110,7 @@ Future<BuildJobStatus> executeBuildJob({
           durationMs: stopwatch.elapsedMilliseconds,
           updatedAt: DateTime.now().toUtc(),
         ),
+        logMessage: leaseId == null ? 'VM setup failed.' : 'VM is ready.',
       );
     }
 
