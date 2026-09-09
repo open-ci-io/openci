@@ -9,15 +9,6 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:test/test.dart';
 
-const _job = (
-  owner: 'example',
-  repo: 'mobile',
-  commitSha: '0123456789abcdef0123456789abcdef01234567',
-  workflowFileName: 'checks/smoke.dart',
-  installationId: '42',
-  branch: 'feature/worker',
-);
-
 class _RecordingLogger implements Logger {
   final stdoutMessages = <String>[];
   final stderrMessages = <String>[];
@@ -40,45 +31,33 @@ void main() {
       logger = _RecordingLogger();
     });
 
-    test(
-      'submits exactly one job with the specified workflow and revision',
-      () async {
-        const serverUrl = 'http://localhost:9090';
-        final requests = <http.Request>[];
-        final client = MockClient((request) async {
-          requests.add(request);
-          return http.Response('{"success":true,"jobId":"job-test"}', 200);
-        });
+    test('requests the default seed data exactly once', () async {
+      const serverUrl = 'http://localhost:9090';
+      final requests = <http.Request>[];
+      final client = MockClient((request) async {
+        requests.add(request);
+        return http.Response('{"success":true,"jobId":"job-test"}', 200);
+      });
 
-        final result = await seedLocalData(
-          logger,
-          job: _job,
-          client: client,
-          environment: {'OPENCI_SERVER_URL': serverUrl},
-        );
+      final result = await seedLocalData(
+        logger,
+        client: client,
+        environment: {'OPENCI_SERVER_URL': serverUrl},
+      );
 
-        expect(result, isTrue);
-        expect(requests, hasLength(1));
-        final request = requests.single;
-        expect(request.method, 'POST');
-        expect(request.url, Uri.parse('$serverUrl/internal/seed'));
-        expect(request.headers['content-type'], 'application/json');
-        expect(jsonDecode(request.body), {
-          'owner': 'example',
-          'repo': 'mobile',
-          'commitSha': '0123456789abcdef0123456789abcdef01234567',
-          'workflowName': 'checks/smoke.dart',
-          'workflowFileName': 'checks/smoke.dart',
-          'installationId': '42',
-          'branch': 'feature/worker',
-        });
-        expect(logger.stderrMessages, isEmpty);
-        expect(logger.stdoutMessages, [
-          '\n${t.dev.start.stepSeed}',
-          t.dev.start.stepSeedCompleted,
-        ]);
-      },
-    );
+      expect(result, isTrue);
+      expect(requests, hasLength(1));
+      final request = requests.single;
+      expect(request.method, 'POST');
+      expect(request.url, Uri.parse('$serverUrl/internal/seed'));
+      expect(request.headers['content-type'], 'application/json');
+      expect(jsonDecode(request.body), isEmpty);
+      expect(logger.stderrMessages, isEmpty);
+      expect(logger.stdoutMessages, [
+        '\n${t.dev.start.stepSeed}',
+        t.dev.start.stepSeedCompleted,
+      ]);
+    });
 
     test('uses the process server URL with the default HTTP client', () async {
       final serverUrl =
@@ -86,7 +65,7 @@ void main() {
       var requestCount = 0;
 
       final result = await http.runWithClient(
-        () => seedLocalData(logger, job: _job),
+        () => seedLocalData(logger),
         () => MockClient((request) async {
           requestCount++;
           expect(request.url, Uri.parse('$serverUrl/internal/seed'));
@@ -108,7 +87,6 @@ void main() {
 
       final result = await seedLocalData(
         logger,
-        job: _job,
         client: client,
         environment: const {},
       );
@@ -131,7 +109,6 @@ void main() {
 
       final result = await seedLocalData(
         logger,
-        job: _job,
         client: client,
         environment: const {},
       );
@@ -146,7 +123,6 @@ void main() {
 
       final result = await seedLocalData(
         logger,
-        job: _job,
         client: client,
         environment: const {},
         timeout: const Duration(milliseconds: 50),

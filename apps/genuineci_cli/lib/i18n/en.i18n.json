@@ -28,15 +28,8 @@
     "start": {
       "description": "Start local services and run the Mac Orchard Worker until Ctrl+C.",
       "flags": {
-        "seed": "Queue one build job after starting services. Requires --repo, --commit-sha, --workflow and --installation-id.",
-        "repo": "GitHub repository as OWNER/REPO (required with --seed).",
-        "commitSha": "Full 40-character commit SHA available on GitHub (required with --seed).",
-        "workflow": "Dart workflow path relative to genuine_ci/, e.g. worker_smoke.dart (required with --seed).",
-        "installationId": "Positive GitHub App installation ID (required with --seed; mock ID 12345678 is not supported).",
-        "branch": "Branch name for the seeded job's metadata (with --seed)."
+        "seed": "Queue the default smoke-test build job after starting services."
       },
-      "seedOptionsRequireSeed": "Build job options require --seed.",
-      "invalidSeedOption": "Missing or invalid --${option}. See --help for the expected value.",
       "starting": "Starting OpenCI Local Development Environment...",
       "stepTart": "Step 1: Checking Tart VM base image...",
       "stepTartNotFound": "Error: Tart VM image \"base-macos\" not found.\nPlease run the following commands to setup the base image:\n  tart pull ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5\n  tart clone ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5 base-macos",

@@ -10,18 +10,8 @@ import '../../i18n/i18n.dart';
 const _defaultServerUrl = 'http://localhost:8080';
 const _defaultTimeout = Duration(seconds: 10);
 
-typedef SeedJobOptions = ({
-  String owner,
-  String repo,
-  String commitSha,
-  String workflowFileName,
-  String installationId,
-  String branch,
-});
-
 Future<bool> seedLocalData(
   Logger logger, {
-  required SeedJobOptions job,
   @visibleForTesting http.Client? client,
   @visibleForTesting Map<String, String>? environment,
   @visibleForTesting Duration timeout = _defaultTimeout,
@@ -37,15 +27,7 @@ Future<bool> seedLocalData(
         .post(
           Uri.parse('$serverUrl/internal/seed'),
           headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'owner': job.owner,
-            'repo': job.repo,
-            'commitSha': job.commitSha,
-            'workflowName': job.workflowFileName,
-            'workflowFileName': job.workflowFileName,
-            'installationId': job.installationId,
-            'branch': job.branch,
-          }),
+          body: jsonEncode({}),
         )
         .timeout(timeout);
     if (!_isSuccessful(seedResponse)) {

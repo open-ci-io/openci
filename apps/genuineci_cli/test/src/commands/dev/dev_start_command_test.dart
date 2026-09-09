@@ -3,17 +3,8 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:cli_util/cli_logging.dart';
 import 'package:genuineci_cli/src/commands/dev/dev_start_command.dart';
-import 'package:genuineci_cli/src/commands/dev/seed_local_data.dart';
 import 'package:genuineci_cli/src/i18n/i18n.dart';
 import 'package:test/test.dart';
-
-const _seedArguments = [
-  '--seed',
-  '--repo=example/mobile',
-  '--commit-sha=0123456789abcdef0123456789abcdef01234567',
-  '--workflow=worker_smoke.dart',
-  '--installation-id=42',
-];
 
 class _RecordingLogger implements Logger {
   final stdoutMessages = <String>[];
@@ -49,7 +40,7 @@ void main() {
   Future<int?> runStart({
     required bool shouldSeed,
     required bool seedSucceeds,
-    required void Function(SeedJobOptions job) onSeed,
+    required void Function() onSeed,
     OrchardWorkerStarter? orchardWorkerStarter,
   }) {
     final runner = CommandRunner<int>('genuineci', 'CLI tool')
@@ -60,15 +51,15 @@ void main() {
           tartBaseImageChecker: (_) async => true,
           dockerComposeStarter: (_, _) async => true,
           orchardContextSetup: (_) async => true,
-          localDataSeeder: (_, {required job}) async {
-            onSeed(job);
+          localDataSeeder: (_) async {
+            onSeed();
             return seedSucceeds;
           },
           orchardWorkerStarter: orchardWorkerStarter ?? (_) async => 0,
         ),
       );
 
-    return runner.run(['start', if (shouldSeed) ..._seedArguments]);
+    return runner.run(['start', if (shouldSeed) '--seed']);
   }
 
   test('reports projectRootNotFound before checking Tart', () async {
@@ -95,7 +86,7 @@ void main() {
     final result = await runStart(
       shouldSeed: false,
       seedSucceeds: true,
-      onSeed: (_) => seedCallCount++,
+      onSeed: () => seedCallCount++,
     );
 
     expect(result, equals(0));
@@ -103,25 +94,16 @@ void main() {
   });
 
   test('seeds local data when --seed is specified', () async {
-    final seededJobs = <SeedJobOptions>[];
+    var seedCallCount = 0;
 
     final result = await runStart(
       shouldSeed: true,
       seedSucceeds: true,
-      onSeed: seededJobs.add,
+      onSeed: () => seedCallCount++,
     );
 
     expect(result, equals(0));
-    expect(seededJobs, [
-      (
-        owner: 'example',
-        repo: 'mobile',
-        commitSha: '0123456789abcdef0123456789abcdef01234567',
-        workflowFileName: 'worker_smoke.dart',
-        installationId: '42',
-        branch: 'main',
-      ),
-    ]);
+    expect(seedCallCount, equals(1));
   });
 
   test('returns 1 when seeding local data fails', () async {
@@ -130,7 +112,7 @@ void main() {
     final result = await runStart(
       shouldSeed: true,
       seedSucceeds: false,
-      onSeed: (_) => seedCallCount++,
+      onSeed: () => seedCallCount++,
       orchardWorkerStarter: (_) async => fail('Worker must not start'),
     );
 
@@ -155,7 +137,7 @@ void main() {
             tartBaseImageChecker: (_) async => recordStep('tart'),
             dockerComposeStarter: (_, _) async => recordStep('compose'),
             orchardContextSetup: (_) async => recordStep('context'),
-            localDataSeeder: (_, {required job}) async => recordStep('seed'),
+            localDataSeeder: (_) async => recordStep('seed'),
             orchardWorkerStarter: (workerLogger) async {
               expect(workerLogger, same(logger));
               calls.add('worker');
@@ -164,10 +146,7 @@ void main() {
           ),
         );
 
-      expect(
-        await runner.run(['start', if (shouldSeed) ..._seedArguments]),
-        17,
-      );
+      expect(await runner.run(['start', if (shouldSeed) '--seed']), 17);
       expect(calls, [
         'tart',
         'compose',
@@ -190,116 +169,6 @@ void main() {
       ).run();
 
       expect(result, 1);
-    });
-  }
-
-  test('passes a nested workflow and explicit branch to the seeder', () async {
-    SeedJobOptions? seededJob;
-    final runner = CommandRunner<int>('genuineci', 'CLI tool')
-      ..addCommand(
-        DevStartCommand(
-          logger: _RecordingLogger(),
-          projectRootFinder: () => tempDirectory,
-          tartBaseImageChecker: (_) async => true,
-          dockerComposeStarter: (_, _) async => true,
-          orchardContextSetup: (_) async => true,
-          localDataSeeder: (_, {required job}) async {
-            seededJob = job;
-            return true;
-          },
-          orchardWorkerStarter: (_) async => 0,
-        ),
-      );
-
-    expect(
-      await runner.run([
-        'start',
-        ..._seedArguments.where((arg) => !arg.startsWith('--workflow=')),
-        '--workflow= checks/smoke.dart ',
-        '--branch=feature/worker',
-      ]),
-      0,
-    );
-    expect(seededJob!.workflowFileName, 'checks/smoke.dart');
-    expect(seededJob!.branch, 'feature/worker');
-  });
-
-  Future<int?> runInvalidStart(List<String> arguments) {
-    final runner = CommandRunner<int>('genuineci', 'CLI tool')
-      ..addCommand(
-        DevStartCommand(
-          logger: _RecordingLogger(),
-          projectRootFinder: () => fail('Setup must not start'),
-        ),
-      );
-    return runner.run(['start', ...arguments]);
-  }
-
-  for (final option in ['repo', 'commit-sha', 'workflow', 'installation-id']) {
-    test('requires --$option before starting services', () async {
-      await expectLater(
-        runInvalidStart([
-          ..._seedArguments.where((arg) => !arg.startsWith('--$option=')),
-        ]),
-        throwsA(
-          isA<UsageException>().having(
-            (error) => error.message,
-            'message',
-            t.dev.start.invalidSeedOption(option: option),
-          ),
-        ),
-      );
-    });
-  }
-
-  for (final entry in {
-    'repo': ['', 'openci', 'owner/repo/extra', 'https://github.com/owner/repo'],
-    'commit-sha': ['main', 'abc123', 'g' * 40],
-    'workflow': [
-      'ci.yml',
-      '/tmp/ci.dart',
-      '../ci.dart',
-      'nested/../../ci.dart',
-      'genuine_ci/ci.dart',
-      r'..\ci.dart',
-      'ci\u0000.dart',
-    ],
-    'installation-id': ['0', '-1', 'abc', '12345678', '9' * 30],
-    'branch': ['', 'two branches'],
-  }.entries) {
-    for (var i = 0; i < entry.value.length; i++) {
-      test('rejects invalid --${entry.key} case $i before setup', () async {
-        await expectLater(
-          runInvalidStart([
-            ..._seedArguments.where(
-              (arg) => !arg.startsWith('--${entry.key}='),
-            ),
-            '--${entry.key}=${entry.value[i]}',
-          ]),
-          throwsA(
-            isA<UsageException>().having(
-              (error) => error.message,
-              'message',
-              t.dev.start.invalidSeedOption(option: entry.key),
-            ),
-          ),
-        );
-      });
-    }
-  }
-
-  for (final argument in [..._seedArguments.skip(1), '--branch=develop']) {
-    test('rejects $argument without --seed before setup', () async {
-      await expectLater(
-        runInvalidStart([argument]),
-        throwsA(
-          isA<UsageException>().having(
-            (error) => error.message,
-            'message',
-            t.dev.start.seedOptionsRequireSeed,
-          ),
-        ),
-      );
     });
   }
 }

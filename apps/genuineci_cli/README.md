@@ -4,27 +4,20 @@ Run `genuineci dev start` from the OpenCI checkout to start local services and t
 Mac Orchard worker. The existing Docker Compose credentials and `base-macos` VM
 must be configured first.
 
-To also queue one build job, add `--seed` and specify the target repository,
-full commit SHA, Dart workflow, and GitHub App installation ID:
+To also queue the default smoke-test build job:
 
 ```sh
-genuineci dev start --seed \
-  --repo=openci-org/openci \
-  --commit-sha='COMMIT_SHA' \
-  --workflow='WORKFLOW.dart' \
-  --installation-id='INSTALLATION_ID' \
-  --branch=develop
+genuineci dev start --seed
 ```
 
-Replace the uppercase placeholders with real values. The commit must be pushed to
-GitHub and accessible to the configured GitHub App. `--workflow` is relative to
-`genuine_ci/` at that commit; for `genuine_ci/worker_smoke.dart`, pass
-`--workflow=worker_smoke.dart`. `--branch` records the branch name and defaults to
-`main`; checkout uses `--commit-sha`.
+The server seeds `test-team` and one `macos-latest` job for
+`openci-org/openci`'s `genuine_ci/worker_smoke.dart`, pinned to commit
+`b6ab255a62ca0c5216ec67c4b251c7b1732bd290` on `test/build-job-worker-smoke`.
+The workflow checks macOS and Flutter versions and runs the worker's unit tests.
+It uses this fixed fixture, not uncommitted files in your local checkout.
 
-This submits one job directly through the seed API using the local `test-team`
-and `macos-latest` runner. It exercises the build job worker; webhook reception
-and planning are separate. Options for a job require `--seed`, and missing or
-invalid values exit with code 64 before services start.
+The server resolves the installation ID using the GitHub App already configured
+in Docker Compose. That App must have access to `openci-org/openci`.
+Webhook reception and planning are separate from this smoke test.
 
 Press Ctrl+C to stop the Mac Orchard worker. Docker containers keep running.

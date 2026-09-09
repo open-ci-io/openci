@@ -63,6 +63,153 @@ void main() {
       return client;
     }
 
+    group('getRepositoryInstallationId', () {
+      test(
+        'finds the repository installation using the configured App JWT',
+        () async {
+          testEnv['GITHUB_API_BASE_URL'] =
+              'https://github.example.test/api/v3/';
+          final requests = <http.Request>[];
+          final client = apiClient((request) {
+            requests.add(request);
+            return _jsonResponse({'id': 42});
+          });
+
+          expect(
+            await GitHubService.getRepositoryInstallationId(
+              owner: 'example',
+              repo: 'mobile',
+              environment: testEnv,
+              client: client,
+            ),
+            '42',
+          );
+          final request = requests.single;
+          expect(request.method, 'GET');
+          expect(
+            request.url.toString(),
+            'https://github.example.test/api/v3/repos/example/mobile/installation',
+          );
+          expect(request.headers['accept'], 'application/vnd.github+json');
+          final jwt = request.headers['authorization']!.substring(
+            'Bearer '.length,
+          );
+          final payload = jsonDecode(
+            utf8.decode(
+              base64Url.decode(
+                base64Url.normalize(jwt.split('.')[1]),
+              ),
+            ),
+          );
+          expect(payload['iss'], testEnv['GITHUB_APP_ID']);
+        },
+      );
+
+      test('uses the default HTTP client when none is supplied', () async {
+        final result = await http.runWithClient(
+          () => GitHubService.getRepositoryInstallationId(
+            owner: 'example',
+            repo: 'mobile',
+            environment: testEnv,
+          ),
+          () => MockClient((_) async => _jsonResponse({'id': 42})),
+        );
+        expect(result, '42');
+      });
+
+      for (final key in [
+        'GITHUB_APP_ID',
+        'GITHUB_PRIVATE_KEY_PATH',
+        'GITHUB_API_BASE_URL',
+      ]) {
+        for (final value in [null, '']) {
+          test(
+            'rejects missing $key with value $value before requesting GitHub',
+            () async {
+              testEnv.remove(key);
+              if (value != null) testEnv[key] = value;
+              await expectLater(
+                GitHubService.getRepositoryInstallationId(
+                  owner: 'example',
+                  repo: 'mobile',
+                  environment: testEnv,
+                  client: apiClient((_) => fail('GitHub must not be called')),
+                ),
+                throwsA(
+                  isA<StateError>().having(
+                    (error) => error.message,
+                    'message',
+                    contains(key),
+                  ),
+                ),
+              );
+            },
+          );
+        }
+      }
+
+      test(
+        'rejects a missing private key file before requesting GitHub',
+        () async {
+          await privateKeyFile.delete();
+          await expectLater(
+            GitHubService.getRepositoryInstallationId(
+              owner: 'example',
+              repo: 'mobile',
+              environment: testEnv,
+              client: apiClient((_) => fail('GitHub must not be called')),
+            ),
+            throwsA(isA<FileSystemException>()),
+          );
+        },
+      );
+
+      for (final status in [403, 404]) {
+        test(
+          'propagates a GitHub $status without returning a dummy ID',
+          () async {
+            await expectLater(
+              GitHubService.getRepositoryInstallationId(
+                owner: 'example',
+                repo: 'mobile',
+                environment: testEnv,
+                client: apiClient(
+                  (_) => http.Response('No installation', status),
+                ),
+              ),
+              throwsA(
+                isA<HttpException>().having(
+                  (error) => error.message,
+                  'message',
+                  contains('$status'),
+                ),
+              ),
+            );
+          },
+        );
+      }
+
+      for (final body in [
+        '{}',
+        '{"id":0}',
+        '{"id":-1}',
+        '{"id":"42"}',
+        'invalid',
+      ]) {
+        test('rejects an invalid installation response: $body', () async {
+          await expectLater(
+            GitHubService.getRepositoryInstallationId(
+              owner: 'example',
+              repo: 'mobile',
+              environment: testEnv,
+              client: apiClient((_) => http.Response(body, 200)),
+            ),
+            throwsFormatException,
+          );
+        });
+      }
+    });
+
     group('listRepositories', () {
       test(
         'maps repository fields and defaults using the configured API host',

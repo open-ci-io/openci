@@ -17,17 +17,8 @@ typedef TartBaseImageChecker = Future<bool> Function(Logger logger);
 typedef DockerComposeStarter =
     Future<bool> Function(Logger logger, Directory projectRoot);
 typedef OrchardContextSetup = Future<bool> Function(Logger logger);
-typedef LocalDataSeeder =
-    Future<bool> Function(Logger logger, {required SeedJobOptions job});
+typedef LocalDataSeeder = Future<bool> Function(Logger logger);
 typedef OrchardWorkerStarter = Future<int> Function(Logger logger);
-
-const _seedOptions = [
-  'repo',
-  'commit-sha',
-  'workflow',
-  'installation-id',
-  'branch',
-];
 
 class DevStartCommand extends Command<int> {
   @override
@@ -63,26 +54,11 @@ class DevStartCommand extends Command<int> {
        _orchardContextSetup = orchardContextSetup,
        _localDataSeeder = localDataSeeder,
        _orchardWorkerStarter = orchardWorkerStarter {
-    argParser
-      ..addFlag('seed', negatable: false, help: t.dev.start.flags.seed)
-      ..addOption('repo', help: t.dev.start.flags.repo, valueHelp: 'OWNER/REPO')
-      ..addOption(
-        'commit-sha',
-        help: t.dev.start.flags.commitSha,
-        valueHelp: 'SHA',
-      )
-      ..addOption(
-        'workflow',
-        help: t.dev.start.flags.workflow,
-        valueHelp: 'FILE.dart',
-      )
-      ..addOption('installation-id', help: t.dev.start.flags.installationId)
-      ..addOption('branch', help: t.dev.start.flags.branch, defaultsTo: 'main');
+    argParser.addFlag('seed', negatable: false, help: t.dev.start.flags.seed);
   }
 
   @override
   Future<int> run() async {
-    final seedJob = _parseSeedJob();
     _logger.stdout(t.dev.start.starting);
 
     final projectRoot = _projectRootFinder();
@@ -109,69 +85,14 @@ class DevStartCommand extends Command<int> {
       return 1;
     }
 
-    if (seedJob != null) {
-      final didSeedLocalData = await _localDataSeeder(_logger, job: seedJob);
+    final shouldSeedLocalData = argResults?['seed'] as bool? ?? false;
+    if (shouldSeedLocalData) {
+      final didSeedLocalData = await _localDataSeeder(_logger);
       if (!didSeedLocalData) {
         return 1;
       }
     }
 
     return _orchardWorkerStarter(_logger);
-  }
-
-  SeedJobOptions? _parseSeedJob() {
-    final results = argResults;
-    if (results == null) return null;
-    if (!results.flag('seed')) {
-      if (_seedOptions.any(results.wasParsed)) {
-        usageException(t.dev.start.seedOptionsRequireSeed);
-      }
-      return null;
-    }
-
-    String readOption(String name, bool Function(String) isValid) {
-      final value = results.option(name)?.trim() ?? '';
-      if (!isValid(value)) {
-        usageException(t.dev.start.invalidSeedOption(option: name));
-      }
-      return value;
-    }
-
-    final repository = readOption(
-      'repo',
-      (value) => RegExp(r'^[A-Za-z0-9-]+/[A-Za-z0-9_.-]+$').hasMatch(value),
-    ).split('/');
-    final commitSha = readOption(
-      'commit-sha',
-      (value) => RegExp(r'^[a-fA-F0-9]{40}$').hasMatch(value),
-    );
-    final workflow = readOption(
-      'workflow',
-      (value) =>
-          value.endsWith('.dart') &&
-          !value.startsWith('/') &&
-          !value.startsWith('genuine_ci/') &&
-          !value.split('/').contains('..') &&
-          !RegExp(r'[\x00-\x1f\\]').hasMatch(value),
-    );
-    final installationId = readOption(
-      'installation-id',
-      (value) =>
-          RegExp(r'^[1-9][0-9]*$').hasMatch(value) &&
-          int.tryParse(value) != null &&
-          value != '12345678',
-    );
-    final branch = readOption(
-      'branch',
-      (value) => value.isNotEmpty && !RegExp(r'\s').hasMatch(value),
-    );
-    return (
-      owner: repository[0],
-      repo: repository[1],
-      commitSha: commitSha,
-      workflowFileName: workflow,
-      installationId: installationId,
-      branch: branch,
-    );
   }
 }

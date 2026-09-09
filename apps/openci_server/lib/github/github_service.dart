@@ -20,6 +20,50 @@ class GitHubService {
     );
   }
 
+  static Future<String> getRepositoryInstallationId({
+    required String owner,
+    required String repo,
+    Map<String, String>? environment,
+    http.Client? client,
+  }) async {
+    final env = environment ?? Platform.environment;
+    for (final name in [
+      'GITHUB_APP_ID',
+      'GITHUB_PRIVATE_KEY_PATH',
+      'GITHUB_API_BASE_URL',
+    ]) {
+      if (env[name] == null || env[name]!.isEmpty) {
+        throw StateError('$name environment variable is not configured');
+      }
+    }
+    final jwt = generateJwt(
+      env['GITHUB_APP_ID']!,
+      await File(env['GITHUB_PRIVATE_KEY_PATH']!).readAsString(),
+    );
+    final apiUrl = env['GITHUB_API_BASE_URL']!.replaceFirst(RegExp(r'/+$'), '');
+    final url = Uri.parse('$apiUrl/repos/$owner/$repo/installation');
+    final headers = {
+      'Authorization': 'Bearer $jwt',
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'User-Agent': 'OpenCI-Server',
+    };
+    final response = client != null
+        ? await client.get(url, headers: headers)
+        : await http.get(url, headers: headers);
+    if (response.statusCode != HttpStatus.ok) {
+      throw HttpException(
+        'Failed to retrieve repository installation from GitHub: '
+        '${response.statusCode} ${response.body}',
+      );
+    }
+    final data = jsonDecode(response.body);
+    if (data case {'id': final int id} when id > 0) {
+      return id.toString();
+    }
+    throw const FormatException('GitHub installation response has no valid id');
+  }
+
   static Future<String> getInstallationToken({
     required String installationIdStr,
     Map<String, String>? environment,

@@ -171,12 +171,6 @@ class Translations$dev$start$en {
 
 	late final Translations$dev$start$flags$en flags = Translations$dev$start$flags$en.internal(_root);
 
-	/// en: 'Build job options require --seed.'
-	String get seedOptionsRequireSeed => 'Build job options require --seed.';
-
-	/// en: 'Missing or invalid --${option}. See --help for the expected value.'
-	String invalidSeedOption({required Object option}) => 'Missing or invalid --${option}. See --help for the expected value.';
-
 	/// en: 'Starting OpenCI Local Development Environment...'
 	String get starting => 'Starting OpenCI Local Development Environment...';
 
@@ -240,23 +234,8 @@ class Translations$dev$start$flags$en {
 
 	// Translations
 
-	/// en: 'Queue one build job after starting services. Requires --repo, --commit-sha, --workflow and --installation-id.'
-	String get seed => 'Queue one build job after starting services. Requires --repo, --commit-sha, --workflow and --installation-id.';
-
-	/// en: 'GitHub repository as OWNER/REPO (required with --seed).'
-	String get repo => 'GitHub repository as OWNER/REPO (required with --seed).';
-
-	/// en: 'Full 40-character commit SHA available on GitHub (required with --seed).'
-	String get commitSha => 'Full 40-character commit SHA available on GitHub (required with --seed).';
-
-	/// en: 'Dart workflow path relative to genuine_ci/, e.g. worker_smoke.dart (required with --seed).'
-	String get workflow => 'Dart workflow path relative to genuine_ci/, e.g. worker_smoke.dart (required with --seed).';
-
-	/// en: 'Positive GitHub App installation ID (required with --seed; mock ID 12345678 is not supported).'
-	String get installationId => 'Positive GitHub App installation ID (required with --seed; mock ID 12345678 is not supported).';
-
-	/// en: 'Branch name for the seeded job's metadata (with --seed).'
-	String get branch => 'Branch name for the seeded job\'s metadata (with --seed).';
+	/// en: 'Queue the default smoke-test build job after starting services.'
+	String get seed => 'Queue the default smoke-test build job after starting services.';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -283,14 +262,7 @@ extension on Translations {
 			'use.invalidLanguage' => ({required Object input}) => 'Invalid language "${input}". Supported languages: japanese, english.',
 			'dev.description' => 'Manage local development environment (Docker, Tart, DB, Server).',
 			'dev.start.description' => 'Start local services and run the Mac Orchard Worker until Ctrl+C.',
-			'dev.start.flags.seed' => 'Queue one build job after starting services. Requires --repo, --commit-sha, --workflow and --installation-id.',
-			'dev.start.flags.repo' => 'GitHub repository as OWNER/REPO (required with --seed).',
-			'dev.start.flags.commitSha' => 'Full 40-character commit SHA available on GitHub (required with --seed).',
-			'dev.start.flags.workflow' => 'Dart workflow path relative to genuine_ci/, e.g. worker_smoke.dart (required with --seed).',
-			'dev.start.flags.installationId' => 'Positive GitHub App installation ID (required with --seed; mock ID 12345678 is not supported).',
-			'dev.start.flags.branch' => 'Branch name for the seeded job\'s metadata (with --seed).',
-			'dev.start.seedOptionsRequireSeed' => 'Build job options require --seed.',
-			'dev.start.invalidSeedOption' => ({required Object option}) => 'Missing or invalid --${option}. See --help for the expected value.',
+			'dev.start.flags.seed' => 'Queue the default smoke-test build job after starting services.',
 			'dev.start.starting' => 'Starting OpenCI Local Development Environment...',
 			'dev.start.stepTart' => 'Step 1: Checking Tart VM base image...',
 			'dev.start.stepTartNotFound' => 'Error: Tart VM image "base-macos" not found.\nPlease run the following commands to setup the base image:\n  tart pull ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5\n  tart clone ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5 base-macos',

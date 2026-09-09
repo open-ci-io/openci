@@ -136,8 +136,6 @@ class _Translations$dev$start$ja extends Translations$dev$start$en {
 	// Translations
 	@override String get description => 'ローカルサービスを起動し、Ctrl+CまでMac側のOrchard Workerを実行します。';
 	@override late final _Translations$dev$start$flags$ja flags = _Translations$dev$start$flags$ja._(_root);
-	@override String get seedOptionsRequireSeed => 'ビルドジョブのオプションには--seedが必要です。';
-	@override String invalidSeedOption({required Object option}) => '--${option}が未指定、または無効です。指定形式は--helpを確認してください。';
 	@override String get starting => 'OpenCI ローカル開発環境を起動しています...';
 	@override String get stepTart => 'Step 1: Tart VM ベースイメージを確認中...';
 	@override String get stepTartNotFound => 'エラー: Tart VM イメージ「base-macos」が見つかりません。\n以下のコマンドを実行してイメージを準備してください:\n  tart pull ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5\n  tart clone ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5 base-macos';
@@ -165,12 +163,7 @@ class _Translations$dev$start$flags$ja extends Translations$dev$start$flags$en {
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
-	@override String get seed => 'サービス起動後にビルドジョブを1件投入します。--repo、--commit-sha、--workflow、--installation-idが必要です。';
-	@override String get repo => 'GitHubリポジトリをOWNER/REPO形式で指定します（--seed時は必須）。';
-	@override String get commitSha => 'GitHubに存在する40桁のcommit SHAを指定します（--seed時は必須）。';
-	@override String get workflow => 'genuine_ci/からの相対パスでDartワークフローを指定します。例: worker_smoke.dart（--seed時は必須）。';
-	@override String get installationId => 'GitHub Appの正のinstallation IDを指定します（--seed時は必須。ダミーID 12345678は使用できません）。';
-	@override String get branch => '投入するジョブのメタデータに使うブランチ名です（--seed時のみ）。';
+	@override String get seed => 'サービス起動後にデフォルトの動作確認用ジョブを1件投入します。';
 }
 
 /// The flat map containing all translations for locale <ja>.
@@ -197,14 +190,7 @@ extension on TranslationsJa {
 			'use.invalidLanguage' => ({required Object input}) => '無効な言語です: 「${input}」。対応言語: japanese, english',
 			'dev.description' => 'ローカル開発環境（Docker, Tart, DB, サーバー）を管理します。',
 			'dev.start.description' => 'ローカルサービスを起動し、Ctrl+CまでMac側のOrchard Workerを実行します。',
-			'dev.start.flags.seed' => 'サービス起動後にビルドジョブを1件投入します。--repo、--commit-sha、--workflow、--installation-idが必要です。',
-			'dev.start.flags.repo' => 'GitHubリポジトリをOWNER/REPO形式で指定します（--seed時は必須）。',
-			'dev.start.flags.commitSha' => 'GitHubに存在する40桁のcommit SHAを指定します（--seed時は必須）。',
-			'dev.start.flags.workflow' => 'genuine_ci/からの相対パスでDartワークフローを指定します。例: worker_smoke.dart（--seed時は必須）。',
-			'dev.start.flags.installationId' => 'GitHub Appの正のinstallation IDを指定します（--seed時は必須。ダミーID 12345678は使用できません）。',
-			'dev.start.flags.branch' => '投入するジョブのメタデータに使うブランチ名です（--seed時のみ）。',
-			'dev.start.seedOptionsRequireSeed' => 'ビルドジョブのオプションには--seedが必要です。',
-			'dev.start.invalidSeedOption' => ({required Object option}) => '--${option}が未指定、または無効です。指定形式は--helpを確認してください。',
+			'dev.start.flags.seed' => 'サービス起動後にデフォルトの動作確認用ジョブを1件投入します。',
 			'dev.start.starting' => 'OpenCI ローカル開発環境を起動しています...',
 			'dev.start.stepTart' => 'Step 1: Tart VM ベースイメージを確認中...',
 			'dev.start.stepTartNotFound' => 'エラー: Tart VM イメージ「base-macos」が見つかりません。\n以下のコマンドを実行してイメージを準備してください:\n  tart pull ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5\n  tart clone ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5 base-macos',
