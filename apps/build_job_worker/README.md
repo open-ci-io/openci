@@ -1,11 +1,11 @@
 # build_job_worker
 
 OpenCIのビルドjobを実行するDartバックエンドサービス。
-jobを1件ずつ取得・実行する常駐プロセスです。
+Orchardの実行枠に応じてjobを並列実行する常駐プロセスです。
 
 現在は設定の読み込み、jobを1件取得する関数、runの作成・完了記録、jobの完了記録、GitHub Checksの完了更新、OrchardのVM準備・削除・コマンド実行、Lokiへのログ送信、GitHubトークン・secretsの取得、ソースのcheckout・ワークフロー実行を実装しています。
 `executeBuildJob()`で、取得済みのjobを実行開始の記録から結果保存・VM削除まで処理できます。
-`runBuildJobWorker()`で、jobを1件ずつ取得して実行するループを利用できます。
+`runBuildJobWorker()`で、空き枠分のjobを取得して並列実行するループを利用できます。
 `main.dart`からこのループを起動し、`executeBuildJob()`を呼び出します。
 サーバー・Orchard・Lokiのクライアントは起動時に生成し、job間で共有します。
 Composeでは`build-job-worker`を常駐サービスとして起動します。
@@ -32,7 +32,7 @@ Composeでは`build-job-worker`を常駐サービスとして起動します。
 HTTP失敗・不正なレスポンスは例外にし、応答待ちは標準10秒でタイムアウトします。
 `calculateMaxConcurrentJobs()`はworker一覧、1 jobのCPU数・メモリ（GiB）、現在時刻から実行可能数を計算します。
 workerごとのVM枠・CPU・メモリの制約を反映し、停止中・最終heartbeatから3分超・Tart/arm64以外のworkerを除外します。
-返す値は総実行枠です。実行中jobの差し引きと実行ループへの接続は呼び出し側で行います。
+返す値は総実行枠です。`runBuildJobWorker()`で実行中jobの数を差し引いて利用します。
 `OrchardApiClient.getMaxConcurrentJobs()`はworker一覧を取得し、この計算関数で総実行枠を返します。
 CPU・メモリの既定値はVM作成と共通です。HTTP失敗・不正な応答・タイムアウトは呼び出し元へ返します。
 `waitForVmRunning()`は標準で3秒間隔・最大5分間、`running`または`active`になるまで待機します。
@@ -119,9 +119,11 @@ VM準備に成功した場合は`finally`でVMの削除を試みます。起動�
 コマンド出力の送信失敗は発生時に、進捗送信などそれ以外の例外は終了処理を試みた後に`onError`へ通知します。このコールバックは例外を投げずに記録してください。
 クライアントの生成・共有・終了処理は呼び出し元で行います。キャンセル監視、job全体のタイムアウトはまだ行いません。
 
-`runBuildJobWorker(api: api, executeJob: executeJob, shouldStop: shouldStop, onError: onError)`は、jobの取得と実行を順番に繰り返します。
-`executeJob`には`executeBuildJob()`を呼ぶ関数を渡します。結果保存・VM削除を含む実行関数の終了を待ってから次のjobを取得するため、jobの同時実行は1件です。
-jobがない場合と、取得・実行関数が例外を投げた場合は、`pollInterval`（標準3秒）だけ待って次のjobを取得します。
+`runBuildJobWorker()`には、`getMaxConcurrentJobs: orchardApi.getMaxConcurrentJobs`で実行枠の取得処理を渡します。
+各巡回で総実行枠から実行中jobの数を引き、空き枠分のjobを1件ずつ取得して並列実行します。
+`executeJob`には`executeBuildJob()`を呼ぶ関数を渡します。結果保存・VM削除を含む実行関数が終了するまで、そのjobは実行枠を使います。
+巡回後は`pollInterval`（標準3秒）待って実行枠と空きを再確認します。完了したjobの枠は次の巡回で再利用します。
+実行枠が0、またはOrchardから取得できない場合は新しいjobの取得を待ちます。枠が減少しても実行中jobは中断しません。
 実行関数が`FAILURE`を返した場合もループを継続します。同じjobの自動再実行は行いません。
 ループで捕捉した例外は`onError`へ通知します。`executeBuildJob()`内で捕捉する例外は、そちらへ渡した`onError`で記録してください。コールバックは例外を投げないようにしてください。
 `shouldStop`が`true`なら新たなjob取得を止めます。取得待ち中に停止要求が来ても、取得できたjobは実行と後片付けを終えてから停止します。
@@ -165,7 +167,7 @@ dart run bin/main.dart
 起動後はjobを継続して取得します。起動・取得・実行・結果保存・VM削除などの例外は標準エラー出力へ記録し、DSN設定時はSentryにも送信します。
 Sentryへの送信はjobの処理を待たせずに行い、worker終了時に送信完了を最大5秒待ってからSentryを閉じます。送信の失敗でjobの結果は変更しません。
 `SIGTERM`または`SIGINT`（Ctrl+C）で新しいjobの取得を止め、取得済みjobの結果保存・VM削除を試みてからクライアントを閉じます。
-空キューの待機中なら最大3秒、job取得・実行中ならその処理が終わるまで待ちます。
+巡回の待機中なら最大3秒、取得済みjobがある場合はすべての実行と後片付けが終わるまで待ちます。
 停止シグナルによる正常終了は終了コード0、設定・起動に失敗した場合は終了コード1です。
 
 ## 検証

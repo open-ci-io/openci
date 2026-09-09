@@ -47,7 +47,7 @@ void main() {
         expect(result.stdout, contains('Starting build job worker...'));
         expect(
           result.stdout,
-          contains('Waiting for the current job to finish.'),
+          contains('Waiting for all running jobs to finish.'),
         );
         expect(result.stdout, contains('Build job worker stopped.'));
         expect(result.stderr, isEmpty);
@@ -83,7 +83,7 @@ void main() {
 
     final request = await nextClaim.future.timeout(_waitTimeout);
     expect(worker.process.kill(ProcessSignal.sigterm), isTrue);
-    await worker.waitForOutput('Waiting for the current job to finish.');
+    await worker.waitForOutput('Waiting for all running jobs to finish.');
     await _reply(request, {'job': null});
     final result = await worker.finish();
 
@@ -134,7 +134,7 @@ void main() {
 
       final request = await claim.future.timeout(_waitTimeout);
       expect(worker.process.kill(ProcessSignal.sigint), isTrue);
-      await worker.waitForOutput('Waiting for the current job to finish.');
+      await worker.waitForOutput('Waiting for all running jobs to finish.');
       await _reply(request, {'job': _job().toJson()});
       final (sentryRequest, event) = await report.future.timeout(_waitTimeout);
       await worker.waitForOutput('Build job worker stopped.');
@@ -214,6 +214,8 @@ void main() {
           );
           final path = request.uri.path;
           switch ((request.method, path)) {
+            case ('GET', '/v1/workers'):
+              await _reply(request, _workers(1));
             case ('POST', '/v1/vms'):
               final body = await _body(request);
               expect(body['image'], 'test-base-macos');
@@ -279,7 +281,7 @@ void main() {
 
         await workflowStarted.future.timeout(_waitTimeout);
         expect(worker.process.kill(ProcessSignal.sigterm), isTrue);
-        await worker.waitForOutput('Waiting for the current job to finish.');
+        await worker.waitForOutput('Waiting for all running jobs to finish.');
         expect(worker.exitCode, isNull);
         expect(updates, isEmpty);
         expect(deletion.isCompleted, isFalse);
@@ -385,6 +387,79 @@ void main() {
     );
   }
 
+  for (final capacity in [2, 3]) {
+    test(
+      'uses Orchard capacity $capacity and drains every claimed job on shutdown',
+      () async {
+        final allStarted = Completer<void>();
+        final runRequests = <String, HttpRequest>{};
+        final jobs = List.generate(
+          capacity,
+          (index) => _job().copyWith(id: 'job-$index'),
+        );
+        final finished = {for (final job in jobs) job.id: Completer<void>()};
+        final completedJobs = <String>[];
+        var claims = 0;
+        final orchard = await _serve((request) async {
+          expect(request.method, 'GET');
+          expect(request.uri.path, '/v1/workers');
+          await _reply(request, _workers(capacity));
+        });
+        final server = await _serve((request) async {
+          final path = request.uri.pathSegments;
+          final body = await _body(request);
+          if (path.last == 'claim') {
+            final index = claims++;
+            await _reply(request, {
+              'job': index < jobs.length ? jobs[index].toJson() : null,
+            });
+          } else if (path.last == 'runs') {
+            runRequests[path[1]] = request;
+            if (runRequests.length == capacity) allStarted.complete();
+          } else if (request.method == 'PATCH' && path.length == 2) {
+            expect(body['status'], 'FAILURE');
+            completedJobs.add(path[1]);
+            await _reply(request, null, statusCode: 204);
+          } else if (path.last == 'check-run') {
+            expect(body['conclusion'], 'failure');
+            await _reply(request, null, statusCode: 204);
+            finished[path[1]]!.complete();
+          } else {
+            fail('Unexpected request: ${request.method} ${request.uri}');
+          }
+        });
+        final worker = await _startWorker({
+          ...environment,
+          'OPENCI_SERVER_URL': _url(server),
+          'ORCHARD_API_URL': _url(orchard),
+        });
+
+        await allStarted.future.timeout(_waitTimeout);
+        expect(claims, capacity);
+        expect(worker.process.kill(ProcessSignal.sigterm), isTrue);
+        await worker.waitForOutput('Waiting for all running jobs to finish.');
+        for (final job in jobs.take(capacity - 1)) {
+          await _reply(runRequests[job.id]!, null, statusCode: 503);
+          await finished[job.id]!.future.timeout(_waitTimeout);
+        }
+        expect(worker.exitCode, isNull);
+        await _reply(runRequests[jobs.last.id]!, null, statusCode: 503);
+        final result = await worker.finish();
+
+        expect(result.exitCode, 0);
+        expect(claims, capacity);
+        expect(completedJobs, unorderedEquals(jobs.map((job) => job.id)));
+        expect(
+          finished.values.every((completion) => completion.isCompleted),
+          isTrue,
+        );
+        expect(result.stdout, contains('Build job worker stopped.'));
+        _expectNoCredentials(result, environment);
+      },
+      skip: Platform.isWindows,
+    );
+  }
+
   for (final key in environment.keys) {
     test('exits with an error when $key is missing', () async {
       final worker = await _startWorker({...environment}..remove(key));
@@ -446,6 +521,15 @@ void main() {
 }
 
 Future<_WorkerProcess> _startWorker(Map<String, String> environment) async {
+  final orchardUrl =
+      environment['ORCHARD_API_URL'] ??
+      _url(
+        await _serve((request) async {
+          expect(request.method, 'GET');
+          expect(request.uri.path, '/v1/workers');
+          await _reply(request, _workers(1));
+        }),
+      );
   final processEnvironment = {...Platform.environment}
     ..remove('OPENCI_SERVER_URL')
     ..remove('INTERNAL_API_KEY')
@@ -453,7 +537,9 @@ Future<_WorkerProcess> _startWorker(Map<String, String> environment) async {
     ..remove('ORCHARD_SERVICE_ACCOUNT_TOKEN')
     ..remove('SENTRY_DSN')
     ..addAll({
-      'ORCHARD_API_URL': 'http://127.0.0.1:1',
+      'ORCHARD_API_URL': orchardUrl,
+      'ORCHARD_VM_CPU': '2',
+      'ORCHARD_VM_MEMORY_GB': '4',
       'LOKI_URL': 'http://127.0.0.1:1',
       'LOKI_URL_FOR_VM': 'http://127.0.0.1:1',
     })
@@ -582,6 +668,18 @@ BuildJob _job() => BuildJob(
   createdAt: DateTime.utc(2026, 9, 7),
   updatedAt: DateTime.utc(2026, 9, 7),
 );
+
+List<Map<String, dynamic>> _workers(int capacity) => [
+  {
+    'name': 'mac-worker',
+    'last_seen': DateTime.now().toUtc().toIso8601String(),
+    'resources': {
+      'org.cirruslabs.tart-vms': capacity,
+      'org.cirruslabs.logical-cores': capacity * 2,
+      'org.cirruslabs.memory-mib': capacity * 4096,
+    },
+  },
+];
 
 void _expectNoCredentials(
   ProcessResult result,

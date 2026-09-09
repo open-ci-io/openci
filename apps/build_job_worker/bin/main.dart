@@ -59,7 +59,7 @@ Future<void> _runWorker(Config config) async {
       if (stopRequested) return;
       stopRequested = true;
       stdout.writeln(
-        'Received $signal. Waiting for the current job to finish.',
+        'Received $signal. Waiting for all running jobs to finish.',
       );
     }
 
@@ -71,6 +71,7 @@ Future<void> _runWorker(Config config) async {
     stdout.writeln('Starting build job worker...');
     await runBuildJobWorker(
       api: api,
+      getMaxConcurrentJobs: orchardApi.getMaxConcurrentJobs,
       executeJob: (job) => executeBuildJob(
         api: api,
         orchardApi: orchardApi!,

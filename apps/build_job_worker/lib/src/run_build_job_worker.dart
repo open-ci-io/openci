@@ -2,13 +2,9 @@ import 'package:openci_shared/openci_shared.dart';
 
 import 'claim_next_build_job.dart';
 
-/// Claims and executes jobs one at a time until [shouldStop] returns true.
-///
-/// [executeJob] is responsible for result recording and cleanup before returning.
-/// A job claimed while stopping is still executed; it must not be abandoned.
-/// [onError] reports thrown errors and must not throw. The caller owns clients.
 Future<void> runBuildJobWorker({
   required OpenCiApiService api,
+  required Future<int> Function() getMaxConcurrentJobs,
   required Future<BuildJobStatus> Function(BuildJob job) executeJob,
   required bool Function() shouldStop,
   required void Function(Object error, StackTrace stackTrace) onError,
@@ -22,19 +18,31 @@ Future<void> runBuildJobWorker({
     );
   }
 
-  while (!shouldStop()) {
-    try {
-      final job = await claimNextBuildJob(api);
-      if (job != null) {
-        await executeJob(job);
-        continue;
-      }
-    } catch (error, stackTrace) {
-      onError(error, stackTrace);
-    }
+  final running = <Future<void>>{};
+  try {
+    while (!shouldStop()) {
+      try {
+        final capacity = await getMaxConcurrentJobs();
+        final availableSlots = capacity - running.length;
+        for (var slot = 0; slot < availableSlots && !shouldStop(); slot++) {
+          final job = await claimNextBuildJob(api);
+          if (job == null) break;
 
-    if (!shouldStop()) {
-      await Future<void>.delayed(pollInterval);
+          late final Future<void> execution;
+          execution = Future.sync(() => executeJob(job))
+              .then<void>((_) {}, onError: onError)
+              .whenComplete(() => running.remove(execution));
+          running.add(execution);
+        }
+      } catch (error, stackTrace) {
+        onError(error, stackTrace);
+      }
+
+      if (!shouldStop()) {
+        await Future<void>.delayed(pollInterval);
+      }
     }
+  } finally {
+    await Future.wait(running);
   }
 }
