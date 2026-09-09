@@ -38,6 +38,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$login$en login = Translations$login$en.internal(_root);
 	late final Translations$use$en use = Translations$use$en.internal(_root);
 	late final Translations$dev$en dev = Translations$dev$en.internal(_root);
+	late final Translations$sync$en sync = Translations$sync$en.internal(_root);
 	late final Translations$common$en common = Translations$common$en.internal(_root);
 }
 
@@ -135,6 +136,20 @@ class Translations$dev$en {
 	String get description => 'Manage local development environment (Docker, Tart, DB, Server).';
 
 	late final Translations$dev$start$en start = Translations$dev$start$en.internal(_root);
+}
+
+// Path: sync
+class Translations$sync$en {
+	Translations$sync$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Sync local workflow definitions with GenuineCI.'
+	String get description => 'Sync local workflow definitions with GenuineCI.';
+
+	late final Translations$sync$secrets$en secrets = Translations$sync$secrets$en.internal(_root);
 }
 
 // Path: common
@@ -250,6 +265,39 @@ class Translations$dev$start$en {
 	String get stepBuildJobWorkerWaiting => 'Waiting for the current build job to finish before restarting services...';
 }
 
+// Path: sync.secrets
+class Translations$sync$secrets$en {
+	Translations$sync$secrets$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Generate genuine_ci/secrets.g.dart from the active team's secret names.'
+	String get description => 'Generate genuine_ci/secrets.g.dart from the active team\'s secret names.';
+
+	/// en: 'sync secrets does not accept positional arguments.'
+	String get noArguments => 'sync secrets does not accept positional arguments.';
+
+	/// en: 'Run genuineci login --local before syncing secrets.'
+	String get loginRequired => 'Run genuineci login --local before syncing secrets.';
+
+	/// en: 'No genuine_ci directory found. Run this command from your workflow project.'
+	String get workflowDirectoryNotFound => 'No genuine_ci directory found. Run this command from your workflow project.';
+
+	/// en: 'Could not fetch secret names (HTTP ${status}).'
+	String requestFailed({required Object status}) => 'Could not fetch secret names (HTTP ${status}).';
+
+	/// en: 'Could not fetch secret names. Check the server connection and response.'
+	String get fetchFailed => 'Could not fetch secret names. Check the server connection and response.';
+
+	/// en: 'Could not save secrets.g.dart. Check the destination and file permissions.'
+	String get saveFailed => 'Could not save secrets.g.dart. Check the destination and file permissions.';
+
+	/// en: 'Generated secret definitions: ${path}'
+	String saved({required Object path}) => 'Generated secret definitions: ${path}';
+}
+
 // Path: dev.start.flags
 class Translations$dev$start$flags$en {
 	Translations$dev$start$flags$en.internal(this._root);
@@ -313,6 +361,15 @@ extension on Translations {
 			'dev.start.projectRootNotFound' => 'Error: OpenCI project root not found.',
 			'dev.start.stepOrchardController' => 'Step 2: Starting Orchard Controller...',
 			'dev.start.stepBuildJobWorkerWaiting' => 'Waiting for the current build job to finish before restarting services...',
+			'sync.description' => 'Sync local workflow definitions with GenuineCI.',
+			'sync.secrets.description' => 'Generate genuine_ci/secrets.g.dart from the active team\'s secret names.',
+			'sync.secrets.noArguments' => 'sync secrets does not accept positional arguments.',
+			'sync.secrets.loginRequired' => 'Run genuineci login --local before syncing secrets.',
+			'sync.secrets.workflowDirectoryNotFound' => 'No genuine_ci directory found. Run this command from your workflow project.',
+			'sync.secrets.requestFailed' => ({required Object status}) => 'Could not fetch secret names (HTTP ${status}).',
+			'sync.secrets.fetchFailed' => 'Could not fetch secret names. Check the server connection and response.',
+			'sync.secrets.saveFailed' => 'Could not save secrets.g.dart. Check the destination and file permissions.',
+			'sync.secrets.saved' => ({required Object path}) => 'Generated secret definitions: ${path}',
 			'common.error' => ({required Object error}) => 'Error: ${error}',
 			_ => null,
 		};

@@ -57,6 +57,17 @@ void main() {
     expect(runner.commands['use'], isA<UseCommand>());
   });
 
+  test('registers sync secrets with localized descriptions', () {
+    final sync = runner.commands['sync'];
+    expect(sync, isA<SyncCommand>());
+    expect(sync!.description, t.sync.description);
+    expect(sync.subcommands['secrets'], isA<SyncSecretsCommand>());
+    expect(
+      sync.subcommands['secrets']!.description,
+      t.sync.secrets.description,
+    );
+  });
+
   test('login requires --local while cloud login is unavailable', () async {
     await expectLater(
       runner.run(['login']),

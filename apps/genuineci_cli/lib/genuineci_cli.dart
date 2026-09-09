@@ -4,6 +4,8 @@ export 'src/command_runner.dart';
 export 'src/commands/dev/dev_command.dart';
 export 'src/commands/dev/dev_start_command.dart';
 export 'src/commands/login_command.dart';
+export 'src/commands/sync/sync_command.dart';
+export 'src/commands/sync/sync_secrets_command.dart';
 export 'src/commands/use_command.dart';
 export 'src/config/cli_config.dart';
 export 'src/config/cli_config_data.dart';
