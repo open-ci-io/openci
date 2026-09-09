@@ -64,6 +64,97 @@ void main() {
       });
     });
 
+    group('getMaxConcurrentJobs', () {
+      for (final (cpu, memory, expected) in [
+        (2, 4, 4),
+        (5, 4, 2),
+        (2, 12, 2),
+      ]) {
+        test('calculates capacity for $cpu CPUs and $memory GiB', () async {
+          final workers = [
+            for (final name in ['mac-1', 'mac-2'])
+              {
+                'name': name,
+                'last_seen': DateTime.now().toUtc().toIso8601String(),
+                'resources': {
+                  'org.cirruslabs.tart-vms': 2,
+                  'org.cirruslabs.logical-cores': 8,
+                  'org.cirruslabs.memory-mib': 16384,
+                },
+              },
+          ];
+          final client = _createClient((request) async {
+            expect(request.method, 'GET');
+            expect(request.url.path, '/v1/workers');
+            return http.Response(jsonEncode(workers), 200);
+          });
+
+          expect(
+            await client.getMaxConcurrentJobs(cpuCount: cpu, memoryGb: memory),
+            expected,
+          );
+        });
+      }
+
+      test('returns zero for an empty cluster', () async {
+        final client = _createClient((_) async => http.Response('[]', 200));
+
+        expect(await client.getMaxConcurrentJobs(cpuCount: 2, memoryGb: 4), 0);
+      });
+
+      test('shares CPU and memory defaults with VM creation', () async {
+        late Map<String, dynamic> resources;
+        final client = _createClient((request) async {
+          if (request.method == 'POST') {
+            final body = jsonDecode(request.body) as Map<String, dynamic>;
+            resources = body['resources'] as Map<String, dynamic>;
+            return _leaseResponse('pending');
+          }
+          return http.Response(
+            jsonEncode([
+              {
+                'last_seen': DateTime.now().toUtc().toIso8601String(),
+                'resources': resources,
+              },
+            ]),
+            200,
+          );
+        });
+
+        await client.createLease(imageName: 'base-macos');
+        final vmResources = resources;
+        for (final limit in [
+          'org.cirruslabs.logical-cores',
+          'org.cirruslabs.memory-mib',
+        ]) {
+          resources = vmResources.map(
+            (name, value) =>
+                MapEntry(name, name == limit ? value : (value as int) * 2),
+          );
+          expect(await client.getMaxConcurrentJobs(), 1, reason: limit);
+        }
+      });
+
+      test('propagates a malformed worker response', () async {
+        final client = _createClient((_) async => http.Response('{}', 200));
+
+        await expectLater(client.getMaxConcurrentJobs(), throwsFormatException);
+      });
+
+      test('uses the supplied request timeout', () async {
+        final response = Completer<http.Response>();
+        final client = _createClient((_) => response.future);
+        addTearDown(() => response.complete(http.Response('[]', 200)));
+
+        await expectLater(
+          client.getMaxConcurrentJobs(
+            timeout: const Duration(milliseconds: 10),
+          ),
+          throwsA(isA<TimeoutException>()),
+        );
+      });
+    });
+
     test('creates a VM with its image and resource requirements', () async {
       final client = _createClient((request) async {
         expect(request.method, 'POST');
@@ -247,6 +338,7 @@ void main() {
 
     final operations = <String, Future<void> Function(OrchardApiClient)>{
       'listWorkers': (client) => client.listWorkers(),
+      'getMaxConcurrentJobs': (client) => client.getMaxConcurrentJobs(),
       'createLease': (client) => client.createLease(imageName: 'base-macos'),
       'getLease': (client) => client.getLease('lease-1'),
       'deleteLease': (client) => client.deleteLease('lease-1'),
@@ -276,6 +368,7 @@ void main() {
       final client = _createClient((_) async => throw error);
 
       await expectLater(client.listWorkers(), throwsA(same(error)));
+      await expectLater(client.getMaxConcurrentJobs(), throwsA(same(error)));
       await expectLater(client.getLease('lease-1'), throwsA(same(error)));
       await expectLater(
         client.waitForVmRunning('lease-1'),

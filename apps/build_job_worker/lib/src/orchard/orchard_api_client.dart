@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 
 import '../config.dart';
+import 'calculate_max_concurrent_jobs.dart' show calculateMaxConcurrentJobs;
 
 class OrchardLease {
   const OrchardLease({
@@ -41,6 +42,12 @@ class OrchardApiClient {
   final Config _config;
   final http.Client _httpClient;
 
+  int get _defaultCpuCount =>
+      int.tryParse(Platform.environment['ORCHARD_VM_CPU'] ?? '') ?? 2;
+
+  int get _defaultMemoryGb =>
+      int.tryParse(Platform.environment['ORCHARD_VM_MEMORY_GB'] ?? '') ?? 4;
+
   Map<String, String> get _headers {
     final credentials =
         '${_config.orchardServiceAccountName}:${_config.orchardServiceAccountToken}';
@@ -65,6 +72,22 @@ class OrchardApiClient {
     return workers.cast<Map<String, dynamic>>();
   }
 
+  /// Total job capacity using the same VM size defaults as [createLease].
+  /// Currently running jobs must be counted by the caller.
+  Future<int> getMaxConcurrentJobs({
+    int? cpuCount,
+    int? memoryGb,
+    Duration timeout = const Duration(seconds: 10),
+  }) async {
+    final workers = await listWorkers(timeout: timeout);
+    return calculateMaxConcurrentJobs(
+      workers: workers,
+      cpuCount: cpuCount ?? _defaultCpuCount,
+      memoryGb: memoryGb ?? _defaultMemoryGb,
+      now: DateTime.now().toUtc(),
+    );
+  }
+
   Future<OrchardLease> createLease({
     required String imageName,
     String? vmName,
@@ -73,15 +96,8 @@ class OrchardApiClient {
     bool headless = true,
     String os = 'darwin',
   }) async {
-    final cpu =
-        cpuCount ??
-        int.tryParse(Platform.environment['ORCHARD_VM_CPU'] ?? '') ??
-        2;
-    final memoryMiB =
-        (memoryGb ??
-            int.tryParse(Platform.environment['ORCHARD_VM_MEMORY_GB'] ?? '') ??
-            4) *
-        1024;
+    final cpu = cpuCount ?? _defaultCpuCount;
+    final memoryMiB = (memoryGb ?? _defaultMemoryGb) * 1024;
     final response = await _httpClient.post(
       _vmUri(),
       headers: _headers,
