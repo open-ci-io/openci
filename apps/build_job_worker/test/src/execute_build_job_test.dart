@@ -272,9 +272,11 @@ void main() {
           'checkout',
           'checkout:SUCCESS',
           'secrets',
+          'run_workflow:IN_PROGRESS',
           'writeSecrets',
           'writeWorkflow',
           'workflow',
+          'run_workflow:SUCCESS',
           'completeRun',
           'completeJob',
           'completeCheck',
@@ -325,13 +327,15 @@ void main() {
         expect(steps.last.createdAt, steps.first.createdAt);
         expect(steps.last.updatedAt.isBefore(steps.first.updatedAt), isFalse);
 
-        expect(logRequests, hasLength(6));
+        expect(logRequests, hasLength(8));
         for (final (index, step) in [
           'prepare_vm',
           'prepare_vm',
           'checkout',
           'checkout',
           'checkout',
+          'run_workflow',
+          'run_workflow',
           'run_workflow',
         ].indexed) {
           final request = logRequests[index];
@@ -428,6 +432,45 @@ void main() {
       expect(completed.durationMs, greaterThanOrEqualTo(10));
     });
 
+    test('reports workflow progress and duration', () async {
+      final started = Completer<void>();
+      final finish = pending['workflow'] = Completer<void>();
+      addTearDown(() {
+        if (!finish.isCompleted) finish.complete();
+      });
+      respondToLog = (request) async {
+        final labels = _lokiStream(request)['stream'] as Map<String, dynamic>;
+        if (labels['type'] == 'step_log' &&
+            labels['step_id'] == 'run_workflow') {
+          started.complete();
+        }
+        return http.Response('', 204);
+      };
+
+      final result = execute();
+      await started.future;
+      final inProgress = stepEvents('run_workflow').single;
+      expect(inProgress.status, BuildJobStatus.IN_PROGRESS);
+      expect(inProgress.id, 'run_workflow');
+      expect(inProgress.runId, runIds.single);
+      expect(inProgress.name, 'Run workflow');
+      expect(inProgress.stepOrder, 2);
+      expect(inProgress.durationMs, 0);
+      expect(inProgress.createdAt.isUtc, isTrue);
+      expect(inProgress.updatedAt, inProgress.createdAt);
+      expect(completions, isEmpty);
+      expect(deletedVms, isEmpty);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      finish.complete();
+
+      expect(await result, BuildJobStatus.SUCCESS);
+      final completed = stepEvents('run_workflow').last;
+      expect(completed.status, BuildJobStatus.SUCCESS);
+      expect(completed.createdAt, inProgress.createdAt);
+      expect(completed.updatedAt.isBefore(inProgress.updatedAt), isFalse);
+      expect(completed.durationMs, greaterThanOrEqualTo(10));
+    });
+
     test(
       'records a nonzero workflow exit code as failure and cleans up',
       () async {
@@ -437,6 +480,10 @@ void main() {
 
         expectCompletion(BuildJobStatus.FAILURE);
         expect(stepEvents('checkout').last.status, BuildJobStatus.SUCCESS);
+        expect(stepEvents('run_workflow').map((step) => step.status), [
+          BuildJobStatus.IN_PROGRESS,
+          BuildJobStatus.FAILURE,
+        ]);
         expect(deletedVms, ['lease-1']);
         expect(errors, isEmpty);
       },
@@ -513,6 +560,16 @@ void main() {
             ['writeCheckout', 'checkout'].contains(stage)
                 ? BuildJobStatus.FAILURE
                 : BuildJobStatus.SUCCESS,
+          ],
+        ]);
+        expect(stepEvents('run_workflow').map((step) => step.status), [
+          if ([
+            'writeSecrets',
+            'writeWorkflow',
+            'workflow',
+          ].contains(stage)) ...[
+            BuildJobStatus.IN_PROGRESS,
+            BuildJobStatus.FAILURE,
           ],
         ]);
         expect(errors, hasLength(1));
@@ -649,7 +706,7 @@ void main() {
       expect(await execute(), BuildJobStatus.SUCCESS);
 
       expectCompletion(BuildJobStatus.SUCCESS);
-      expect(errors, hasLength(6));
+      expect(errors, hasLength(8));
       expect(deletedVms, ['lease-1']);
     });
 
@@ -692,7 +749,31 @@ void main() {
       expect(deletedVms, ['lease-1']);
     });
 
-    for (final stepId in ['prepare_vm', 'checkout']) {
+    test('preserves workflow failure when progress delivery fails', () async {
+      final workflowError = failures['workflow'] = StateError(
+        'Workflow failed',
+      );
+      respondToLog = (request) async {
+        final labels = _lokiStream(request)['stream'] as Map<String, dynamic>;
+        return http.Response(
+          '',
+          labels['type'] == 'step_event' && labels['step_id'] == 'run_workflow'
+              ? 503
+              : 204,
+        );
+      };
+
+      expect(await execute(), BuildJobStatus.FAILURE);
+
+      expectCompletion(BuildJobStatus.FAILURE);
+      expect(stepEvents('run_workflow').last.status, BuildJobStatus.FAILURE);
+      expect(errors, hasLength(3));
+      expect(errors.last.$1, same(workflowError));
+      expect(errors.last.$2.toString(), sourceStack.toString());
+      expect(deletedVms, ['lease-1']);
+    });
+
+    for (final stepId in ['prepare_vm', 'checkout', 'run_workflow']) {
       test('continues after $stepId progress times out', () async {
         final response = Completer<http.Response>();
         respondToLog = (request) {
@@ -724,7 +805,8 @@ void main() {
         final response = Completer<http.Response>();
         respondToLog = (request) {
           final labels = _lokiStream(request)['stream'] as Map<String, dynamic>;
-          if (labels['step_id'] != 'run_workflow') {
+          if (labels['type'] != 'step_log' ||
+              labels['step_id'] != 'run_workflow') {
             return Future.value(http.Response('', 204));
           }
           started.complete();

@@ -143,18 +143,42 @@ Future<BuildJobStatus> executeBuildJob({
       );
     }
     final secretsContent = await fetchJobSecrets(api: api, jobId: job.id);
-    final exitCode = await runWorkflow(
-      api: orchardApi,
-      lokiClient: lokiClient,
-      lokiUrl: config.internalLokiUrl,
-      vmLokiUrl: config.lokiUrl,
-      vmName: vmName,
-      job: job,
+    final workflowStartedAt = DateTime.now().toUtc();
+    final workflowStep = BuildStep(
+      id: 'run_workflow',
       runId: runId,
-      secretsContent: secretsContent,
-      onLogError: onError,
+      name: 'Run workflow',
+      status: BuildJobStatus.IN_PROGRESS,
+      durationMs: 0,
+      stepOrder: 2,
+      createdAt: workflowStartedAt,
+      updatedAt: workflowStartedAt,
     );
-    status = exitCode == 0 ? BuildJobStatus.SUCCESS : BuildJobStatus.FAILURE;
+    await reportStep(workflowStep);
+    final workflowStopwatch = Stopwatch()..start();
+    try {
+      final exitCode = await runWorkflow(
+        api: orchardApi,
+        lokiClient: lokiClient,
+        lokiUrl: config.internalLokiUrl,
+        vmLokiUrl: config.lokiUrl,
+        vmName: vmName,
+        job: job,
+        runId: runId,
+        secretsContent: secretsContent,
+        onLogError: onError,
+      );
+      status = exitCode == 0 ? BuildJobStatus.SUCCESS : BuildJobStatus.FAILURE;
+    } finally {
+      workflowStopwatch.stop();
+      await reportStep(
+        workflowStep.copyWith(
+          status: status,
+          durationMs: workflowStopwatch.elapsedMilliseconds,
+          updatedAt: DateTime.now().toUtc(),
+        ),
+      );
+    }
   } catch (error, stackTrace) {
     errors.add((error, stackTrace));
   } finally {

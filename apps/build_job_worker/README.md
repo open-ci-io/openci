@@ -102,6 +102,7 @@ stdout・stderrは`step_id: run_workflow`でLokiへ送り、送信待ちが終�
 run IDとVM名を生成し、run作成、GitHubトークン取得、VM準備、checkout、secrets取得、ワークフロー実行を順に行います。
 VM準備は`prepare_vm`（表示名`Set up VM`）として、開始時に`IN_PROGRESS`、終了時に`SUCCESS`または`FAILURE`と処理時間をLokiへ送信します。既存のビルド画面で状態と所要時間を確認できます。
 checkoutも`checkout`（表示名`Checkout Repository`）として同じ進捗を送信し、VM準備の次に表示します。既存のcheckoutログをこのステップから確認できます。
+ワークフロー実行も`run_workflow`（表示名`Run workflow`）として開始・終了状態と所要時間を送信し、checkoutの次に表示します。既存のワークフローログをこのステップから確認できます。
 進捗イベントの送信は1件あたり最大10秒待ち、失敗してもjobの実行結果やVM削除の処理は変えません。
 終了コード0なら`SUCCESS`、それ以外や実行途中の例外なら`FAILURE`として、run・job・GitHub Checksに結果の保存を試みます。
 run作成が失敗した場合はrunの完了更新とVM作成を行わず、job・GitHub Checksの失敗記録を試みます。
@@ -186,4 +187,3 @@ docker build -f apps/build_job_worker/Dockerfile -t openci-build-job-worker .
 
 - 実行中jobのキャンセル監視。
 - VM準備に失敗した場合の自動リトライ。
-- ワークフロー全体の進捗イベント送信。
