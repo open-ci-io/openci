@@ -21,11 +21,20 @@ Future<Response> onRequest(RequestContext context) async {
         bodyJson['userId'] as String? ?? bodyJson['userUid'] as String?;
     final teamId = bodyJson['teamId'] as String? ?? 'test-team';
     final teamName = bodyJson['name'] as String? ?? 'Test Team';
+    final installationId = bodyJson['installationId'] as String? ?? '12345678';
+    final installationNumber = int.tryParse(installationId);
+    if (installationNumber == null || installationNumber <= 0) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {'success': false, 'error': 'installationId must be positive'},
+      );
+    }
 
     await db.seedDao.ensureTestTeam(
       teamId: teamId,
       name: teamName,
       userId: userId,
+      installationId: installationNumber,
     );
 
     final job = await db.seedDao.createTestBuildJob(
@@ -35,7 +44,7 @@ Future<Response> onRequest(RequestContext context) async {
       workflowName: bodyJson['workflowName'] as String? ?? 'Test Workflow',
       workflowFileName: bodyJson['workflowFileName'] as String? ?? 'ci.yml',
       teamId: teamId,
-      installationId: bodyJson['installationId'] as String? ?? '12345678',
+      installationId: installationId,
       commitSha: bodyJson['commitSha'] as String? ?? 'main',
       commitMessage:
           bodyJson['commitMessage'] as String? ??
