@@ -1,5 +1,6 @@
 import 'package:genuine_ci/genuine_ci.dart';
 
+import 'paths.g.dart';
 import 'secrets.g.dart';
 
 Future<void> main() async {
@@ -13,5 +14,5 @@ Future<void> main() async {
     base64Content: Secrets.firebaseOptionsDartBase64,
   );
 
-  await FlutterCi.staticAnalysis(genuineCI.workspacePath.dashboard);
+  await FlutterCi.staticAnalysis(WorkspacePaths.root.apps.dashboard);
 }

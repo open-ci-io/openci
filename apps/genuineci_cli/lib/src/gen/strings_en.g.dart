@@ -149,6 +149,7 @@ class Translations$sync$en {
 	/// en: 'Sync local workflow definitions with GenuineCI.'
 	String get description => 'Sync local workflow definitions with GenuineCI.';
 
+	late final Translations$sync$paths$en paths = Translations$sync$paths$en.internal(_root);
 	late final Translations$sync$secrets$en secrets = Translations$sync$secrets$en.internal(_root);
 }
 
@@ -265,6 +266,30 @@ class Translations$dev$start$en {
 	String get stepBuildJobWorkerWaiting => 'Waiting for the current build job to finish before restarting services...';
 }
 
+// Path: sync.paths
+class Translations$sync$paths$en {
+	Translations$sync$paths$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Generate genuine_ci/paths.g.dart from the pubspec.yaml workspace.'
+	String get description => 'Generate genuine_ci/paths.g.dart from the pubspec.yaml workspace.';
+
+	/// en: 'sync paths does not accept positional arguments.'
+	String get noArguments => 'sync paths does not accept positional arguments.';
+
+	/// en: 'No project containing pubspec.yaml and a genuine_ci directory found. Run this command from your workflow project.'
+	String get projectRootNotFound => 'No project containing pubspec.yaml and a genuine_ci directory found. Run this command from your workflow project.';
+
+	/// en: 'Could not read or write ${path}. Check that the file exists and you have permission to access it.'
+	String fileAccessFailed({required Object path}) => 'Could not read or write ${path}. Check that the file exists and you have permission to access it.';
+
+	/// en: 'Generated workspace paths: ${path}'
+	String saved({required Object path}) => 'Generated workspace paths: ${path}';
+}
+
 // Path: sync.secrets
 class Translations$sync$secrets$en {
 	Translations$sync$secrets$en.internal(this._root);
@@ -362,6 +387,11 @@ extension on Translations {
 			'dev.start.stepOrchardController' => 'Step 2: Starting Orchard Controller...',
 			'dev.start.stepBuildJobWorkerWaiting' => 'Waiting for the current build job to finish before restarting services...',
 			'sync.description' => 'Sync local workflow definitions with GenuineCI.',
+			'sync.paths.description' => 'Generate genuine_ci/paths.g.dart from the pubspec.yaml workspace.',
+			'sync.paths.noArguments' => 'sync paths does not accept positional arguments.',
+			'sync.paths.projectRootNotFound' => 'No project containing pubspec.yaml and a genuine_ci directory found. Run this command from your workflow project.',
+			'sync.paths.fileAccessFailed' => ({required Object path}) => 'Could not read or write ${path}. Check that the file exists and you have permission to access it.',
+			'sync.paths.saved' => ({required Object path}) => 'Generated workspace paths: ${path}',
 			'sync.secrets.description' => 'Generate genuine_ci/secrets.g.dart from the active team\'s secret names.',
 			'sync.secrets.noArguments' => 'sync secrets does not accept positional arguments.',
 			'sync.secrets.loginRequired' => 'Run genuineci login --local before syncing secrets.',
