@@ -1,7 +1,12 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:http/http.dart' as http;
 import 'package:openci_server/database.dart';
+import 'package:openci_server/github/github_service.dart';
+
+// Pin the smoke-test fixture so local worker verification is reproducible.
+const _smokeCommitSha = 'b6ab255a62ca0c5216ec67c4b251c7b1732bd290';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -21,26 +26,59 @@ Future<Response> onRequest(RequestContext context) async {
         bodyJson['userId'] as String? ?? bodyJson['userUid'] as String?;
     final teamId = bodyJson['teamId'] as String? ?? 'test-team';
     final teamName = bodyJson['name'] as String? ?? 'Test Team';
+    final owner = bodyJson['owner'] as String? ?? 'openci-org';
+    final repo = bodyJson['repo'] as String? ?? 'openci';
+    var installationId = bodyJson['installationId'] as String?;
+    if (installationId == null) {
+      Map<String, String>? environment;
+      try {
+        environment = context.read<Map<String, String>>();
+      } catch (_) {
+        // GitHubService uses the server's process configuration by default.
+      }
+      http.Client? client;
+      try {
+        client = context.read<http.Client>();
+      } catch (_) {
+        // GitHubService creates its own HTTP requests by default.
+      }
+      installationId = await GitHubService.getRepositoryInstallationId(
+        owner: owner,
+        repo: repo,
+        environment: environment,
+        client: client,
+      );
+    }
+    final installationNumber = int.tryParse(installationId);
+    if (installationNumber == null || installationNumber <= 0) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {'success': false, 'error': 'installationId must be positive'},
+      );
+    }
 
     await db.seedDao.ensureTestTeam(
       teamId: teamId,
       name: teamName,
       userId: userId,
+      installationId: installationNumber,
     );
 
     final job = await db.seedDao.createTestBuildJob(
       runsOn: bodyJson['runsOn'] as String? ?? 'macos-latest',
-      owner: bodyJson['owner'] as String? ?? 'openci-org',
-      repo: bodyJson['repo'] as String? ?? 'openci',
-      workflowName: bodyJson['workflowName'] as String? ?? 'Test Workflow',
-      workflowFileName: bodyJson['workflowFileName'] as String? ?? 'ci.yml',
+      owner: owner,
+      repo: repo,
+      workflowName:
+          bodyJson['workflowName'] as String? ?? 'Build job worker smoke',
+      workflowFileName:
+          bodyJson['workflowFileName'] as String? ?? 'worker_smoke.dart',
       teamId: teamId,
-      installationId: bodyJson['installationId'] as String? ?? '12345678',
-      commitSha: bodyJson['commitSha'] as String? ?? 'main',
+      installationId: installationId,
+      commitSha: bodyJson['commitSha'] as String? ?? _smokeCommitSha,
       commitMessage:
           bodyJson['commitMessage'] as String? ??
           'feat: Test build job created by seed',
-      branch: bodyJson['branch'] as String? ?? 'main',
+      branch: bodyJson['branch'] as String? ?? 'test/build-job-worker-smoke',
     );
 
     return Response.json(

@@ -163,7 +163,7 @@ class _Translations$dev$start$flags$ja extends Translations$dev$start$flags$en {
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
-	@override String get seed => 'サービス起動後にローカルテストデータを投入します。';
+	@override String get seed => 'サービス起動後にデフォルトの動作確認用ジョブを1件投入します。';
 }
 
 /// The flat map containing all translations for locale <ja>.
@@ -190,7 +190,7 @@ extension on TranslationsJa {
 			'use.invalidLanguage' => ({required Object input}) => '無効な言語です: 「${input}」。対応言語: japanese, english',
 			'dev.description' => 'ローカル開発環境（Docker, Tart, DB, サーバー）を管理します。',
 			'dev.start.description' => 'ローカルサービスを起動し、Ctrl+CまでMac側のOrchard Workerを実行します。',
-			'dev.start.flags.seed' => 'サービス起動後にローカルテストデータを投入します。',
+			'dev.start.flags.seed' => 'サービス起動後にデフォルトの動作確認用ジョブを1件投入します。',
 			'dev.start.starting' => 'OpenCI ローカル開発環境を起動しています...',
 			'dev.start.stepTart' => 'Step 1: Tart VM ベースイメージを確認中...',
 			'dev.start.stepTartNotFound' => 'エラー: Tart VM イメージ「base-macos」が見つかりません。\n以下のコマンドを実行してイメージを準備してください:\n  tart pull ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5\n  tart clone ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5 base-macos',

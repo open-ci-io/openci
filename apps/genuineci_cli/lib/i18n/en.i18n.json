@@ -28,7 +28,7 @@
     "start": {
       "description": "Start local services and run the Mac Orchard Worker until Ctrl+C.",
       "flags": {
-        "seed": "Seed local test data after starting services."
+        "seed": "Queue the default smoke-test build job after starting services."
       },
       "starting": "Starting OpenCI Local Development Environment...",
       "stepTart": "Step 1: Checking Tart VM base image...",

@@ -28,7 +28,7 @@
     "start": {
       "description": "ローカルサービスを起動し、Ctrl+CまでMac側のOrchard Workerを実行します。",
       "flags": {
-        "seed": "サービス起動後にローカルテストデータを投入します。"
+        "seed": "サービス起動後にデフォルトの動作確認用ジョブを1件投入します。"
       },
       "starting": "OpenCI ローカル開発環境を起動しています...",
       "stepTart": "Step 1: Tart VM ベースイメージを確認中...",

@@ -234,8 +234,8 @@ class Translations$dev$start$flags$en {
 
 	// Translations
 
-	/// en: 'Seed local test data after starting services.'
-	String get seed => 'Seed local test data after starting services.';
+	/// en: 'Queue the default smoke-test build job after starting services.'
+	String get seed => 'Queue the default smoke-test build job after starting services.';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -262,7 +262,7 @@ extension on Translations {
 			'use.invalidLanguage' => ({required Object input}) => 'Invalid language "${input}". Supported languages: japanese, english.',
 			'dev.description' => 'Manage local development environment (Docker, Tart, DB, Server).',
 			'dev.start.description' => 'Start local services and run the Mac Orchard Worker until Ctrl+C.',
-			'dev.start.flags.seed' => 'Seed local test data after starting services.',
+			'dev.start.flags.seed' => 'Queue the default smoke-test build job after starting services.',
 			'dev.start.starting' => 'Starting OpenCI Local Development Environment...',
 			'dev.start.stepTart' => 'Step 1: Checking Tart VM base image...',
 			'dev.start.stepTartNotFound' => 'Error: Tart VM image "base-macos" not found.\nPlease run the following commands to setup the base image:\n  tart pull ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5\n  tart clone ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5 base-macos',
