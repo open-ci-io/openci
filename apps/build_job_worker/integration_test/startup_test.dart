@@ -303,7 +303,7 @@ void main() {
           'status': 'completed',
           'conclusion': conclusion,
         });
-        expect(logs, hasLength(6));
+        expect(logs, hasLength(8));
         final streams = logs
             .map(
               (log) =>
@@ -318,14 +318,14 @@ void main() {
                   'step_event',
             )
             .toList();
-        expect(stepEvents, hasLength(4));
+        expect(stepEvents, hasLength(6));
         for (final (index, stream) in stepEvents.indexed) {
           expect(stream['stream'], {
             'stream': 'stdout',
             'type': 'step_event',
             'run_id': runId,
             'build_job_id': 'job-1',
-            'step_id': index < 2 ? 'prepare_vm' : 'checkout',
+            'step_id': ['prepare_vm', 'checkout', 'run_workflow'][index ~/ 2],
           });
           final values =
               (stream['values'] as List<dynamic>).single as List<dynamic>;
@@ -333,9 +333,13 @@ void main() {
             jsonDecode(values[1] as String) as Map<String, dynamic>,
           );
           expect(step.runId, runId);
+          expect(step.stepOrder, index ~/ 2);
+          final completedStatus = index >= 4 && workflowExitCode != 0
+              ? BuildJobStatus.FAILURE
+              : BuildJobStatus.SUCCESS;
           expect(
             step.status,
-            index.isEven ? BuildJobStatus.IN_PROGRESS : BuildJobStatus.SUCCESS,
+            index.isEven ? BuildJobStatus.IN_PROGRESS : completedStatus,
           );
         }
         final outputLogs = streams
