@@ -15,6 +15,7 @@ dependencies:
   http: ^1.6.0
   json_annotation: ^4.12.0
   meta: ^1.16.0
+  openci_shared: ^1.0.6
   path: ^1.9.0
   slang: ^4.19.0
 
