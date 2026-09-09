@@ -10,6 +10,7 @@ resolution: workspace
 
 dependencies:
   http: ^1.6.0
+  meta: ^1.16.0
   openci_shared: ^1.0.1
   sentry: ^9.22.0
 

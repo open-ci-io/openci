@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:meta/meta.dart';
+
 /// Total job capacity; currently running jobs must be counted by the caller.
 int calculateMaxConcurrentJobs({
   required List<Map<String, dynamic>> workers,
@@ -12,13 +14,14 @@ int calculateMaxConcurrentJobs({
   }
   var capacity = 0;
   for (final worker in workers) {
-    if (!_isWorkerAvailable(worker, now)) continue;
-    capacity += _calculateWorkerCapacity(worker, cpuCount, memoryGb);
+    if (!isWorkerAvailable(worker, now)) continue;
+    capacity += calculateWorkerCapacity(worker, cpuCount, memoryGb);
   }
   return capacity;
 }
 
-bool _isWorkerAvailable(Map<String, dynamic> worker, DateTime now) {
+@visibleForTesting
+bool isWorkerAvailable(Map<String, dynamic> worker, DateTime now) {
   if ((worker['scheduling_paused'] as bool? ?? false) ||
       (worker['runtime'] as String? ?? 'tart') != 'tart' ||
       (worker['arch'] as String? ?? 'arm64') != 'arm64') {
@@ -30,7 +33,8 @@ bool _isWorkerAvailable(Map<String, dynamic> worker, DateTime now) {
   return lastSeen != null && !lastSeen.isBefore(cutoff);
 }
 
-int _calculateWorkerCapacity(
+@visibleForTesting
+int calculateWorkerCapacity(
   Map<String, dynamic> worker,
   int cpuCount,
   int memoryGb,
@@ -38,16 +42,16 @@ int _calculateWorkerCapacity(
   final resources = worker['resources'];
   if (resources is! Map<String, dynamic>) return 0;
 
-  final vmSlots = _readResource(resources, 'org.cirruslabs.tart-vms');
+  final vmSlots = readResource(resources, 'org.cirruslabs.tart-vms');
   final cpuSlots =
-      _readResource(resources, 'org.cirruslabs.logical-cores') ~/ cpuCount;
+      readResource(resources, 'org.cirruslabs.logical-cores') ~/ cpuCount;
   final memorySlots =
-      _readResource(resources, 'org.cirruslabs.memory-mib') ~/
-      (memoryGb * 1024);
+      readResource(resources, 'org.cirruslabs.memory-mib') ~/ (memoryGb * 1024);
   return min(vmSlots, min(cpuSlots, memorySlots));
 }
 
-int _readResource(Map<String, dynamic> resources, String name) {
+@visibleForTesting
+int readResource(Map<String, dynamic> resources, String name) {
   final value = resources[name];
   return value is int && value > 0 ? value : 0;
 }
