@@ -64,10 +64,19 @@ class _Translations$login$ja extends Translations$login$en {
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
-	@override String get description => 'GenuineCI サーバー（ローカルまたはクラウド）にログインします。';
+	@override String get description => 'ローカルのGenuineCIサーバーにログインします。';
 	@override late final _Translations$login$flags$ja flags = _Translations$login$flags$ja._(_root);
 	@override String get loggingIn => 'GenuineCI にログイン中...';
-	@override String savedSuccess({required Object profile}) => 'プロファイル「${profile}」の認証情報を保存しました。';
+	@override String savedSuccess({required Object profile}) => 'プロファイル「${profile}」を保存し、有効にしました。';
+	@override String get localOnly => '現在はローカルログインのみ対応しています。genuineci login --local を実行してください。';
+	@override String get noArguments => 'loginに位置引数は指定できません。';
+	@override String get localServerUnavailable => 'ローカルサーバーのAPIキーを取得できませんでした。genuineci dev start --seed を実行して再試行してください。';
+	@override String get authenticationFailed => 'ローカルサーバーの認証に失敗しました。genuineci dev start で起動したサーバーを確認してください。';
+	@override String requestFailed({required Object status}) => 'チーム一覧を取得できませんでした（HTTP ${status}）。';
+	@override String get seedRequired => 'test-teamが見つかりません。genuineci dev start --seed を実行してからログインしてください。';
+	@override String get invalidResponse => 'サーバーから返されたチーム一覧が不正です。';
+	@override String get connectionFailed => 'ローカルサーバーに接続できませんでした。genuineci dev start の起動状態を確認してください。';
+	@override String get saveFailed => '認証情報を保存できませんでした。ローカルの認証情報ファイルと権限を確認してください。';
 }
 
 // Path: use
@@ -122,9 +131,6 @@ class _Translations$login$flags$ja extends Translations$login$flags$en {
 
 	// Translations
 	@override String get local => 'ローカルDocker環境（http://localhost:8080）に接続します。';
-	@override String get server => '接続先サーバーURL。';
-	@override String get teamId => '対象のチームID。';
-	@override String get profile => '認証情報を保存するプロファイル名。';
 }
 
 // Path: dev.start
@@ -180,13 +186,19 @@ extension on TranslationsJa {
 			'cli.version' => ({required Object version}) => 'genuineci バージョン: ${version}',
 			'cli.flags.version' => 'ツールのバージョンを表示します。',
 			'cli.flags.verbose' => '詳細なログ出力を有効にします。',
-			'login.description' => 'GenuineCI サーバー（ローカルまたはクラウド）にログインします。',
+			'login.description' => 'ローカルのGenuineCIサーバーにログインします。',
 			'login.flags.local' => 'ローカルDocker環境（http://localhost:8080）に接続します。',
-			'login.flags.server' => '接続先サーバーURL。',
-			'login.flags.teamId' => '対象のチームID。',
-			'login.flags.profile' => '認証情報を保存するプロファイル名。',
 			'login.loggingIn' => 'GenuineCI にログイン中...',
-			'login.savedSuccess' => ({required Object profile}) => 'プロファイル「${profile}」の認証情報を保存しました。',
+			'login.savedSuccess' => ({required Object profile}) => 'プロファイル「${profile}」を保存し、有効にしました。',
+			'login.localOnly' => '現在はローカルログインのみ対応しています。genuineci login --local を実行してください。',
+			'login.noArguments' => 'loginに位置引数は指定できません。',
+			'login.localServerUnavailable' => 'ローカルサーバーのAPIキーを取得できませんでした。genuineci dev start --seed を実行して再試行してください。',
+			'login.authenticationFailed' => 'ローカルサーバーの認証に失敗しました。genuineci dev start で起動したサーバーを確認してください。',
+			'login.requestFailed' => ({required Object status}) => 'チーム一覧を取得できませんでした（HTTP ${status}）。',
+			'login.seedRequired' => 'test-teamが見つかりません。genuineci dev start --seed を実行してからログインしてください。',
+			'login.invalidResponse' => 'サーバーから返されたチーム一覧が不正です。',
+			'login.connectionFailed' => 'ローカルサーバーに接続できませんでした。genuineci dev start の起動状態を確認してください。',
+			'login.saveFailed' => '認証情報を保存できませんでした。ローカルの認証情報ファイルと権限を確認してください。',
 			'use.description' => '表示言語を設定します（japanese, english）。',
 			'use.success' => ({required Object language}) => '言語を${language}に設定しました。',
 			'use.invalidLanguage' => ({required Object input}) => '無効な言語です: 「${input}」。対応言語: japanese, english',

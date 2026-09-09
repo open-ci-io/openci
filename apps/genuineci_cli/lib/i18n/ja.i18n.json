@@ -8,15 +8,21 @@
     }
   },
   "login": {
-    "description": "GenuineCI サーバー（ローカルまたはクラウド）にログインします。",
+    "description": "ローカルのGenuineCIサーバーにログインします。",
     "flags": {
-      "local": "ローカルDocker環境（http://localhost:8080）に接続します。",
-      "server": "接続先サーバーURL。",
-      "teamId": "対象のチームID。",
-      "profile": "認証情報を保存するプロファイル名。"
+      "local": "ローカルDocker環境（http://localhost:8080）に接続します。"
     },
     "loggingIn": "GenuineCI にログイン中...",
-    "savedSuccess": "プロファイル「${profile}」の認証情報を保存しました。"
+    "savedSuccess": "プロファイル「${profile}」を保存し、有効にしました。",
+    "localOnly": "現在はローカルログインのみ対応しています。genuineci login --local を実行してください。",
+    "noArguments": "loginに位置引数は指定できません。",
+    "localServerUnavailable": "ローカルサーバーのAPIキーを取得できませんでした。genuineci dev start --seed を実行して再試行してください。",
+    "authenticationFailed": "ローカルサーバーの認証に失敗しました。genuineci dev start で起動したサーバーを確認してください。",
+    "requestFailed": "チーム一覧を取得できませんでした（HTTP ${status}）。",
+    "seedRequired": "test-teamが見つかりません。genuineci dev start --seed を実行してからログインしてください。",
+    "invalidResponse": "サーバーから返されたチーム一覧が不正です。",
+    "connectionFailed": "ローカルサーバーに接続できませんでした。genuineci dev start の起動状態を確認してください。",
+    "saveFailed": "認証情報を保存できませんでした。ローカルの認証情報ファイルと権限を確認してください。"
   },
   "use": {
     "description": "表示言語を設定します（japanese, english）。",

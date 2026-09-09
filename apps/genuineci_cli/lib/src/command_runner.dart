@@ -24,7 +24,7 @@ class GenuineCiCommandRunner extends CommandRunner<int> {
       )
       ..addFlag('verbose', negatable: false, help: t.cli.flags.verbose);
 
-    addCommand(LoginCommand());
+    addCommand(LoginCommand(logger: _logger));
     addCommand(UseCommand(logger: _logger));
     addCommand(DevCommand(logger: _logger));
   }
