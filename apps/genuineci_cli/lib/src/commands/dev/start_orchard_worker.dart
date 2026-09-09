@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cli_util/cli_logging.dart';
@@ -13,7 +14,8 @@ typedef OrchardWorkerProcessStarter =
       required ProcessStartMode mode,
     });
 
-Future<int> startOrchardWorker(
+/// Starts the Mac worker. The caller must [OrchardWorker.stop] it when done.
+Future<OrchardWorker?> startOrchardWorker(
   Logger logger, {
   @visibleForTesting OrchardProcessRunner processRunner = Process.run,
   @visibleForTesting OrchardWorkerProcessStarter processStarter = Process.start,
@@ -29,7 +31,7 @@ Future<int> startOrchardWorker(
     final token = tokenResult.stdout.toString().trim();
     if (tokenResult.exitCode != 0 || token.isEmpty) {
       logger.stderr(t.dev.start.stepOrchardWorkerFailed);
-      return 1;
+      return null;
     }
 
     logger.stdout('\n${t.dev.start.stepOrchardWorker}');
@@ -42,32 +44,73 @@ Future<int> startOrchardWorker(
       '--no-pki',
     ], mode: ProcessStartMode.inheritStdio);
 
-    ProcessSignal? stopSignal;
-    void stop(ProcessSignal signal) {
-      stopSignal ??= signal;
-      // Orchard handles SIGINT by shutting down its worker.
-      process.kill(ProcessSignal.sigint);
-    }
-
-    final interruptSubscription =
-        (interruptSignals ?? ProcessSignal.sigint.watch()).listen(stop);
-    final terminateSubscription =
-        (terminateSignals ?? ProcessSignal.sigterm.watch()).listen(stop);
-    try {
-      final exitCode = await process.exitCode;
-      if (stopSignal != null) {
-        return 128 + stopSignal!.signalNumber;
-      }
-      if (exitCode != 0) {
-        logger.stderr(t.dev.start.stepOrchardWorkerFailed);
-      }
-      return exitCode < 0 ? 128 - exitCode : exitCode;
-    } finally {
-      await interruptSubscription.cancel();
-      await terminateSubscription.cancel();
-    }
+    return OrchardWorker._(
+      process,
+      logger,
+      interruptSignals ?? ProcessSignal.sigint.watch(),
+      terminateSignals ?? ProcessSignal.sigterm.watch(),
+    );
   } on ProcessException catch (error) {
     logger.stderr('${t.dev.start.stepOrchardWorkerFailed}\n${error.message}');
-    return 1;
+    return null;
+  }
+}
+
+class OrchardWorker {
+  final Process _process;
+  var _exited = false;
+  var _stopRequested = false;
+  ProcessSignal? _stopSignal;
+  late final Future<int> exitCode;
+
+  OrchardWorker._(
+    this._process,
+    Logger logger,
+    Stream<ProcessSignal> interruptSignals,
+    Stream<ProcessSignal> terminateSignals,
+  ) {
+    final subscriptions = [
+      interruptSignals.listen(_handleSignal),
+      terminateSignals.listen(_handleSignal),
+    ];
+    exitCode = _waitForExit(logger, subscriptions);
+  }
+
+  bool get isRunning => !_exited && !_stopRequested;
+
+  Future<void> stop() async {
+    if (isRunning) {
+      _stopRequested = true;
+      // Orchard handles SIGINT by shutting down its worker.
+      _process.kill(ProcessSignal.sigint);
+    }
+    await exitCode;
+  }
+
+  void _handleSignal(ProcessSignal signal) {
+    _stopSignal ??= signal;
+    _stopRequested = true;
+    _process.kill(ProcessSignal.sigint);
+  }
+
+  Future<int> _waitForExit(
+    Logger logger,
+    List<StreamSubscription<ProcessSignal>> subscriptions,
+  ) async {
+    try {
+      final code = await _process.exitCode;
+      if (_stopSignal != null) {
+        return 128 + _stopSignal!.signalNumber;
+      }
+      if (code != 0 && !_stopRequested) {
+        logger.stderr(t.dev.start.stepOrchardWorkerFailed);
+      }
+      return code < 0 ? 128 - code : code;
+    } finally {
+      _exited = true;
+      for (final subscription in subscriptions) {
+        await subscription.cancel();
+      }
+    }
   }
 }

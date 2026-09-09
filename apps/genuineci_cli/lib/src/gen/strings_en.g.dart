@@ -183,8 +183,8 @@ class Translations$dev$start$en {
 	/// en: 'Tart VM (base-macos) exists.'
 	String get stepTartExists => 'Tart VM (base-macos) exists.';
 
-	/// en: 'Step 2: Starting Docker containers...'
-	String get stepDockerCompose => 'Step 2: Starting Docker containers...';
+	/// en: 'Step 5: Starting Docker containers...'
+	String get stepDockerCompose => 'Step 5: Starting Docker containers...';
 
 	/// en: 'Error: Failed to start Docker containers.'
 	String get stepDockerComposeFailed => 'Error: Failed to start Docker containers.';
@@ -213,8 +213,8 @@ class Translations$dev$start$en {
 	/// en: 'Error: Orchard Worker could not start or exited with an error.'
 	String get stepOrchardWorkerFailed => 'Error: Orchard Worker could not start or exited with an error.';
 
-	/// en: 'Step 5: Seeding local test data...'
-	String get stepSeed => 'Step 5: Seeding local test data...';
+	/// en: 'Step 6: Seeding local test data...'
+	String get stepSeed => 'Step 6: Seeding local test data...';
 
 	/// en: 'Error: Failed to seed local test data.'
 	String get stepSeedFailed => 'Error: Failed to seed local test data.';
@@ -224,6 +224,12 @@ class Translations$dev$start$en {
 
 	/// en: 'Error: OpenCI project root not found.'
 	String get projectRootNotFound => 'Error: OpenCI project root not found.';
+
+	/// en: 'Step 2: Starting Orchard Controller...'
+	String get stepOrchardController => 'Step 2: Starting Orchard Controller...';
+
+	/// en: 'Waiting for the current build job to finish before restarting services...'
+	String get stepBuildJobWorkerWaiting => 'Waiting for the current build job to finish before restarting services...';
 }
 
 // Path: dev.start.flags
@@ -267,7 +273,7 @@ extension on Translations {
 			'dev.start.stepTart' => 'Step 1: Checking Tart VM base image...',
 			'dev.start.stepTartNotFound' => 'Error: Tart VM image "base-macos" not found.\nPlease run the following commands to setup the base image:\n  tart pull ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5\n  tart clone ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5 base-macos',
 			'dev.start.stepTartExists' => 'Tart VM (base-macos) exists.',
-			'dev.start.stepDockerCompose' => 'Step 2: Starting Docker containers...',
+			'dev.start.stepDockerCompose' => 'Step 5: Starting Docker containers...',
 			'dev.start.stepDockerComposeFailed' => 'Error: Failed to start Docker containers.',
 			'dev.start.stepDockerComposeStarted' => 'Docker containers started.',
 			'dev.start.stepOrchardWaiting' => 'Step 3: Waiting for Orchard Controller to initialize...',
@@ -277,10 +283,12 @@ extension on Translations {
 			'dev.start.stepOrchardContextRegistered' => 'Orchard CLI context authenticated.',
 			'dev.start.stepOrchardWorker' => 'Starting Orchard Worker on this Mac. Press Ctrl+C to stop it. Docker containers will keep running.',
 			'dev.start.stepOrchardWorkerFailed' => 'Error: Orchard Worker could not start or exited with an error.',
-			'dev.start.stepSeed' => 'Step 5: Seeding local test data...',
+			'dev.start.stepSeed' => 'Step 6: Seeding local test data...',
 			'dev.start.stepSeedFailed' => 'Error: Failed to seed local test data.',
 			'dev.start.stepSeedCompleted' => 'Local test data seeded.',
 			'dev.start.projectRootNotFound' => 'Error: OpenCI project root not found.',
+			'dev.start.stepOrchardController' => 'Step 2: Starting Orchard Controller...',
+			'dev.start.stepBuildJobWorkerWaiting' => 'Waiting for the current build job to finish before restarting services...',
 			'common.error' => ({required Object error}) => 'Error: ${error}',
 			_ => null,
 		};

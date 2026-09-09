@@ -140,7 +140,7 @@ class _Translations$dev$start$ja extends Translations$dev$start$en {
 	@override String get stepTart => 'Step 1: Tart VM ベースイメージを確認中...';
 	@override String get stepTartNotFound => 'エラー: Tart VM イメージ「base-macos」が見つかりません。\n以下のコマンドを実行してイメージを準備してください:\n  tart pull ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5\n  tart clone ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5 base-macos';
 	@override String get stepTartExists => 'Tart VM (base-macos) を確認しました。';
-	@override String get stepDockerCompose => 'Step 2: Docker コンテナを起動中...';
+	@override String get stepDockerCompose => 'Step 5: Docker コンテナを起動中...';
 	@override String get stepDockerComposeFailed => 'エラー: Docker コンテナの起動に失敗しました。';
 	@override String get stepDockerComposeStarted => 'Docker コンテナを起動しました。';
 	@override String get stepOrchardWaiting => 'Step 3: Orchard Controller の起動を待機中...';
@@ -150,10 +150,12 @@ class _Translations$dev$start$ja extends Translations$dev$start$en {
 	@override String get stepOrchardContextRegistered => 'Orchard CLI コンテキストを認証しました。';
 	@override String get stepOrchardWorker => 'Mac側のOrchard Workerを起動します。Ctrl+Cで停止できます。Dockerコンテナは起動したままになります。';
 	@override String get stepOrchardWorkerFailed => 'エラー: Orchard Workerを起動できなかったか、異常終了しました。';
-	@override String get stepSeed => 'Step 5: ローカルテストデータを投入中...';
+	@override String get stepSeed => 'Step 6: ローカルテストデータを投入中...';
 	@override String get stepSeedFailed => 'エラー: ローカルテストデータの投入に失敗しました。';
 	@override String get stepSeedCompleted => 'ローカルテストデータを投入しました。';
 	@override String get projectRootNotFound => 'エラー: OpenCI プロジェクトのルートディレクトリが見つかりません。';
+	@override String get stepOrchardController => 'Step 2: Orchard Controllerを起動中...';
+	@override String get stepBuildJobWorkerWaiting => 'サービスを再起動する前に、実行中のビルドジョブの終了を待っています...';
 }
 
 // Path: dev.start.flags
@@ -195,7 +197,7 @@ extension on TranslationsJa {
 			'dev.start.stepTart' => 'Step 1: Tart VM ベースイメージを確認中...',
 			'dev.start.stepTartNotFound' => 'エラー: Tart VM イメージ「base-macos」が見つかりません。\n以下のコマンドを実行してイメージを準備してください:\n  tart pull ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5\n  tart clone ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5 base-macos',
 			'dev.start.stepTartExists' => 'Tart VM (base-macos) を確認しました。',
-			'dev.start.stepDockerCompose' => 'Step 2: Docker コンテナを起動中...',
+			'dev.start.stepDockerCompose' => 'Step 5: Docker コンテナを起動中...',
 			'dev.start.stepDockerComposeFailed' => 'エラー: Docker コンテナの起動に失敗しました。',
 			'dev.start.stepDockerComposeStarted' => 'Docker コンテナを起動しました。',
 			'dev.start.stepOrchardWaiting' => 'Step 3: Orchard Controller の起動を待機中...',
@@ -205,10 +207,12 @@ extension on TranslationsJa {
 			'dev.start.stepOrchardContextRegistered' => 'Orchard CLI コンテキストを認証しました。',
 			'dev.start.stepOrchardWorker' => 'Mac側のOrchard Workerを起動します。Ctrl+Cで停止できます。Dockerコンテナは起動したままになります。',
 			'dev.start.stepOrchardWorkerFailed' => 'エラー: Orchard Workerを起動できなかったか、異常終了しました。',
-			'dev.start.stepSeed' => 'Step 5: ローカルテストデータを投入中...',
+			'dev.start.stepSeed' => 'Step 6: ローカルテストデータを投入中...',
 			'dev.start.stepSeedFailed' => 'エラー: ローカルテストデータの投入に失敗しました。',
 			'dev.start.stepSeedCompleted' => 'ローカルテストデータを投入しました。',
 			'dev.start.projectRootNotFound' => 'エラー: OpenCI プロジェクトのルートディレクトリが見つかりません。',
+			'dev.start.stepOrchardController' => 'Step 2: Orchard Controllerを起動中...',
+			'dev.start.stepBuildJobWorkerWaiting' => 'サービスを再起動する前に、実行中のビルドジョブの終了を待っています...',
 			'common.error' => ({required Object error}) => 'エラー: ${error}',
 			_ => null,
 		};

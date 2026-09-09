@@ -34,7 +34,7 @@
       "stepTart": "Step 1: Checking Tart VM base image...",
       "stepTartNotFound": "Error: Tart VM image \"base-macos\" not found.\nPlease run the following commands to setup the base image:\n  tart pull ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5\n  tart clone ghcr.io/cirruslabs/macos-tahoe-vanilla:26.5 base-macos",
       "stepTartExists": "Tart VM (base-macos) exists.",
-      "stepDockerCompose": "Step 2: Starting Docker containers...",
+      "stepDockerCompose": "Step 5: Starting Docker containers...",
       "stepDockerComposeFailed": "Error: Failed to start Docker containers.",
       "stepDockerComposeStarted": "Docker containers started.",
       "stepOrchardWaiting": "Step 3: Waiting for Orchard Controller to initialize...",
@@ -44,10 +44,12 @@
       "stepOrchardContextRegistered": "Orchard CLI context authenticated.",
       "stepOrchardWorker": "Starting Orchard Worker on this Mac. Press Ctrl+C to stop it. Docker containers will keep running.",
       "stepOrchardWorkerFailed": "Error: Orchard Worker could not start or exited with an error.",
-      "stepSeed": "Step 5: Seeding local test data...",
+      "stepSeed": "Step 6: Seeding local test data...",
       "stepSeedFailed": "Error: Failed to seed local test data.",
       "stepSeedCompleted": "Local test data seeded.",
-      "projectRootNotFound": "Error: OpenCI project root not found."
+      "projectRootNotFound": "Error: OpenCI project root not found.",
+      "stepOrchardController": "Step 2: Starting Orchard Controller...",
+      "stepBuildJobWorkerWaiting": "Waiting for the current build job to finish before restarting services..."
     }
   },
   "common": {

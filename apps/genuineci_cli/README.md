@@ -4,6 +4,11 @@ Run `genuineci dev start` from the OpenCI checkout to start local services and t
 Mac Orchard worker. The existing Docker Compose credentials and `base-macos` VM
 must be configured first.
 
+The command starts Orchard Controller and the Mac worker first. When restarting,
+it stops the old build-job-worker and waits for its current job to finish while
+the server remains available for saving results and deleting the VM. It then
+rebuilds and starts the application containers.
+
 To also queue the default smoke-test build job:
 
 ```sh
