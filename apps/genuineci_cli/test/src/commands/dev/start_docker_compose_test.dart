@@ -32,7 +32,14 @@ void main() {
     for (final (step, arguments, message) in [
       (
         DockerComposeStep.startOrchardController,
-        ['compose', 'up', '-d', '--no-recreate', 'orchard-controller'],
+        [
+          'compose',
+          'up',
+          '-d',
+          '--no-recreate',
+          '--remove-orphans',
+          'orchard-controller',
+        ],
         t.dev.start.stepOrchardController,
       ),
       (
@@ -41,7 +48,7 @@ void main() {
         t.dev.start.stepBuildJobWorkerWaiting,
       ),
     ]) {
-      test('$step only touches the selected service', () async {
+      test('$step passes the expected Compose arguments', () async {
         final calls = <List<String>>[];
         final result = await startDockerCompose(
           logger,
@@ -108,6 +115,7 @@ void main() {
           'up',
           '-d',
           '--build',
+          '--remove-orphans',
           'server',
           'build-job-planner',
           'build-job-worker',
