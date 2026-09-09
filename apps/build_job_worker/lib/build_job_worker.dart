@@ -8,6 +8,8 @@ export 'src/create_build_run.dart';
 export 'src/execute_build_job.dart';
 export 'src/fetch_job_secrets.dart';
 export 'src/loki/push_log_to_loki.dart';
+export 'src/orchard/calculate_max_concurrent_jobs.dart'
+    show calculateMaxConcurrentJobs;
 export 'src/orchard/execute_command.dart';
 export 'src/orchard/orchard_api_client.dart';
 export 'src/orchard/prepare_vm.dart';

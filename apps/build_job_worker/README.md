@@ -30,6 +30,9 @@ Composeでは`build-job-worker`を常駐サービスとして起動します。
 `OrchardApiClient(config: config)`でクライアントを作成し、使用後に`close()`を呼び出します。
 `listWorkers()`は`GET /v1/workers`からworker一覧を取得し、各workerの情報をそのまま返します。
 HTTP失敗・不正なレスポンスは例外にし、応答待ちは標準10秒でタイムアウトします。
+`calculateMaxConcurrentJobs()`はworker一覧、1 jobのCPU数・メモリ（GiB）、現在時刻から実行可能数を計算します。
+workerごとのVM枠・CPU・メモリの制約を反映し、停止中・最終heartbeatから3分超・Tart/arm64以外のworkerを除外します。
+返す値は総実行枠です。実行中jobの差し引きと実行ループへの接続は呼び出し側で行います。
 `waitForVmRunning()`は標準で3秒間隔・最大5分間、`running`または`active`になるまで待機します。
 HTTP応答待ちも制限時間に含み、APIエラーは呼び出し元へ返します。
 `prepareVm()`はVMを作成し、標準で最大15分の起動待ちを行ってVM情報を返します。
