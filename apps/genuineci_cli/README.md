@@ -26,3 +26,14 @@ in Docker Compose. That App must have access to `openci-org/openci`.
 Webhook reception and planning are separate from this smoke test.
 
 Press Ctrl+C to stop the Mac Orchard worker. Docker containers keep running.
+
+After seeding, log in from another terminal:
+
+```sh
+genuineci login --local
+```
+
+This reads the API key from the running `openci-server` container, authenticates
+with `http://localhost:8080`, and selects `test-team`. After the server confirms
+the team, it saves and activates the `local` credential profile. Failed login
+attempts leave existing credentials unchanged.

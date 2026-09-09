@@ -8,15 +8,21 @@
     }
   },
   "login": {
-    "description": "Log in to GenuineCI server (Local or Cloud).",
+    "description": "Log in to the local GenuineCI server.",
     "flags": {
-      "local": "Log in to local Docker environment (http://localhost:8080).",
-      "server": "Server base URL.",
-      "teamId": "Target team ID.",
-      "profile": "Profile name to store credentials under."
+      "local": "Log in to local Docker environment (http://localhost:8080)."
     },
     "loggingIn": "Logging in to GenuineCI...",
-    "savedSuccess": "Successfully saved credentials for profile \"${profile}\"."
+    "savedSuccess": "Successfully saved and activated profile \"${profile}\".",
+    "localOnly": "Only local login is currently supported. Run genuineci login --local.",
+    "noArguments": "Login does not accept positional arguments.",
+    "localServerUnavailable": "Could not read the local server's API key. Run genuineci dev start --seed and retry.",
+    "authenticationFailed": "Local server authentication failed. Check the server started by genuineci dev start.",
+    "requestFailed": "Could not fetch teams (HTTP ${status}).",
+    "seedRequired": "Team test-team was not found. Run genuineci dev start --seed before logging in.",
+    "invalidResponse": "The server returned an invalid team list.",
+    "connectionFailed": "Could not connect to the local server. Check that genuineci dev start is running.",
+    "saveFailed": "Could not save credentials. Check the local credentials file and its permissions."
   },
   "use": {
     "description": "Set the default display language (japanese, english).",

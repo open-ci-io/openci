@@ -6,5 +6,10 @@ Future<void> main() async {
     ciTrigger: CiTrigger.pullRequest(branch: 'develop'),
   );
 
+  await genuineCI.placeFile(
+    path: 'apps/dashboard/lib/firebase_options.dart',
+    base64Content: Secrets.firebaseOptions,
+  );
+
   await FlutterCi.staticAnalysis(genuineCI.workspacePath);
 }

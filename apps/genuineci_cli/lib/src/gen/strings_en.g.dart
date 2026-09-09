@@ -66,16 +66,43 @@ class Translations$login$en {
 
 	// Translations
 
-	/// en: 'Log in to GenuineCI server (Local or Cloud).'
-	String get description => 'Log in to GenuineCI server (Local or Cloud).';
+	/// en: 'Log in to the local GenuineCI server.'
+	String get description => 'Log in to the local GenuineCI server.';
 
 	late final Translations$login$flags$en flags = Translations$login$flags$en.internal(_root);
 
 	/// en: 'Logging in to GenuineCI...'
 	String get loggingIn => 'Logging in to GenuineCI...';
 
-	/// en: 'Successfully saved credentials for profile "${profile}".'
-	String savedSuccess({required Object profile}) => 'Successfully saved credentials for profile "${profile}".';
+	/// en: 'Successfully saved and activated profile "${profile}".'
+	String savedSuccess({required Object profile}) => 'Successfully saved and activated profile "${profile}".';
+
+	/// en: 'Only local login is currently supported. Run genuineci login --local.'
+	String get localOnly => 'Only local login is currently supported. Run genuineci login --local.';
+
+	/// en: 'Login does not accept positional arguments.'
+	String get noArguments => 'Login does not accept positional arguments.';
+
+	/// en: 'Could not read the local server's API key. Run genuineci dev start --seed and retry.'
+	String get localServerUnavailable => 'Could not read the local server\'s API key. Run genuineci dev start --seed and retry.';
+
+	/// en: 'Local server authentication failed. Check the server started by genuineci dev start.'
+	String get authenticationFailed => 'Local server authentication failed. Check the server started by genuineci dev start.';
+
+	/// en: 'Could not fetch teams (HTTP ${status}).'
+	String requestFailed({required Object status}) => 'Could not fetch teams (HTTP ${status}).';
+
+	/// en: 'Team test-team was not found. Run genuineci dev start --seed before logging in.'
+	String get seedRequired => 'Team test-team was not found. Run genuineci dev start --seed before logging in.';
+
+	/// en: 'The server returned an invalid team list.'
+	String get invalidResponse => 'The server returned an invalid team list.';
+
+	/// en: 'Could not connect to the local server. Check that genuineci dev start is running.'
+	String get connectionFailed => 'Could not connect to the local server. Check that genuineci dev start is running.';
+
+	/// en: 'Could not save credentials. Check the local credentials file and its permissions.'
+	String get saveFailed => 'Could not save credentials. Check the local credentials file and its permissions.';
 }
 
 // Path: use
@@ -147,15 +174,6 @@ class Translations$login$flags$en {
 
 	/// en: 'Log in to local Docker environment (http://localhost:8080).'
 	String get local => 'Log in to local Docker environment (http://localhost:8080).';
-
-	/// en: 'Server base URL.'
-	String get server => 'Server base URL.';
-
-	/// en: 'Target team ID.'
-	String get teamId => 'Target team ID.';
-
-	/// en: 'Profile name to store credentials under.'
-	String get profile => 'Profile name to store credentials under.';
 }
 
 // Path: dev.start
@@ -256,13 +274,19 @@ extension on Translations {
 			'cli.version' => ({required Object version}) => 'genuineci version: ${version}',
 			'cli.flags.version' => 'Print the current tool version.',
 			'cli.flags.verbose' => 'Enable verbose logging output.',
-			'login.description' => 'Log in to GenuineCI server (Local or Cloud).',
+			'login.description' => 'Log in to the local GenuineCI server.',
 			'login.flags.local' => 'Log in to local Docker environment (http://localhost:8080).',
-			'login.flags.server' => 'Server base URL.',
-			'login.flags.teamId' => 'Target team ID.',
-			'login.flags.profile' => 'Profile name to store credentials under.',
 			'login.loggingIn' => 'Logging in to GenuineCI...',
-			'login.savedSuccess' => ({required Object profile}) => 'Successfully saved credentials for profile "${profile}".',
+			'login.savedSuccess' => ({required Object profile}) => 'Successfully saved and activated profile "${profile}".',
+			'login.localOnly' => 'Only local login is currently supported. Run genuineci login --local.',
+			'login.noArguments' => 'Login does not accept positional arguments.',
+			'login.localServerUnavailable' => 'Could not read the local server\'s API key. Run genuineci dev start --seed and retry.',
+			'login.authenticationFailed' => 'Local server authentication failed. Check the server started by genuineci dev start.',
+			'login.requestFailed' => ({required Object status}) => 'Could not fetch teams (HTTP ${status}).',
+			'login.seedRequired' => 'Team test-team was not found. Run genuineci dev start --seed before logging in.',
+			'login.invalidResponse' => 'The server returned an invalid team list.',
+			'login.connectionFailed' => 'Could not connect to the local server. Check that genuineci dev start is running.',
+			'login.saveFailed' => 'Could not save credentials. Check the local credentials file and its permissions.',
 			'use.description' => 'Set the default display language (japanese, english).',
 			'use.success' => ({required Object language}) => 'Language set to ${language}.',
 			'use.invalidLanguage' => ({required Object input}) => 'Invalid language "${input}". Supported languages: japanese, english.',

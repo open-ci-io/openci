@@ -1,3 +1,4 @@
+import 'package:args/command_runner.dart';
 import 'package:cli_util/cli_logging.dart';
 import 'package:genuineci_cli/genuineci_cli.dart';
 import 'package:test/test.dart';
@@ -54,6 +55,20 @@ void main() {
   test('registers login and use commands', () {
     expect(runner.commands['login'], isA<LoginCommand>());
     expect(runner.commands['use'], isA<UseCommand>());
+  });
+
+  test('login requires --local while cloud login is unavailable', () async {
+    await expectLater(
+      runner.run(['login']),
+      throwsA(
+        isA<UsageException>().having(
+          (error) => error.message,
+          'message',
+          t.login.localOnly,
+        ),
+      ),
+    );
+    expect(logger.stdoutMessages, isEmpty);
   });
 
   test('runs a subcommand and preserves its exit code and logger', () async {
