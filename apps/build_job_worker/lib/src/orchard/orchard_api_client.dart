@@ -50,6 +50,21 @@ class OrchardApiClient {
     };
   }
 
+  Future<List<Map<String, dynamic>>> listWorkers({
+    Duration timeout = const Duration(seconds: 10),
+  }) async {
+    final response = await _httpClient
+        .get(_apiUri('workers'), headers: _headers)
+        .timeout(timeout);
+    _checkResponse(response, 'list Orchard workers');
+    final workers = jsonDecode(response.body);
+    if (workers is! List<dynamic> ||
+        workers.any((worker) => worker is! Map<String, dynamic>)) {
+      throw const FormatException('Orchard workers must be a list of objects.');
+    }
+    return workers.cast<Map<String, dynamic>>();
+  }
+
   Future<OrchardLease> createLease({
     required String imageName,
     String? vmName,
@@ -208,14 +223,16 @@ class OrchardApiClient {
   /// Closes the HTTP client, including an injected client.
   void close() => _httpClient.close();
 
-  Uri _vmUri([String? leaseId]) {
+  Uri _vmUri([String? leaseId]) => _apiUri('vms', leaseId);
+
+  Uri _apiUri(String resource, [String? id]) {
     final baseUri = Uri.parse(_config.orchardApiUrl);
     return baseUri.replace(
       pathSegments: [
         ...baseUri.pathSegments.where((segment) => segment.isNotEmpty),
         'v1',
-        'vms',
-        ?leaseId,
+        resource,
+        ?id,
       ],
     );
   }

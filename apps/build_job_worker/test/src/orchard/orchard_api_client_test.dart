@@ -19,6 +19,51 @@ const _config = Config(
 
 void main() {
   group('OrchardApiClient', () {
+    group('listWorkers', () {
+      for (final workers in <List<Map<String, dynamic>>>[
+        [],
+        [
+          {
+            'name': 'mac-1',
+            'resources': {'org.cirruslabs.tart-vms': 2},
+          },
+          {'name': 'mac-2', 'scheduling_paused': true},
+        ],
+      ]) {
+        test('returns ${workers.length} worker records', () async {
+          final client = _createClient((request) async {
+            expect(request.method, 'GET');
+            expect(
+              request.url.toString(),
+              'https://orchard.example.com:6120/v1/workers',
+            );
+            return http.Response(jsonEncode(workers), 200);
+          });
+
+          expect(await client.listWorkers(), workers);
+        });
+      }
+
+      for (final body in ['invalid', '{}', 'null', '[null]']) {
+        test('rejects a malformed worker list: $body', () async {
+          final client = _createClient((_) async => http.Response(body, 200));
+
+          await expectLater(client.listWorkers(), throwsFormatException);
+        });
+      }
+
+      test('times out a stalled request', () async {
+        final response = Completer<http.Response>();
+        final client = _createClient((_) => response.future);
+        addTearDown(() => response.complete(http.Response('[]', 200)));
+
+        await expectLater(
+          client.listWorkers(timeout: const Duration(milliseconds: 10)),
+          throwsA(isA<TimeoutException>()),
+        );
+      });
+    });
+
     test('creates a VM with its image and resource requirements', () async {
       final client = _createClient((request) async {
         expect(request.method, 'POST');
@@ -201,6 +246,7 @@ void main() {
     });
 
     final operations = <String, Future<void> Function(OrchardApiClient)>{
+      'listWorkers': (client) => client.listWorkers(),
       'createLease': (client) => client.createLease(imageName: 'base-macos'),
       'getLease': (client) => client.getLease('lease-1'),
       'deleteLease': (client) => client.deleteLease('lease-1'),
@@ -229,6 +275,7 @@ void main() {
       final error = http.ClientException('Connection failed');
       final client = _createClient((_) async => throw error);
 
+      await expectLater(client.listWorkers(), throwsA(same(error)));
       await expectLater(client.getLease('lease-1'), throwsA(same(error)));
       await expectLater(
         client.waitForVmRunning('lease-1'),
