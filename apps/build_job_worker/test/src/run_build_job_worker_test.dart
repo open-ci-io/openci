@@ -16,10 +16,12 @@ void main() {
   late List<BuildJob> executed;
   late List<(Object, StackTrace)> errors;
   late Future<BuildJobStatus> Function(BuildJob) executeJob;
+  late Future<int> Function() getMaxConcurrentJobs;
   var stopRequested = false;
 
   Future<void> run({Duration interval = pollInterval}) => runBuildJobWorker(
     api: api,
+    getMaxConcurrentJobs: () => getMaxConcurrentJobs(),
     executeJob: (job) {
       executed.add(job);
       return executeJob(job);
@@ -34,6 +36,7 @@ void main() {
     stopRequested = false;
     executed = [];
     errors = [];
+    getMaxConcurrentJobs = () async => 1;
     final now = DateTime.utc(2026, 9, 7);
     firstJob = BuildJob(
       id: 'job-1',
@@ -86,6 +89,173 @@ void main() {
         verifyZeroInteractions(api);
       });
     }
+
+    test('fills two slots and reuses a completed slot', () async {
+      final thirdJob = firstJob.copyWith(id: 'job-3');
+      final jobs = [firstJob, secondJob, thirdJob];
+      final completions = [Completer<void>(), Completer<void>()];
+      final fullPoll = Completer<void>();
+      final thirdStarted = Completer<void>();
+      var claims = 0;
+      getMaxConcurrentJobs = () async {
+        if (executed.length == 2 && !fullPoll.isCompleted) fullPoll.complete();
+        return 2;
+      };
+      when(() => api.claimNextJob(const {})).thenAnswer((_) async {
+        return createMockResponse({'job': jobs[claims++].toJson()});
+      });
+      executeJob = (job) async {
+        if (job.id == thirdJob.id) {
+          stopRequested = true;
+          thirdStarted.complete();
+        } else {
+          await completions[jobs.indexOf(job)].future;
+        }
+        return BuildJobStatus.SUCCESS;
+      };
+
+      var stopped = false;
+      final worker = run().then((_) => stopped = true);
+      await fullPoll.future;
+      await Future<void>.delayed(Duration.zero);
+      expect(claims, 2);
+      expect(executed, [firstJob, secondJob]);
+
+      completions.first.complete();
+      await thirdStarted.future;
+      expect(claims, 3);
+      expect(stopped, isFalse);
+      completions.last.complete();
+      await worker;
+      expect(executed, jobs);
+      expect(errors, isEmpty);
+    });
+
+    for (final failure in [null, StateError('Capacity unavailable')]) {
+      test(
+        'pauses claims for ${failure ?? 'zero capacity'} and retries',
+        () async {
+          final firstPoll = Completer<void>();
+          var polls = 0;
+          getMaxConcurrentJobs = () async {
+            if (++polls == 1) {
+              firstPoll.complete();
+              if (failure != null) throw failure;
+              return 0;
+            }
+            return 1;
+          };
+
+          final worker = run();
+          await firstPoll.future;
+          await Future<void>.delayed(Duration.zero);
+          verifyZeroInteractions(api);
+          expect(executed, isEmpty);
+          await worker;
+          expect(polls, 2);
+          expect(executed, [firstJob]);
+          expect(
+            errors.map((entry) => entry.$1),
+            failure == null ? <Object>[] : [failure],
+          );
+        },
+      );
+    }
+
+    test('does not claim after stopping during a capacity request', () async {
+      final capacity = Completer<int>();
+      getMaxConcurrentJobs = () => capacity.future;
+
+      final worker = run();
+      stopRequested = true;
+      capacity.complete(2);
+      await worker;
+
+      verifyZeroInteractions(api);
+      expect(executed, isEmpty);
+    });
+
+    test('uses increased capacity while a job is still running', () async {
+      final finishFirst = Completer<void>();
+      final secondStarted = Completer<void>();
+      var polls = 0;
+      var claims = 0;
+      getMaxConcurrentJobs = () async => ++polls == 1 ? 1 : 2;
+      when(() => api.claimNextJob(const {})).thenAnswer((_) async {
+        final job = claims++ == 0 ? firstJob : secondJob;
+        return createMockResponse({'job': job.toJson()});
+      });
+      executeJob = (job) async {
+        if (job.id == firstJob.id) {
+          await finishFirst.future;
+        } else {
+          stopRequested = true;
+          secondStarted.complete();
+        }
+        return BuildJobStatus.SUCCESS;
+      };
+
+      final worker = run();
+      await secondStarted.future;
+      expect(claims, 2);
+      expect(finishFirst.isCompleted, isFalse);
+      finishFirst.complete();
+      await worker;
+      expect(errors, isEmpty);
+    });
+
+    test(
+      'respects reduced capacity without interrupting running jobs',
+      () async {
+        final completions = [Completer<void>(), Completer<void>()];
+        final reducedPoll = Completer<void>();
+        final afterCompletionPoll = Completer<void>();
+        var polls = 0;
+        var claims = 0;
+        getMaxConcurrentJobs = () async {
+          polls++;
+          if (polls == 2) reducedPoll.complete();
+          if (polls == 3) afterCompletionPoll.complete();
+          return polls == 1 ? 2 : 1;
+        };
+        when(() => api.claimNextJob(const {})).thenAnswer((_) async {
+          final job = claims++ == 0 ? firstJob : secondJob;
+          return createMockResponse({'job': job.toJson()});
+        });
+        executeJob = (job) async {
+          await completions[job.id == firstJob.id ? 0 : 1].future;
+          return BuildJobStatus.SUCCESS;
+        };
+
+        final worker = run();
+        await reducedPoll.future;
+        expect(
+          completions.every((completion) => !completion.isCompleted),
+          isTrue,
+        );
+        completions.first.complete();
+        await afterCompletionPoll.future;
+        await Future<void>.delayed(Duration.zero);
+        expect(claims, 2);
+        stopRequested = true;
+        completions.last.complete();
+        await worker;
+        expect(errors, isEmpty);
+      },
+    );
+
+    test('reports a synchronous executor exception', () async {
+      final error = StateError('Synchronous failure');
+      executeJob = (_) {
+        stopRequested = true;
+        throw error;
+      };
+
+      await run();
+
+      expect(errors.single.$1, same(error));
+      expect(executed, [firstJob]);
+    });
 
     test(
       'waits when the queue is empty, then processes the next job',

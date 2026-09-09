@@ -5,8 +5,8 @@ Mac Orchard worker. The existing Docker Compose credentials and `base-macos` VM
 must be configured first.
 
 The command starts Orchard Controller and the Mac worker first. When restarting,
-it stops the old build-job-worker and waits for its current job to finish while
-the server remains available for saving results and deleting the VM. It then
+it stops the old build-job-worker and waits for all running jobs to finish while
+the server remains available for saving results and deleting their VMs. It then
 rebuilds and starts the application containers.
 
 To also queue the default smoke-test build job:
