@@ -13,5 +13,5 @@ Future<void> main() async {
     base64Content: Secrets.firebaseOptionsDartBase64,
   );
 
-  await FlutterCi.staticAnalysis(genuineCI.workspacePath);
+  await FlutterCi.staticAnalysis(genuineCI.workspacePath.dashboard);
 }
