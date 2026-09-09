@@ -111,6 +111,7 @@ class _Translations$sync$ja extends Translations$sync$en {
 
 	// Translations
 	@override String get description => 'ローカルのワークフロー定義をGenuineCIと同期します。';
+	@override late final _Translations$sync$paths$ja paths = _Translations$sync$paths$ja._(_root);
 	@override late final _Translations$sync$secrets$ja secrets = _Translations$sync$secrets$ja._(_root);
 }
 
@@ -174,6 +175,20 @@ class _Translations$dev$start$ja extends Translations$dev$start$en {
 	@override String get projectRootNotFound => 'エラー: OpenCI プロジェクトのルートディレクトリが見つかりません。';
 	@override String get stepOrchardController => 'Step 2: Orchard Controllerを起動中...';
 	@override String get stepBuildJobWorkerWaiting => 'サービスを再起動する前に、実行中のビルドジョブの終了を待っています...';
+}
+
+// Path: sync.paths
+class _Translations$sync$paths$ja extends Translations$sync$paths$en {
+	_Translations$sync$paths$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'pubspec.yamlのworkspaceからgenuine_ci/paths.g.dartを生成します。';
+	@override String get noArguments => 'sync pathsに位置引数は指定できません。';
+	@override String get projectRootNotFound => 'pubspec.yamlとgenuine_ciディレクトリのあるプロジェクトが見つかりません。ワークフローのあるプロジェクト内で実行してください。';
+	@override String fileAccessFailed({required Object path}) => '${path}を読み書きできませんでした。ファイルの有無とアクセス権限を確認してください。';
+	@override String saved({required Object path}) => 'ワークスペースのパスを生成しました: ${path}';
 }
 
 // Path: sync.secrets
@@ -255,6 +270,11 @@ extension on TranslationsJa {
 			'dev.start.stepOrchardController' => 'Step 2: Orchard Controllerを起動中...',
 			'dev.start.stepBuildJobWorkerWaiting' => 'サービスを再起動する前に、実行中のビルドジョブの終了を待っています...',
 			'sync.description' => 'ローカルのワークフロー定義をGenuineCIと同期します。',
+			'sync.paths.description' => 'pubspec.yamlのworkspaceからgenuine_ci/paths.g.dartを生成します。',
+			'sync.paths.noArguments' => 'sync pathsに位置引数は指定できません。',
+			'sync.paths.projectRootNotFound' => 'pubspec.yamlとgenuine_ciディレクトリのあるプロジェクトが見つかりません。ワークフローのあるプロジェクト内で実行してください。',
+			'sync.paths.fileAccessFailed' => ({required Object path}) => '${path}を読み書きできませんでした。ファイルの有無とアクセス権限を確認してください。',
+			'sync.paths.saved' => ({required Object path}) => 'ワークスペースのパスを生成しました: ${path}',
 			'sync.secrets.description' => '現在のチームのシークレット名からgenuine_ci/secrets.g.dartを生成します。',
 			'sync.secrets.noArguments' => 'sync secretsに位置引数は指定できません。',
 			'sync.secrets.loginRequired' => 'genuineci login --localを実行してからシークレットを同期してください。',

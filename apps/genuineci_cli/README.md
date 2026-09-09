@@ -50,3 +50,30 @@ replaces `genuine_ci/secrets.g.dart` with getters that read environment variable
 at workflow runtime. Secret values are never downloaded or written to this file.
 Run it again after adding or removing secrets. Fetch or generation failures leave
 the existing file unchanged.
+
+Generate typed workspace paths without logging in or starting local services:
+
+```sh
+genuineci sync paths
+```
+
+Run this from your workflow project or one of its subdirectories. The command
+reads the `workspace` list in the root `pubspec.yaml` and each listed package's
+`name`, then writes `genuine_ci/paths.g.dart` following the directory hierarchy.
+For example, `apps/build_job_worker` becomes
+`WorkspacePaths.root.apps.buildJobWorker`. Directory names determine the getters;
+package names are used to validate the workspace. Run it again after adding,
+moving or renaming workspace directories. Read or generation failures preserve
+the existing file.
+
+Import the generated file in your workflow and run it from the repository root,
+as the worker does, because these paths are relative to that root:
+
+```dart
+import 'paths.g.dart';
+
+await FlutterCi.staticAnalysis(WorkspacePaths.root.apps.dashboard);
+```
+
+`WorkspacePaths.root` represents `.` and `WorkspacePaths.root.apps` represents
+`apps`. Both can also be passed directly to methods accepting a `String` path.

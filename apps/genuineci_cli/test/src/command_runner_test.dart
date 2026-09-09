@@ -68,6 +68,12 @@ void main() {
     );
   });
 
+  test('registers sync paths with a localized description', () {
+    final paths = runner.commands['sync']!.subcommands['paths'];
+    expect(paths, isA<SyncPathsCommand>());
+    expect(paths!.description, t.sync.paths.description);
+  });
+
   test('login requires --local while cloud login is unavailable', () async {
     await expectLater(
       runner.run(['login']),
