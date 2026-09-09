@@ -42,6 +42,7 @@ class TranslationsJa extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$login$ja login = _Translations$login$ja._(_root);
 	@override late final _Translations$use$ja use = _Translations$use$ja._(_root);
 	@override late final _Translations$dev$ja dev = _Translations$dev$ja._(_root);
+	@override late final _Translations$sync$ja sync = _Translations$sync$ja._(_root);
 	@override late final _Translations$common$ja common = _Translations$common$ja._(_root);
 }
 
@@ -100,6 +101,17 @@ class _Translations$dev$ja extends Translations$dev$en {
 	// Translations
 	@override String get description => 'ローカル開発環境（Docker, Tart, DB, サーバー）を管理します。';
 	@override late final _Translations$dev$start$ja start = _Translations$dev$start$ja._(_root);
+}
+
+// Path: sync
+class _Translations$sync$ja extends Translations$sync$en {
+	_Translations$sync$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'ローカルのワークフロー定義をGenuineCIと同期します。';
+	@override late final _Translations$sync$secrets$ja secrets = _Translations$sync$secrets$ja._(_root);
 }
 
 // Path: common
@@ -164,6 +176,23 @@ class _Translations$dev$start$ja extends Translations$dev$start$en {
 	@override String get stepBuildJobWorkerWaiting => 'サービスを再起動する前に、実行中のビルドジョブの終了を待っています...';
 }
 
+// Path: sync.secrets
+class _Translations$sync$secrets$ja extends Translations$sync$secrets$en {
+	_Translations$sync$secrets$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => '現在のチームのシークレット名からgenuine_ci/secrets.g.dartを生成します。';
+	@override String get noArguments => 'sync secretsに位置引数は指定できません。';
+	@override String get loginRequired => 'genuineci login --localを実行してからシークレットを同期してください。';
+	@override String get workflowDirectoryNotFound => 'genuine_ciディレクトリが見つかりません。ワークフローのあるプロジェクト内で実行してください。';
+	@override String requestFailed({required Object status}) => 'シークレット名を取得できませんでした（HTTP ${status}）。';
+	@override String get fetchFailed => 'シークレット名を取得できませんでした。サーバーの接続状態とレスポンスを確認してください。';
+	@override String get saveFailed => 'secrets.g.dartを保存できませんでした。保存先とファイルの権限を確認してください。';
+	@override String saved({required Object path}) => 'シークレット定義を生成しました: ${path}';
+}
+
 // Path: dev.start.flags
 class _Translations$dev$start$flags$ja extends Translations$dev$start$flags$en {
 	_Translations$dev$start$flags$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -225,6 +254,15 @@ extension on TranslationsJa {
 			'dev.start.projectRootNotFound' => 'エラー: OpenCI プロジェクトのルートディレクトリが見つかりません。',
 			'dev.start.stepOrchardController' => 'Step 2: Orchard Controllerを起動中...',
 			'dev.start.stepBuildJobWorkerWaiting' => 'サービスを再起動する前に、実行中のビルドジョブの終了を待っています...',
+			'sync.description' => 'ローカルのワークフロー定義をGenuineCIと同期します。',
+			'sync.secrets.description' => '現在のチームのシークレット名からgenuine_ci/secrets.g.dartを生成します。',
+			'sync.secrets.noArguments' => 'sync secretsに位置引数は指定できません。',
+			'sync.secrets.loginRequired' => 'genuineci login --localを実行してからシークレットを同期してください。',
+			'sync.secrets.workflowDirectoryNotFound' => 'genuine_ciディレクトリが見つかりません。ワークフローのあるプロジェクト内で実行してください。',
+			'sync.secrets.requestFailed' => ({required Object status}) => 'シークレット名を取得できませんでした（HTTP ${status}）。',
+			'sync.secrets.fetchFailed' => 'シークレット名を取得できませんでした。サーバーの接続状態とレスポンスを確認してください。',
+			'sync.secrets.saveFailed' => 'secrets.g.dartを保存できませんでした。保存先とファイルの権限を確認してください。',
+			'sync.secrets.saved' => ({required Object path}) => 'シークレット定義を生成しました: ${path}',
 			'common.error' => ({required Object error}) => 'エラー: ${error}',
 			_ => null,
 		};

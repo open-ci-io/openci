@@ -58,6 +58,19 @@
       "stepBuildJobWorkerWaiting": "Waiting for the current build job to finish before restarting services..."
     }
   },
+  "sync": {
+    "description": "Sync local workflow definitions with GenuineCI.",
+    "secrets": {
+      "description": "Generate genuine_ci/secrets.g.dart from the active team's secret names.",
+      "noArguments": "sync secrets does not accept positional arguments.",
+      "loginRequired": "Run genuineci login --local before syncing secrets.",
+      "workflowDirectoryNotFound": "No genuine_ci directory found. Run this command from your workflow project.",
+      "requestFailed": "Could not fetch secret names (HTTP ${status}).",
+      "fetchFailed": "Could not fetch secret names. Check the server connection and response.",
+      "saveFailed": "Could not save secrets.g.dart. Check the destination and file permissions.",
+      "saved": "Generated secret definitions: ${path}"
+    }
+  },
   "common": {
     "error": "Error: ${error}"
   }

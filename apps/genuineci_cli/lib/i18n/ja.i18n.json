@@ -58,6 +58,19 @@
       "stepBuildJobWorkerWaiting": "サービスを再起動する前に、実行中のビルドジョブの終了を待っています..."
     }
   },
+  "sync": {
+    "description": "ローカルのワークフロー定義をGenuineCIと同期します。",
+    "secrets": {
+      "description": "現在のチームのシークレット名からgenuine_ci/secrets.g.dartを生成します。",
+      "noArguments": "sync secretsに位置引数は指定できません。",
+      "loginRequired": "genuineci login --localを実行してからシークレットを同期してください。",
+      "workflowDirectoryNotFound": "genuine_ciディレクトリが見つかりません。ワークフローのあるプロジェクト内で実行してください。",
+      "requestFailed": "シークレット名を取得できませんでした（HTTP ${status}）。",
+      "fetchFailed": "シークレット名を取得できませんでした。サーバーの接続状態とレスポンスを確認してください。",
+      "saveFailed": "secrets.g.dartを保存できませんでした。保存先とファイルの権限を確認してください。",
+      "saved": "シークレット定義を生成しました: ${path}"
+    }
+  },
   "common": {
     "error": "エラー: ${error}"
   }

@@ -37,3 +37,16 @@ This reads the API key from the running `openci-server` container, authenticates
 with `http://localhost:8080`, and selects `test-team`. After the server confirms
 the team, it saves and activates the `local` credential profile. Failed login
 attempts leave existing credentials unchanged.
+
+Then generate typed secret definitions from your workflow project:
+
+```sh
+genuineci sync secrets
+```
+
+The command uses the active credential profile and finds the nearest ancestor
+containing a `genuine_ci` directory, starting from the current directory. It
+replaces `genuine_ci/secrets.g.dart` with getters that read environment variables
+at workflow runtime. Secret values are never downloaded or written to this file.
+Run it again after adding or removing secrets. Fetch or generation failures leave
+the existing file unchanged.
