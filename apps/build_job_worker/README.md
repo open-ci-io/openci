@@ -28,6 +28,8 @@ Composeでは`build-job-worker`を常駐サービスとして起動します。
 `BUILD_JOB_ID`は不要です。Orchardの認証情報は環境変数から読み込みます。
 
 `OrchardApiClient(config: config)`でクライアントを作成し、使用後に`close()`を呼び出します。
+`listWorkers()`は`GET /v1/workers`からworker一覧を取得し、各workerの情報をそのまま返します。
+HTTP失敗・不正なレスポンスは例外にし、応答待ちは標準10秒でタイムアウトします。
 `waitForVmRunning()`は標準で3秒間隔・最大5分間、`running`または`active`になるまで待機します。
 HTTP応答待ちも制限時間に含み、APIエラーは呼び出し元へ返します。
 `prepareVm()`はVMを作成し、標準で最大15分の起動待ちを行ってVM情報を返します。
