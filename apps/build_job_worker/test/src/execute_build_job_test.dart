@@ -108,6 +108,19 @@ void main() {
       })
       .toList();
 
+  List<String> stepLogs(String stepId) => logRequests
+      .map(_lokiStream)
+      .where((stream) {
+        final labels = stream['stream'] as Map<String, dynamic>;
+        return labels['type'] == 'step_log' && labels['step_id'] == stepId;
+      })
+      .map((stream) {
+        final values =
+            (stream['values'] as List<dynamic>).single as List<dynamic>;
+        return values[1] as String;
+      })
+      .toList();
+
   setUpAll(() {
     registerFallbackValue((String line, String stream) {});
   });
@@ -327,8 +340,14 @@ void main() {
         expect(steps.last.createdAt, steps.first.createdAt);
         expect(steps.last.updatedAt.isBefore(steps.first.updatedAt), isFalse);
 
-        expect(logRequests, hasLength(8));
+        expect(stepLogs('prepare_vm'), [
+          'Creating VM from test-macos-image and waiting for it to start.',
+          'VM is ready.',
+        ]);
+        expect(logRequests, hasLength(10));
         for (final (index, step) in [
+          'prepare_vm',
+          'prepare_vm',
           'prepare_vm',
           'prepare_vm',
           'checkout',
@@ -382,6 +401,9 @@ void main() {
           stepEvents('prepare_vm').single.status,
           BuildJobStatus.IN_PROGRESS,
         );
+        expect(stepLogs('prepare_vm'), [
+          'Creating VM from test-macos-image and waiting for it to start.',
+        ]);
         expect(commands, isEmpty);
         await Future<void>.delayed(const Duration(milliseconds: 20));
         finish.complete();
@@ -549,6 +571,14 @@ void main() {
                 : BuildJobStatus.SUCCESS,
           ],
         ]);
+        expect(stepLogs('prepare_vm'), [
+          if (!['createRun', 'token'].contains(stage)) ...[
+            'Creating VM from test-macos-image and waiting for it to start.',
+            ['createVm', 'waitVm'].contains(stage)
+                ? 'VM setup failed.'
+                : 'VM is ready.',
+          ],
+        ]);
         expect(stepEvents('checkout').map((step) => step.status), [
           if (![
             'createRun',
@@ -706,7 +736,7 @@ void main() {
       expect(await execute(), BuildJobStatus.SUCCESS);
 
       expectCompletion(BuildJobStatus.SUCCESS);
-      expect(errors, hasLength(8));
+      expect(errors, hasLength(10));
       expect(deletedVms, ['lease-1']);
     });
 
@@ -718,7 +748,7 @@ void main() {
 
       expectCompletion(BuildJobStatus.FAILURE);
       expect(stepEvents('prepare_vm').last.status, BuildJobStatus.FAILURE);
-      expect(errors, hasLength(3));
+      expect(errors, hasLength(5));
       expect(errors.last.$1, same(vmError));
       expect(errors.last.$2.toString(), sourceStack.toString());
       expect(deletedVms, ['lease-1']);
@@ -773,12 +803,17 @@ void main() {
       expect(deletedVms, ['lease-1']);
     });
 
-    for (final stepId in ['prepare_vm', 'checkout', 'run_workflow']) {
-      test('continues after $stepId progress times out', () async {
+    for (final (stepId, type) in [
+      ('prepare_vm', 'step_event'),
+      ('prepare_vm', 'step_log'),
+      ('checkout', 'step_event'),
+      ('run_workflow', 'step_event'),
+    ]) {
+      test('continues after $stepId $type delivery times out', () async {
         final response = Completer<http.Response>();
         respondToLog = (request) {
           final labels = _lokiStream(request)['stream'] as Map<String, dynamic>;
-          if (labels['type'] == 'step_event' &&
+          if (labels['type'] == type &&
               labels['step_id'] == stepId &&
               stepEvents(stepId).last.status == BuildJobStatus.IN_PROGRESS) {
             return response.future;

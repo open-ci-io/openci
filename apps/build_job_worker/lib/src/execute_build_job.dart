@@ -17,11 +17,6 @@ import 'orchard/prepare_vm.dart';
 import 'resolve_github_installation_token.dart';
 import 'run_workflow.dart';
 
-/// Executes one claimed job and attempts all completion and VM cleanup steps.
-///
-/// The returned status describes execution, even if saving it or cleanup fails.
-/// [onError] reports execution, log, completion and cleanup errors and must not
-/// throw. The caller owns the clients and closes them after all jobs finish.
 Future<BuildJobStatus> executeBuildJob({
   required OpenCiApiService api,
   required OrchardApiClient orchardApi,
@@ -51,19 +46,24 @@ Future<BuildJobStatus> executeBuildJob({
   String? leaseId;
   final errors = <(Object, StackTrace)>[];
 
-  Future<void> reportStep(BuildStep step) async {
-    try {
-      await pushLogToLoki(
-        client: lokiClient,
-        lokiUrl: config.internalLokiUrl,
-        runId: runId,
-        jobId: job.id,
-        stepId: step.id,
-        type: 'step_event',
-        message: jsonEncode(step.toJson()),
-      ).timeout(const Duration(seconds: 10));
-    } catch (error, stackTrace) {
-      errors.add((error, stackTrace));
+  Future<void> reportStep(BuildStep step, {String? logMessage}) async {
+    for (final entry in {
+      'step_event': jsonEncode(step.toJson()),
+      'step_log': ?logMessage,
+    }.entries) {
+      try {
+        await pushLogToLoki(
+          client: lokiClient,
+          lokiUrl: config.internalLokiUrl,
+          runId: runId,
+          jobId: job.id,
+          stepId: step.id,
+          type: entry.key,
+          message: entry.value,
+        ).timeout(const Duration(seconds: 10));
+      } catch (error, stackTrace) {
+        errors.add((error, stackTrace));
+      }
     }
   }
 
@@ -82,7 +82,11 @@ Future<BuildJobStatus> executeBuildJob({
       createdAt: startedAt,
       updatedAt: startedAt,
     );
-    await reportStep(vmStep);
+    await reportStep(
+      vmStep,
+      logMessage:
+          'Creating VM from ${config.baseVmName} and waiting for it to start.',
+    );
     final stopwatch = Stopwatch()..start();
     try {
       final lease = await prepareVm(
@@ -101,6 +105,7 @@ Future<BuildJobStatus> executeBuildJob({
           durationMs: stopwatch.elapsedMilliseconds,
           updatedAt: DateTime.now().toUtc(),
         ),
+        logMessage: leaseId == null ? 'VM setup failed.' : 'VM is ready.',
       );
     }
 

@@ -29,7 +29,14 @@ Future<bool> startDockerCompose(
 }) async {
   final (arguments, message) = switch (step) {
     DockerComposeStep.startOrchardController => (
-      ['compose', 'up', '-d', '--no-recreate', 'orchard-controller'],
+      [
+        'compose',
+        'up',
+        '-d',
+        '--no-recreate',
+        '--remove-orphans',
+        'orchard-controller',
+      ],
       t.dev.start.stepOrchardController,
     ),
     DockerComposeStep.stopBuildJobWorker => (
@@ -42,6 +49,7 @@ Future<bool> startDockerCompose(
         'up',
         '-d',
         '--build',
+        '--remove-orphans',
         'server',
         'build-job-planner',
         'build-job-worker',
