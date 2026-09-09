@@ -15,10 +15,14 @@ import 'start_orchard_worker.dart';
 typedef ProjectRootFinder = Directory? Function();
 typedef TartBaseImageChecker = Future<bool> Function(Logger logger);
 typedef DockerComposeStarter =
-    Future<bool> Function(Logger logger, Directory projectRoot);
+    Future<bool> Function(
+      Logger logger,
+      Directory projectRoot, {
+      DockerComposeStep step,
+    });
 typedef OrchardContextSetup = Future<bool> Function(Logger logger);
 typedef LocalDataSeeder = Future<bool> Function(Logger logger);
-typedef OrchardWorkerStarter = Future<int> Function(Logger logger);
+typedef OrchardWorkerStarter = Future<OrchardWorker?> Function(Logger logger);
 
 class DevStartCommand extends Command<int> {
   @override
@@ -72,11 +76,12 @@ class DevStartCommand extends Command<int> {
       return 1;
     }
 
-    final didStartDockerCompose = await _dockerComposeStarter(
+    final didStartController = await _dockerComposeStarter(
       _logger,
       projectRoot,
+      step: DockerComposeStep.startOrchardController,
     );
-    if (!didStartDockerCompose) {
+    if (!didStartController) {
       return 1;
     }
 
@@ -85,14 +90,34 @@ class DevStartCommand extends Command<int> {
       return 1;
     }
 
-    final shouldSeedLocalData = argResults?['seed'] as bool? ?? false;
-    if (shouldSeedLocalData) {
-      final didSeedLocalData = await _localDataSeeder(_logger);
-      if (!didSeedLocalData) {
-        return 1;
-      }
+    final worker = await _orchardWorkerStarter(_logger);
+    if (worker == null) {
+      return 1;
     }
 
-    return _orchardWorkerStarter(_logger);
+    try {
+      final shouldSeedLocalData = argResults?['seed'] as bool? ?? false;
+      for (final start in [
+        () => _dockerComposeStarter(
+          _logger,
+          projectRoot,
+          step: DockerComposeStep.stopBuildJobWorker,
+        ),
+        () => _dockerComposeStarter(_logger, projectRoot),
+        if (shouldSeedLocalData) () => _localDataSeeder(_logger),
+      ]) {
+        if (!worker.isRunning) {
+          final code = await worker.exitCode;
+          return code == 0 ? 1 : code;
+        }
+        if (!await start()) {
+          return 1;
+        }
+      }
+
+      return await worker.exitCode;
+    } finally {
+      await worker.stop();
+    }
   }
 }

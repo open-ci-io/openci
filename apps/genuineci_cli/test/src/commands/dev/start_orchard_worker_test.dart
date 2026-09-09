@@ -48,34 +48,36 @@ void main() {
   });
 
   test(
-    'runs the local worker with terminal output and waits for exit',
+    'starts the local worker with terminal output before waiting for exit',
     () async {
       final calls = <List<String>>[];
       final started = Completer<void>();
       var completed = false;
 
-      final result =
-          startOrchardWorker(
-            logger,
-            processRunner: (executable, arguments) async {
-              calls.add([executable, ...arguments]);
-              return ProcessResult(1, 0, '$token\n', '');
-            },
-            processStarter: (executable, arguments, {required mode}) async {
-              calls.add([executable, ...arguments]);
-              expect(mode, ProcessStartMode.inheritStdio);
-              started.complete();
-              return worker;
-            },
-          ).then((code) {
-            completed = true;
-            return code;
-          });
+      final result = await startOrchardWorker(
+        logger,
+        processRunner: (executable, arguments) async {
+          calls.add([executable, ...arguments]);
+          return ProcessResult(1, 0, '$token\n', '');
+        },
+        processStarter: (executable, arguments, {required mode}) async {
+          calls.add([executable, ...arguments]);
+          expect(mode, ProcessStartMode.inheritStdio);
+          started.complete();
+          return worker;
+        },
+      );
+      final exitCode = result!.exitCode.then((code) {
+        completed = true;
+        return code;
+      });
       await started.future;
+      expect(result.isRunning, isTrue);
       expect(completed, isFalse);
       worker.exited.complete(0);
 
-      expect(await result, 0);
+      expect(await exitCode, 0);
+      expect(result.isRunning, isFalse);
       expect(calls, [
         ['orchard', 'get', 'bootstrap-token', 'bootstrap-admin'],
         [
@@ -102,7 +104,8 @@ void main() {
         processStarter: (_, _, {required mode}) async => worker,
       );
 
-      expect(result, code == 17 ? 17 : 137);
+      expect(await result!.exitCode, code == 17 ? 17 : 137);
+      expect(result.isRunning, isFalse);
       expect(logger.stderrMessages, [t.dev.start.stepOrchardWorkerFailed]);
     });
   }
@@ -121,7 +124,7 @@ void main() {
               fail('Worker must not start'),
         );
 
-        expect(result, 1);
+        expect(result, isNull);
         expect(logger.stdoutMessages, isEmpty);
         expect(logger.stderrMessages, [t.dev.start.stepOrchardWorkerFailed]);
       },
@@ -145,7 +148,7 @@ void main() {
           },
         );
 
-        expect(result, 1);
+        expect(result, isNull);
         expect(logger.stderrMessages, [
           '${t.dev.start.stepOrchardWorkerFailed}\nnot found',
         ]);
@@ -166,27 +169,59 @@ void main() {
       addTearDown(terminations.close);
       var completed = false;
 
-      final result =
-          startOrchardWorker(
-            logger,
-            processRunner: (_, _) async => ProcessResult(1, 0, token, ''),
-            processStarter: (_, _, {required mode}) async => worker,
-            interruptSignals: interrupts.stream,
-            terminateSignals: terminations.stream,
-          ).then((code) {
-            completed = true;
-            return code;
-          });
+      final result = await startOrchardWorker(
+        logger,
+        processRunner: (_, _) async => ProcessResult(1, 0, token, ''),
+        processStarter: (_, _, {required mode}) async => worker,
+        interruptSignals: interrupts.stream,
+        terminateSignals: terminations.stream,
+      );
+      final exitCode = result!.exitCode.then((code) {
+        completed = true;
+        return code;
+      });
       await listening.future;
       (signal == ProcessSignal.sigint ? interrupts : terminations).add(signal);
 
       expect(worker.signals, [ProcessSignal.sigint]);
+      expect(result.isRunning, isFalse);
       expect(completed, isFalse);
       worker.exited.complete(1);
-      expect(await result, 128 + signal.signalNumber);
+      expect(await exitCode, 128 + signal.signalNumber);
+      expect(result.isRunning, isFalse);
+      await result.stop();
+      expect(worker.signals, [ProcessSignal.sigint]);
       expect(logger.stderrMessages, isEmpty);
       expect(interrupts.hasListener, isFalse);
       expect(terminations.hasListener, isFalse);
     });
   }
+
+  test('stop waits for cleanup and only sends one signal', () async {
+    final interrupts = StreamController<ProcessSignal>();
+    final terminations = StreamController<ProcessSignal>();
+    addTearDown(interrupts.close);
+    addTearDown(terminations.close);
+    final result = await startOrchardWorker(
+      logger,
+      processRunner: (_, _) async => ProcessResult(1, 0, token, ''),
+      processStarter: (_, _, {required mode}) async => worker,
+      interruptSignals: interrupts.stream,
+      terminateSignals: terminations.stream,
+    );
+    var stopped = false;
+    final stopping = result!.stop().then((_) => stopped = true);
+    final alsoStopping = result.stop();
+
+    expect(result.isRunning, isFalse);
+    expect(stopped, isFalse);
+    expect(worker.signals, [ProcessSignal.sigint]);
+    worker.exited.complete(1);
+    await stopping;
+    await alsoStopping;
+    expect(stopped, isTrue);
+    expect(interrupts.hasListener, isFalse);
+    expect(terminations.hasListener, isFalse);
+    expect(logger.stderrMessages, isEmpty);
+  });
 }

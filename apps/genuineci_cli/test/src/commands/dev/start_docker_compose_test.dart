@@ -29,6 +29,47 @@ void main() {
       projectRoot = Directory('/path/to/openci');
     });
 
+    for (final (step, arguments, message) in [
+      (
+        DockerComposeStep.startOrchardController,
+        ['compose', 'up', '-d', '--no-recreate', 'orchard-controller'],
+        t.dev.start.stepOrchardController,
+      ),
+      (
+        DockerComposeStep.stopBuildJobWorker,
+        ['compose', 'stop', 'build-job-worker'],
+        t.dev.start.stepBuildJobWorkerWaiting,
+      ),
+    ]) {
+      test('$step only touches the selected service', () async {
+        final calls = <List<String>>[];
+        final result = await startDockerCompose(
+          logger,
+          projectRoot,
+          step: step,
+          environment: const {'PATH': '/usr/local/bin'},
+          processRunner:
+              (
+                executable,
+                args, {
+                required workingDirectory,
+                required environment,
+              }) async {
+                expect(executable, 'docker');
+                expect(workingDirectory, projectRoot.path);
+                expect(environment, {'PATH': '/usr/local/bin'});
+                calls.add(args);
+                return 0;
+              },
+        );
+
+        expect(result, isTrue);
+        expect(calls, [arguments]);
+        expect(logger.stdoutMessages, ['\n$message']);
+        expect(logger.stderrMessages, isEmpty);
+      });
+    }
+
     test('starts worker services from the project root', () async {
       late String executable;
       final calls = <List<String>>[];

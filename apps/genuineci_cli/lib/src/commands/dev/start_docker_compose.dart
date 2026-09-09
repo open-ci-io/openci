@@ -13,32 +13,51 @@ typedef DockerComposeProcessRunner =
       required Map<String, String> environment,
     });
 
-const _dockerComposeArguments = [
-  'compose',
-  'up',
-  '-d',
-  '--build',
-  'server',
-  'build-job-planner',
-  'build-job-worker',
-  'loki',
-];
+enum DockerComposeStep {
+  startOrchardController,
+  stopBuildJobWorker,
+  startServices,
+}
 
 Future<bool> startDockerCompose(
   Logger logger,
   Directory projectRoot, {
+  DockerComposeStep step = DockerComposeStep.startServices,
   @visibleForTesting
   DockerComposeProcessRunner processRunner = _runDockerComposeProcess,
   @visibleForTesting Map<String, String>? environment,
 }) async {
-  logger.stdout('\n${t.dev.start.stepDockerCompose}');
+  final (arguments, message) = switch (step) {
+    DockerComposeStep.startOrchardController => (
+      ['compose', 'up', '-d', '--no-recreate', 'orchard-controller'],
+      t.dev.start.stepOrchardController,
+    ),
+    DockerComposeStep.stopBuildJobWorker => (
+      ['compose', 'stop', 'build-job-worker'],
+      t.dev.start.stepBuildJobWorkerWaiting,
+    ),
+    DockerComposeStep.startServices => (
+      [
+        'compose',
+        'up',
+        '-d',
+        '--build',
+        'server',
+        'build-job-planner',
+        'build-job-worker',
+        'loki',
+      ],
+      t.dev.start.stepDockerCompose,
+    ),
+  };
+  logger.stdout('\n$message');
 
   final composeEnvironment = environment ?? Platform.environment;
 
   try {
     final exitCode = await processRunner(
       'docker',
-      _dockerComposeArguments,
+      arguments,
       workingDirectory: projectRoot.path,
       environment: composeEnvironment,
     );
@@ -51,7 +70,9 @@ Future<bool> startDockerCompose(
     return false;
   }
 
-  logger.stdout(t.dev.start.stepDockerComposeStarted);
+  if (step == DockerComposeStep.startServices) {
+    logger.stdout(t.dev.start.stepDockerComposeStarted);
+  }
   return true;
 }
 
