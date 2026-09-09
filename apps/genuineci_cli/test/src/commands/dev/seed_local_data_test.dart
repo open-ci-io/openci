@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cli_util/cli_logging.dart';
-import 'package:crypto/crypto.dart';
 import 'package:genuineci_cli/src/commands/dev/seed_local_data.dart';
 import 'package:genuineci_cli/src/i18n/i18n.dart';
 import 'package:http/http.dart' as http;
@@ -23,6 +22,15 @@ class _RecordingLogger implements Logger {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+const job = {
+  'owner': 'example',
+  'repo': 'project',
+  'commitSha': '0123456789012345678901234567890123456789',
+  'workflowFileName': 'smoke.dart',
+  'installationId': '42',
+  'branch': 'develop',
+};
+
 void main() {
   group('seedLocalData', () {
     late _RecordingLogger logger;
@@ -31,58 +39,25 @@ void main() {
       logger = _RecordingLogger();
     });
 
-    test('seeds a team and dispatches a signed push webhook', () async {
-      const serverUrl = 'http://localhost:9090';
-      const webhookSecret = 'test-secret';
+    test('submits exactly one configured job', () async {
       final requests = <http.Request>[];
-      final client = MockClient((request) async {
-        requests.add(request);
-        return http.Response('{}', 200);
-      });
-
       final result = await seedLocalData(
         logger,
-        client: client,
-        environment: {
-          'OPENCI_SERVER_URL': serverUrl,
-          'GITHUB_WEBHOOK_SECRET': webhookSecret,
-        },
+        job,
+        client: MockClient((request) async {
+          requests.add(request);
+          return http.Response('{}', 200);
+        }),
+        environment: {'OPENCI_SERVER_URL': 'http://localhost:9090'},
       );
-
       expect(result, isTrue);
-      expect(requests, hasLength(2));
-
-      final seedRequest = requests[0];
-      expect(seedRequest.method, equals('POST'));
-      expect(seedRequest.url, equals(Uri.parse('$serverUrl/internal/seed')));
-      expect(seedRequest.headers['content-type'], equals('application/json'));
-      expect(jsonDecode(seedRequest.body), equals({}));
-
-      final webhookRequest = requests[1];
-      expect(webhookRequest.method, equals('POST'));
-      expect(webhookRequest.url, equals(Uri.parse('$serverUrl/webhook')));
-      expect(webhookRequest.headers['x-github-event'], equals('push'));
-      expect(
-        webhookRequest.headers['x-github-delivery'],
-        matches(RegExp(r'^delivery-\d+$')),
-      );
-      final expectedDigest = Hmac(
-        sha256,
-        utf8.encode(webhookSecret),
-      ).convert(utf8.encode(webhookRequest.body));
-      expect(
-        webhookRequest.headers['x-hub-signature-256'],
-        equals('sha256=$expectedDigest'),
-      );
-      expect(
-        jsonDecode(webhookRequest.body),
-        containsPair('ref', 'refs/heads/main'),
-      );
+      final request = requests.single;
+      expect(request.method, 'POST');
+      expect(request.url.toString(), 'http://localhost:9090/internal/seed');
+      expect(request.headers['content-type'], 'application/json');
+      expect(jsonDecode(request.body), job);
       expect(logger.stderrMessages, isEmpty);
-      expect(logger.stdoutMessages, [
-        '\n${t.dev.start.stepSeed}',
-        t.dev.start.stepSeedCompleted,
-      ]);
+      expect(logger.stdoutMessages.last, t.dev.start.stepSeedCompleted);
     });
 
     test('returns false when the seed request fails', () async {
@@ -94,6 +69,7 @@ void main() {
 
       final result = await seedLocalData(
         logger,
+        job,
         client: client,
         environment: const {},
       );
@@ -109,28 +85,6 @@ void main() {
       expect(logger.stdoutMessages, ['\n${t.dev.start.stepSeed}']);
     });
 
-    test('returns false when the webhook request fails', () async {
-      final client = MockClient((request) async {
-        if (request.url.path == '/webhook') {
-          return http.Response('webhook failed', 500);
-        }
-        return http.Response('{}', 200);
-      });
-
-      final result = await seedLocalData(
-        logger,
-        client: client,
-        environment: const {},
-      );
-
-      expect(result, isFalse);
-      expect(
-        logger.stderrMessages.single,
-        contains(t.dev.start.stepSeedFailed),
-      );
-      expect(logger.stderrMessages.single, contains('Body: webhook failed'));
-    });
-
     test('returns false when an HTTP request throws', () async {
       final client = MockClient(
         (_) async => throw Exception('connection failed'),
@@ -138,6 +92,7 @@ void main() {
 
       final result = await seedLocalData(
         logger,
+        job,
         client: client,
         environment: const {},
       );
@@ -156,6 +111,7 @@ void main() {
 
       final result = await seedLocalData(
         logger,
+        job,
         client: client,
         environment: const {},
         timeout: const Duration(milliseconds: 50),
@@ -168,29 +124,6 @@ void main() {
       );
       expect(logger.stderrMessages.single, contains('TimeoutException'));
       expect(logger.stdoutMessages, ['\n${t.dev.start.stepSeed}']);
-    });
-
-    test('returns false when webhook request times out', () async {
-      final client = MockClient((request) {
-        if (request.url.path == '/internal/seed') {
-          return Future.value(http.Response('{}', 200));
-        }
-        return Completer<http.Response>().future;
-      });
-
-      final result = await seedLocalData(
-        logger,
-        client: client,
-        environment: const {},
-        timeout: const Duration(milliseconds: 50),
-      );
-
-      expect(result, isFalse);
-      expect(
-        logger.stderrMessages.single,
-        contains(t.dev.start.stepSeedFailed),
-      );
-      expect(logger.stderrMessages.single, contains('TimeoutException'));
     });
   });
 }

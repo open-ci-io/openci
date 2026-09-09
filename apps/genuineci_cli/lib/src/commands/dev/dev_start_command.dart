@@ -17,7 +17,8 @@ typedef TartBaseImageChecker = Future<bool> Function(Logger logger);
 typedef DockerComposeStarter =
     Future<bool> Function(Logger logger, Directory projectRoot);
 typedef OrchardContextSetup = Future<bool> Function(Logger logger);
-typedef LocalDataSeeder = Future<bool> Function(Logger logger);
+typedef LocalDataSeeder =
+    Future<bool> Function(Logger logger, Map<String, String> job);
 typedef OrchardWorkerStarter = Future<int> Function(Logger logger);
 
 class DevStartCommand extends Command<int> {
@@ -55,10 +56,63 @@ class DevStartCommand extends Command<int> {
        _localDataSeeder = localDataSeeder,
        _orchardWorkerStarter = orchardWorkerStarter {
     argParser.addFlag('seed', negatable: false, help: t.dev.start.flags.seed);
+    for (final entry in const {
+      'seed-repository': 'GitHub repository: owner/repo',
+      'seed-sha': 'Full commit SHA to check out',
+      'seed-workflow':
+          'Dart filename inside genuine_ci/ (e.g. worker_smoke.dart)',
+      'seed-installation-id': 'GitHub App installation ID',
+      'seed-branch': 'Branch containing the commit',
+    }.entries) {
+      argParser.addOption(
+        entry.key,
+        help: '${entry.value} (required with --seed)',
+      );
+    }
   }
 
   @override
   Future<int> run() async {
+    final shouldSeedLocalData = argResults?['seed'] as bool? ?? false;
+    final job = <String, String>{};
+    for (final option in argParser.options.keys.where(
+      (name) => name.startsWith('seed-'),
+    )) {
+      final value = argResults?[option] as String?;
+      if (shouldSeedLocalData && (value == null || value.trim().isEmpty)) {
+        usageException('--$option is required with --seed.');
+      }
+      if (!shouldSeedLocalData && value != null) {
+        usageException('--$option requires --seed.');
+      }
+      if (value != null) job[option] = value.trim();
+    }
+    if (shouldSeedLocalData) {
+      if (!RegExp(
+        r'^[A-Za-z0-9][A-Za-z0-9-]*/[A-Za-z0-9_.-]+$',
+      ).hasMatch(job['seed-repository']!)) {
+        usageException('--seed-repository must be owner/repo.');
+      }
+      if (!RegExp(r'^[a-fA-F0-9]{40}$').hasMatch(job['seed-sha']!)) {
+        usageException('--seed-sha must be a full 40-character commit SHA.');
+      }
+      if (!RegExp(
+        r'^[A-Za-z0-9_-][A-Za-z0-9_.-]*\.dart$',
+      ).hasMatch(job['seed-workflow']!)) {
+        usageException(
+          '--seed-workflow must be a Dart filename inside genuine_ci/.',
+        );
+      }
+      final installationId = int.tryParse(job['seed-installation-id']!);
+      if (!RegExp(r'^[1-9][0-9]*$').hasMatch(job['seed-installation-id']!) ||
+          installationId == null ||
+          installationId <= 0 ||
+          installationId == 12345678) {
+        usageException(
+          '--seed-installation-id must be a real positive installation ID.',
+        );
+      }
+    }
     _logger.stdout(t.dev.start.starting);
 
     final projectRoot = _projectRootFinder();
@@ -85,9 +139,16 @@ class DevStartCommand extends Command<int> {
       return 1;
     }
 
-    final shouldSeedLocalData = argResults?['seed'] as bool? ?? false;
     if (shouldSeedLocalData) {
-      final didSeedLocalData = await _localDataSeeder(_logger);
+      final didSeedLocalData = await _localDataSeeder(_logger, {
+        'owner': job['seed-repository']!.split('/').first,
+        'repo': job['seed-repository']!.split('/').last,
+        'commitSha': job['seed-sha']!,
+        'workflowFileName': job['seed-workflow']!,
+        'workflowName': job['seed-workflow']!,
+        'installationId': job['seed-installation-id']!,
+        'branch': job['seed-branch']!,
+      });
       if (!didSeedLocalData) {
         return 1;
       }

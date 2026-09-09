@@ -20,6 +20,15 @@ class _RecordingLogger implements Logger {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+const seedArgs = [
+  '--seed',
+  '--seed-repository=example/project',
+  '--seed-sha=0123456789012345678901234567890123456789',
+  '--seed-workflow=smoke.dart',
+  '--seed-installation-id=42',
+  '--seed-branch=develop',
+];
+
 void main() {
   late Directory originalDirectory;
   late Directory tempDirectory;
@@ -51,7 +60,16 @@ void main() {
           tartBaseImageChecker: (_) async => true,
           dockerComposeStarter: (_, _) async => true,
           orchardContextSetup: (_) async => true,
-          localDataSeeder: (_) async {
+          localDataSeeder: (_, job) async {
+            expect(job, {
+              'owner': 'example',
+              'repo': 'project',
+              'commitSha': '0123456789012345678901234567890123456789',
+              'workflowFileName': 'smoke.dart',
+              'workflowName': 'smoke.dart',
+              'installationId': '42',
+              'branch': 'develop',
+            });
             onSeed();
             return seedSucceeds;
           },
@@ -59,7 +77,48 @@ void main() {
         ),
       );
 
-    return runner.run(['start', if (shouldSeed) '--seed']);
+    return runner.run(['start', if (shouldSeed) ...seedArgs]);
+  }
+
+  for (final args in [
+    ['--seed'],
+    for (var i = 1; i < seedArgs.length; i++)
+      [...seedArgs.take(i), ...seedArgs.skip(i + 1)],
+    ['--seed-repository=example/project'],
+    for (final invalid in [
+      '--seed-repository=invalid',
+      '--seed-repository=../project',
+      '--seed-sha=main',
+      '--seed-workflow=../smoke.dart',
+      '--seed-workflow=ci.yml',
+      '--seed-installation-id=0',
+      '--seed-installation-id=abc',
+      '--seed-installation-id=0x2a',
+      '--seed-installation-id=-1',
+      '--seed-installation-id=999999999999999999999999',
+      '--seed-installation-id=12345678',
+      '--seed-branch= ',
+    ])
+      [
+        ...seedArgs.where(
+          (arg) => arg.split('=').first != invalid.split('=').first,
+        ),
+        invalid,
+      ],
+  ]) {
+    test('rejects invalid seed arguments before setup: $args', () async {
+      final runner = CommandRunner<int>('genuineci', 'CLI')
+        ..addCommand(
+          DevStartCommand(
+            logger: _RecordingLogger(),
+            projectRootFinder: () => fail('Must validate before setup'),
+          ),
+        );
+      await expectLater(
+        runner.run(['start', ...args]),
+        throwsA(isA<UsageException>()),
+      );
+    });
   }
 
   test('reports projectRootNotFound before checking Tart', () async {
@@ -137,7 +196,7 @@ void main() {
             tartBaseImageChecker: (_) async => recordStep('tart'),
             dockerComposeStarter: (_, _) async => recordStep('compose'),
             orchardContextSetup: (_) async => recordStep('context'),
-            localDataSeeder: (_) async => recordStep('seed'),
+            localDataSeeder: (_, _) async => recordStep('seed'),
             orchardWorkerStarter: (workerLogger) async {
               expect(workerLogger, same(logger));
               calls.add('worker');
@@ -146,7 +205,7 @@ void main() {
           ),
         );
 
-      expect(await runner.run(['start', if (shouldSeed) '--seed']), 17);
+      expect(await runner.run(['start', if (shouldSeed) ...seedArgs]), 17);
       expect(calls, [
         'tart',
         'compose',
