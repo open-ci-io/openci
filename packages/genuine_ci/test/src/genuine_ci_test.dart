@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:genuine_ci/genuine_ci.dart';
@@ -21,6 +22,138 @@ void main() {
         genuineCI.resolveWorkingDirectory('apps/dashboard'),
         '$workspacePath${Platform.pathSeparator}apps/dashboard',
       );
+    });
+  });
+
+  group('GenuineCI.placeFileFromBase64', () {
+    late Directory workspace;
+    late GenuineCI ci;
+
+    setUp(() async {
+      workspace = await Directory.systemTemp.createTemp(
+        'genuine-ci-place-file-',
+      );
+      ci = GenuineCI.forTesting(
+        workspacePath: workspace.path,
+        currentWorkingDirectory: 'another-directory',
+      );
+    });
+
+    tearDown(() => workspace.delete(recursive: true));
+
+    test(
+      'creates parent directories and restores text relative to the workspace',
+      () async {
+        const content = '// Firebase設定\nconst projectId = "test-project";\n';
+
+        await ci.placeFileFromBase64(
+          path: 'apps/dashboard/lib/firebase_options.dart',
+          base64Content: base64Encode(utf8.encode(content)),
+        );
+
+        expect(
+          await File(
+            '${workspace.path}/apps/dashboard/lib/firebase_options.dart',
+          ).readAsString(),
+          content,
+        );
+        expect(
+          Directory('${workspace.path}/another-directory').existsSync(),
+          isFalse,
+        );
+      },
+    );
+
+    test('preserves binary bytes without decoding them as text', () async {
+      final bytes = List<int>.generate(256, (index) => index);
+
+      await ci.placeFileFromBase64(
+        path: 'signing/certificate.p12',
+        base64Content: base64Encode(bytes),
+      );
+
+      expect(
+        await File('${workspace.path}/signing/certificate.p12').readAsBytes(),
+        bytes,
+      );
+    });
+
+    test(
+      'overwrites an existing file without leaving old trailing bytes',
+      () async {
+        final file = File('${workspace.path}/config.txt');
+        await file.writeAsString(
+          'old content that is longer than the replacement',
+        );
+
+        await ci.placeFileFromBase64(
+          path: 'config.txt',
+          base64Content: base64Encode(utf8.encode('new')),
+        );
+
+        expect(await file.readAsString(), 'new');
+      },
+    );
+
+    test('accepts empty Base64 as an empty file', () async {
+      await ci.placeFileFromBase64(path: 'empty.txt', base64Content: '');
+
+      expect(await File('${workspace.path}/empty.txt').readAsBytes(), isEmpty);
+    });
+
+    for (final fileExists in [false, true]) {
+      test(
+        'invalid Base64 preserves the filesystem (existing file: $fileExists)',
+        () async {
+          final file = File('${workspace.path}/config/private.txt');
+          if (fileExists) {
+            await file.parent.create();
+            await file.writeAsString('previous content');
+          }
+
+          await expectLater(
+            ci.placeFileFromBase64(
+              path: 'config/private.txt',
+              base64Content: 'private-base64-content!!!',
+            ),
+            throwsA(
+              isA<FormatException>()
+                  .having(
+                    (error) => error.message,
+                    'message',
+                    'Invalid Base64 content.',
+                  )
+                  .having((error) => error.source, 'source', isNull)
+                  .having(
+                    (error) => error.toString(),
+                    'diagnostic',
+                    isNot(contains('private-base64-content')),
+                  ),
+            ),
+          );
+
+          if (fileExists) {
+            expect(await file.readAsString(), 'previous content');
+          } else {
+            expect(await file.parent.exists(), isFalse);
+          }
+        },
+      );
+    }
+
+    test('propagates filesystem errors when a parent path is a file', () async {
+      final parentFile = File('${workspace.path}/blocked');
+      await parentFile.writeAsString('keep');
+
+      await expectLater(
+        ci.placeFileFromBase64(
+          path: 'blocked/config.txt',
+          base64Content: base64Encode(utf8.encode('new')),
+        ),
+        throwsA(isA<FileSystemException>()),
+      );
+
+      expect(await parentFile.readAsString(), 'keep');
     });
   });
 
