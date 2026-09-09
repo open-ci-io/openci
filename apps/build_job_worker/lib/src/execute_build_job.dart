@@ -17,11 +17,6 @@ import 'orchard/prepare_vm.dart';
 import 'resolve_github_installation_token.dart';
 import 'run_workflow.dart';
 
-/// Executes one claimed job and attempts all completion and VM cleanup steps.
-///
-/// The returned status describes execution, even if saving it or cleanup fails.
-/// [onError] reports execution, log, completion and cleanup errors and must not
-/// throw. The caller owns the clients and closes them after all jobs finish.
 Future<BuildJobStatus> executeBuildJob({
   required OpenCiApiService api,
   required OrchardApiClient orchardApi,
