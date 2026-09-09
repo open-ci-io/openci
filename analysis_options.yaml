@@ -2,6 +2,7 @@ analyzer:
   errors:
     file_names: ignore
   exclude:
+    - "build/**"
     - "**/*.g.dart"
     - "**/*.freezed.dart"
 
