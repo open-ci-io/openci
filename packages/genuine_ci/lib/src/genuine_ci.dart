@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:meta/meta.dart';
@@ -55,6 +56,21 @@ class GenuineCI {
       workingDirectory ?? currentWorkingDirectory,
     );
     await runCommand(command, workingDirectory: cwd);
+  }
+
+  Future<void> placeFileFromBase64({
+    required String path,
+    required String base64Content,
+  }) async {
+    final List<int> bytes;
+    try {
+      bytes = base64Decode(base64Content);
+    } on FormatException {
+      throw const FormatException('Invalid Base64 content.');
+    }
+    final file = File(resolveWorkingDirectory(path));
+    await file.parent.create(recursive: true);
+    await file.writeAsBytes(bytes, flush: true);
   }
 
   @visibleForTesting
