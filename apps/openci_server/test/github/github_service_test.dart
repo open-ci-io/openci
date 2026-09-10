@@ -395,6 +395,41 @@ void main() {
         },
       );
 
+      test('uses the default HTTP client when none is supplied', () async {
+        final requests = <http.Request>[];
+        const content = '// 日本語のワークフロー\nvoid main() {}\n';
+
+        final result = await http.runWithClient(
+          () => GitHubService.fetchWorkflowContent(
+            owner: 'org',
+            repo: 'mobile',
+            workflowFileName: 'ci.dart',
+            installationIdStr: '98765',
+            token: 'existing-token',
+            commitSha: 'abc123',
+            environment: {},
+          ),
+          () => MockClient((request) async {
+            requests.add(request);
+            return _jsonResponse({
+              'content': base64Encode(utf8.encode(content)),
+              'encoding': 'base64',
+            });
+          }),
+        );
+
+        expect(result, content);
+        expect(requests.single.method, 'GET');
+        expect(
+          requests.single.url.toString(),
+          'https://api.github.com/repos/org/mobile/contents/.genuineci/ci.dart?ref=abc123',
+        );
+        expect(
+          requests.single.headers['authorization'],
+          'Bearer existing-token',
+        );
+      });
+
       for (final fileName in ['ci.dart', 'secrets.g.dart']) {
         test('reads legacy $fileName when .genuineci is absent', () async {
           final requests = <http.Request>[];
