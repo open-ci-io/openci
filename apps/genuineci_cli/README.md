@@ -1,5 +1,10 @@
 GenuineCI command-line tools.
 
+Store Dart CI workflows and generated files in `.genuineci/` at the repository
+root. For a Dart workspace, list `.genuineci` in the root `pubspec.yaml` workspace.
+The server and worker prefer `.genuineci/`, and can still read `genuine_ci/` when
+the new directory is absent so builds pinned to older commits keep working.
+
 Run `genuineci dev start` from the OpenCI checkout to start local services and the
 Mac Orchard worker. The existing Docker Compose credentials and `base-macos` VM
 must be configured first.
@@ -45,8 +50,8 @@ genuineci sync secrets
 ```
 
 The command uses the active credential profile and finds the nearest ancestor
-containing a `genuine_ci` directory, starting from the current directory. It
-replaces `genuine_ci/secrets.g.dart` with getters that read environment variables
+containing a `.genuineci` directory, starting from the current directory. It
+replaces `.genuineci/secrets.g.dart` with getters that read environment variables
 at workflow runtime. Secret values are never downloaded or written to this file.
 Run it again after adding or removing secrets. Fetch or generation failures leave
 the existing file unchanged.
@@ -59,7 +64,7 @@ genuineci sync paths
 
 Run this from your workflow project or one of its subdirectories. The command
 reads the `workspace` list in the root `pubspec.yaml` and each listed package's
-`name`, then writes `genuine_ci/paths.g.dart` following the directory hierarchy.
+`name`, then writes `.genuineci/paths.g.dart` following the directory hierarchy.
 For example, `apps/build_job_worker` becomes
 `WorkspacePaths.root.apps.buildJobWorker`. Directory names determine the getters;
 package names are used to validate the workspace. Run it again after adding,

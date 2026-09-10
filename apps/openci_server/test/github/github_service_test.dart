@@ -356,7 +356,7 @@ void main() {
 
     group('fetchWorkflowContent', () {
       test(
-        'fetches Dart from genuine_ci at the commit using an existing token',
+        'fetches Dart from .genuineci at the commit using an existing token',
         () async {
           final requests = <http.Request>[];
           const content = '// 日本語のワークフロー\nvoid main() {}\n';
@@ -386,7 +386,7 @@ void main() {
           expect(requests.single.method, 'GET');
           expect(
             requests.single.url.toString(),
-            'https://api.github.com/repos/org/mobile/contents/genuine_ci/ci.dart?ref=abc123',
+            'https://api.github.com/repos/org/mobile/contents/.genuineci/ci.dart?ref=abc123',
           );
           expect(
             requests.single.headers['authorization'],
@@ -394,6 +394,108 @@ void main() {
           );
         },
       );
+
+      test('uses the default HTTP client when none is supplied', () async {
+        final requests = <http.Request>[];
+        const content = '// 日本語のワークフロー\nvoid main() {}\n';
+
+        final result = await http.runWithClient(
+          () => GitHubService.fetchWorkflowContent(
+            owner: 'org',
+            repo: 'mobile',
+            workflowFileName: 'ci.dart',
+            installationIdStr: '98765',
+            token: 'existing-token',
+            commitSha: 'abc123',
+            environment: {},
+          ),
+          () => MockClient((request) async {
+            requests.add(request);
+            return _jsonResponse({
+              'content': base64Encode(utf8.encode(content)),
+              'encoding': 'base64',
+            });
+          }),
+        );
+
+        expect(result, content);
+        expect(requests.single.method, 'GET');
+        expect(
+          requests.single.url.toString(),
+          'https://api.github.com/repos/org/mobile/contents/.genuineci/ci.dart?ref=abc123',
+        );
+        expect(
+          requests.single.headers['authorization'],
+          'Bearer existing-token',
+        );
+      });
+
+      for (final fileName in ['ci.dart', 'secrets.g.dart']) {
+        test('reads legacy $fileName when .genuineci is absent', () async {
+          final requests = <http.Request>[];
+          final client = apiClient((request) {
+            requests.add(request);
+            if (request.url.path.endsWith('/genuine_ci/$fileName')) {
+              return _jsonResponse({'content': 'legacy', 'encoding': 'utf-8'});
+            }
+            return http.Response('Not Found', 404);
+          });
+
+          expect(
+            await GitHubService.fetchWorkflowContent(
+              owner: 'org',
+              repo: 'mobile',
+              workflowFileName: fileName,
+              installationIdStr: '98765',
+              commitSha: 'old-commit',
+              environment: testEnv,
+              client: client,
+            ),
+            'legacy',
+          );
+          expect(requests.map((request) => request.url.path), [
+            '/repos/org/mobile/contents/.genuineci/$fileName',
+            '/repos/org/mobile/contents/.genuineci',
+            '/repos/org/mobile/contents/genuine_ci/$fileName',
+          ]);
+          for (final request in requests) {
+            expect(request.url.queryParameters, {'ref': 'old-commit'});
+          }
+        });
+      }
+
+      for (final directoryStatus in [200, 403]) {
+        test(
+          'does not read legacy files when .genuineci returns $directoryStatus',
+          () async {
+            final client = apiClient((request) {
+              if (request.url.path.endsWith('/.genuineci/ci.dart')) {
+                return http.Response('Not Found', 404);
+              }
+              expect(request.url.path, '/repos/org/mobile/contents/.genuineci');
+              return _jsonResponse([], statusCode: directoryStatus);
+            });
+
+            await expectLater(
+              GitHubService.fetchWorkflowContent(
+                owner: 'org',
+                repo: 'mobile',
+                workflowFileName: 'ci.dart',
+                installationIdStr: '98765',
+                environment: testEnv,
+                client: client,
+              ),
+              throwsA(
+                isA<HttpException>().having(
+                  (error) => error.message,
+                  'message',
+                  contains(directoryStatus == 200 ? '404' : '403'),
+                ),
+              ),
+            );
+          },
+        );
+      }
 
       test('fetches YAML from .openci and encodes the branch ref', () async {
         final requests = <http.Request>[];
@@ -513,24 +615,24 @@ void main() {
         () async {
           final requests = <http.Request>[];
           const sources = {
-            'genuine_ci/ci.dart': '// ビルド\nvoid main() {}\n',
-            'genuine_ci/secrets.g.dart': 'const secretName = "API_TOKEN";\n',
+            '.genuineci/ci.dart': '// ビルド\nvoid main() {}\n',
+            '.genuineci/secrets.g.dart': 'const secretName = "API_TOKEN";\n',
           };
           final client = apiClient((request) {
             requests.add(request);
-            if (request.url.path.endsWith('/contents/genuine_ci')) {
+            if (request.url.path.endsWith('/contents/.genuineci')) {
               return _jsonResponse([
                 for (final path in sources.keys)
                   {'type': 'file', 'name': path.split('/').last, 'path': path},
                 {
                   'type': 'file',
                   'name': 'README.md',
-                  'path': 'genuine_ci/README.md',
+                  'path': '.genuineci/README.md',
                 },
                 {
                   'type': 'dir',
                   'name': 'helpers',
-                  'path': 'genuine_ci/helpers',
+                  'path': '.genuineci/helpers',
                 },
               ]);
             }
@@ -553,9 +655,9 @@ void main() {
           expect(files.map((file) => file.name), ['ci.dart', 'secrets.g.dart']);
           expect({for (final file in files) file.path: file.content}, sources);
           expect(requests.map((request) => request.url.path), [
-            '/repos/org/mobile/contents/genuine_ci',
-            '/repos/org/mobile/contents/genuine_ci/ci.dart',
-            '/repos/org/mobile/contents/genuine_ci/secrets.g.dart',
+            '/repos/org/mobile/contents/.genuineci',
+            '/repos/org/mobile/contents/.genuineci/ci.dart',
+            '/repos/org/mobile/contents/.genuineci/secrets.g.dart',
           ]);
           for (final request in requests) {
             expect(request.method, 'GET');
@@ -568,7 +670,74 @@ void main() {
         },
       );
 
-      test('returns no files if genuine_ci does not exist', () async {
+      test(
+        'loads old commits from genuine_ci when .genuineci is absent',
+        () async {
+          final requests = <http.Request>[];
+          final client = apiClient((request) {
+            requests.add(request);
+            final path = request.url.path.split('/contents/').last;
+            return switch (path) {
+              '.genuineci' => _jsonResponse({
+                'message': 'Not Found',
+              }, statusCode: 404),
+              'genuine_ci' => _jsonResponse([
+                {
+                  'type': 'file',
+                  'name': 'ci.dart',
+                  'path': 'genuine_ci/ci.dart',
+                },
+              ]),
+              'genuine_ci/ci.dart' => _jsonResponse({
+                'type': 'file',
+                'content': base64Encode(utf8.encode('void main() {}')),
+              }),
+              _ => fail('Unexpected GitHub path: $path'),
+            };
+          });
+
+          final files = await GitHubService.fetchGenuineCiFiles(
+            owner: 'org',
+            repo: 'mobile',
+            commitSha: 'old-commit',
+            installationIdStr: '98765',
+            environment: testEnv,
+            client: client,
+          );
+
+          expect(files.single.path, 'genuine_ci/ci.dart');
+          expect(files.single.content, 'void main() {}');
+          expect(requests.map((request) => request.url.path), [
+            '/repos/org/mobile/contents/.genuineci',
+            '/repos/org/mobile/contents/genuine_ci',
+            '/repos/org/mobile/contents/genuine_ci/ci.dart',
+          ]);
+          for (final request in requests) {
+            expect(request.url.queryParameters, {'ref': 'old-commit'});
+          }
+        },
+      );
+
+      test('does not fall back when .genuineci exists but is empty', () async {
+        final client = apiClient((request) {
+          expect(request.url.path, '/repos/org/mobile/contents/.genuineci');
+          return _jsonResponse([]);
+        });
+
+        expect(
+          await GitHubService.fetchGenuineCiFiles(
+            owner: 'org',
+            repo: 'mobile',
+            commitSha: 'abc123',
+            installationIdStr: '98765',
+            environment: testEnv,
+            client: client,
+          ),
+          isEmpty,
+        );
+      });
+
+      test('returns no files if neither workflow directory exists', () async {
         final client = apiClient(
           (_) => _jsonResponse({'message': 'Not Found'}, statusCode: 404),
         );
