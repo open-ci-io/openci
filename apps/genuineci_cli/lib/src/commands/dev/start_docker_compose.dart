@@ -60,7 +60,10 @@ Future<bool> startDockerCompose(
   };
   logger.stdout('\n$message');
 
-  final composeEnvironment = environment ?? Platform.environment;
+  final composeEnvironment = {
+    ...(environment ?? Platform.environment),
+    'ENABLE_INTERNAL_API': 'true',
+  };
 
   try {
     final exitCode = await processRunner(

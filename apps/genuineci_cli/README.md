@@ -9,6 +9,9 @@ it stops the old build-job-worker and waits for all running jobs to finish while
 the server remains available for saving results and deleting their VMs. It then
 rebuilds and starts the application containers.
 
+The `/internal` seed and cleanup API is disabled by default. `genuineci dev start`
+automatically enables it by passing `ENABLE_INTERNAL_API=true` to Docker Compose.
+
 To also queue the default smoke-test build job:
 
 ```sh
