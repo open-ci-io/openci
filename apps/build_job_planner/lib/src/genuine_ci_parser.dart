@@ -32,7 +32,7 @@ class ParsedCiTrigger {
     final expectedEventType = switch (type) {
       'push' => 'push',
       'pullRequest' => 'pull_request',
-      _ => type,
+      _ => null,
     };
 
     if (eventType != expectedEventType) {

@@ -146,6 +146,36 @@ void main() {
       });
     }
 
+    test('parses constant trigger constructors with an import prefix', () {
+      final workflow = parseGenuineCiWorkflow('''
+import 'package:genuine_ci/genuine_ci.dart' show GenuineCI;
+import 'package:genuine_ci/genuine_ci.dart' as ci;
+
+Future<void> main() async {
+  await GenuineCI.init(
+    workflowName: 'CI',
+    ciTriggers: [
+      const ci.CiTrigger.pullRequest(branch: 'develop'),
+      const ci.CiTrigger.push(branch: 'release/*'),
+    ],
+  );
+}
+''', 'ci.dart');
+
+      expect(workflow, isNotNull);
+      expect(workflow!.ciTriggers, hasLength(2));
+      expect(
+        workflow.matches(eventType: 'pull_request', branch: 'develop'),
+        isTrue,
+      );
+      expect(workflow.matches(eventType: 'push', branch: 'release/v1'), isTrue);
+      expect(workflow.matches(eventType: 'push', branch: 'develop'), isFalse);
+      expect(
+        workflow.matches(eventType: 'pull_request', branch: 'release/v1'),
+        isFalse,
+      );
+    });
+
     test('an empty trigger list never matches an event', () {
       final workflow = parseGenuineCiWorkflow('''
 void main() {
@@ -164,6 +194,21 @@ void main() {
   });
 
   group('ParsedWorkflow.matches', () {
+    for (final triggerType in ['workflow_dispatch', 'pull_request']) {
+      test('does not match unsupported trigger types: $triggerType', () {
+        final workflow = ParsedWorkflow(
+          workflowFileName: 'ci.dart',
+          workflowName: 'CI',
+          ciTriggers: [ParsedCiTrigger(type: triggerType, branch: '*')],
+        );
+
+        expect(
+          workflow.matches(eventType: triggerType, branch: 'main'),
+          isFalse,
+        );
+      });
+    }
+
     test('treats regex punctuation in branch patterns literally', () {
       const workflow = ParsedWorkflow(
         workflowFileName: 'ci.dart',
