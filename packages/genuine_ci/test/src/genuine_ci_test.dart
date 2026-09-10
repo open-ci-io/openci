@@ -167,10 +167,28 @@ void main() {
   });
 
   group('GenuineCI.init', () {
+    test('retains all configured triggers as an immutable snapshot', () async {
+      final triggers = [
+        const CiTrigger.pullRequest(branch: 'develop'),
+        const CiTrigger.push(branch: 'develop'),
+      ];
+      final ci = await GenuineCI.init(
+        workflowName: 'Dashboard CI',
+        ciTriggers: triggers,
+      );
+      triggers.clear();
+
+      expect(ci.ciTriggers, const [
+        CiTrigger.pullRequest(branch: 'develop'),
+        CiTrigger.push(branch: 'develop'),
+      ]);
+      expect(() => ci.ciTriggers.clear(), throwsUnsupportedError);
+    });
+
     test('initializes with default current directory as workspace', () async {
       final ci = await GenuineCI.init(
         workflowName: 'Test Workflow',
-        ciTrigger: const CiTrigger.push(branch: 'main'),
+        ciTriggers: const [CiTrigger.push(branch: 'main')],
       );
 
       expect(ci.workflowName, 'Test Workflow');
@@ -181,7 +199,7 @@ void main() {
       final customPath = '${Directory.systemTemp.path}/custom_workspace';
       final ci = await GenuineCI.init(
         workflowName: 'Test Workflow',
-        ciTrigger: const CiTrigger.push(branch: 'main'),
+        ciTriggers: const [CiTrigger.push(branch: 'main')],
         workspacePath: customPath,
       );
 

@@ -11,7 +11,7 @@ import 'workspace_directory.dart';
 class GenuineCI {
   GenuineCI._({
     required this.workflowName,
-    required this.ciTrigger,
+    required this.ciTriggers,
     required this.machine,
     this.currentWorkingDirectory,
     required this.workspacePath,
@@ -22,18 +22,20 @@ class GenuineCI {
     required this.workspacePath,
     this.currentWorkingDirectory,
   }) : workflowName = 'test',
-       ciTrigger = const CiTrigger.push(branch: 'test'),
+       ciTriggers = const [CiTrigger.push(branch: 'test')],
        machine = MachineType.macOsLatest;
 
   final String workflowName;
-  final CiTrigger ciTrigger;
+
+  /// Events that can start this workflow. Any matching trigger schedules a run.
+  final List<CiTrigger> ciTriggers;
   final MachineType machine;
   final String? currentWorkingDirectory;
   final String workspacePath;
 
   static Future<GenuineCI> init({
     required String workflowName,
-    required CiTrigger ciTrigger,
+    required List<CiTrigger> ciTriggers,
     MachineType machine = MachineType.macOsLatest,
     String? currentWorkingDirectory,
     String? workspacePath,
@@ -42,7 +44,7 @@ class GenuineCI {
 
     return GenuineCI._(
       workflowName: workflowName,
-      ciTrigger: ciTrigger,
+      ciTriggers: List.unmodifiable(ciTriggers),
       machine: machine,
       currentWorkingDirectory: currentWorkingDirectory,
       workspacePath: workspace,

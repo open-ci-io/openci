@@ -6,7 +6,10 @@ import 'secrets.g.dart';
 Future<void> main() async {
   final genuineCI = await GenuineCI.init(
     workflowName: 'Dashboard CI',
-    ciTrigger: CiTrigger.pullRequest(branch: 'develop'),
+    ciTriggers: [
+      CiTrigger.pullRequest(branch: 'develop'),
+      CiTrigger.push(branch: 'develop'),
+    ],
   );
 
   await genuineCI.placeFileFromBase64(

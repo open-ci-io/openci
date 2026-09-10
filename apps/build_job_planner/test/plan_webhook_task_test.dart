@@ -71,6 +71,65 @@ void main() {
       });
     });
 
+    for (final eventType in ['push', 'pull_request']) {
+      for (final branch in ['develop', 'main']) {
+        test(
+          'matches multiple triggers for $eventType targeting $branch',
+          () async {
+            _stubWorkflow(api, team, _multiTriggerWorkflowSource);
+            final task = eventType == 'push'
+                ? _pushTask(branch: branch)
+                : _pullRequestTask(
+                    baseBranch: branch,
+                    headBranch: branch == 'develop' ? 'feature/ci' : 'develop',
+                  );
+
+            final plans = await planWebhookTask(task: task, api: api);
+
+            expect(plans, hasLength(branch == 'develop' ? 1 : 0));
+            if (plans.isNotEmpty) {
+              expect(plans.single.workflowName, 'Dashboard CI');
+              expect(plans.single.workflowFileName, 'dashboard_ci.dart');
+              expect(plans.single.commitSha, 'abc123');
+              expect(
+                plans.single.branch,
+                eventType == 'push' ? 'develop' : 'feature/ci',
+              );
+              expect(
+                plans.single.pullRequestNumber,
+                eventType == 'push' ? null : 42,
+              );
+            }
+          },
+        );
+      }
+    }
+
+    test(
+      'creates only one plan when multiple triggers match the event',
+      () async {
+        _stubWorkflow(api, team, '''
+Future<void> main() async {
+  await GenuineCI.init(
+    workflowName: 'CI',
+    ciTriggers: [
+      CiTrigger.push(branch: '*'),
+      CiTrigger.push(branch: 'develop'),
+      CiTrigger.push(branch: 'develop'),
+    ],
+  );
+}
+''');
+
+        final plans = await planWebhookTask(
+          task: _pushTask(branch: 'develop'),
+          api: api,
+        );
+
+        expect(plans, hasLength(1));
+      },
+    );
+
     test(
       'returns no plans for a deleted branch without calling APIs',
       () async {
@@ -170,10 +229,55 @@ void main() {
   });
 }
 
-WebhookTask _pushTask({bool deleted = false}) {
+void _stubWorkflow(OpenCiApiService api, Team team, String source) {
+  when(
+    () => api.getTeamByInstallationId(998877),
+  ).thenAnswer((_) async => createMockResponse(team));
+  when(
+    () => api.fetchGenuineCiFiles(
+      'team-1',
+      'openci',
+      'abc123',
+      owner: 'openci-org',
+      installationId: 998877,
+    ),
+  ).thenAnswer(
+    (_) async => createMockResponse([
+      {
+        'name': 'dashboard_ci.dart',
+        'path': 'genuine_ci/dashboard_ci.dart',
+        'content': source,
+      },
+    ]),
+  );
+}
+
+WebhookTask _pullRequestTask({
+  required String baseBranch,
+  required String headBranch,
+}) {
+  return _task(
+    eventType: 'pull_request',
+    payload: jsonEncode({
+      'number': 42,
+      'pull_request': {
+        'head': {'sha': 'abc123', 'ref': headBranch},
+        'base': {'ref': baseBranch},
+        'title': 'feat: multiple triggers',
+      },
+      'repository': {
+        'name': 'openci',
+        'owner': {'login': 'openci-org'},
+      },
+      'installation': {'id': 998877},
+    }),
+  );
+}
+
+WebhookTask _pushTask({bool deleted = false, String branch = 'main'}) {
   return _task(
     payload: jsonEncode({
-      'ref': 'refs/heads/main',
+      'ref': 'refs/heads/$branch',
       'head_commit': {'id': 'abc123', 'message': 'feat: planner\n\ndetails'},
       'repository': {
         'name': 'openci',
@@ -185,11 +289,11 @@ WebhookTask _pushTask({bool deleted = false}) {
   );
 }
 
-WebhookTask _task({required String payload}) {
+WebhookTask _task({required String payload, String eventType = 'push'}) {
   return WebhookTask(
     id: 'task-1',
     deliveryId: 'delivery-1',
-    eventType: 'push',
+    eventType: eventType,
     payload: payload,
     status: 'processing',
     createdAt: DateTime.utc(2026),
@@ -202,7 +306,19 @@ String _workflowSource({required String branch}) =>
 Future<void> main() async {
   await GenuineCI.init(
     workflowName: 'CI',
-    ciTrigger: CiTrigger.push(branch: '$branch'),
+    ciTriggers: [CiTrigger.push(branch: '$branch')],
+  );
+}
+''';
+
+const _multiTriggerWorkflowSource = '''
+Future<void> main() async {
+  await GenuineCI.init(
+    workflowName: 'Dashboard CI',
+    ciTriggers: [
+      CiTrigger.pullRequest(branch: 'develop'),
+      CiTrigger.push(branch: 'develop'),
+    ],
   );
 }
 ''';

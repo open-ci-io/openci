@@ -12,5 +12,3 @@ abstract class CiTrigger with _$CiTrigger {
     required String branch,
   }) = _PullRequestCiTrigger;
 }
-
-typedef CITrigger = CiTrigger;

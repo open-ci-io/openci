@@ -232,7 +232,7 @@ const _workflowSource = '''
 Future<void> main() async {
   await GenuineCI.init(
     workflowName: 'CI',
-    ciTrigger: CiTrigger.push(branch: 'main'),
+    ciTriggers: [CiTrigger.push(branch: 'main')],
   );
 }
 ''';
