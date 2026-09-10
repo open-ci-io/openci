@@ -31,7 +31,7 @@ void main() {
 
   setUp(() async {
     root = await Directory.systemTemp.createTemp('genuineci-sync-paths-');
-    workflows = await Directory(p.join(root.path, '.genuineci')).create();
+    workflows = await Directory(p.join(root.path, 'genuine_ci')).create();
     pubspec = File(p.join(root.path, 'pubspec.yaml'));
     await pubspec.writeAsString('workspace: [apps/dashboard]\n');
     final member = File(p.join(root.path, 'apps/dashboard/pubspec.yaml'));
@@ -66,10 +66,6 @@ void main() {
 
   test('creates paths from a nested directory without login', () async {
     await output.delete();
-    await pubspec.writeAsString('workspace: [apps/dashboard, .genuineci]\n');
-    await File(
-      p.join(workflows.path, 'pubspec.yaml'),
-    ).writeAsString('name: genuine_ci_workflows\n');
     final nested = await Directory(
       p.join(root.path, 'apps/dashboard/lib/src'),
     ).create(recursive: true);
@@ -83,12 +79,6 @@ void main() {
 
     final source = await output.readAsString();
     expect(source, contains('abstract final class WorkspacePaths'));
-    expect(
-      source,
-      contains(
-        'WorkspaceDirectory get genuineci => const WorkspaceDirectory(".genuineci");',
-      ),
-    );
     expect(
       source,
       contains(

@@ -37,7 +37,7 @@ class SyncPathsCommand extends Command<int> {
       final packages = await readWorkspacePackages(root);
       final paths = await readWorkspaceDirectories(root, packages.values);
       final source = generateWorkspacePaths(paths);
-      final file = File('${root.path}/.genuineci/paths.g.dart');
+      final file = File('${root.path}/genuine_ci/paths.g.dart');
       await file.writeAsStringAtomic(source);
       _logger.stdout(t.sync.paths.saved(path: file.path));
       return 0;

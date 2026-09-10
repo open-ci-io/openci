@@ -131,16 +131,16 @@ extension type const WorkspaceRoot$Apps._(String _path) implements WorkspaceDire
         'apps/dashboard',
         'apps/build_job_worker',
         'packages/genuine_ci',
-        '.genuineci',
+        'genuine_ci',
       ]);
 
       expect(root.path, '.');
-      expect(root.children.keys, ['genuineci', 'apps', 'packages']);
+      expect(root.children.keys, ['apps', 'genuineCi', 'packages']);
       final apps = root.children['apps']!;
       expect(apps.path, 'apps');
       expect(apps.children.keys, ['buildJobWorker', 'dashboard']);
       expect(apps.children['dashboard']!.path, 'apps/dashboard');
-      expect(root.children['genuineci']!.path, '.genuineci');
+      expect(root.children['genuineCi']!.path, 'genuine_ci');
       expect(
         root.children['packages']!.children['genuineCi']!.path,
         'packages/genuine_ci',
@@ -244,7 +244,7 @@ extension type const WorkspaceRoot$Apps._(String _path) implements WorkspaceDire
             'apps/dashboard',
             'apps/build_job_worker',
             'packages/genuine_ci',
-            '.genuineci',
+            'genuine_ci',
             'foo_bar/package',
             'foo/bar/package',
             'length',
@@ -265,7 +265,7 @@ void main() {
     acceptPath(WorkspacePaths.root.apps.dashboard),
     acceptPath(WorkspacePaths.root.apps.buildJobWorker),
     acceptPath(WorkspacePaths.root.packages.genuineCi),
-    acceptPath(WorkspacePaths.root.genuineci),
+    acceptPath(WorkspacePaths.root.genuineCi),
     acceptPath(WorkspacePaths.root.fooBar.package),
     acceptPath(WorkspacePaths.root.foo.bar.package),
     acceptPath(WorkspacePaths.root.length),
@@ -283,7 +283,7 @@ void main() {
           'apps/dashboard',
           'apps/build_job_worker',
           'packages/genuine_ci',
-          '.genuineci',
+          'genuine_ci',
           'foo_bar/package',
           'foo/bar/package',
           'length',

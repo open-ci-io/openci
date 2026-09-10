@@ -19,10 +19,10 @@ void main() {
 
   group('findWorkspaceRoot', () {
     test(
-      'finds the root from the workflow directory and SDK package',
+      'finds the root from a package with the same name as genuine_ci',
       () async {
         final workflows = await Directory(
-          p.join(root.path, '.genuineci'),
+          p.join(root.path, 'genuine_ci'),
         ).create();
         final sdk = await Directory(
           p.join(root.path, 'packages/genuine_ci'),
@@ -39,7 +39,7 @@ void main() {
 
     test('requires both a pubspec and a workflow directory', () async {
       expect(findWorkspaceRoot(root), isNull);
-      await Directory(p.join(root.path, '.genuineci')).create();
+      await Directory(p.join(root.path, 'genuine_ci')).create();
       await pubspec.delete();
 
       expect(findWorkspaceRoot(root), isNull);
@@ -58,16 +58,16 @@ name: example
 workspace:
   - apps/frontend # The directory name differs from the package name.
   - packages/genuine_ci
-  - .genuineci
+  - genuine_ci
 ''');
     await addPackage('apps/frontend', 'name: dashboard\n');
     await addPackage('packages/genuine_ci', "name: 'genuine_ci'\n");
-    await addPackage('.genuineci', 'name: genuine_ci_workflows\n');
+    await addPackage('genuine_ci', 'name: genuine_ci_workflows\n');
 
     expect(await readWorkspacePackages(root), {
       'dashboard': 'apps/frontend',
       'genuine_ci': 'packages/genuine_ci',
-      'genuine_ci_workflows': '.genuineci',
+      'genuine_ci_workflows': 'genuine_ci',
     });
   });
 

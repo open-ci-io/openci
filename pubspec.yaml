@@ -10,7 +10,7 @@ workspace:
   - apps/build_job_worker
   - apps/genuineci_cli
   - apps/openci_server
-  - .genuineci
+  - genuine_ci
   - packages/genuine_ci
   - packages/macos_updater
   - packages/openci_shared

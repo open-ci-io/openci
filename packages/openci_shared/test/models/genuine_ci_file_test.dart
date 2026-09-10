@@ -8,14 +8,14 @@ void main() {
     const source = 'void main() {\n  print("CI: テスト");\n}\n';
     final json = {
       'name': 'ci.dart',
-      'path': '.genuineci/workflows/ci.dart',
+      'path': 'genuine_ci/workflows/ci.dart',
       'content': source,
     };
 
     final file = GenuineCiFile.fromJson(json);
 
     expect(file.name, 'ci.dart');
-    expect(file.path, '.genuineci/workflows/ci.dart');
+    expect(file.path, 'genuine_ci/workflows/ci.dart');
     expect(file.content, source);
     expect(jsonDecode(jsonEncode(file)), json);
   });

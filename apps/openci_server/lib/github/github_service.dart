@@ -402,8 +402,11 @@ jobs:
         ? '?ref=${Uri.encodeComponent(ref)}'
         : '';
     final directory = workflowFileName.endsWith('.dart')
-        ? '.genuineci'
+        ? 'genuine_ci'
         : '.openci';
+    final url =
+        '$githubApiBaseUrlStr/repos/$owner/$repo/contents/$directory/$workflowFileName$query';
+
     final headers = {
       'Authorization': 'Bearer $actualToken',
       'Accept': 'application/vnd.github+json',
@@ -411,27 +414,9 @@ jobs:
       'User-Agent': 'OpenCI-Server',
     };
 
-    Future<http.Response> getContents(String path) {
-      final url = Uri.parse(
-        '$githubApiBaseUrlStr/repos/$owner/$repo/contents/$path$query',
-      );
-      return client != null
-          ? client.get(url, headers: headers)
-          : http.get(url, headers: headers);
-    }
-
-    var response = await getContents('$directory/$workflowFileName');
-    if (directory == '.genuineci' &&
-        response.statusCode == HttpStatus.notFound) {
-      // Older commits, including the pinned smoke fixture, use genuine_ci.
-      // Only fall back when the new directory itself is absent.
-      final directoryResponse = await getContents(directory);
-      if (directoryResponse.statusCode == HttpStatus.notFound) {
-        response = await getContents('genuine_ci/$workflowFileName');
-      } else if (directoryResponse.statusCode != HttpStatus.ok) {
-        response = directoryResponse;
-      }
-    }
+    final response = client != null
+        ? await client.get(Uri.parse(url), headers: headers)
+        : await http.get(Uri.parse(url), headers: headers);
 
     if (response.statusCode != 200) {
       throw HttpException(
@@ -473,7 +458,7 @@ jobs:
       return [
         const GenuineCiFile(
           name: 'dashboard_ci.dart',
-          path: '.genuineci/dashboard_ci.dart',
+          path: 'genuine_ci/dashboard_ci.dart',
           content: '''
 import 'package:genuine_ci/genuine_ci.dart';
 
@@ -520,12 +505,7 @@ Future<void> main() async {
     }
 
     try {
-      late final RepositoryContents contents;
-      try {
-        contents = await getContents('.genuineci');
-      } on NotFound {
-        contents = await getContents('genuine_ci');
-      }
+      final contents = await getContents('genuine_ci');
 
       final files = <GenuineCiFile>[];
       if (contents.isDirectory && contents.tree != null) {

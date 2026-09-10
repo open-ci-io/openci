@@ -97,8 +97,7 @@ HTTP成功・`success: true`・`secretsContent`が文字列であることを確
 API失敗や不正な応答は`StateError`にし、レスポンス本文や元の例外メッセージは含めません。
 返された文字列を`runWorkflow()`の`secretsContent`へ渡します。
 
-`runWorkflow()`は、checkout済みのVMで`flutter pub get`と`flutter pub run .genuineci/<workflowFileName>`を順に実行し、終了コードを返します。
-旧コミットの再実行用に、`.genuineci/`が存在しない場合は`genuine_ci/`を使用します。
+`runWorkflow()`は、checkout済みのVMで`flutter pub get`と`flutter pub run genuine_ci/<workflowFileName>`を順に実行し、終了コードを返します。
 `secretsContent`はAPIと同じ`NAME=value`形式で渡し、secretsがない場合は空文字列を渡します。
 `.env`を権限`600`で上書きし、値をシェルコードとして評価せず環境変数に設定します。値の引用は不要です。
 `vmHomePath`（標準`/Users/admin`）配下の`fvm/default`をFlutterに使い、run・job IDとVM用Loki URLを設定します。

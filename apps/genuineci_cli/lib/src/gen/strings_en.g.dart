@@ -274,14 +274,14 @@ class Translations$sync$paths$en {
 
 	// Translations
 
-	/// en: 'Generate .genuineci/paths.g.dart from the pubspec.yaml workspace.'
-	String get description => 'Generate .genuineci/paths.g.dart from the pubspec.yaml workspace.';
+	/// en: 'Generate genuine_ci/paths.g.dart from the pubspec.yaml workspace.'
+	String get description => 'Generate genuine_ci/paths.g.dart from the pubspec.yaml workspace.';
 
 	/// en: 'sync paths does not accept positional arguments.'
 	String get noArguments => 'sync paths does not accept positional arguments.';
 
-	/// en: 'No project containing pubspec.yaml and a .genuineci directory found. Run this command from your workflow project.'
-	String get projectRootNotFound => 'No project containing pubspec.yaml and a .genuineci directory found. Run this command from your workflow project.';
+	/// en: 'No project containing pubspec.yaml and a genuine_ci directory found. Run this command from your workflow project.'
+	String get projectRootNotFound => 'No project containing pubspec.yaml and a genuine_ci directory found. Run this command from your workflow project.';
 
 	/// en: 'Could not read or write ${path}. Check that the file exists and you have permission to access it.'
 	String fileAccessFailed({required Object path}) => 'Could not read or write ${path}. Check that the file exists and you have permission to access it.';
@@ -298,8 +298,8 @@ class Translations$sync$secrets$en {
 
 	// Translations
 
-	/// en: 'Generate .genuineci/secrets.g.dart from the active team's secret names.'
-	String get description => 'Generate .genuineci/secrets.g.dart from the active team\'s secret names.';
+	/// en: 'Generate genuine_ci/secrets.g.dart from the active team's secret names.'
+	String get description => 'Generate genuine_ci/secrets.g.dart from the active team\'s secret names.';
 
 	/// en: 'sync secrets does not accept positional arguments.'
 	String get noArguments => 'sync secrets does not accept positional arguments.';
@@ -307,8 +307,8 @@ class Translations$sync$secrets$en {
 	/// en: 'Run genuineci login --local before syncing secrets.'
 	String get loginRequired => 'Run genuineci login --local before syncing secrets.';
 
-	/// en: 'No .genuineci directory found. Run this command from your workflow project.'
-	String get workflowDirectoryNotFound => 'No .genuineci directory found. Run this command from your workflow project.';
+	/// en: 'No genuine_ci directory found. Run this command from your workflow project.'
+	String get workflowDirectoryNotFound => 'No genuine_ci directory found. Run this command from your workflow project.';
 
 	/// en: 'Could not fetch secret names (HTTP ${status}).'
 	String requestFailed({required Object status}) => 'Could not fetch secret names (HTTP ${status}).';
@@ -387,15 +387,15 @@ extension on Translations {
 			'dev.start.stepOrchardController' => 'Step 2: Starting Orchard Controller...',
 			'dev.start.stepBuildJobWorkerWaiting' => 'Waiting for the current build job to finish before restarting services...',
 			'sync.description' => 'Sync local workflow definitions with GenuineCI.',
-			'sync.paths.description' => 'Generate .genuineci/paths.g.dart from the pubspec.yaml workspace.',
+			'sync.paths.description' => 'Generate genuine_ci/paths.g.dart from the pubspec.yaml workspace.',
 			'sync.paths.noArguments' => 'sync paths does not accept positional arguments.',
-			'sync.paths.projectRootNotFound' => 'No project containing pubspec.yaml and a .genuineci directory found. Run this command from your workflow project.',
+			'sync.paths.projectRootNotFound' => 'No project containing pubspec.yaml and a genuine_ci directory found. Run this command from your workflow project.',
 			'sync.paths.fileAccessFailed' => ({required Object path}) => 'Could not read or write ${path}. Check that the file exists and you have permission to access it.',
 			'sync.paths.saved' => ({required Object path}) => 'Generated workspace paths: ${path}',
-			'sync.secrets.description' => 'Generate .genuineci/secrets.g.dart from the active team\'s secret names.',
+			'sync.secrets.description' => 'Generate genuine_ci/secrets.g.dart from the active team\'s secret names.',
 			'sync.secrets.noArguments' => 'sync secrets does not accept positional arguments.',
 			'sync.secrets.loginRequired' => 'Run genuineci login --local before syncing secrets.',
-			'sync.secrets.workflowDirectoryNotFound' => 'No .genuineci directory found. Run this command from your workflow project.',
+			'sync.secrets.workflowDirectoryNotFound' => 'No genuine_ci directory found. Run this command from your workflow project.',
 			'sync.secrets.requestFailed' => ({required Object status}) => 'Could not fetch secret names (HTTP ${status}).',
 			'sync.secrets.fetchFailed' => 'Could not fetch secret names. Check the server connection and response.',
 			'sync.secrets.saveFailed' => 'Could not save secrets.g.dart. Check the destination and file permissions.',

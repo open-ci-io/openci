@@ -54,7 +54,6 @@ void main() {
         r'''/workspace ' " $(touch injected) `touch injected`''';
     vmHome = '${temporary.path}/home with spaces';
     await Directory(workspace).create();
-    await Directory('$workspace/.genuineci').create();
     final flutterBin = Directory('$vmHome/fvm/default/bin');
     await flutterBin.create(recursive: true);
     final recorder = File('${temporary.path}/record_flutter.dart');
@@ -144,7 +143,7 @@ void main() {
         expect(recorded[1]['arguments'], [
           'pub',
           'run',
-          '.genuineci/${job.workflowFileName}',
+          'genuine_ci/${job.workflowFileName}',
         ]);
         for (final call in recorded) {
           expect(
@@ -174,36 +173,6 @@ void main() {
         expect(requests, isNotEmpty);
       },
     );
-
-    test(
-      'runs old commits from genuine_ci when .genuineci is absent',
-      () async {
-        await Directory('$workspace/.genuineci').delete();
-        await Directory('$workspace/genuine_ci').create();
-
-        expect(await run(), 0);
-
-        final recorded = await calls();
-        expect(recorded[1]['arguments'], [
-          'pub',
-          'run',
-          'genuine_ci/${job.workflowFileName}',
-        ]);
-      },
-    );
-
-    test('prefers .genuineci when both workflow directories exist', () async {
-      await Directory('$workspace/genuine_ci').create();
-
-      expect(await run(), 0);
-
-      final recorded = await calls();
-      expect(recorded[1]['arguments'], [
-        'pub',
-        'run',
-        '.genuineci/${job.workflowFileName}',
-      ]);
-    });
 
     test('returns a pub get failure without starting the workflow', () async {
       environment['WORKER_TEST_PUB_GET_EXIT'] = '17';
