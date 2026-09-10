@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:genuineci_cli/src/commands/sync/generate_workspace_paths.dart';
+import 'package:genuineci_cli/src/commands/sync/read_workspace_packages.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
@@ -211,8 +211,15 @@ extension type const WorkspaceRoot$Apps._(String _path) implements WorkspaceDire
     late File probe;
     late String packageConfigPath;
 
+    setUpAll(() {
+      packageConfigPath = p.join(
+        findWorkspaceRoot()!.path,
+        '.dart_tool',
+        'package_config.json',
+      );
+    });
+
     setUp(() async {
-      packageConfigPath = (await Isolate.packageConfig)!.toFilePath();
       directory = await Directory.systemTemp.createTemp('genuineci-path-code-');
       definitions = File(p.join(directory.path, 'paths.g.dart'));
       probe = File(p.join(directory.path, 'probe.dart'));
