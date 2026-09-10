@@ -16,16 +16,76 @@ extension type const WorkspaceRoot._(String _path) implements WorkspaceDirectory
 }
 
 extension type const WorkspaceRoot$Apps._(String _path) implements WorkspaceDirectory {
-  WorkspaceDirectory get buildJobPlanner => const WorkspaceDirectory("apps/build_job_planner");
-  WorkspaceDirectory get buildJobWorker => const WorkspaceDirectory("apps/build_job_worker");
-  WorkspaceDirectory get dashboard => const WorkspaceDirectory("apps/dashboard");
-  WorkspaceDirectory get genuineciCli => const WorkspaceDirectory("apps/genuineci_cli");
-  WorkspaceDirectory get openciServer => const WorkspaceDirectory("apps/openci_server");
+  WorkspaceRoot$Apps$BuildJobPlanner get buildJobPlanner => const WorkspaceRoot$Apps$BuildJobPlanner._("apps/build_job_planner");
+  WorkspaceRoot$Apps$BuildJobWorker get buildJobWorker => const WorkspaceRoot$Apps$BuildJobWorker._("apps/build_job_worker");
+  WorkspaceRoot$Apps$Dashboard get dashboard => const WorkspaceRoot$Apps$Dashboard._("apps/dashboard");
+  WorkspaceRoot$Apps$GenuineciCli get genuineciCli => const WorkspaceRoot$Apps$GenuineciCli._("apps/genuineci_cli");
+  WorkspaceRoot$Apps$OpenciServer get openciServer => const WorkspaceRoot$Apps$OpenciServer._("apps/openci_server");
+}
+
+extension type const WorkspaceRoot$Apps$BuildJobPlanner._(String _path) implements WorkspaceDirectory {
+  WorkspaceDirectory get bin => const WorkspaceDirectory("apps/build_job_planner/bin");
+  WorkspaceDirectory get lib => const WorkspaceDirectory("apps/build_job_planner/lib");
+  WorkspaceDirectory get test => const WorkspaceDirectory("apps/build_job_planner/test");
+}
+
+extension type const WorkspaceRoot$Apps$BuildJobWorker._(String _path) implements WorkspaceDirectory {
+  WorkspaceDirectory get bin => const WorkspaceDirectory("apps/build_job_worker/bin");
+  WorkspaceDirectory get integrationTest => const WorkspaceDirectory("apps/build_job_worker/integration_test");
+  WorkspaceDirectory get lib => const WorkspaceDirectory("apps/build_job_worker/lib");
+  WorkspaceDirectory get test => const WorkspaceDirectory("apps/build_job_worker/test");
+}
+
+extension type const WorkspaceRoot$Apps$Dashboard._(String _path) implements WorkspaceDirectory {
+  WorkspaceDirectory get android => const WorkspaceDirectory("apps/dashboard/android");
+  WorkspaceDirectory get assets => const WorkspaceDirectory("apps/dashboard/assets");
+  WorkspaceDirectory get ios => const WorkspaceDirectory("apps/dashboard/ios");
+  WorkspaceDirectory get lib => const WorkspaceDirectory("apps/dashboard/lib");
+  WorkspaceDirectory get macos => const WorkspaceDirectory("apps/dashboard/macos");
+  WorkspaceDirectory get scripts => const WorkspaceDirectory("apps/dashboard/scripts");
+  WorkspaceDirectory get test => const WorkspaceDirectory("apps/dashboard/test");
+  WorkspaceDirectory get web => const WorkspaceDirectory("apps/dashboard/web");
+}
+
+extension type const WorkspaceRoot$Apps$GenuineciCli._(String _path) implements WorkspaceDirectory {
+  WorkspaceDirectory get bin => const WorkspaceDirectory("apps/genuineci_cli/bin");
+  WorkspaceDirectory get lib => const WorkspaceDirectory("apps/genuineci_cli/lib");
+  WorkspaceDirectory get test => const WorkspaceDirectory("apps/genuineci_cli/test");
+}
+
+extension type const WorkspaceRoot$Apps$OpenciServer._(String _path) implements WorkspaceDirectory {
+  WorkspaceDirectory get integrationTest => const WorkspaceDirectory("apps/openci_server/integration_test");
+  WorkspaceDirectory get lib => const WorkspaceDirectory("apps/openci_server/lib");
+  WorkspaceDirectory get routes => const WorkspaceDirectory("apps/openci_server/routes");
+  WorkspaceDirectory get test => const WorkspaceDirectory("apps/openci_server/test");
 }
 
 extension type const WorkspaceRoot$Packages._(String _path) implements WorkspaceDirectory {
-  WorkspaceDirectory get genuineCi => const WorkspaceDirectory("packages/genuine_ci");
-  WorkspaceDirectory get macosUpdater => const WorkspaceDirectory("packages/macos_updater");
-  WorkspaceDirectory get openciShared => const WorkspaceDirectory("packages/openci_shared");
-  WorkspaceDirectory get pubspecVersionHook => const WorkspaceDirectory("packages/pubspec_version_hook");
+  WorkspaceRoot$Packages$GenuineCi get genuineCi => const WorkspaceRoot$Packages$GenuineCi._("packages/genuine_ci");
+  WorkspaceRoot$Packages$MacosUpdater get macosUpdater => const WorkspaceRoot$Packages$MacosUpdater._("packages/macos_updater");
+  WorkspaceRoot$Packages$OpenciShared get openciShared => const WorkspaceRoot$Packages$OpenciShared._("packages/openci_shared");
+  WorkspaceRoot$Packages$PubspecVersionHook get pubspecVersionHook => const WorkspaceRoot$Packages$PubspecVersionHook._("packages/pubspec_version_hook");
+}
+
+extension type const WorkspaceRoot$Packages$GenuineCi._(String _path) implements WorkspaceDirectory {
+  WorkspaceDirectory get lib => const WorkspaceDirectory("packages/genuine_ci/lib");
+  WorkspaceDirectory get test => const WorkspaceDirectory("packages/genuine_ci/test");
+}
+
+extension type const WorkspaceRoot$Packages$MacosUpdater._(String _path) implements WorkspaceDirectory {
+  WorkspaceDirectory get example => const WorkspaceDirectory("packages/macos_updater/example");
+  WorkspaceDirectory get lib => const WorkspaceDirectory("packages/macos_updater/lib");
+  WorkspaceDirectory get macos => const WorkspaceDirectory("packages/macos_updater/macos");
+  WorkspaceDirectory get pigeons => const WorkspaceDirectory("packages/macos_updater/pigeons");
+  WorkspaceDirectory get test => const WorkspaceDirectory("packages/macos_updater/test");
+}
+
+extension type const WorkspaceRoot$Packages$OpenciShared._(String _path) implements WorkspaceDirectory {
+  WorkspaceDirectory get lib => const WorkspaceDirectory("packages/openci_shared/lib");
+  WorkspaceDirectory get test => const WorkspaceDirectory("packages/openci_shared/test");
+}
+
+extension type const WorkspaceRoot$Packages$PubspecVersionHook._(String _path) implements WorkspaceDirectory {
+  WorkspaceDirectory get lib => const WorkspaceDirectory("packages/pubspec_version_hook/lib");
+  WorkspaceDirectory get test => const WorkspaceDirectory("packages/pubspec_version_hook/test");
 }
