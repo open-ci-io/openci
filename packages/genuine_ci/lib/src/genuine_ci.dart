@@ -6,6 +6,7 @@ import 'package:meta/meta.dart';
 import 'ci_trigger.dart';
 import 'command_runner.dart';
 import 'machine_type.dart';
+import 'workspace_directory.dart';
 
 class GenuineCI {
   GenuineCI._({
@@ -59,7 +60,8 @@ class GenuineCI {
   }
 
   Future<void> placeFileFromBase64({
-    required String path,
+    required WorkspaceDirectory dir,
+    required String fileName,
     required String base64Content,
   }) async {
     final List<int> bytes;
@@ -68,7 +70,9 @@ class GenuineCI {
     } on FormatException {
       throw const FormatException('Invalid Base64 content.');
     }
-    final file = File(resolveWorkingDirectory(path));
+    final file = File(
+      '${resolveWorkingDirectory(dir)}${Platform.pathSeparator}$fileName',
+    );
     await file.parent.create(recursive: true);
     await file.writeAsBytes(bytes, flush: true);
   }

@@ -47,7 +47,8 @@ void main() {
         const content = '// Firebase設定\nconst projectId = "test-project";\n';
 
         await ci.placeFileFromBase64(
-          path: 'apps/dashboard/lib/firebase_options.dart',
+          dir: const WorkspaceDirectory('apps/dashboard/lib'),
+          fileName: 'firebase_options.dart',
           base64Content: base64Encode(utf8.encode(content)),
         );
 
@@ -68,7 +69,8 @@ void main() {
       final bytes = List<int>.generate(256, (index) => index);
 
       await ci.placeFileFromBase64(
-        path: 'signing/certificate.p12',
+        dir: const WorkspaceDirectory('signing'),
+        fileName: 'certificate.p12',
         base64Content: base64Encode(bytes),
       );
 
@@ -87,7 +89,8 @@ void main() {
         );
 
         await ci.placeFileFromBase64(
-          path: 'config.txt',
+          dir: const WorkspaceDirectory('.'),
+          fileName: 'config.txt',
           base64Content: base64Encode(utf8.encode('new')),
         );
 
@@ -96,7 +99,11 @@ void main() {
     );
 
     test('accepts empty Base64 as an empty file', () async {
-      await ci.placeFileFromBase64(path: 'empty.txt', base64Content: '');
+      await ci.placeFileFromBase64(
+        dir: const WorkspaceDirectory('.'),
+        fileName: 'empty.txt',
+        base64Content: '',
+      );
 
       expect(await File('${workspace.path}/empty.txt').readAsBytes(), isEmpty);
     });
@@ -113,7 +120,8 @@ void main() {
 
           await expectLater(
             ci.placeFileFromBase64(
-              path: 'config/private.txt',
+              dir: const WorkspaceDirectory('config'),
+              fileName: 'private.txt',
               base64Content: 'private-base64-content!!!',
             ),
             throwsA(
@@ -147,7 +155,8 @@ void main() {
 
       await expectLater(
         ci.placeFileFromBase64(
-          path: 'blocked/config.txt',
+          dir: const WorkspaceDirectory('blocked'),
+          fileName: 'config.txt',
           base64Content: base64Encode(utf8.encode('new')),
         ),
         throwsA(isA<FileSystemException>()),

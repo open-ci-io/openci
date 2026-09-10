@@ -10,7 +10,8 @@ Future<void> main() async {
   );
 
   await genuineCI.placeFileFromBase64(
-    path: 'apps/dashboard/lib/firebase_options.dart',
+    dir: WorkspacePaths.root.apps.dashboard.lib,
+    fileName: 'firebase_options.dart',
     base64Content: Secrets.firebaseOptionsDartBase64,
   );
 
