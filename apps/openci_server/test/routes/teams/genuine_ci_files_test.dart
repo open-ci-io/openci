@@ -125,7 +125,7 @@ void main() {
         expect(request.method, 'GET');
         expect(
           request.url.path,
-          '/repos/openci-org/openci/contents/genuine_ci',
+          '/repos/openci-org/openci/contents/.genuineci',
         );
         expect(request.url.queryParameters['ref'], 'commit-sha-123');
         return http.Response('[]', HttpStatus.ok);

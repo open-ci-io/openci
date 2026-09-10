@@ -42,12 +42,12 @@ void main() {
         (_) async => createMockResponse([
           {
             'name': 'ci.dart',
-            'path': 'genuine_ci/ci.dart',
+            'path': '.genuineci/ci.dart',
             'content': _workflowSource(branch: 'main'),
           },
           {
             'name': 'develop.dart',
-            'path': 'genuine_ci/develop.dart',
+            'path': '.genuineci/develop.dart',
             'content': _workflowSource(branch: 'develop'),
           },
         ]),

@@ -132,7 +132,7 @@ Future<Response> _get(
       e,
       s,
       logMessage:
-          'Failed to fetch genuine_ci files for team $teamId, repo $repo',
+          'Failed to fetch .genuineci files for team $teamId, repo $repo',
     );
   }
 }
