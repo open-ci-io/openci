@@ -76,7 +76,12 @@ void main() {
 
     final source = await output.readAsString();
     expect(source, contains('abstract final class WorkspacePaths'));
-    expect(source, contains('String get dashboard => "apps/dashboard";'));
+    expect(
+      source,
+      contains(
+        'WorkspaceDirectory get dashboard => const WorkspaceDirectory("apps/dashboard");',
+      ),
+    );
     expect(source, isNot(contains(root.path)));
     expect(await secrets.readAsString(), '// Existing secrets\n');
     expect(logger.stdoutMessages, [t.sync.paths.saved(path: output.path)]);
@@ -95,7 +100,12 @@ void main() {
       expect(await runSync(workingDirectory: workflows), 0);
       final source = await output.readAsString();
       expect(source, contains('get packages =>'));
-      expect(source, contains('get dashboard => "packages/dashboard";'));
+      expect(
+        source,
+        contains(
+          'get dashboard => const WorkspaceDirectory("packages/dashboard");',
+        ),
+      );
       expect(source, isNot(contains('apps/dashboard')));
       expect(await runSync(), 0);
       expect(await output.readAsString(), source);
@@ -147,7 +157,7 @@ void main() {
 
     expect(
       await output.readAsString(),
-      contains('get dashboard => "apps/dashboard";'),
+      contains('get dashboard => const WorkspaceDirectory("apps/dashboard");'),
     );
     expect(await File(p.join(sdk.path, 'paths.g.dart')).exists(), isFalse);
   });
@@ -188,7 +198,10 @@ void main() {
 
     final source = await output.readAsString();
     expect(source, contains('get apps =>'));
-    expect(source, contains('get dashboard => "apps/dashboard";'));
+    expect(
+      source,
+      contains('get dashboard => const WorkspaceDirectory("apps/dashboard");'),
+    );
     expect(source, isNot(contains('frontend')));
   });
 
