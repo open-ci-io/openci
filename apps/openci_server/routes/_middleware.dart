@@ -31,7 +31,23 @@ Handler middleware(Handler handler) {
       .use(authProvider(_firebaseApp))
       .use(provider<FirebaseApp>((context) => _firebaseApp))
       .use(corsMiddleware())
+      .use(internalRoutesMiddleware())
       .use(requestLogger());
+}
+
+Middleware internalRoutesMiddleware({Map<String, String>? environment}) {
+  final env = environment ?? Platform.environment;
+  final enabled = env['ENABLE_INTERNAL_API'] == 'true';
+
+  return (handler) {
+    return (context) {
+      final segments = context.request.uri.pathSegments;
+      if (!enabled && segments.isNotEmpty && segments.first == 'internal') {
+        return Response(statusCode: HttpStatus.notFound);
+      }
+      return handler(context);
+    };
+  };
 }
 
 Middleware sentryMiddleware() {

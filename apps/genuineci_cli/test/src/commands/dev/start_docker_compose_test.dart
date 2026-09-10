@@ -64,7 +64,10 @@ void main() {
               }) async {
                 expect(executable, 'docker');
                 expect(workingDirectory, projectRoot.path);
-                expect(environment, {'PATH': '/usr/local/bin'});
+                expect(environment, {
+                  'PATH': '/usr/local/bin',
+                  'ENABLE_INTERNAL_API': 'true',
+                });
                 calls.add(args);
                 return 0;
               },
@@ -128,6 +131,7 @@ void main() {
         'BASE_VM_NAME': 'custom-base',
         'INTERNAL_API_KEY': 'custom-api-key',
         'ORCHARD_API_URL': 'https://custom-orchard.example.com',
+        'ENABLE_INTERNAL_API': 'true',
       });
       expect(logger.stderrMessages, isEmpty);
       expect(
@@ -139,13 +143,17 @@ void main() {
       );
     });
 
-    test('leaves unset configuration to Compose and its .env file', () async {
+    test('enables the API without mutating the input', () async {
       late Map<String, String> capturedEnvironment;
+      final suppliedEnvironment = {
+        'PATH': '/usr/local/bin',
+        'ENABLE_INTERNAL_API': 'false',
+      };
 
       final result = await startDockerCompose(
         logger,
         projectRoot,
-        environment: const {'PATH': '/usr/local/bin'},
+        environment: suppliedEnvironment,
         processRunner:
             (_, _, {required workingDirectory, required environment}) async {
               capturedEnvironment = environment;
@@ -154,7 +162,14 @@ void main() {
       );
 
       expect(result, isTrue);
-      expect(capturedEnvironment, {'PATH': '/usr/local/bin'});
+      expect(capturedEnvironment, {
+        'PATH': '/usr/local/bin',
+        'ENABLE_INTERNAL_API': 'true',
+      });
+      expect(suppliedEnvironment, {
+        'PATH': '/usr/local/bin',
+        'ENABLE_INTERNAL_API': 'false',
+      });
     });
 
     test(
@@ -175,12 +190,16 @@ void main() {
         expect(result, isTrue);
         expect(
           capturedEnvironment.keys,
-          unorderedEquals(Platform.environment.keys),
+          unorderedEquals({
+            ...Platform.environment.keys,
+            'ENABLE_INTERNAL_API',
+          }),
         );
+        expect(capturedEnvironment['ENABLE_INTERNAL_API'], 'true');
         expect(
-          capturedEnvironment.entries.every(
-            (entry) => entry.value == Platform.environment[entry.key],
-          ),
+          capturedEnvironment.entries
+              .where((entry) => entry.key != 'ENABLE_INTERNAL_API')
+              .every((entry) => entry.value == Platform.environment[entry.key]),
           isTrue,
         );
       },
