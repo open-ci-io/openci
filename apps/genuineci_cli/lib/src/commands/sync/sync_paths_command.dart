@@ -6,6 +6,7 @@ import 'package:cli_util/cli_logging.dart';
 import '../../extensions/file_extensions.dart';
 import '../../i18n/i18n.dart';
 import 'generate_workspace_paths.dart';
+import 'read_workspace_directories.dart';
 import 'read_workspace_packages.dart';
 
 class SyncPathsCommand extends Command<int> {
@@ -34,7 +35,8 @@ class SyncPathsCommand extends Command<int> {
         return 1;
       }
       final packages = await readWorkspacePackages(root);
-      final source = generateWorkspacePaths(packages.values);
+      final paths = await readWorkspaceDirectories(root, packages.values);
+      final source = generateWorkspacePaths(paths);
       final file = File('${root.path}/genuine_ci/paths.g.dart');
       await file.writeAsStringAtomic(source);
       _logger.stdout(t.sync.paths.saved(path: file.path));

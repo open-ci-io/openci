@@ -67,8 +67,11 @@ void main() {
   test('creates paths from a nested directory without login', () async {
     await output.delete();
     final nested = await Directory(
-      p.join(root.path, 'apps/dashboard/lib'),
-    ).create();
+      p.join(root.path, 'apps/dashboard/lib/src'),
+    ).create(recursive: true);
+    for (final name in ['.dart_tool', 'build']) {
+      await Directory(p.join(root.path, 'apps/dashboard', name)).create();
+    }
     final secrets = File(p.join(workflows.path, 'secrets.g.dart'));
     await secrets.writeAsString('// Existing secrets\n');
 
@@ -79,9 +82,19 @@ void main() {
     expect(
       source,
       contains(
-        'WorkspaceDirectory get dashboard => const WorkspaceDirectory("apps/dashboard");',
+        r'WorkspaceRoot$Apps$Dashboard get dashboard => '
+        r'const WorkspaceRoot$Apps$Dashboard._("apps/dashboard");',
       ),
     );
+    expect(
+      source,
+      contains(
+        'WorkspaceDirectory get lib => const WorkspaceDirectory("apps/dashboard/lib");',
+      ),
+    );
+    for (final field in ['src', 'dartTool', 'build']) {
+      expect(source, isNot(contains('get $field')));
+    }
     expect(source, isNot(contains(root.path)));
     expect(await secrets.readAsString(), '// Existing secrets\n');
     expect(logger.stdoutMessages, [t.sync.paths.saved(path: output.path)]);
@@ -188,6 +201,18 @@ void main() {
       );
     },
   );
+
+  test('preserves paths when a package subdirectory name is invalid', () async {
+    await Directory(p.join(root.path, 'apps/dashboard/class')).create();
+
+    expect(await runSync(), 1);
+
+    await expectPreserved();
+    expect(
+      logger.stderrMessages.single,
+      contains('Directory "class" cannot be used as a Dart field'),
+    );
+  });
 
   test('uses directory names even when the package name differs', () async {
     await File(
