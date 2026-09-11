@@ -13,6 +13,7 @@ workspace:
   - apps/openci_server
   - genuine_ci
   - packages/genuine_ci
+  - packages/genuineci_api_client
   - packages/macos_updater
   - packages/openci_shared
   - packages/pubspec_version_hook
