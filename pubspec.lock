@@ -1309,6 +1309,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0-rc.2"
+  serverpod_client:
+    dependency: transitive
+    description:
+      name: serverpod_client
+      sha256: "420fdc4ce9172ea1bd8d0ecf7d3a638d2666cc885538abf11ccf5e8c6ba26220"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0-rc.2"
   serverpod_database:
     dependency: transitive
     description:
