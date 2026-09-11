@@ -1,0 +1,6 @@
+include: ../../analysis_options.yaml
+
+linter:
+  rules:
+    # Serverpod 4.0.0-rc.2 generates an empty body for the Client constructor.
+    empty_constructor_bodies: false
