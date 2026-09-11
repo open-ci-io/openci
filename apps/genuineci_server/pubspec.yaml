@@ -1,0 +1,9 @@
+name: genuineci_server
+description: GenuineCI server.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.11.5
+
+resolution: workspace
