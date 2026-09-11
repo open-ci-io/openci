@@ -1,5 +1,5 @@
-name: genuineci_client
-description: Dart client for the GenuineCI server.
+name: genuineci_api_client
+description: Dart API client for the GenuineCI server.
 version: 0.0.1
 publish_to: none
 
