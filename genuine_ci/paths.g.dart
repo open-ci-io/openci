@@ -57,7 +57,6 @@ extension type const WorkspaceRoot$Apps$GenuineciCli._(String _path) implements 
 extension type const WorkspaceRoot$Apps$GenuineciServer._(String _path) implements WorkspaceDirectory {
   WorkspaceDirectory get bin => const WorkspaceDirectory("apps/genuineci_server/bin");
   WorkspaceDirectory get config => const WorkspaceDirectory("apps/genuineci_server/config");
-  WorkspaceDirectory get lib => const WorkspaceDirectory("apps/genuineci_server/lib");
 }
 
 extension type const WorkspaceRoot$Apps$OpenciServer._(String _path) implements WorkspaceDirectory {
