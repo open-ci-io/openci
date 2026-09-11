@@ -7,3 +7,6 @@ environment:
   sdk: ^3.11.5
 
 resolution: workspace
+
+dependencies:
+  serverpod: 3.4.13
