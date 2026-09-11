@@ -1,0 +1,5 @@
+apiServer:
+  port: 8180
+  publicHost: localhost
+  publicPort: 8180
+  publicScheme: http

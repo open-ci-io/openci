@@ -11,8 +11,34 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _is;
+import '../endpoints/greeting_endpoint.dart' as _imlzn9oq;
 
 class Endpoints extends _is.EndpointDispatch {
   @override
-  void initializeEndpoints(_is.Server server) {}
+  void initializeEndpoints(_is.Server server) {
+    var endpoints = <String, _is.Endpoint>{
+      'greeting': _imlzn9oq.GreetingEndpoint()
+        ..initialize(
+          server,
+          'greeting',
+          null,
+        ),
+    };
+    connectors['greeting'] = _is.EndpointConnector(
+      name: 'greeting',
+      endpoint: endpoints['greeting']!,
+      methodConnectors: {
+        'hello': _is.MethodConnector(
+          name: 'hello',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['greeting'] as _imlzn9oq.GreetingEndpoint)
+                  .hello(session),
+        ),
+      },
+    );
+  }
 }
