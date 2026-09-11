@@ -9,4 +9,5 @@ environment:
 resolution: workspace
 
 dependencies:
+  http: ^1.6.0
   serverpod_client: 4.0.0-rc.2
