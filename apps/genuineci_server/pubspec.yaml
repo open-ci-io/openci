@@ -4,6 +4,9 @@ version: 0.0.1
 publish_to: none
 
 environment:
-  sdk: ^3.11.5
+  sdk: ^3.12.2
 
 resolution: workspace
+
+dependencies:
+  serverpod: 4.0.0-rc.2
