@@ -51,6 +51,7 @@ void main() {
   late Map<String, Map<String, dynamic>> completions;
   late List<(Object, StackTrace)> errors;
   late List<http.Request> logRequests;
+  late List<String> apiLogs;
   late Map<String, Object> failures;
   late Map<String, Completer<void>> pending;
   late Future<http.Response> Function(http.Request) respondToLog;
@@ -108,19 +109,6 @@ void main() {
       })
       .toList();
 
-  List<String> stepLogs(String stepId) => logRequests
-      .map(_lokiStream)
-      .where((stream) {
-        final labels = stream['stream'] as Map<String, dynamic>;
-        return labels['type'] == 'step_log' && labels['step_id'] == stepId;
-      })
-      .map((stream) {
-        final values =
-            (stream['values'] as List<dynamic>).single as List<dynamic>;
-        return values[1] as String;
-      })
-      .toList();
-
   setUpAll(() {
     registerFallbackValue((String line, String stream) {});
   });
@@ -137,6 +125,7 @@ void main() {
     completions = {};
     errors = [];
     logRequests = [];
+    apiLogs = [];
     failures = {};
     pending = {};
     leaseId = 'lease-1';
@@ -168,6 +157,16 @@ void main() {
       final body = invocation.positionalArguments[1] as Map<String, dynamic>;
       runIds.add(body['id'] as String);
       await record('createRun');
+      return createMockResponse<void>(null);
+    });
+    when(
+      () => api.appendStepLog(job.id, any(), 'prepare_vm', any()),
+    ).thenAnswer((invocation) async {
+      expect(invocation.positionalArguments[1], runIds.single);
+      final body = invocation.positionalArguments[3] as Map<String, dynamic>;
+      final entry =
+          (body['logs'] as List<dynamic>).single as Map<String, dynamic>;
+      apiLogs.add(entry['message'] as String);
       return createMockResponse<void>(null);
     });
     when(() => api.resolveInstallationToken(job.id)).thenAnswer((_) async {
@@ -340,14 +339,12 @@ void main() {
         expect(steps.last.createdAt, steps.first.createdAt);
         expect(steps.last.updatedAt.isBefore(steps.first.updatedAt), isFalse);
 
-        expect(stepLogs('prepare_vm'), [
+        expect(apiLogs, [
           'Creating VM from test-macos-image and waiting for it to start.',
           'VM is ready.',
         ]);
-        expect(logRequests, hasLength(10));
+        expect(logRequests, hasLength(8));
         for (final (index, step) in [
-          'prepare_vm',
-          'prepare_vm',
           'prepare_vm',
           'prepare_vm',
           'checkout',
@@ -401,7 +398,7 @@ void main() {
           stepEvents('prepare_vm').single.status,
           BuildJobStatus.IN_PROGRESS,
         );
-        expect(stepLogs('prepare_vm'), [
+        expect(apiLogs, [
           'Creating VM from test-macos-image and waiting for it to start.',
         ]);
         expect(commands, isEmpty);
@@ -571,7 +568,7 @@ void main() {
                 : BuildJobStatus.SUCCESS,
           ],
         ]);
-        expect(stepLogs('prepare_vm'), [
+        expect(apiLogs, [
           if (!['createRun', 'token'].contains(stage)) ...[
             'Creating VM from test-macos-image and waiting for it to start.',
             ['createVm', 'waitVm'].contains(stage)
@@ -730,13 +727,31 @@ void main() {
       });
     }
 
+    test('reports API log failures without failing the workflow', () async {
+      when(
+        () => api.appendStepLog(job.id, any(), 'prepare_vm', any()),
+      ).thenAnswer(
+        (_) async => createMockResponse<void>(null, statusCode: 503),
+      );
+
+      expect(await execute(), BuildJobStatus.SUCCESS);
+
+      expectCompletion(BuildJobStatus.SUCCESS);
+      expect(errors, hasLength(2));
+      expect(
+        errors.map((entry) => entry.$1.toString()),
+        everyElement(contains('HTTP 503')),
+      );
+      expect(deletedVms, ['lease-1']);
+    });
+
     test('reports Loki failures without failing the workflow', () async {
       respondToLog = (_) async => http.Response('', 503);
 
       expect(await execute(), BuildJobStatus.SUCCESS);
 
       expectCompletion(BuildJobStatus.SUCCESS);
-      expect(errors, hasLength(10));
+      expect(errors, hasLength(8));
       expect(deletedVms, ['lease-1']);
     });
 
@@ -748,7 +763,7 @@ void main() {
 
       expectCompletion(BuildJobStatus.FAILURE);
       expect(stepEvents('prepare_vm').last.status, BuildJobStatus.FAILURE);
-      expect(errors, hasLength(5));
+      expect(errors, hasLength(3));
       expect(errors.last.$1, same(vmError));
       expect(errors.last.$2.toString(), sourceStack.toString());
       expect(deletedVms, ['lease-1']);
@@ -811,6 +826,16 @@ void main() {
     ]) {
       test('continues after $stepId $type delivery times out', () async {
         final response = Completer<http.Response>();
+        if (type == 'step_log') {
+          when(
+            () => api.appendStepLog(job.id, any(), stepId, any()),
+          ).thenAnswer((_) async {
+            if (stepEvents(stepId).last.status == BuildJobStatus.IN_PROGRESS) {
+              await response.future;
+            }
+            return createMockResponse<void>(null);
+          });
+        }
         respondToLog = (request) {
           final labels = _lokiStream(request)['stream'] as Map<String, dynamic>;
           if (labels['type'] == type &&
