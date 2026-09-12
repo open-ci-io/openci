@@ -31,7 +31,6 @@ extension type const WorkspaceRoot$Apps$BuildJobPlanner._(String _path) implemen
 
 extension type const WorkspaceRoot$Apps$BuildJobWorker._(String _path) implements WorkspaceDirectory {
   WorkspaceDirectory get bin => const WorkspaceDirectory("apps/build_job_worker/bin");
-  WorkspaceDirectory get integrationTest => const WorkspaceDirectory("apps/build_job_worker/integration_test");
   WorkspaceDirectory get lib => const WorkspaceDirectory("apps/build_job_worker/lib");
   WorkspaceDirectory get test => const WorkspaceDirectory("apps/build_job_worker/test");
 }
