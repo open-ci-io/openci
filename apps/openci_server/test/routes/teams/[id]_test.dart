@@ -9,7 +9,7 @@ import 'package:openci_server/database.dart';
 import 'package:openci_server/team/team_dao.dart';
 import 'package:test/test.dart';
 
-import '../../../routes/teams/[id].dart' as route;
+import '../../../routes/teams/[id]/index.dart' as route;
 
 class MockAppDatabase extends Mock implements AppDatabase {}
 
