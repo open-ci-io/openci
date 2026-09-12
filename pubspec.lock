@@ -281,14 +281,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.1"
-  config:
-    dependency: transitive
-    description:
-      name: config
-      sha256: "28dbe3a3b2881f929787d50681d7a3c37b0e7ed928232bf6e24f12995ec6c102"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.9.1"
   convert:
     dependency: transitive
     description:
@@ -845,14 +837,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  isolated_object:
-    dependency: transitive
-    description:
-      name: isolated_object
-      sha256: b52bf712237ee196a3724e8467fe1ef9286842070c22fcd57e01455e1539ab8f
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.0"
   jni:
     dependency: transitive
     description:
@@ -1197,46 +1181,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.0"
-  redis:
-    dependency: transitive
-    description:
-      name: redis
-      sha256: d7c7f18a374936baa786baf5f0e747aa5510bb289aad44b30ec41e3b703233b4
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.1.0"
-  relic:
-    dependency: transitive
-    description:
-      name: relic
-      sha256: "202cef8a41667b35bd93db662e360ab5be5f67493b539121ed6f8899b10d893f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0-rc.1"
-  relic_core:
-    dependency: transitive
-    description:
-      name: relic_core
-      sha256: "3c15d9655d2c95bdec6620f27ee99c0f2236343fa915ac6cb846cb6430d9c565"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0-rc.1"
-  relic_io:
-    dependency: transitive
-    description:
-      name: relic_io
-      sha256: "1808fc4fa6fa9580e013af119fe1504eb1ba01ad6db3808053dc18c53dda8c65"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0-rc.1"
-  rfc_6901:
-    dependency: transitive
-    description:
-      name: rfc_6901
-      sha256: "6a43b1858dca2febaf93e15639aa6b0c49ccdfd7647775f15a499f872b018154"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.1"
   riverpod:
     dependency: transitive
     description:
@@ -1301,62 +1245,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.5.2"
-  serverpod:
-    dependency: transitive
-    description:
-      name: serverpod
-      sha256: "05ba96e7fe1aba8e846dc4127c472bdd9f6375151d75715489dee6286773308f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0-rc.2"
-  serverpod_client:
-    dependency: transitive
-    description:
-      name: serverpod_client
-      sha256: "420fdc4ce9172ea1bd8d0ecf7d3a638d2666cc885538abf11ccf5e8c6ba26220"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0-rc.2"
-  serverpod_database:
-    dependency: transitive
-    description:
-      name: serverpod_database
-      sha256: f510994040addebc2c8b87817c824767579b533f5c3a9dddfb3dfe79b7e75a7e
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0-rc.2"
-  serverpod_embedded_postgres:
-    dependency: transitive
-    description:
-      name: serverpod_embedded_postgres
-      sha256: c5500d1c1294c89af3bb4a8a7b7c6aa8876dcffe67cbd7c4e79c883deeaeecdc
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0-rc.2"
-  serverpod_logging:
-    dependency: transitive
-    description:
-      name: serverpod_logging
-      sha256: "177d3f53144f2811c2df01bb5134fae59db48129fac62efef11d12407feae6a7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.0"
-  serverpod_serialization:
-    dependency: transitive
-    description:
-      name: serverpod_serialization
-      sha256: b170a4cb0f5c3b5a6de0b68302a5cc3feee260f18da1794821a95d0afa190ef3
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0-rc.2"
-  serverpod_shared:
-    dependency: transitive
-    description:
-      name: serverpod_shared
-      sha256: "8f381f2093d1ea57093ebce996374c7f23d3d4dae00f41fe249bc1e6509ef7b9"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0-rc.2"
   shared_preferences:
     dependency: transitive
     description:
@@ -1530,30 +1418,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.2"
-  sqlite3_connection_pool:
-    dependency: transitive
-    description:
-      name: sqlite3_connection_pool
-      sha256: b01024fd67922680e5512abf3201974dab2d98d0664d145ec741740b448fdc5f
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.11"
-  sqlite3_web:
-    dependency: transitive
-    description:
-      name: sqlite3_web
-      sha256: ef40711ea02a41f6c9b1b8be3d89d12c9ee23b6447bcd3c07b033a89a74b80f9
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.9.3"
-  sqlite_async:
-    dependency: transitive
-    description:
-      name: sqlite_async
-      sha256: "17176f00a10e5b8ba6e0205e42de1c15a94ff8762745fed19750b44b6bbd5649"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.14.3"
   sqlparser:
     dependency: transitive
     description:
@@ -1610,14 +1474,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.8"
-  synchronized:
-    dependency: transitive
-    description:
-      name: synchronized
-      sha256: "63896c27e81b28f8cb4e69ead0d3e8f03f1d1e5fc531a3e579cabed6a2c7c9e5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.4.0+1"
   system_info2:
     dependency: transitive
     description:
@@ -1626,14 +1482,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.0"
-  system_resources_2:
-    dependency: transitive
-    description:
-      name: system_resources_2
-      sha256: "3f1d7da26ece139d03e8679ca5d99faceadfdbb4edc108244aa4cc362b9181ef"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.2"
   term_glyph:
     dependency: transitive
     description:
@@ -1802,14 +1650,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.1"
-  whiskers:
-    dependency: transitive
-    description:
-      name: whiskers
-      sha256: "099799a838ebce1f28809547bb7f2e8fd9b44f4c2bebea9921ab548d95350b64"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.1"
   win32:
     dependency: transitive
     description:
@@ -1851,5 +1691,5 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.12.2 <4.0.0"
+  dart: ">=3.11.5 <4.0.0"
   flutter: ">=3.41.6 <4.0.0"

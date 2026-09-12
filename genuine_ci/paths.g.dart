@@ -20,7 +20,6 @@ extension type const WorkspaceRoot$Apps._(String _path) implements WorkspaceDire
   WorkspaceRoot$Apps$BuildJobWorker get buildJobWorker => const WorkspaceRoot$Apps$BuildJobWorker._("apps/build_job_worker");
   WorkspaceRoot$Apps$Dashboard get dashboard => const WorkspaceRoot$Apps$Dashboard._("apps/dashboard");
   WorkspaceRoot$Apps$GenuineciCli get genuineciCli => const WorkspaceRoot$Apps$GenuineciCli._("apps/genuineci_cli");
-  WorkspaceRoot$Apps$GenuineciServer get genuineciServer => const WorkspaceRoot$Apps$GenuineciServer._("apps/genuineci_server");
   WorkspaceRoot$Apps$OpenciServer get openciServer => const WorkspaceRoot$Apps$OpenciServer._("apps/openci_server");
 }
 
@@ -54,13 +53,6 @@ extension type const WorkspaceRoot$Apps$GenuineciCli._(String _path) implements 
   WorkspaceDirectory get test => const WorkspaceDirectory("apps/genuineci_cli/test");
 }
 
-extension type const WorkspaceRoot$Apps$GenuineciServer._(String _path) implements WorkspaceDirectory {
-  WorkspaceDirectory get bin => const WorkspaceDirectory("apps/genuineci_server/bin");
-  WorkspaceDirectory get config => const WorkspaceDirectory("apps/genuineci_server/config");
-  WorkspaceDirectory get integrationTest => const WorkspaceDirectory("apps/genuineci_server/integration_test");
-  WorkspaceDirectory get lib => const WorkspaceDirectory("apps/genuineci_server/lib");
-}
-
 extension type const WorkspaceRoot$Apps$OpenciServer._(String _path) implements WorkspaceDirectory {
   WorkspaceDirectory get integrationTest => const WorkspaceDirectory("apps/openci_server/integration_test");
   WorkspaceDirectory get lib => const WorkspaceDirectory("apps/openci_server/lib");
@@ -70,7 +62,6 @@ extension type const WorkspaceRoot$Apps$OpenciServer._(String _path) implements 
 
 extension type const WorkspaceRoot$Packages._(String _path) implements WorkspaceDirectory {
   WorkspaceRoot$Packages$GenuineCi get genuineCi => const WorkspaceRoot$Packages$GenuineCi._("packages/genuine_ci");
-  WorkspaceRoot$Packages$GenuineciApiClient get genuineciApiClient => const WorkspaceRoot$Packages$GenuineciApiClient._("packages/genuineci_api_client");
   WorkspaceRoot$Packages$MacosUpdater get macosUpdater => const WorkspaceRoot$Packages$MacosUpdater._("packages/macos_updater");
   WorkspaceRoot$Packages$OpenciShared get openciShared => const WorkspaceRoot$Packages$OpenciShared._("packages/openci_shared");
   WorkspaceRoot$Packages$PubspecVersionHook get pubspecVersionHook => const WorkspaceRoot$Packages$PubspecVersionHook._("packages/pubspec_version_hook");
@@ -79,11 +70,6 @@ extension type const WorkspaceRoot$Packages._(String _path) implements Workspace
 extension type const WorkspaceRoot$Packages$GenuineCi._(String _path) implements WorkspaceDirectory {
   WorkspaceDirectory get lib => const WorkspaceDirectory("packages/genuine_ci/lib");
   WorkspaceDirectory get test => const WorkspaceDirectory("packages/genuine_ci/test");
-}
-
-extension type const WorkspaceRoot$Packages$GenuineciApiClient._(String _path) implements WorkspaceDirectory {
-  WorkspaceDirectory get example => const WorkspaceDirectory("packages/genuineci_api_client/example");
-  WorkspaceDirectory get lib => const WorkspaceDirectory("packages/genuineci_api_client/lib");
 }
 
 extension type const WorkspaceRoot$Packages$MacosUpdater._(String _path) implements WorkspaceDirectory {
