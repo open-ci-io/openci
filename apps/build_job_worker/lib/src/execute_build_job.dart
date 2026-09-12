@@ -16,6 +16,7 @@ import 'orchard/orchard_api_client.dart';
 import 'orchard/prepare_vm.dart';
 import 'resolve_github_installation_token.dart';
 import 'run_workflow.dart';
+import 'send_step_log_chunk.dart';
 
 Future<BuildJobStatus> executeBuildJob({
   required OpenCiApiService api,
@@ -52,6 +53,16 @@ Future<BuildJobStatus> executeBuildJob({
       'step_log': ?logMessage,
     }.entries) {
       try {
+        if (entry.key == 'step_log') {
+          await sendStepLogChunk(
+            api: api,
+            jobId: job.id,
+            runId: runId,
+            stepId: step.id,
+            lines: [entry.value],
+          ).timeout(const Duration(seconds: 10));
+          continue;
+        }
         await pushLogToLoki(
           client: lokiClient,
           lokiUrl: config.internalLokiUrl,

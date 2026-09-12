@@ -164,6 +164,7 @@ void main() {
         final deletion = Completer<HttpRequest>();
         final updates = <(String, Map<String, dynamic>)>[];
         final logs = <Map<String, dynamic>>[];
+        final apiLogs = <dynamic>[];
         var claims = 0;
         late String runId;
         late String vmName;
@@ -194,6 +195,10 @@ void main() {
                 'success': true,
                 'secretsContent': 'TEST_SECRET=test-secret-value',
               });
+            case ('POST', final path)
+                when path == '/builds/job-1/runs/$runId/steps/prepare_vm/logs':
+              apiLogs.addAll((await _body(request))['logs'] as List<dynamic>);
+              await _reply(request, {'success': true});
             case ('PATCH', final path) when path == '/builds/job-1/runs/$runId':
               updates.add(('run', await _body(request)));
               await _reply(request, null, statusCode: 204);
@@ -305,7 +310,14 @@ void main() {
           'status': 'completed',
           'conclusion': conclusion,
         });
-        expect(logs, hasLength(10));
+        expect(apiLogs, [
+          {
+            'message':
+                'Creating VM from test-base-macos and waiting for it to start.',
+          },
+          {'message': 'VM is ready.'},
+        ]);
+        expect(logs, hasLength(8));
         final streams = logs
             .map(
               (log) =>
@@ -351,13 +363,8 @@ void main() {
                   'step_log',
             )
             .toList();
-        expect(outputLogs, hasLength(4));
+        expect(outputLogs, hasLength(2));
         for (final (index, (stepId, message)) in [
-          (
-            'prepare_vm',
-            'Creating VM from test-base-macos and waiting for it to start.',
-          ),
-          ('prepare_vm', 'VM is ready.'),
           ('checkout', 'checkout output'),
           ('run_workflow', 'workflow output'),
         ].indexed) {
