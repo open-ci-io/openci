@@ -15,8 +15,8 @@ import '../../routes/builds/[id]/runs/index.dart' as runs;
 import '../../routes/builds/index.dart' as builds;
 import '../../routes/devices/[id].dart' as device;
 import '../../routes/devices/index.dart' as devices;
-import '../../routes/teams/[id].dart' as team;
-import '../../routes/teams/[id]/github/repositories.dart' as repositories;
+import '../../routes/teams/[id]/index.dart' as team;
+import '../../routes/teams/[id]/github/repositories/index.dart' as repositories;
 import '../../routes/teams/[id]/github/repositories/[owner]/[repo]/branches.dart'
     as branches;
 import '../../routes/teams/[id]/repositories/[repo]/genuine-ci-files.dart'

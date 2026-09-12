@@ -10,7 +10,7 @@ import 'package:openci_server/database.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
-import '../../../routes/teams/[id]/github/repositories.dart'
+import '../../../routes/teams/[id]/github/repositories/index.dart'
     as repositories_route;
 
 const testRsaPrivateKey = '''
