@@ -172,17 +172,12 @@ Sentryへの送信はjobの処理を待たせずに行い、worker終了時に�
 
 ## 検証
 
-このディレクトリで実行します。WebSocketテストはローカルのテスト用サーバーを自動起動するため、OrchardやVMの起動は不要です。
-ファイル書き込みテストはmacOSまたはLinuxの`/bin/sh`と`base64`を使い、一時ディレクトリ内で検証します。
-checkoutテストはローカルの`git`も使い、一時リポジトリで取得結果を検証します。
-ワークフローのテストは一時ディレクトリ内のテスト用Flutterコマンドで、環境変数・実行順・終了コードを検証します。
-起動テストは子プロセスとローカルの偽APIで、認証・ログ送信・結果保存・停止時の後片付けを検証します。停止シグナルのテストはmacOS・Linux向けです。
+このディレクトリで、フォーマット・静的解析・`test/` の単体テストを確認します。
 
 ```sh
-dart format --output=none --set-exit-if-changed .
+dart format --output=none --set-exit-if-changed lib test bin
 dart analyze --fatal-infos
 dart test
-dart test integration_test
 ```
 
 DockerイメージはDart 3.12.2でコンパイルし、非rootユーザーで実行します。リポジトリルートで次の検証を行えます。

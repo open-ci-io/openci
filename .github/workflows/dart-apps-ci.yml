@@ -102,11 +102,6 @@ jobs:
           dart test test integration_test --coverage=coverage/raw
           dart run coverage:format_coverage --lcov --in=coverage/raw --out=coverage/lcov.info --report-on=lib --report-on=routes --base-directory=.
 
-      - name: Run worker startup tests
-        if: matrix.app == 'build_job_worker'
-        working-directory: ${{ matrix.path }}
-        run: dart test integration_test
-
       - name: Normalize coverage paths
         run: >-
           sed --in-place
