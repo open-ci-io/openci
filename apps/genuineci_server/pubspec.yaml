@@ -10,3 +10,8 @@ resolution: workspace
 
 dependencies:
   serverpod: 4.0.0-rc.2
+
+dev_dependencies:
+  genuineci_api_client:
+    path: ../../packages/genuineci_api_client
+  test: ^1.31.0
