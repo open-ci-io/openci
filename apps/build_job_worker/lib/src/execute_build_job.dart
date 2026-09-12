@@ -18,6 +18,15 @@ import 'resolve_github_installation_token.dart';
 import 'run_workflow.dart';
 import 'send_step_log_chunk.dart';
 
+enum _StepEntryType {
+  stepEvent('step_event'),
+  stepLog('step_log');
+
+  const _StepEntryType(this.value);
+
+  final String value;
+}
+
 Future<BuildJobStatus> executeBuildJob({
   required OpenCiApiService api,
   required OrchardApiClient orchardApi,
@@ -48,12 +57,12 @@ Future<BuildJobStatus> executeBuildJob({
   final errors = <(Object, StackTrace)>[];
 
   Future<void> reportStep(BuildStep step, {String? logMessage}) async {
-    for (final entry in {
-      'step_event': jsonEncode(step.toJson()),
-      'step_log': ?logMessage,
+    for (final entry in <_StepEntryType, String>{
+      _StepEntryType.stepEvent: jsonEncode(step.toJson()),
+      _StepEntryType.stepLog: ?logMessage,
     }.entries) {
       try {
-        if (entry.key == 'step_log') {
+        if (entry.key == _StepEntryType.stepLog) {
           await sendStepLogChunk(
             api: api,
             jobId: job.id,
@@ -69,7 +78,7 @@ Future<BuildJobStatus> executeBuildJob({
           runId: runId,
           jobId: job.id,
           stepId: step.id,
-          type: entry.key,
+          type: entry.key.value,
           message: entry.value,
         ).timeout(const Duration(seconds: 10));
       } catch (error, stackTrace) {
